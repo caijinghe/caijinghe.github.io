@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jinghe Cai</title>
+    <link rel="icon" href="media/logo.svg" type="image/svg+xml" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet">
+
+
+
+    <link rel="stylesheet" href="css/style.css" />
+
+    <script type="module" src="js/cursor.js"></script>
+    <script type="module" src="js/lepal.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* ✅ 允许纵向滚动；保留 100vh 视觉但不锁死高度 */
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+            /* 只禁水平滚动 */
+            overflow-y: auto;
+            /* 允许垂直滚动 */
+        }
+
+        /* 顶部返回按钮（沿用你的样式） */
+        .logo-button {
+            position: fixed;
+            /* 固定方便随时返回 */
+            top: 3vw;
+            left: 4vw;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            border: 1px solid #ffffff80;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            background: transparent;
+            z-index: 10;
+            backdrop-filter: blur(2px);
+            transition: border-color .2s ease, transform .2s ease;
+        }
+
+
+
+        .logo-button img {
+            width: 36px;
+            height: 36px;
+        }
+
+        /* 主容器：竖向堆叠 */
+        .stack {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            /* 大图无缝衔接 */
+        }
+
+        /* 每一个版块（图/视频都用它包裹） */
+        .block {
+            width: 100vw;
+            position: relative;
+        }
+
+
+
+
+
+        /* 中间层：流星画布 */
+        .meteor-canvas {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            /* 在图片下方 */
+            pointer-events: none;
+        }
+
+        /* 顶层：你的 PNG 封面图或视频 */
+        .block.cover>img,
+        .block.cover>video {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* 全宽媒体：图片/视频统一规格 */
+        .block img {
+            display: block;
+            width: 100vw;
+            /* 全宽 */
+            height: auto;
+            /* 图片按比例 */
+        }
+
+        .block video {
+            display: block;
+            width: 100vw;
+            /* 全宽 */
+            height: auto;
+            /* 图片按比例 */
+        }
+
+        /* ✅ 中等尺寸的视频段（非全屏），居中显示 */
+        .block.video-focus {
+            display: flex;
+            justify-content: center;
+            padding: 4vh 0;
+            background: #000;
+        }
+
+
+        .video-frame {
+            width: 80%;
+            /* 控制缩小比例，例如 70% */
+            max-width: 1100px;
+            /* 设置一个最大宽度 */
+            aspect-ratio: 16 / 9;
+            overflow: hidden;
+            box-shadow: 0 10px 24px rgba(0, 0, 0, .35);
+        }
+
+
+        .video-frame>video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* 需要完整画面可改为 contain */
+        }
+
+
+        /* 如果你想要「固定高、充满裁切」的封面型段落，可给该 block 加 .cover */
+        .block.cover {
+            /* height: 100vh; */
+            overflow: hidden;
+        }
+
+        .block.cover img,
+        .block.cover video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* 1pt 白色分隔线（全宽、无额外间距） */
+        .divider {
+            height: 0.3pt;
+            width: 100vw;
+            background: #565656;
+            margin: 0;
+            /* 不增加上下空隙 */
+            pointer-events: none;
+            /* 不影响鼠标事件 */
+        }
+
+        /* 文案说明（偶尔需要时） */
+        .caption {
+            position: absolute;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #ccc;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, .5);
+        }
+
+        /* 容器本身 */
+
+        .center {
+            width: 100%;
+            text-align: center;
+            padding-inline: clamp(16px, 5vw, 80px);
+            /* 
+    🔹 左右内边距最少 16px，最多 80px，
+    中间值按 5% viewport 宽度自适应
+  */
+            box-sizing: border-box;
+        }
+
+
+        #animated-text {
+            font-family: 'Nunito', sans-serif;
+            font-size: 3.5vw;
+            text-align: center;
+            background: linear-gradient(90deg,
+                    #8be9fd,
+                    /* 浅蓝 */
+                    #82cfff,
+                    /* 天蓝 */
+                    #bd93f9,
+                    /* 淡紫 */
+                    #ff79c6,
+                    /* 粉 */
+                    #ffb6e6,
+                    /* 淡粉 */
+                    #8be9fd
+                    /* 回到浅蓝 */
+                );
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 300% 100%;
+            display: inline-block;
+            position: relative;
+        }
+
+        #animated-text span {
+            display: inline-block;
+            white-space: pre;
+            opacity: 1;
+            /* 打字机直接显现，不需要提前隐藏 */
+        }
+
+
+
+        /* 容器相对定位 */
+        .splash-block {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* 背景图 */
+        .splash-bg {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+
+        /* 手机框通用样式 */
+        .phone-frame {
+            position: absolute;
+            top: 53%;
+            /* 垂直居中 */
+            transform: translateY(-50%);
+            width: 260px;
+            /* 手机宽度，可调 */
+            aspect-ratio: 9 / 19.5;
+            /* 手机比例：9:19.5 (常见全面屏) */
+            border-radius: 35px;
+            border: 2px solid #888;
+            /* 圆角边框 */
+            overflow: hidden;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+            background: #000;
+        }
+
+        /* 视频填充 */
+        .phone-frame video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            border-radius: 30px;
+        }
+
+
+        /* 左右位置 */
+        .phone-left {
+            left: 39%;
+            /* 具体位置自己调 */
+        }
+
+        .phone-right {
+            right: 18%;
+            /* 具体位置自己调 */
+        }
+
+
+
+
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            /* 光标宽度，细一点更自然 */
+            height: 1em;
+            /* ✅ 跟字体大小保持一致 */
+            background: #fff;
+            margin-left: 2px;
+            animation: blink 0.7s steps(1) infinite;
+            vertical-align: middle;
+            /* ✅ 用 middle 对齐，而不是 bottom */
+            position: relative;
+            top: 0.1em;
+            /* ✅ 微调，防止位移 */
+        }
+
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+
+
+
+
+        /* footer 先保留样式（注释掉 DOM），最后再启用 */
+        footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 4vw;
+            font-size: 12px;
+            border-top: 1px solid #222;
+            color: #aaa;
+        }
+
+        .more-wrapper {
+            text-decoration: none;
+        }
+
+        .more-text {
+            position: relative;
+            width: 135px;
+            height: 38px;
+            border: 1px solid #ffffff66;
+            border-radius: 999px;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 600px;
+            cursor: none;
+        }
+
+        .more-text .face {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 300;
+            color: #fff;
+            backface-visibility: hidden;
+            transform-style: preserve-3d;
+            transition: transform 1.2s cubic-bezier(0.22, 1.61, 0.36, 1);
+        }
+
+        .more-text .top {
+            transform: rotateX(90deg) translateY(-100%);
+            transform-origin: top;
+        }
+
+        .more-wrapper:hover .more-text .front {
+            transform: rotateX(-90deg) translateY(100%);
+            transform-origin: bottom;
+        }
+
+        .more-wrapper:hover .more-text .top {
+            transform: rotateX(0deg);
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 返回按钮 -->
+    <a href="work.html" class="logo-button" aria-label="Back to Works">
+        <img src="media/wander/logo_withe.svg" alt="Back" />
+    </a>
+
+    <!-- 纵向堆叠的媒体区 -->
+    <main class="stack" id="lepal-stack">
+        <!-- ✅ 示例：全屏封面（裁切） -->
+        <section class="block cover" data-meteors>
+            <img src="media/lepal/cover.png" loading="eager" alt="LePal Cover" />
+        </section>
+
+
+        <!-- ✅ 示例：普通大图（不裁切） -->
+        <section class="block">
+            <img src="media/lepal/role.svg" loading="lazy" alt="Intro shot" />
+        </section>
+
+        <!-- <div class="divider" aria-hidden="true"></div> -->
+
+        <section class="block">
+            <img src="media/lepal/overview.svg" loading="lazy" alt="Intro shot" />
+        </section>
+
+        <section class="block">
+            <img src="media/lepal/overview1-1.png" loading="lazy" alt="Intro shot" />
+        </section>
+
+        <section class="block">
+            <img src="media/lepal/overview1-2.svg" loading="lazy" alt="Intro shot" />
+        </section>
+
+
+
+        <section class="block">
+            <img src="media/lepal/process.svg" loading="lazy" alt="Intro shot" />
+        </section>
+
+
+
+        <section class="block">
+            <img src="media/lepal/problem.svg" loading="lazy" alt="Intro shot" />
+        </section>
+
+
+        <section class="block">
+            <img src="media/lepal/hmw1-1.svg" loading="lazy" alt="Intro shot" />
+        </section>
+
+
+        <section class="block video-focus" id="onboarding-video">
+            <div class="video-frame">
+                <video class="lepal-video" playsinline muted loop preload="metadata" poster="media/lepal/snap.svg">
+                    <source src="media/lepal/onboarding.mp4" type="video/mp4" />
+                </video>
+            </div>
+        </section>
+
+
+        <section class="block">
+            <img src="media/lepal/hmw1-2.svg" loading="lazy" alt="Intro shot" />
+        </section>
+
+
+        <section class="block">
+            <img src="media/lepal/hmw2.svg" loading="lazy" alt="Intro shot" />
+        </section>
+
+        <section class="block">
+            <img src="media/lepal/hmw3-1.svg" loading="lazy" alt="Intro shot" />
+        </section>
+
+        <section class="block video-focus" id="ia-video">
+            <div class="video-frame">
+                <video class="lepal-video" playsinline webkit-playsinline muted loop preload="auto"
+                    poster="media/lepal/snap.svg" style="background:#000">
+                    <source src="media/lepal/ia.mp4" type="video/mp4" />
+                </video>
+            </div>
+        </section>
+
+
+        <section class="block">
+            <img src="media/lepal/hmw3-2.svg" loading="lazy" alt="Intro shot" />
+        </section>
+
+
+        <section class="block">
+            <img src="media/lepal/strategy1.svg" loading="lazy" alt="Intro shot" />
+        </section>
+
+
+        <section class="block">
+            <img src="media/lepal/strategy2.svg" loading="lazy" alt="Intro shot" />
+        </section>
+
+        <section class="block">
+            <img src="media/lepal/strategy3.svg" loading="lazy" alt="Intro shot" />
+        </section>
+
+
+        <div class="center">
+            <h1 class="gradient-text" id="animated-text">
+                “A Private Corner for Your Emotions”
+            </h1>
+        </div>
+
+
+        <section class="block">
+            <img src="media/lepal/strategy4.svg" loading="lazy" alt="Intro shot" />
+        </section>
+
+        <section class="block">
+            <img src="media/lepal/strategy5.svg" loading="lazy" alt="Intro shot" />
+        </section>
+
+        <section class="block">
+            <img src="media/lepal/iteration.svg" loading="lazy" alt="Intro shot" />
+        </section>
+
+
+
+        <section class="block">
+            <img src="media/lepal/designsystem.svg" loading="lazy" alt="Intro shot" />
+        </section>
+
+
+        <section class="block splash-block">
+            <!-- 背景图 -->
+            <img src="media/lepal/splash.svg" loading="lazy" alt="Intro shot" class="splash-bg" />
+
+            <!-- 左侧视频 -->
+            <div class="phone-frame phone-left">
+                <video autoplay muted loop playsinline>
+                    <source src="media/lepal/splash1.mp4" type="video/mp4" />
+                </video>
+            </div>
+
+            <!-- 右侧视频 -->
+            <div class="phone-frame phone-right">
+                <video autoplay muted loop playsinline>
+                    <source src="media/lepal/splash2.mp4" type="video/mp4" />
+                </video>
+            </div>
+        </section>
+
+
+
+
+
+        <!-- ✅ 示例：视频段落（自动静音循环，进入视口自动播放） -->
+        <section class="block cover">
+            <video class="lepal-video" playsinline muted loop preload="metadata" poster="media/lepal/snap.svg">
+                <source src="media/lepal/03.mp4" type="video/mp4" />
+                <!-- 可加 webm 作为备选 -->
+            </video>
+            <!-- <div class="caption">Optional video caption</div> -->
+        </section>
+
+        <!-- ✅ 更多大图 -->
+        <section class="block">
+            <img src="media/lepal/04.jpg" loading="lazy" alt="Detail 1" />
+        </section>
+        <section class="block">
+            <img src="media/lepal/05.jpg" loading="lazy" alt="Detail 2" />
+        </section>
+    </main>
+
+    <div id="custom-cursor"></div>
+
+
+</body>
+
+</html>

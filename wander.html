@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wander</title>
+    <link rel="icon" href="media/logo.svg" type="image/svg+xml" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" href="css/style.css" />
+    <script type="module" src="js/cursor.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: #ffffff;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+
+        .content {
+            flex: 1;
+            display: flex;
+            /* height: 100vh; */
+            align-items: stretch;
+            overflow: hidden;
+        }
+
+
+
+        .left-panel {
+            flex: 1;
+            padding: 8vw 4vw 3vw 4vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+
+        }
+
+        .info-award-wrapper {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 2vw;
+            /* ❌ 不需要 margin-top 或 margin-bottom */
+        }
+
+        .project-info {
+            /* display: flex; */
+            /* flex-direction: row; */
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 2vw;
+            /* ❌ 不需要 margin-top 或 margin-bottom */
+        }
+
+
+        .project-info h1 {
+            font-size: 3rem;
+            font-weight: 300;
+            /* margin-top: 10rem; */
+        }
+
+        .project-info h2 {
+            font-size: 0.9rem;
+            font-weight: 200;
+            line-height: 1.5;
+        }
+
+        .project-info p {
+            font-size: 1rem;
+            font-weight: 200;
+            margin-top: 30px;
+            line-height: 1.6;
+        }
+
+        .award {
+            width: 25vh;
+        }
+
+        .project-title {
+            font-size: 3rem;
+            font-weight: 300;
+        }
+
+
+        .project-text {
+            font-size: 14px;
+            display: inline-block;
+            line-height: 1.6;
+        }
+
+        .paper-button {
+            font-family: inherit;
+            font-size: 13px;
+            padding: 4px 10px;
+            margin-top: 6px;
+            border: 1px solid #111;
+            background: #ffffff;
+            color: #000000;
+            border-radius: 6px;
+            cursor: none;
+            transition: background 0.3s ease;
+        }
+
+        .paper-button:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+
+
+        .right-panel {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4vw;
+            padding-left: 0;
+        }
+
+        .video {
+
+            max-width: 60vw;
+            border-radius: 8px;
+        }
+
+        .logo-button {
+            position: absolute;
+            top: 3vw;
+            left: 4vw;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            border: 1px solid #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            background: transparent;
+            z-index: 10;
+        }
+
+        .logo-button img {
+            width: 36px;
+            height: 36px;
+        }
+
+        footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 4vw;
+            font-size: 0.8rem;
+            border-top: 0.8px solid #ffffff;
+        }
+
+        footer span {
+            color: #ffffff;
+            font-weight: 300;
+        }
+
+        .more-wrapper {
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .more-text {
+            position: relative;
+            width: 135px;
+            height: 38px;
+            border: 1px solid #ffffff;
+            border-radius: 999px;
+            overflow: hidden;
+            perspective: 600px;
+            display: inline-block;
+            cursor: none;
+        }
+
+        .more-text .face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 300;
+            color: #ffffff;
+            backface-visibility: hidden;
+            transform-style: preserve-3d;
+            transition: transform 1.5s cubic-bezier(0.22, 1.61, 0.36, 1);
+        }
+
+        .more-text .top {
+            transform: rotateX(90deg) translateY(-100%);
+            transform-origin: top;
+        }
+
+        .more-wrapper:hover .more-text .front {
+            transform: rotateX(-90deg) translateY(100%);
+            transform-origin: bottom;
+        }
+
+        .more-wrapper:hover .more-text .top {
+            transform: rotateX(0deg);
+            font-weight: 500;
+        }
+
+        .divider {
+            display: none;
+        }
+
+        @media (max-width: 1300px) {
+            html {
+                height: auto !important;
+                overflow-x: hidden;
+            }
+
+            html,
+            body {
+                height: auto;
+                min-height: 100vh;
+                overflow-x: hidden;
+            }
+
+            .content {
+                flex-direction: column;
+                height: auto !important;
+            }
+
+            .left-panel {
+                padding: 10vw 8vw 0 8vw;
+            }
+
+
+            .info-award-wrapper {
+                flex-direction: row;
+                align-items: flex-start;
+                justify-content: space-between;
+                gap: 1vw;
+                margin-top: 0vh;
+            }
+
+            .project-info h1 {
+                font-size: 1.8rem;
+                font-weight: 300;
+                margin-top: 0;
+            }
+
+            .project-info p {
+                font-size: 0.8rem;
+                font-weight: 200;
+                margin-top: 1rem;
+                line-height: 1.5;
+            }
+
+            .award {
+                margin-top: 6rem;
+                width: 200px;
+            }
+
+            .divider {
+                display: none;
+                width: 100%;
+                height: 0.8px;
+                background-color: #8f8f8f;
+                border: none;
+            }
+
+            .right-panel {
+                padding: 4vw 8vw 15vw 8vw;
+            }
+
+            .video {
+                width: 100%;
+                max-width: none;
+                /* ✅ 关键：覆盖掉默认 max-width */
+                height: auto;
+                /* ✅ 给它更大的高度，撑起来 */
+                object-fit: cover;
+                /* ✅ 防止变形并填满空间 */
+                border-radius: 8px;
+            }
+
+
+
+
+
+            .logo-button {
+                top: 8vw;
+                left: 8vw;
+                width: 45px;
+                height: 45px;
+                border-radius: 50%;
+                border: 1px solid #ffffff;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-decoration: none;
+                flex-shrink: 0;
+            }
+
+            .logo-bottom {
+                display: flex;
+                flex-direction: row;
+                /* ✅ 关键：横向排列 */
+                align-items: center;
+                justify-content: space-between;
+                gap: 1rem;
+                flex-wrap: wrap;
+            }
+
+
+
+            .logo-button img {
+                width: 30px;
+                height: 30px;
+            }
+
+
+
+            footer {
+                padding: 20px 8vw;
+            }
+
+            footer span {
+                font-size: 0.75rem;
+                color: #FFFCF2;
+            }
+
+            .more-text {
+                width: 110px;
+                height: 30px;
+                border: 0.8px solid #ffffff;
+            }
+
+            .more-text .face {
+                font-size: 0.75rem;
+                font-weight: 200;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content">
+        <div class="left-panel">
+            <a href="work.html" class="logo-button">
+                <img src="media/wander/logo_withe.svg" alt="Back" />
+            </a>
+            <div class="info-award-wrapper">
+                <div class="project-info">
+                    <!-- <img src="media/wander/chiplay.svg" alt="Award" class="award" /> -->
+                    <p>
+
+                        <img src="media/wander/chiplay.svg" alt="Award" class="award" />
+
+                    <h1>Wander</h1>
+
+                    <p>Gamified Sleep Experience<br />
+                        Oct 2021, Research Work</p>
+
+                    <h2>
+                        Nighttime phone use is a major cause of sleep disorders. Our approach is to introduce
+                        lightweight interventions across the sleep cycle to gently modify this behavior. The core of
+                        this strategy is a breath-controlled audio game that reframes the smartphone as a sleep aid. It
+                        uses gamification to guide users through breathing exercises, turning the source of the problem
+                        into the solution for a healthier sleep habit.
+                    </h2>
+
+                    <a href="https://scholar.google.com/citations?view_op=view_citation&hl=en&user=USR_nP8AAAAJ&citation_for_view=USR_nP8AAAAJ:u-x6o8ySG0sC"
+                        target="_blank">
+                        <button class="paper-button">Paper Download</button>
+                    </a><br /><br />
+
+
+
+                    </p>
+                </div>
+            </div>
+
+
+
+
+
+
+
+
+        </div>
+
+        <hr class="divider" />
+
+        <div class="right-panel">
+            <video controls class="video">
+                <source src="media/wander/wander.mp4" type="video/mp4" />
+                <track src="media/wander/wander.vtt" kind="subtitles" srclang="en" label="English" default>
+            </video>
+        </div>
+
+    </div>
+
+    <footer>
+        <span>© 2025 Jinghe Cai. All rights reserved.</span>
+        <a href="work.html" class="more-wrapper">
+            <span class="more-text">
+                <span class="face front">MORE WORKS</span>
+                <span class="face top">MORE WORKS</span>
+            </span>
+        </a>
+    </footer>
+
+    <div id="custom-cursor"></div>
+
+    <script>
+        const images = document.querySelectorAll('.carousel-image');
+        const dotsContainer = document.querySelector('.dots');
+        let current = 0;
+        let interval;
+
+        function showImage(index) {
+            images.forEach((img, i) => {
+                img.classList.toggle('active', i === index);
+            });
+            document.querySelectorAll('.dot').forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+            current = index;
+        }
+
+        function createDots() {
+            images.forEach((_, i) => {
+                const dot = document.createElement('div');
+                dot.classList.add('dot');
+                if (i === 0) dot.classList.add('active');
+                dot.addEventListener('click', () => {
+                    showImage(i);
+                    resetInterval();
+                });
+                dotsContainer.appendChild(dot);
+            });
+        }
+
+        function nextImage() {
+            showImage((current + 1) % images.length);
+        }
+
+        function startInterval() {
+            interval = setInterval(nextImage, 4000);
+        }
+
+        function resetInterval() {
+            clearInterval(interval);
+            startInterval();
+        }
+
+        createDots();
+        startInterval();
+    </script>
+</body>
+
+</html>

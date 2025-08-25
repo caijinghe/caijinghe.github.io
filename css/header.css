@@ -1,0 +1,167 @@
+/* 固定顶部 Header */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 999;
+  background-color: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 0;
+}
+
+/* 内部容器居中 + 控最大宽度 */
+/* .header-inner {
+  width: 100%;
+  max-width: 1200px;
+  padding: 0 20px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+} */
+.header-inner {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  /* ✅ 删除 padding 和 max-width 限制 */
+}
+
+
+/* 包裹 nav 和 logo 的 pill header 盒子 */
+.pill-header {
+  display: flex;
+  align-items: center;
+  background-color: rgba(255, 252, 242, 0.6);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  /* border: 1px solid #c7c7c7; */
+  border: 1px solid #6e6e6e;
+  border-radius: 1200px;
+  padding: 8px 20px 8px 30px;
+  width: 100%;
+  max-width: 450px;
+}
+
+
+.pill-header .logo {
+  margin-right: auto;
+}
+
+.pill-header .nav {
+  display: flex;
+  gap: 30px;
+}
+
+
+/* Logo */
+.logo {
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  color: #000000;
+  cursor: none;
+}
+
+.logo span {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.logo a {
+  cursor: none;
+  text-decoration: none;
+  color: inherit;
+}
+
+.logo-icon {
+  height: 28px;
+  width: auto;
+  display: block;
+}
+
+
+
+
+
+/* 导航栏 */
+.header .nav {
+  display: flex;
+  gap: 30px;
+}
+
+/* Cube Button 主体 */
+.cube-button {
+  display: flex;
+  position: relative;
+  width: fit-content;
+  height: 25px;
+  perspective: 600px;
+  text-decoration: none;
+  cursor: none;
+}
+
+.header .cube-button {
+  min-width: 50px;
+}
+
+/* Cube Button 动画面 */
+.cube-button .face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  color: #000000;
+  font-size: 14px;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  transition: transform 1.5s cubic-bezier(0.22, 1.61, 0.36, 1);
+}
+
+.cube-button .top {
+  transform: rotateX(90deg) translateY(-100%);
+  transform-origin: top;
+}
+
+.cube-button:hover .front {
+  transform: rotateX(-90deg) translateY(100%);
+  transform-origin: bottom;
+}
+
+.cube-button:hover .top {
+  transform: rotateX(0deg) translateZ(0);
+  font-family: 'Inter';
+  font-weight: 700;
+}
+
+/* 默认最大宽度 */
+.pill-header {
+  max-width: 450px;
+}
+
+/* 小屏幕时缩短导航条 */
+@media (max-width: 600px) {
+
+  .pill-header {
+    max-width: 320px;
+    min-width: 120px;
+    padding: 6px 16px 6px 20px; /* 可选：减少 padding */
+  }
+
+
+  .cube-button .face {
+    font-size: 13px; /* 可选：缩小文字 */
+  }
+
+  .logo-icon {
+    height: 24px; /* 可选：缩小 logo 图标 */
+  }
+}

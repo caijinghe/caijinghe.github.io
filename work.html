@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jinghe Cai</title>
+  <link rel="icon" href="media/logo.svg" type="image/svg+xml" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/bitcount-grid-single/index.css" />
+
+
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/header.css" />
+  <link rel="stylesheet" href="css/work.css" />
+
+
+  <!-- JS -->
+  <script type="module" src="js/cursor.js"></script>
+  <script type="module" src="js/animation.js"></script>
+  <script type="module" src="js/work.js"></script>
+
+  <!-- audio -->
+  <!-- <audio id="hoverSound" src="media/hover1.wav" preload="auto"></audio>
+  <audio id="clickSound" src="media/click.mp3" preload="auto"></audio> -->
+
+</head>
+
+
+
+<body>
+  <div class="layout" id="mainLayout">
+    <div class="page-wrapper">
+
+      <!-- Header  ⟨ 已完成部分 ⟩ -->
+      <header class="header fade-in-line">
+        <div class="header-inner">
+          <div class="pill-header">
+            <a href="index.html" class="logo">
+              <img src="media/logo.svg" alt="Logo" class="logo-icon" />
+            </a>
+            <nav class="nav">
+              <a href="work.html" class="cube-button">
+                <span class="face front">Works</span>
+                <span class="face top">Works</span>
+              </a>
+              <a href="about.html" class="cube-button">
+                <span class="face front">About</span>
+                <span class="face top">About</span>
+              </a>
+            </nav>
+          </div>
+        </div>
+      </header>
+
+
+
+
+
+
+
+
+
+      <main class="works-container">
+        <div class="works-wrap">
+          <div class="work-layout">
+            <!-- Left image preview -->
+            <div class="work-preview">
+              <img id="previewImage" src="media/work_snap.svg" alt="Preview" />
+            </div>
+
+            <!-- Right work list -->
+            <div class="work-list">
+
+
+
+
+
+              <div class="work-header">
+                <span>YEAR</span>
+                <span>NAME</span>
+                <span>CONTENT</span>
+                <div class="filter-wrapper hover-trigger">
+                  <div class="filter-box">
+                    <div class="filter-label">All</div>
+                    <div class="filter-options"></div>
+                  </div>
+                </div>
+                <!-- <div class="arrow-col">▼</div> -->
+              </div>
+
+
+
+              <div class="work-item" data-img="work_samsung.png" data-category="design">
+                <span class="year">2025</span>
+                <span class="name project-name font-medium">Samsung</span>
+
+                <span class="content">
+                  Branding Strategy
+                  <span class="tag tag-pill tag-client"> client based </span>
+                </span>
+
+
+                <span class="toggle-symbol"></span>
+                <div class="work-description">Future-forward design strategy including principles, methodology and CMF
+                  framework for Samsung Mobile,
+                  unifying brand experience across devices for Gen Z.</div>
+              </div>
+
+              <div class="work-item" data-img="work_MFST.png" data-category="design research">
+                <span class="year">2025</span>
+                <span class="name project-name font-medium">Microsoft</span>
+                <span class="content">AI Design Toolkit <span class="tag tag-pill tag-client"> client based </span>
+                </span>
+                <span class="toggle-symbol"></span>
+                <div class="work-description">
+                  Lightweight toolkit for responsible AI design, with workflows, principles, and case studies to guide
+                  BIC (Business & Industry Copilots) teams in building enterprise AI features grounded in ethics,
+                  transparency, and trust.
+                </div>
+              </div>
+
+              <div class="work-item" data-img="work_lepal.svg" data-category="design" data-link="lepal.html">
+                <span class="year">2024</span>
+                <span class="name project-name font-medium">LePal.ai</span>
+                <span class="content">AI Mental Health Companion <span class="tag tag-pill tag-intern"> launched
+                  </span> </span>
+                <span class="toggle-symbol"></span>
+                <div class="work-description">Redesigned the core user flow, helping Gen Z grow spirit companions
+                  through bite-size conversational therapy, gamified self-care, and emotional insights to build lasting
+                  emotional resilience.</div>
+              </div>
+
+              <div class="work-item" data-img="work_pink.png" data-category="design">
+                <span class="year">2024</span>
+                <span class="name project-name font-medium">Pink Panthers</span>
+                <span class="content">Menstrual Health Service</span>
+                <span class="toggle-symbol"></span>
+                <div class="work-description">A holistic menstrual health initiative empowering teenage girls through a
+                  school-integrated digital platform that combines interactive education, guided care, and
+                  family-inclusive support.</div>
+              </div>
+
+              <!-- <div class="work-item" data-img="work_play.png" data-category="research">
+                <span class="year">2025</span>
+                <span class="name project-name font-medium">Designing Play</span>
+                <span class="content">Playground Design Guidebook</span>
+                <span class="toggle-symbol"></span>
+                <div class="work-description">A guidebook exploring how design can transform playgrounds into inclusive,
+                  safe, and connected community spaces.</div>
+              </div> -->
+
+              <div class="work-item" data-img="work_cathill.png" data-category="design research">
+                <span class="year">2023</span>
+                <span class="name project-name font-medium">CatHill</span>
+                <span class="content">Emotion-adaptive Experience <span class="tag tag-pill tag-pub"> 	published
+                  </span></span>
+                <span class="toggle-symbol"></span>
+                <div class="work-description">An emotion-driven interactive storytelling game that uses CBT techniques
+                  and mouth-controlled interactions to help college students manage anxiety and build emotional
+                  awareness.
+                </div>
+              </div>
+
+              <!-- <div class="work-item" data-img="work_digital.png" data-category="research">
+                <span class="year">2023</span>
+                <span class="name project-name font-medium">Living Craft</span>
+                <span class="content">Digital Making Study</S> <span class="tag tag-pill tag-pub"> publication
+                  </span></span>
+                <span class="toggle-symbol"></span>
+                <div class="work-description">A study on how digital making revitalizes intangible cultural heritage
+                  through the reinterpretation of Hairy Monkey craft with creative technologies.
+                </div>
+              </div> -->
+
+
+              <div class="work-item" data-img="work_elder.svg" data-category="design research">
+                <span class="year">2022</span>
+                <span class="name project-name font-medium">ElderEase</span>
+                <span class="content">Accessible Agent Design</span>
+                <span class="toggle-symbol"></span>
+                <div class="work-description">Voice-based assistant system designed to address smartphone interaction
+                  barriers among older adults through research-led modeling.</div>
+              </div>
+
+              <div class="work-item" data-img="work_wander.svg" data-category="design research" data-link="wander.html">
+                <span class="year">2021</span>
+                <span class="name project-name font-medium">Wander</span>
+                <span class="content">Gamified Sleep Experience<span class="tag tag-pill tag-pub"> 	published
+                  </span></span>
+                <span class="toggle-symbol"></span>
+                <div class="work-description">A breath-controlled casual audio game that transforms smartphones into
+                  calming sleep companions, combining gamification with breathing and meditation techniques to encourage
+                  healthier sleep habits.</div>
+              </div>
+
+
+              <div class="work-item" data-img="work_bibf.png" data-category="visual" data-link="bibf.html">
+                <span class="year">2020</span>
+                <span class="name project-name font-medium">BIBF</span>
+                <span class="content">Key Visual Design</Var> <span class="tag tag-pill tag-client"> launched
+                    </client></span></span>
+                <span class="toggle-symbol"></span>
+                <div class="work-description">Visual identity for Beijing International Book Fair,
+                  featuring hero illustration creation and adaptation across posters and cultural merchandise.</div>
+              </div>
+
+              <div class="work-item" data-img="work_redwing.svg" data-category="visual" data-link="redwing.html">
+                <span class="year">2020</span>
+                <span class="name project-name font-medium">Red Wing</span>
+                <span class="content">Narrative Illustration Series</span>
+                <span class="toggle-symbol"></span>
+                <div class="work-description">A quiet tale of a tiny girl with a ladybug shell, wandering through
+                  blooming dreams and hidden worlds.</div>
+              </div>
+
+
+
+              <div class="work-item" data-img="work_naive.svg" data-category="visual" data-link="naivevil.html">
+                <!-- ✅ 加上链接地址 -->
+                <span class="year">2019</span>
+                <span class="name project-name font-medium">Naïvevil</span>
+                <span class="content">Chinese Ink Painting</span>
+                <span class="toggle-symbol"></span>
+                <div class="work-description">
+                  An ink series that twists classical idioms and cultural archetypes into
+                  quiet satire through animal forms and painterly ambiguity.
+                </div>
+              </div>
+
+
+            </div>
+          </div>
+        </div>
+      </main>
+
+
+
+
+
+
+
+    </div>
+
+    <!-- Custom Cursor -->
+    <div id="custom-cursor"></div>
+
+
+</body>
+
+</html>

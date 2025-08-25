@@ -1,0 +1,759 @@
+/* 基础设置 */
+
+html, body {
+  background-color: #FFFCF2;
+}
+
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+
+* {
+  box-sizing: border-box;
+}
+
+.social-icons-fixed {
+  position: fixed;
+  top: 50%;
+  right: 50px;
+  transform: translate(350%, -50%); /* ⛔️ 初始滑出屏幕右侧 */
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  z-index: 999;
+  transition: transform 0.6s ease;
+  opacity: 1; /* 可有可无 */
+}
+
+.social-icons-fixed.slide-in {
+  transform: translate(0%, -50%); /* ✅ 滑入原位 */
+}
+
+
+
+.social-icon img {
+  width: 24px;
+  height: 24px;
+  display: block;
+  opacity: 0.8;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+
+.social-icons-fixed.fade-out {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+
+/* 布局：左右两栏 */
+.section-container {
+  display: flex;
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* 左侧 Sticky 图像区域 */
+.sticky-left {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 图片叠加容器 */
+.image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* 每一张图 */
+.photo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photo img {
+  max-width: 70vh;
+  padding-top: 35px;
+  padding-left: 100px;
+  height: auto;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+
+/* 右侧文字区域 */
+.scroll-right {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.about-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100vh;
+  padding-left: 20px;
+  box-sizing: border-box;
+}
+
+#panel1 {
+  padding-top: 70px;
+  /* padding-right: 280px; */
+  max-width: 500px;
+}
+
+.about-panel h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 20px;
+}
+
+.about-panel h2 {
+  font-size: 1.5rem;
+  line-height: 1.5;
+  margin-bottom: 10px;
+  font-weight: 200;
+}
+
+.about-panel p {
+  font-size: 1rem;
+  line-height: 1;
+  margin-bottom: 10px;
+  font-weight: 200;
+}
+
+.sora {
+  font-family: 'Sora', sans-serif;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.award-block {
+  margin-top: 30px;
+  margin-bottom: 8vh;
+}
+
+
+.award-row {
+  display: grid;
+  grid-template-columns: 60px 1fr; /* 左列固定，右列自适应 */
+  gap: 16px;
+  margin-bottom: 12px;
+  align-items: start;
+  width: 100%;
+}
+
+.award-year {
+  font-weight: 500;
+  font-size: 1.1rem;
+  text-align: left;
+  font-family: 'Sora', sans-serif;
+  font-feature-settings: "tnum";
+}
+
+.award-text {
+  font-size: 1.1rem;
+  font-weight: 200;
+  line-height: 1.4;
+  word-break: break-word;
+
+}
+
+
+
+
+.infinite-ticker {
+  width: 100%;
+  overflow: hidden;
+  height: 3.5rem;
+  display: flex;
+  align-items: center;
+  position: relative;
+  z-index: 9;
+  transition: opacity 0.3s ease-in-out;
+  opacity: 1;
+  margin-top: 0px;
+  border-top: 1px solid #6e6e6e;
+  border-bottom: 1px solid #6e6e6e;
+
+}
+
+
+
+.ticker-track {
+  display: inline-block;
+  white-space: nowrap;
+  animation: none; /* 默认无动画 */
+}
+
+.ticker-track.animate-scroll {
+  animation: scrollLoop var(--duration, 50s) linear infinite;
+}
+
+@keyframes scrollLoop {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-1 * var(--scroll-width)));
+  }
+}
+
+.ticker-item {
+  display: inline-block;
+  margin: 10px 35px;
+  /* font-family: 'Sora', sans-serif; */
+  font-family: 'Inter', sans-serif;
+  font-weight: 200;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+
+#footer-trigger {
+  width: 100%;
+  height: 1px;
+  margin-top: 0px;
+}
+
+
+
+.shelf-section {
+  height: 100vh;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  overflow: visible;
+}
+
+
+.shelf-section h1 {
+  font-size: 2rem;
+  padding-top: 0;
+  /* padding-bottom: 0; */
+  margin-top: 180px;
+  /* margin-bottom: 0px; */
+  z-index: 3;
+  /* line-height: 0.1; */
+}
+
+/* .shelf-section h4 {
+  font-size: 1rem;
+  font-weight: 300;
+  align-items: center;
+  padding-top: 0;  
+  color: #6e6e6e;
+  z-index: 3;
+  line-height: 1.1;
+  text-align: center
+} */
+
+.shelf-viewport {
+  width: 100%;
+  max-width: 1200px;
+  position: relative;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.svg-books-row {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  height: 80%;
+  position: relative;
+  z-index: 2;
+  margin-bottom: 20vh;
+}
+
+.book-svg {
+  height: auto;
+  max-height: 380px;
+  max-width: 100%;
+  align-self: flex-end;
+  margin-bottom: 0;
+  transition: transform 0.8s ease-in-out;
+  opacity: 1;
+  pointer-events: auto;
+  
+}
+
+
+.book-svg.faded {
+  opacity: 0.3;
+  transition: opacity 0.4s ease;
+}
+
+
+.item-2019 {
+  margin-left: -15px;
+  margin-right: 50px;
+}
+
+.item-2020 {
+  margin-left: -50px;
+  margin-right: -12px;
+}
+
+.item-2021 {
+  margin-left: 8px;
+}
+
+.item-2022 {
+  margin-left: -5px;
+  margin-right: 0px;
+}
+
+.item-2023 {
+  margin-left: 0px;
+  margin-right: 0px;
+}
+
+.item-2024 {
+  margin-left: -35px;
+}
+
+.item-2025 {
+  margin-left: 5px;
+  margin-right: -35px;
+}
+
+.book-line {
+  width: 110%;
+  height: 1px;
+  background: #000;
+  position: absolute;
+  bottom: 0px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+}
+
+
+/* 📏 Timeline Ruler */
+.timeline-ruler {
+  position: absolute;
+  bottom: 16vh;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 9.5px;
+  z-index: 0;
+}
+
+.tick {
+  width: 2px;
+  background: #000;
+  position: relative;
+  border-radius: 999px;
+  transition: opacity 0.3s ease;
+  will-change: opacity;
+}
+
+.tick.minor {
+  height: 7px;
+  opacity: 0.8;
+}
+
+.tick.major {
+  height: 12px;
+  width: 3px;
+  opacity: 0.8;
+}
+
+.year-label {
+  position: absolute;
+  top: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1rem;
+  font-weight: 300;
+  white-space: nowrap;
+  color: #000000;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+  will-change: opacity;
+}
+/* ✅ 非高亮 tick 和 label：仅降低透明度 */
+.year-label.faded{
+  opacity: 0.1;
+  transition: opacity 0.4s ease;
+}
+
+
+.tick.faded {
+  background: hsla(0, 0%, 0%, 0.15); /* 黑色，透明度 15% */
+  opacity: 1;                        /* 保持不变 */
+}
+
+
+/* ✅ 高亮年份：完全不透明，字体可加重 */
+.year-label.highlighted,
+.tick.highlighted {
+  opacity: 1 !important;
+  font-weight: 300;
+}
+
+/* ✅ 如果你需要隐藏某些年份/线条（非 hover 相关） */
+.year-label.dimmed,
+.tick.dimmed
+ {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.year-label.hidden,
+.tick.major.hidden,
+.tick.minor.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+
+/* 内容 */
+
+.year-info {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translateX(-50%);
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  z-index: 5;
+  padding: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  display: flex;
+  will-change: opacity;
+
+  /* ✅ 新增宽度设置 */
+  max-width: 1000px;
+  /* 或者你可以改成更大的值 */
+  width: 90%;
+  /* 适配响应式宽度 */
+}
+
+
+.year-info.active {
+  opacity: 1;
+  pointer-events: none;
+}
+
+
+
+.info-images {
+  width: 100%;
+  display: flex;
+  justify-content: left;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.info-images img {
+  height: 150px;
+  width: auto;
+  border-radius: 10px;
+  border: 1px solid #000;
+  object-fit: contain;
+}
+
+.info-text {
+  width: 100%;
+  text-align: left;
+  margin-top: 1rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #111;
+}
+
+.book-svg.faded {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.layout-2019 {
+  left: 65%;
+}
+
+.layout-2020 {
+  left: 80%;
+}
+
+.layout-2021 {
+  left: 87%;
+}
+
+.layout-2024 {
+  left: 60%;
+}
+
+.layout-2025 {
+  left: 62%;
+}
+
+/* 针对 2022 年的图像间距微调 */
+
+.layout-2022 .info-images img:first-child {
+  margin-left: 30px;
+  /* 根据你喜欢的间距调整 */
+}
+
+.layout-2022 .info-images img:nth-child(2) {
+  margin-right: 260px;
+  /* 根据你喜欢的间距调整 */
+}
+
+.layout-2022 .info-text-split {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 180px;
+  margin-top: 0px;
+  width: 100%;
+  max-width: 1000px;
+  margin-left: 30px;
+  margin-right: auto;
+}
+
+/* 针对 2023 年的图像间距微调 */
+.layout-2023 .info-images img:first-child {
+  margin-left: 100px;
+  /* 根据你喜欢的间距调整 */
+}
+
+.layout-2023 .info-images img:nth-child(2) {
+  margin-right: 165px;
+  /* 根据你喜欢的间距调整 */
+}
+
+.layout-2023 .info-text-split {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 60px;
+  margin-top: 0px;
+  width: 120%;
+  max-width: 1200px;
+  margin-left: 100px;
+  margin-right: auto;
+}
+
+.info-images,
+.info-text-split {
+  position: relative;
+  z-index: 1;
+}
+
+.info-text-split {
+  position: relative;
+  z-index: 1;
+}
+
+.info-images img {
+  pointer-events: none;
+}
+
+
+
+
+.page-footer {
+  text-align: center;
+  padding-bottom: 5vh;
+  /* padding-top: 0px; */
+  font-size: 0.8rem;
+  font-weight: 300;
+  color: #6e6e6e;
+}
+
+
+
+
+@media (max-width: 1200px) {
+
+  .section-container {
+    display: flex;
+    position: relative;
+    width: 100%;
+    padding-left: 100px;
+  }
+
+  .scroll-right {
+    width: 100%;
+  }
+
+
+
+  .sticky-left {
+    display: none;
+  }
+
+  .shelf-section {
+    display: none;
+  }
+
+ 
+
+  .infinite-ticker {
+    display: none;
+  }
+
+
+  #footer-trigger {
+    display: none;
+  }
+
+
+}
+
+
+
+
+
+
+
+/* 🌐 响应式媒体查询：平板和手机适配 */
+@media (max-width: 600px) {
+  /* 隐藏 Sticky 图片区域 */
+
+
+  .section-container {
+    display: flex;
+    position: relative;
+    width: 100%;
+    padding: 30px;
+  }
+
+
+  #panel1 {
+    padding-top: 0px;
+    padding-right: 20px;
+  }
+
+  .sticky-left {
+    display: none;
+  }
+
+  .shelf-section {
+    display: none;
+  }
+
+  /* 右侧文字区域改为100%宽度 */
+  .scroll-right {
+    width: 100%;
+  }
+
+  /* #panel2 {
+  display: none;
+} */
+
+  .about-panel p {
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 3px;
+    font-weight: 300;
+  }
+
+
+  /* 调整 about-panel 文字内边距 */
+  .about-panel {
+    padding: 20px 10px;
+  }
+
+
+
+  .about-panel h1 {
+    font-size: 1.2rem;
+  }
+
+  .about-panel h2 {
+    font-size: 1rem;
+  }
+
+.award-year {
+  font-size: 0.9rem;
+}
+
+.award-text {
+  font-size: 0.9rem;
+}
+
+
+  /* 调整社交图标位置 */
+  .social-icons-fixed {
+    gap: 24px;
+  }
+
+  .social-icon img {
+    width: 20px;
+    height: 20px;
+  }
+
+  .social-icons-fixed {
+    position: fixed;
+    bottom: 20px;
+    /* 距离底部 */
+    top: auto;
+    flex-direction: row;
+    /* 改为横排 */
+    gap: 24px;
+    /* 调整图标间距 */
+    z-index: 999;
+
+
+  }
+
+
+
+
+  .infinite-ticker {
+    display: none;
+  }
+
+  #footer-trigger {
+    display: none;
+  }
+
+
+    .about-panel p {
+    display: none;
+  }
+
+
+
+
+}

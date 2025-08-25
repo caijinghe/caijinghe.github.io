@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jinghe Cai</title>
+  <link rel="icon" href="media/logo.svg" type="image/svg+xml" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Sora:wght@400;600;700&display=swap"
+    rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Sora:wght@100;200;300;400;600;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.35/bundled/lenis.min.js"></script>
+
+
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/header.css" />
+  <link rel="stylesheet" href="css/about.css" />
+
+
+
+</head>
+
+
+
+<body>
+  <div class="layout" id="mainLayout">
+    <div class="page-wrapper">
+      <!-- Header -->
+      <header class="header fade-in-line">
+        <div class="header-inner">
+          <div class="pill-header">
+            <a href="index.html" class="logo">
+              <img src="media/logo.svg" alt="Logo" class="logo-icon" />
+            </a>
+            <nav class="nav">
+              <a href="work.html" class="cube-button">
+                <span class="face front">Works</span>
+                <span class="face top">Works</span>
+              </a>
+              <a href="about.html" class="cube-button">
+                <span class="face front">About</span>
+                <span class="face top">About</span>
+              </a>
+            </nav>
+          </div>
+        </div>
+      </header>
+
+
+      <!-- Fixed Social Icons -->
+      <div class="social-icons-fixed">
+        <a href="https://www.linkedin.com/in/jinghe-cai" target="_blank" class="social-icon">
+          <img src="media/icon_linkedin.svg" alt="LinkedIn" />
+        </a>
+        <a href="https://www.instagram.com/asawhy/" target="_blank" class="social-icon">
+          <img src="media/icon_ins.svg" alt="Instagram" />
+        </a>
+        <a href="https://scholar.google.com/citations?user=USR_nP8AAAAJ&hl=en" target="_blank" class="social-icon">
+          <img src="media/icon_scholar.png" alt="Google Scholar" />
+        </a>
+        <a href="https://drive.google.com/file/d/1IsOUI2ZcsX_7XXkCw_bYc1aIiybE1FQT/view?usp=sharing" target="_blank"
+          class="social-icon">
+          <img src="media/icon_resume.svg" alt="Resume" />
+        </a>
+      </div>
+
+
+      <main class="about">
+        <div class="section-container">
+          <!-- Sticky Left Image -->
+          <div class="sticky-left">
+            <div class="image-wrapper">
+              <div class="photo" id="photo1">
+                <img src="media/about_detect.svg" alt="Detect" class="about-img-sm" />
+              </div>
+              <div class="photo" id="photo2">
+                <img src="media/dance.svg" alt="Dance" class="about-img-sm" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Scrollable Right Sections -->
+          <div class="scroll-right">
+            <section class="about-panel" id="panel1">
+              <h1 class="sora">I’M A PRODUCT DESIGNER</h1>
+              <h2>
+                Grounded in affective computing, with experience in cutting-edge HCI research,
+                AI systems, startups, and iOS app design.
+              </h2>
+              <h2>
+                From publishing to reviewing for top HCI conferences, I bring 5+ years of research
+                experience into a creative design process to craft meaningful digital experiences.
+              </h2>
+            </section>
+
+            <section class="about-panel" id="panel2">
+              <h1 class="sora">Designing is My Thinking<br>Crafting is My Language</h1>
+
+              <div class="award-block">
+                <div class="award-row">
+                  <div class="award-year">2025</div>
+                  <div class="award-text">MUSE Design Awards, Gold Winner in User Experience</div>
+                </div>
+                <div class="award-row">
+                  <div class="award-year">2025</div>
+                  <div class="award-text">NY Product Awards, Gold Winner in Product Design</div>
+                </div>
+                <div class="award-row">
+                  <div class="award-year">2025</div>
+                  <div class="award-text">IDEA Design Awards, Finalist in Product Design</div>
+                </div>
+                <div class="award-row">
+                  <div class="award-year">2025</div>
+                  <div class="award-text">Indigo Design Awards, Bronze Winner in 8 categories</div>
+                </div>
+                <div class="award-row">
+                  <div class="award-year">2025</div>
+                  <div class="award-text">Student Service Design Challenge Finalist</div>
+                </div>
+                <div class="award-row">
+                  <div class="award-year">2023</div>
+                  <div class="award-text">SCAD Challenge Awards, 2nd place in 2D/3D Design</div>
+                </div>
+                <div class="award-row">
+                  <div class="award-year">2023</div>
+                  <div class="award-text">China Illustration Annual Competition, Exhibition work</div>
+                </div>
+                <div class="award-row">
+                  <div class="award-year">2020</div>
+                  <div class="award-text">National Postgraduate Animation Competition, 1st Place</div>
+                </div>
+                <div class="award-row">
+                  <div class="award-year">2020</div>
+                  <div class="award-text">International Student Animation Festival, Best Comic</div>
+                </div>
+              </div>
+            </section>
+
+
+
+
+
+
+
+
+
+
+
+
+          </div>
+        </div>
+
+        <div class="infinite-ticker" id="infiniteTicker">
+          <div class="ticker-track" id="tickerTrack">
+            <span class="ticker-item">Branding Strategy</span>
+            <span class="ticker-item">System Design</span>
+            <span class="ticker-item">UX Design / Research</span>
+            <span class="ticker-item">Product Design</span>
+            <span class="ticker-item">Visual Storytelling</span>
+            <span class="ticker-item">Content Design</span>
+            <!-- ✅ 下面是克隆的第二段 -->
+            <span class="ticker-item">Branding Strategy</span>
+            <span class="ticker-item">System Design</span>
+            <span class="ticker-item">UX Design / Research</span>
+            <span class="ticker-item">Product Design</span>
+            <span class="ticker-item">Visual Storytelling</span>
+            <span class="ticker-item">Content Design</span>
+          </div>
+        </div>
+
+
+        <div id="footer-trigger"></div>
+
+
+        <!-- Fullscreen Shelf Section -->
+        <section class="shelf-section" id="section3">
+
+
+
+
+
+
+
+          <!-- Books and timeline here (reuse your current code) -->
+          <div class="shelf-viewport">
+            <h1 class="sora">My Life on the Shelf</h1>
+            <!-- <h4>Every spine tells a story. <br>
+              Hover to leaf through the chapters.</h4> -->
+
+
+
+            <div class="svg-books-row">
+              <div class="book-line"></div>
+              <img src="media/life-2019.svg" class="book-svg item-2019" alt="2019" />
+              <img src="media/life-2020.svg" class="book-svg item-2020" alt="2020" />
+              <img src="media/life-2021.svg" class="book-svg item-2021" alt="2021" />
+              <img src="media/life-2022.svg" class="book-svg item-2022" alt="2022" />
+              <img src="media/life-2023.svg" class="book-svg item-2023" alt="2023" />
+              <img src="media/life-2024.svg" class="book-svg item-2024" alt="2024" />
+              <img src="media/life-2025.svg" class="book-svg item-2025" alt="2025" />
+            </div>
+
+            <!-- 🟡 插入 year-info 模块（比如 2019） -->
+            <div class="year-info layout-2019" id="info-2019">
+              <div class="info-images">
+                <img src="media/photo-2019-1.png" alt="Photo 1" />
+                <img src="media/photo-2019-2.png" alt="Photo 2" />
+              </div>
+              <div class="info-text">
+                <p>I graduated from Xiamen University with a BFA in Fine Arts.<br>
+                  Twelve of my paintings lined the hallway for my graduation show.<br>
+                  They were all sold on the first day.</p>
+              </div>
+            </div>
+
+            <div class="year-info layout-2020" id="info-2020">
+              <div class="info-images">
+                <img src="media/photo-2020-1.png" alt="Photo 3" />
+                <img src="media/photo-2020-2.png" alt="Photo 4" />
+              </div>
+              <div class="info-text">
+                <p>My first comic book was published.<br>
+                  A friend went to a bookstore just to find it.<br>
+                  She texted me, “I’m proud of you.”</p>
+              </div>
+            </div>
+
+            <div class="year-info layout-2021" id="info-2021">
+              <div class="info-images">
+                <img src="media/photo-2021-1.png" alt="Photo 5" />
+                <img src="media/photo-2021-2.png" alt="Photo 6" />
+                <img src="media/photo-2021-3.png" alt="Photo 7" />
+              </div>
+              <div class="info-text">
+                <p>Dove into affective computing. Days and nights blurred in the lab.<br>
+                  I attended conferences and published my first first-author paper.<br>
+                  It felt like a step closer to a PhD.</p>
+              </div>
+            </div>
+
+
+
+            <div class="year-info layout-2022" id="info-2022">
+              <div class="info-images">
+                <img src="media/photo-2022-1.png" alt="Photo 9" />
+                <img src="media/photo-2022-2.png" alt="Photo 10" />
+                <img src="media/photo-2022-3.png" alt="Photo 11" />
+                <img src="media/photo-2022-4.png" alt="Photo 12" />
+              </div>
+              <div class="info-text-split">
+                <div class="info-text left">
+                  <p>
+                    Multiple paper rejections made me reflect:<br>
+                    whether research ever reached the real world.
+                  </p>
+                </div>
+                <div class="info-text right">
+                  <p>
+                    I wavered between staying in academia<br>
+                    and moving toward industry.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+
+
+            <div class="year-info layout-2023" id="info-2023">
+              <div class="info-images">
+                <img src="media/photo-2023-1.png" alt="Photo 13" />
+                <img src="media/photo-2023-2.png" alt="Photo 14" />
+                <img src="media/photo-2023-3.png" alt="Photo 15" />
+              </div>
+              <div class="info-text-split">
+                <div class="info-text left">
+                  <p>
+                    I brought my work to CHI 2023 and quietly stepped away<br>
+                    from academia. In the years after, I stayed on as a reviewer<br>
+                    for ACM CHI and MM. A soft goodbye.<br>
+                  </p>
+                </div>
+                <div class="info-text right">
+                  <p>
+                    That year, I graduated from<br>
+                    Tsinghua University with a<br>
+                    MCS in Computer Science.<br>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+
+            <div class="year-info layout-2024" id="info-2024">
+              <div class="info-images">
+                <img src="media/photo-2024-1.png" alt="Photo 16" />
+                <img src="media/photo-2024-2.png" alt="Photo 17" />
+                <img src="media/photo-2024-3.png" alt="Photo 18" />
+              </div>
+              <div class="info-text">
+                <p>
+                  I took a half-year gap to publish my second book.<br>
+                  Then I came to the U.S., ready to explore design in the real world.<br>
+                  Now I’m a UX Design grad student at SCAD!<br>
+                </p>
+              </div>
+            </div>
+
+
+            <div class="year-info layout-2025" id="info-2025">
+              <div class="info-images">
+                <img src="media/photo-2025-1.png" alt="Photo 19" />
+                <img src="media/photo-2025-2.png" alt="Photo 20" />
+                <img src="media/photo-2025-3.png" alt="Photo 21" />
+                <img src="media/photo-2025-4.png" alt="Photo 22" />
+              </div>
+              <div class="info-text">
+                <p>
+                  Years of HCI research shaped how I think and design, helping me stand out.<br>
+                  I led client projects with Microsoft and Samsung, turning design into impact.<br>
+                  One apple at a time, the story continues...<br>
+                </p>
+              </div>
+            </div>
+
+
+
+
+
+
+
+
+            <!-- ✅ JS 会动态填充这个容器 -->
+            <div class="timeline-ruler" id="timelineRuler"></div>
+          </div>
+
+
+
+
+          <!-- Footer -->
+          <footer class="page-footer">
+            <div class="footer-content">
+              <p class="footer-text">© 2025 <span class="font-agbalumo">Jinghe Cai</span>. All rights reserved.</p>
+            </div>
+          </footer>
+
+
+        </section>
+
+
+
+
+
+
+
+    </div>
+    <div id="custom-cursor"></div>
+
+
+    <script type="module" src="js/animation.js"></script>
+    <script type="module" src="js/about.js"></script>
+    <script type="module" src="js/cursor.js"></script>
+
+  </div>
+</body>
+
+</html>

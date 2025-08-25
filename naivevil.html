@@ -1,0 +1,445 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jinghe Cai</title>
+    <!-- Favicon -->
+    <link rel="icon" href="media/logo.svg" type="image/svg+xml" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Sora:wght@100;200;300;400;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.35/bundled/lenis.min.js"></script>
+    
+    <link rel="stylesheet" href="css/style.css" />
+    <script type="module" src="js/cursor.js"></script>
+
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Inter, sans-serif;
+            /* background-color: #FFFCF2; */
+            background-color: #fff;
+            color: #111;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            cursor: none;
+        }
+
+        header {
+            padding: 3vw 4vw 4vw 4vw;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6rem;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .back-button {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            border: 1px solid #6e6e6e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+
+        .back-button img {
+            width: 36px;
+            height: 36px;
+        }
+
+        .project-title {
+            /* font-family: 'Sora', sans-serif; */
+            font-size: 3rem;
+            font-weight: 300;
+        }
+
+        .project-meta {
+            padding-top: 80px;
+            font-size: 1rem;
+            font-weight: 200;
+            line-height: 1.6;
+            color: #000000;
+        }
+
+        .title-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chinese-title {
+            height: 250px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            padding: 0;
+            border-top: 1px solid #ccc;
+            border-left: 1px solid #ccc;
+        }
+
+        .grid-item {
+            aspect-ratio: 1 / 1;
+            border-right: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4vw;
+            background-color: transparent;
+            box-sizing: border-box;
+            cursor: none;
+        }
+
+        
+
+        .grid-item img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+        }
+
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(20px);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+
+            /* ✅ 加入柔和阴影 */
+            box-shadow: 0 0 80px rgba(0, 0, 0, 0.25) inset, 0 0 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .lightbox img {
+            max-width: 90vw;
+            max-height: 90vh;
+            border-radius: 8px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .lightbox.active {
+            display: flex;
+        }
+
+
+        footer {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem 4vw;
+            font-size: 0.8rem;
+            /* border-top: 1px solid #ccc; */
+        }
+
+        footer span {
+            color: #6e6e6e;
+            font-weight: 300;
+        }
+
+
+        .more-wrapper {
+            display: inline-block;
+            text-decoration: none;
+        }
+
+
+
+
+        .more-text {
+            position: relative;
+            width: 135px;
+            height: 38px;
+            border: 1px solid #6e6e6e;
+            border-radius: 999px;
+            overflow: hidden;
+            /* ✅ 关键：限制内部 face 的翻转范围 */
+            perspective: 600px;
+            display: inline-block;
+            cursor: none;
+        }
+
+
+
+        .more-text .face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 300;
+
+            color: #000;
+
+            line-height: 1;
+            /* ✅ 去掉额外空隙 */
+            padding: 0;
+            /* ✅ 显式移除 padding */
+            margin: 0;
+
+            backface-visibility: hidden;
+            transform-style: preserve-3d;
+            transition: transform 1.5s cubic-bezier(0.22, 1.61, 0.36, 1);
+        }
+
+        .more-text .top {
+            transform: rotateX(90deg) translateY(-100%);
+            transform-origin: top;
+        }
+
+        .more-wrapper:hover .more-text .front {
+            transform: rotateX(-90deg) translateY(100%);
+            transform-origin: bottom;
+        }
+
+        .more-wrapper:hover .more-text .top {
+            transform: rotateX(0deg);
+            font-weight: 500;
+        }
+
+
+        @media (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 500px) {
+            header {
+                gap: 1.5rem;
+            }
+
+            header {
+                padding: 8vw 8vw 4vw 8vw;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6rem;
+            }
+
+            .header-top {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+            }
+
+
+
+            .back-button {
+                width: 45px;
+                height: 45px;
+                border-radius: 50%;
+                border: 1px solid #6e6e6e;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-decoration: none;
+                flex-shrink: 0;
+            }
+
+            .header-bottom {
+                display: flex;
+                flex-direction: row;
+                /* ✅ 关键：横向排列 */
+                align-items: center;
+                justify-content: space-between;
+                gap: 1rem;
+                flex-wrap: wrap;
+            }
+
+
+
+            .back-button img {
+                width: 30px;
+                height: 30px;
+            }
+
+            .project-title {
+                /* font-family: 'Sora', sans-serif; */
+                font-size: 1.8rem;
+                font-weight: 300;
+            }
+
+            .project-meta {
+                padding-top: 30px;
+                font-size: 0.7rem;
+                font-weight: 200;
+                line-height: 1.5;
+                color: #000000;
+            }
+
+            .title-group {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .chinese-title {
+                height: 140px;
+            }
+
+
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+
+            .grid-item {
+
+                padding: 8vw;
+            }
+
+
+            footer {
+                margin-top: auto;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 20px 8vw;
+                font-size: 0.8rem;
+                /* border-top: 1px solid #ccc; */
+            }
+
+
+            footer span {
+                font-size: 0.75rem;
+                color: #FFFCF2;
+
+            }
+
+
+            .more-wrapper {
+                display: inline-block;
+                text-decoration: none;
+            }
+
+
+
+
+            .more-text {
+                width: 110px;
+                height: 30px;
+                border: 0.8px solid #000000;
+            }
+
+
+
+            .more-text .face {
+                font-size: 0.75rem;
+                font-weight: 200;
+            }
+
+
+
+
+
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="header-top">
+            <a href="work.html" class="back-button">
+                <img src="media/logo_withe.svg" alt="Back" class="back-icon" data-default="media/work_logo.svg"
+                    data-hover="media/logo.svg" />
+            </a>
+
+        </div>
+        <div class="header-bottom">
+            <div class="title-group">
+                <div class="project-title">Naïvevil</div>
+                <div class="project-meta">Chinese Ink Painting<br />Jul 2019, Individual Work</div>
+            </div>
+            <img src="media/naivevil/naive_name.svg" alt="Naïevil Chinese Name" class="chinese-title" />
+        </div>
+    </header>
+
+    <div class="grid-container">
+        <div class="grid-item"><img src="media/naivevil/naivevil1.jpg" alt="naivevil1" /></div>
+        <div class="grid-item"><img src="media/naivevil/naivevil2.jpg" alt="naivevil2" /></div>
+        <div class="grid-item"><img src="media/naivevil/naivevil3.jpg" alt="naivevil3" /></div>
+        <div class="grid-item"><img src="media/naivevil/naivevil4.jpg" alt="naivevil4" /></div>
+        <div class="grid-item"><img src="media/naivevil/naivevil5.jpg" alt="naivevil5" /></div>
+        <div class="grid-item"><img src="media/naivevil/naivevil6.jpg" alt="naivevil6" /></div>
+        <div class="grid-item"><img src="media/naivevil/naivevil7.jpg" alt="naivevil7" /></div>
+        <div class="grid-item"><img src="media/naivevil/naivevil8.jpg" alt="naivevil8" /></div>
+        <div class="grid-item"><img src="media/naivevil/naivevil9.jpg" alt="naivevil9" /></div>
+        <div class="grid-item"><img src="media/naivevil/naivevil10.jpg" alt="naivevil10" /></div>
+        <div class="grid-item"><img src="media/naivevil/naivevil11.jpg" alt="naivevil11" /></div>
+        <div class="grid-item"><img src="media/naivevil/naivevil12.jpg" alt="naivevil12" /></div>
+    </div>
+
+    <div class="lightbox" id="lightbox">
+        <img id="lightbox-img" src="" alt="Zoomed artwork">
+    </div>
+
+    <footer>
+        <span>© 2025 Jinghe Cai. All rights reserved.</span>
+        <a href="work.html" class="more-wrapper">
+            <span class="more-text">
+                <span class="face front">MORE WORKS</span>
+                <span class="face top">MORE WORKS</span>
+            </span>
+        </a>
+    </footer>
+
+    <div id="custom-cursor"></div>
+
+
+    <script>
+        const gridItems = document.querySelectorAll('.grid-item img');
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+
+        gridItems.forEach(img => {
+            img.addEventListener('click', () => {
+                lightboxImg.src = img.src;
+                lightbox.classList.add('active');
+            });
+        });
+
+        lightbox.addEventListener('click', () => {
+            lightbox.classList.remove('active');
+        });
+
+
+
+    </script>
+</body>
+
+
+</html>

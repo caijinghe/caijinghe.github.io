@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BIBF</title>
+    <link rel="icon" href="media/logo.svg" type="image/svg+xml" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" href="css/style.css" />
+    <script type="module" src="js/cursor.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            font-family: 'Inter', sans-serif;
+            background-color: #fff;
+            color: #111;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+
+        .content {
+            flex: 1;
+            display: flex;
+            /* height: 100vh; */
+            align-items: stretch;
+            overflow: hidden;
+        }
+
+
+
+        .left-panel {
+            flex: 1;
+            padding: 8vw 0 calc(8vw - 2rem) 4vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+
+        }
+
+        /* .left-panel {
+            padding: 8vw 4vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        } */
+
+
+
+
+        .info-award-wrapper {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 2vw;
+            /* ❌ 不需要 margin-top 或 margin-bottom */
+        }
+
+
+
+        .project-info h1 {
+            font-size: 3rem;
+            font-weight: 300;
+            margin-top: 10rem;
+        }
+
+        .project-info p {
+            font-size: 1rem;
+            font-weight: 200;
+            margin-top: 30px;
+            line-height: 1.6;
+        }
+
+        .award {
+            width: 14vh;
+        }
+
+        .right-panel {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4vw;
+            padding-left: 0;
+        }
+
+        .carousel-wrapper {
+            width: 100%;
+            max-width: 1000px;
+            height: 600px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .carousel {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .carousel img {
+            height: 100%;
+            width: auto;
+            max-width: 100%;
+            object-fit: contain;
+            display: none;
+        }
+
+        .carousel img.active {
+            display: block;
+        }
+
+        .dots {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 2.5rem;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: transparent;
+            border: 1px solid #000;
+            cursor: none;
+            transition: background-color 0.3s;
+        }
+
+        .dot.active {
+            background-color: #000;
+        }
+
+        .logo-button {
+            position: absolute;
+            top: 3vw;
+            left: 4vw;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            border: 1px solid #6e6e6e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            background: transparent;
+            z-index: 10;
+        }
+
+        .logo-button img {
+            width: 36px;
+            height: 36px;
+        }
+
+        footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 4vw;
+            font-size: 0.8rem;
+            border-top: 1px solid #ccc;
+        }
+
+        footer span {
+            color: #6e6e6e;
+            font-weight: 300;
+        }
+
+        .more-wrapper {
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .more-text {
+            position: relative;
+            width: 135px;
+            height: 38px;
+            border: 1px solid #6e6e6e;
+            border-radius: 999px;
+            overflow: hidden;
+            perspective: 600px;
+            display: inline-block;
+            cursor: none;
+        }
+
+        .more-text .face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 300;
+            color: #000;
+            backface-visibility: hidden;
+            transform-style: preserve-3d;
+            transition: transform 1.5s cubic-bezier(0.22, 1.61, 0.36, 1);
+        }
+
+        .more-text .top {
+            transform: rotateX(90deg) translateY(-100%);
+            transform-origin: top;
+        }
+
+        .more-wrapper:hover .more-text .front {
+            transform: rotateX(-90deg) translateY(100%);
+            transform-origin: bottom;
+        }
+
+        .more-wrapper:hover .more-text .top {
+            transform: rotateX(0deg);
+            font-weight: 500;
+        }
+
+        .divider {
+            display: none;
+        }
+
+        @media (max-width: 1000px) {
+            html {
+                height: auto !important;
+                overflow-x: hidden;
+            }
+
+            html,
+            body {
+                height: auto;
+                min-height: 100vh;
+                overflow-x: hidden;
+            }
+
+            .content {
+                flex-direction: column;
+                height: auto !important;
+            }
+
+            .left-panel {
+                padding: 10vw 8vw 0 8vw;
+            }
+
+            .info-award-wrapper {
+                flex-direction: row;
+                align-items: flex-start;
+                justify-content: space-between;
+                gap: 1vw;
+                margin-top: 0vh;
+            }
+
+            .project-info h1 {
+                font-size: 1.8rem;
+                font-weight: 300;
+                margin-top: 0;
+            }
+
+            .project-info p {
+                font-size: 0.8rem;
+                font-weight: 200;
+                margin-top: 1rem;
+                line-height: 1.5;
+            }
+
+            .award {
+                margin-top: 5.2rem;
+                width: 90px;
+            }
+
+            .divider {
+                display: block;
+                width: 100%;
+                height: 1px;
+                background-color: #ccc;
+                border: none;
+            }
+
+            .right-panel {
+                padding: 8vw;
+            }
+
+            .carousel-wrapper {
+                height: auto;
+                aspect-ratio: 1 / 1.2;
+            }
+
+            .carousel img {
+                max-height: 100%;
+                height: auto;
+                width: auto;
+            }
+
+
+            .dots {
+                display: flex;
+                justify-content: center;
+                gap: 5px;
+                margin-top: 3vh;
+            }
+
+            .dot {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background-color: transparent;
+                border: 0.5px solid #000;
+                cursor: none;
+                transition: background-color 0.3s;
+            }
+
+            .dot.active {
+                background-color: #000;
+            }
+
+
+            .logo-button {
+                top: 8vw;
+                left: 8vw;
+                width: 45px;
+                height: 45px;
+                border-radius: 50%;
+                border: 1px solid #6e6e6e;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-decoration: none;
+                flex-shrink: 0;
+            }
+
+            .logo-bottom {
+                display: flex;
+                flex-direction: row;
+                /* ✅ 关键：横向排列 */
+                align-items: center;
+                justify-content: space-between;
+                gap: 1rem;
+                flex-wrap: wrap;
+            }
+
+
+
+            .logo-button img {
+                width: 30px;
+                height: 30px;
+            }
+
+
+
+            footer {
+                padding: 20px 8vw;
+            }
+
+            footer span {
+                font-size: 0.75rem;
+                color: #FFFCF2;
+            }
+
+            .more-text {
+                width: 110px;
+                height: 30px;
+                border: 0.8px solid #000000;
+            }
+
+            .more-text .face {
+                font-size: 0.75rem;
+                font-weight: 200;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content">
+        <div class="left-panel">
+            <a href="work.html" class="logo-button">
+                <img src="media/logo_withe.svg" alt="Back" />
+            </a>
+            <div class="info-award-wrapper">
+                <div class="project-info">
+                    <img src="media/bibf/bibf.png" alt="Award" class="award" />
+                    <p>Beijing International Book Fair<br /> <br />Key Visual Design<br />Sep 2020, Client Work</p>
+                </div>
+
+            </div>
+        </div>
+
+        <hr class="divider" />
+
+        <div class="right-panel">
+            <div class="carousel-wrapper">
+                <div class="carousel">
+                    <img src="media/bibf/BIBF1.jpg" class="carousel-image active" />
+                    <img src="media/bibf/BIBF2.jpg" class="carousel-image" />
+                    <img src="media/bibf/BIBF3.jpg" class="carousel-image" />
+                    <img src="media/bibf/BIBF4.jpg" class="carousel-image" />
+                    <img src="media/bibf/BIBF5.jpg" class="carousel-image" />
+                    <img src="media/bibf/BIBF6.jpg" class="carousel-image" />
+                    <img src="media/bibf/BIBF7.jpg" class="carousel-image" />
+                    <img src="media/bibf/BIBF8.jpg" class="carousel-image" />
+                </div>
+            </div>
+            <div class="dots"></div>
+        </div>
+    </div>
+
+    <footer>
+        <span>© 2025 Jinghe Cai. All rights reserved.</span>
+        <a href="work.html" class="more-wrapper">
+            <span class="more-text">
+                <span class="face front">MORE WORKS</span>
+                <span class="face top">MORE WORKS</span>
+            </span>
+        </a>
+    </footer>
+
+    <div id="custom-cursor"></div>
+
+    <script>
+        const images = document.querySelectorAll('.carousel-image');
+        const dotsContainer = document.querySelector('.dots');
+        let current = 0;
+        let interval;
+
+        function showImage(index) {
+            images.forEach((img, i) => {
+                img.classList.toggle('active', i === index);
+            });
+            document.querySelectorAll('.dot').forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+            current = index;
+        }
+
+        function createDots() {
+            images.forEach((_, i) => {
+                const dot = document.createElement('div');
+                dot.classList.add('dot');
+                if (i === 0) dot.classList.add('active');
+                dot.addEventListener('click', () => {
+                    showImage(i);
+                    resetInterval();
+                });
+                dotsContainer.appendChild(dot);
+            });
+        }
+
+        function nextImage() {
+            showImage((current + 1) % images.length);
+        }
+
+        function startInterval() {
+            interval = setInterval(nextImage, 4000);
+        }
+
+        function resetInterval() {
+            clearInterval(interval);
+            startInterval();
+        }
+
+        createDots();
+        startInterval();
+    </script>
+</body>
+
+</html>

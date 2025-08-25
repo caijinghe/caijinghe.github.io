@@ -1,0 +1,939 @@
+
+html, body {
+  background-color: #FFFCF2;
+}
+
+body {
+    overflow: hidden;
+    cursor: none;
+}
+
+/* 强化的修复方案，解决在不同屏幕尺寸下视频边缘出现缝隙的问题 */
+/* ✅ Overlay 遮罩层 */
+#showreelOverlay {
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100dvh;
+  background-color: rgba(255, 252, 242, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: none;
+  box-sizing: border-box;
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.6s ease;
+}
+
+#showreelOverlay.preload {
+  display: none;
+}
+
+#showreelOverlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ✅ 外层边框容器 */
+.showreel-frame {
+  position: relative;
+  width: 95vw;
+  max-width: 960px;
+  padding: 0px 0px;
+  border: 1px solid #000;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  box-sizing: border-box;
+}
+
+/* ✅ 顶部 Header */
+.showreel-header {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 48px;
+  border-bottom: 1px solid #000;
+  font-family: 'Inter', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 300;
+}
+
+
+/* ✅ 中间标题 */
+.header-center {
+  font-weight: 300;
+  pointer-events: none;
+}
+
+/* ✅ 右上角 SHOWREEL */
+.header-right {
+  position: absolute;
+  right: 20px;
+  font-weight: 200;
+}
+
+/* ✅ 关闭按钮 */
+.close-btn {
+  position: absolute;
+  left: 20px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(16px);
+  padding: 0;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  z-index: 10;
+  cursor: none;
+}
+
+
+.close-btn:hover {
+  /* background-image: url('media/video_next_close.svg');  */
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+
+
+/* ✅ 视频容器 */
+.video-container {
+  width: 100%; /* ✅ 完整撑满内容区 */
+  aspect-ratio: 16 / 9;
+  border-radius: 0px 0px 24px 24px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 0 0 1px black;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  background-color: #000;
+  
+}
+
+
+
+
+
+
+/* ✅ 视频样式 */
+/* ✅ 视频样式（适用于 loadingVideo 和 showreelVideo）*/
+.video-container video {
+  position: absolute; /* ✅ 关键行：让视频叠加在容器中 */
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  display: block;
+  margin: 0;
+  backface-visibility: hidden;
+  transform-origin: center;
+  background-color: #000;
+}
+
+
+
+
+/* loading 视频置顶显示，直到主视频准备好 */
+#loadingVideo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 2;
+  pointer-events: none;
+}
+
+
+/* 主视频默认在底下，播放准备好后升到上层 */
+#showreelVideo {
+  z-index: 1;
+}
+
+/* ✅ 视频悬浮控制按钮容器 */
+.video-controls {
+  position: absolute;
+  bottom: 14px;
+  right: 14px;
+  display: flex;
+  gap: 12px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* ✅ hover 到视频容器时显示所有控制按钮 */
+.video-container:hover .video-controls {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ✅ 控制按钮通用样式 */
+.video-controls img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(16px);
+  padding: 0px;
+  transition: background 0.3s ease;
+  cursor: none;
+}
+.video-controls img:hover {
+  background: transparent;
+}
+
+/* ✅ 静音时强制显示音量按钮 */
+.video-container.force-show-sound .video-controls {
+  opacity: 1;
+  pointer-events: auto;
+}
+.video-container.force-show-sound .video-controls #soundToggleBtn {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ✅ 播放按钮仍然只在 hover 时出现 */
+.video-container.force-show-sound .video-controls #playPauseBtn {
+  opacity: 0;
+  visibility: hidden;
+}
+
+
+#customCursorText {
+    position: fixed;
+    top: 0;
+    left: 0;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 10000;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+    color: rgb(0, 0, 0, 0.3);
+    background-color: transparent;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgb(0, 0, 0, 0.3);
+    user-select: none;
+    text-transform: uppercase;
+}
+
+.cursor-hidden {
+    opacity: 0;
+}
+
+.cursor-hide-system *,
+.cursor-hide-system *::before,
+.cursor-hide-system *::after {
+    cursor: none !important;
+}
+
+
+/* ----------------------分割线-------------------------- */
+
+.fade-section {
+    opacity: 0;
+    transition: all 0.8s ease;
+}
+
+
+.fade-section.visible {
+    opacity: 1;
+}
+
+
+/* 通用类：减少重复声明 */
+.fade-opacity {
+    transition: opacity 0.3s ease;
+}
+
+.abs-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.page-wrapper {
+    box-sizing: border-box;
+    overflow-y: scroll;
+    height: 100vh;
+    scroll-behavior: smooth;
+}
+
+.intro-paragraph {
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    line-height: 1.6;
+    margin: 30px 30px 60px;
+    max-width: 1200px;
+    font-family: 'Inter', sans-serif;
+    text-align: left;
+}
+
+.hero-section {
+    height: 100vh;
+    scroll-snap-align: start;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.font-bold {
+    font-weight: 600;
+}
+
+.font-medium {
+    font-weight: 400;
+}
+
+.font-light {
+    font-weight: 200;
+}
+
+.inline-icon {
+    display: inline-block;
+    height: 2em;
+    width: 2em;
+    position: relative;
+    vertical-align: -0.65em;
+}
+
+.inline-icon.icon-dogcat {
+    width: 4em;
+    height: 1.4em;
+    vertical-align: -0.4em;
+}
+
+.inline-icon img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    transition: opacity 0.3s ease;
+}
+
+.icon-default {
+    opacity: 1;
+    z-index: 1;
+}
+
+.icon-hover {
+    opacity: 0;
+    z-index: 2;
+}
+
+.inline-icon:not(.icon-dogcat):hover .icon-default {
+    opacity: 0;
+}
+
+.inline-icon:not(.icon-dogcat):hover .icon-hover {
+    opacity: 1;
+}
+
+
+.intro-fullscreen {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-direction: column;
+    box-sizing: border-box;
+    transition: opacity 0.8s ease;
+}
+
+.intro-fullscreen.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+
+
+.selected-works-section {
+    position: relative;
+    height: 100vh;
+    scroll-snap-align: start;
+    padding: 120px 10px 20px;
+
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.works-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 0;
+    max-width: 1200px;
+    margin: 0 auto;
+
+}
+
+.work-item {
+    max-width: 320px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    isolation: isolate;
+    margin: 0 -10px;
+    margin-bottom: -100px;
+    transition: transform 0.3s ease;
+}
+
+.work-image-wrapper {
+    width: 100%;
+    aspect-ratio: 383 / 446;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.work-image-inner {
+    width: 90%;
+    height: 90%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+    box-sizing: border-box;
+    position: relative;
+    background-color: #FFFCF2;
+    border: 0px solid transparent;
+    border-radius: 12px;
+
+}
+
+.work-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    background-color: transparent;
+    margin-bottom: 0px;
+    border: 1px solid #6e6e6e;
+    border-radius: 12px;
+    padding: 0px;
+    box-sizing: border-box;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: opacity 0.3s ease;
+}
+
+.image-default {
+    z-index: 1;
+}
+
+.image-hover {
+    opacity: 0;
+    z-index: 10;
+}
+
+.image-muted {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    z-index: 12;
+    /* ✅ 一定要比 .image-default 高 */
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.works-grid:hover .work-item .work-image {
+    border-color: #E5E2D7;
+}
+
+.works-grid:hover .work-item:hover .work-image {
+    border-color: #6e6e6e;
+}
+
+/* 所有文字标题变灰 */
+.works-grid:hover .caption-title,
+.works-grid:hover .caption-subtitle {
+    color: #E5E2D7;
+    transition: color 0.3s ease;
+}
+
+/* 当前 hover 的项目文字恢复默认黑色 */
+.works-grid:hover .work-item:hover .caption-title,
+.works-grid:hover .work-item:hover .caption-subtitle {
+    color: #000000;
+}
+
+
+.works-grid:hover .image-muted {
+    opacity: 1;
+}
+
+.works-grid:hover .work-item:hover .image-muted {
+    opacity: 0;
+}
+
+
+.work-item:hover {
+    z-index: 99;
+}
+
+.work-item:hover .work-image-inner {
+    transform: scale(1.03) rotate(2deg);
+    z-index: 10;
+}
+
+.work-item:hover .image-hover {
+    opacity: 1;
+}
+
+.tilted-one {
+    transform: rotate(8.21deg);
+}
+
+.tilted-two {
+    transform: rotate(-3.09deg);
+}
+
+.tilted-three {
+    transform: rotate(9.5deg);
+}
+
+.tilted-four {
+    transform: rotate(-6.74deg);
+}
+
+.caption-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 20px;
+    margin-top: 24px;
+    transition: color 0.3s ease;
+}
+
+.caption-subtitle {
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    font-size: 16px;
+    margin-top: 6px;
+    transition: color 0.3s ease;
+}
+
+/* index.css 或 style.css 最后添加 */
+/* 卡片进入时的回弹效果 */
+/* 卡片弹回动画 keyframes */
+@keyframes tilt-rebound-one {
+    0% {
+        transform: rotate(12deg);
+    }
+
+    60% {
+        transform: rotate(9deg);
+    }
+
+    100% {
+        transform: rotate(8.21deg);
+    }
+}
+
+@keyframes tilt-rebound-two {
+    0% {
+        transform: rotate(-10deg);
+    }
+
+    60% {
+        transform: rotate(-5.5deg);
+    }
+
+    100% {
+        transform: rotate(-3.09deg);
+    }
+}
+
+@keyframes tilt-rebound-three {
+    0% {
+        transform: rotate(11deg);
+    }
+
+    60% {
+        transform: rotate(10deg);
+    }
+
+    100% {
+        transform: rotate(9.5deg);
+    }
+}
+
+@keyframes tilt-rebound-four {
+    0% {
+        transform: rotate(-12deg);
+    }
+
+    60% {
+        transform: rotate(-8.5deg);
+    }
+
+    100% {
+        transform: rotate(-6.74deg);
+    }
+}
+
+
+
+.tilted-one.animate-rebound {
+    animation: tilt-rebound-one 0.5s ease-out forwards;
+}
+
+.tilted-two.animate-rebound {
+    animation: tilt-rebound-two 0.5s ease-out forwards;
+}
+
+.tilted-three.animate-rebound {
+    animation: tilt-rebound-three 0.5s ease-out forwards;
+}
+
+.tilted-four.animate-rebound {
+    animation: tilt-rebound-four 0.5s ease-out forwards;
+}
+
+
+/* intro icon 的弹跳 */
+@keyframes icon-bounce {
+    0% {
+        transform: translateY(-12px);
+        opacity: 0.8;
+    }
+
+    50% {
+        transform: translateY(4px);
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.animate-bounce {
+    animation: icon-bounce 0.6s ease-out both;
+}
+
+/* === Logo Ticker 区域 === */
+.logo-ticker-wrapper {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px 0;
+    overflow: hidden;
+    z-index: 2;
+    border-top: 0.5px solid #000000;
+    border-bottom: 0.5px solid #000000;
+    background-color: transparent;
+}
+
+.logo-ticker {
+    overflow: hidden;
+    position: relative;
+}
+
+.logo-track {
+    display: flex;
+    flex-shrink: 0;
+}
+
+.logo-track img {
+    height: 3vw;
+    min-height: 2rem;
+    margin: 0 1.8rem;
+    flex-shrink: 0;
+    user-select: none;
+    pointer-events: none;
+}
+
+
+
+/* more button */
+
+.more-section {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 20vh;
+    background-color: #FFFCF2;
+    /* ✅ 页面背景保持一致 */
+
+}
+
+
+.more-wrapper {
+    position: static;
+    /* ❌ 不要 fixed 或 relative */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px 20px;
+    height: 48px;
+
+    border: 1px solid #6e6e6e;
+    border-radius: 40px;
+    background-color: transparent;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 200;
+    color: #000;
+    text-decoration: none;
+
+    transition: all 0.3s ease;
+
+}
+
+
+.more-wrapper {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 1.2s ease, transform 1.2s ease;
+    pointer-events: none;
+}
+
+.more-wrapper.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+
+.more-icon {
+    width: 36px;
+    height: 36px;
+    display: block;
+}
+
+/* 只在切换为 GIF 时生效 */
+.more-icon.is-gif {
+  width: 36px;  
+  height: 32px;
+}
+
+
+.more-text {
+    position: relative;
+    display: block;
+    width: 100px;
+    /* 固定宽度避免容器跳动 */
+    height: 100%;
+    perspective: 600px;
+}
+
+.more-text .face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 200;
+    color: #000;
+
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+    transition: transform 1.5s cubic-bezier(0.22, 1.61, 0.36, 1);
+}
+
+.more-text .top {
+    transform: rotateX(90deg) translateY(-100%);
+    transform-origin: top;
+}
+
+.more-wrapper:hover .more-text .front {
+    transform: rotateX(-90deg) translateY(100%);
+    transform-origin: bottom;
+}
+
+.more-wrapper:hover .more-text .top {
+    transform: rotateX(0deg);
+    font-weight: 500;
+}
+
+/* .more-wrapper:hover .more-icon {
+  content: url("media/more_hover.webp");
+} */
+
+
+
+
+@media (max-width: 600px) {
+
+    .intro-paragraph {
+        font-size: 22px;
+        line-height: 1.7;
+        margin: 20px 0 40px;
+        padding: 0 35px;
+    }
+
+    .works-grid {
+        width: 100vw;
+        max-width: 100%;
+        box-sizing: content-box;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 32px;
+        bottom: 20px；
+    }
+
+    .more-wrapper {
+
+        align-items: center;
+        height: 38px;
+        padding: 8px 4px 8px 10px;
+        gap: 5px;
+    }
+
+    .more-section {
+        padding-top: 50px;
+
+    }
+
+
+    .more-text .face {
+        font-size: 14px;
+        display: fixed;
+    }
+
+
+    .more-icon {
+        height: 25px;
+    }
+
+
+    .caption-title {
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    .caption-subtitle {
+        font-size: 14px;
+    }
+
+    .page-wrapper,
+    .selected-works-section {
+        width: 100vw;
+        max-width: 100%;
+        box-sizing: border-box;
+
+    }
+
+
+    .work-item {
+        width: 100%;
+        max-width: none;
+        margin: 0 auto;
+    }
+
+
+    .page-wrapper {
+        overflow-y: auto;
+        /* ✅ 移动端需要可滚动 */
+    }
+
+    .hero-section {
+        height: auto;
+        min-height: 100vh;
+        padding: 5px;
+    }
+
+    .selected-works-section {
+        height: auto;
+        min-height: 200vh;
+        padding: 60px 90px 20px 90px;
+    }
+
+    .logo-ticker img {
+        height: 28px;
+        margin: 0 12px;
+    }
+
+    .logo-ticker-wrapper {
+        padding: 6px 0;
+    }
+
+
+  .showreel-header {
+    font-size: 1rem;
+    height: 40px;
+  }
+
+  .video-container {
+    border-radius: 20px;
+  }
+
+  .close-btn {
+    width: 24px;
+    height: 24px;
+    left: 12px;
+  }
+
+
+
+  .showreel-frame {
+    border-radius: 16px;
+  }
+
+  .showreel-header {
+    font-size: 0.8rem;
+    height: 36px;
+  }
+
+  .video-container {
+    border-radius: 0px 0px 16px 16px;
+  }
+
+  .close-btn {
+    width: 24px;
+    height: 24px;
+    left: 10px;
+  }
+
+
+
+
+  .more-wrapper {
+    transition: none;
+
+}
+
+
+.more-wrapper {
+
+    transition: none;
+}
+
+
+
+
+
+}

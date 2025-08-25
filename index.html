@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jinghe Cai</title>
+  <!-- Favicon -->
+  <link rel="icon" href="media/logo.svg" type="image/svg+xml" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+
+
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/header.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/index.css" />
+  <img src="media/more_hover.gif" style="display: none;" />
+  <link rel="preload" href="media/more_hover.gif" as="image" />
+
+
+  <!-- JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/SplitText.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.35/bundled/lenis.min.js"></script>
+
+
+  <script type="module" src="js/animation.js"></script>
+  <script type="module" src="js/index.js"></script>
+
+
+
+</head>
+
+<!-- Showreel Overlay Card -->
+
+<!-- Showreel Overlay -->
+<div id="showreelOverlay" class="preload hidden">
+  <div class="showreel-frame">
+    <!-- ✅ 顶部 Header -->
+    <div class="showreel-header">
+      <img id="closeShowreelBtn" src="media/video_next.svg" alt="Close" class="close-btn" />
+      <div class="header-center">Jinghe Cai</div>
+      <div class="header-right">SHOWREEL</div>
+    </div>
+
+    <!-- ✅ 视频内容 -->
+    <div class="showreel-card">
+      <div class="video-container">
+        <!-- ✅ Loading 视频，自动播放静音 -->
+        <video id="loadingVideo" autoplay muted playsinline class="loading-video">
+          <source src="media/loading.mp4" type="video/mp4" />
+        </video>
+
+        <!-- ✅ 主视频 -->
+        <video id="showreelVideo" autoplay playsinline muted class="main-video">
+          <source src="media/showreel.mp4" type="video/mp4" />
+        </video>
+
+        <!-- ✅ 控制按钮 -->
+        <div class="video-controls">
+          <img id="playPauseBtn" src="media/video_play.svg" alt="Play" />
+          <img id="soundToggleBtn" src="media/video_noaudio.svg" alt="Sound Toggle" />
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+<body>
+  <div class="layout" id="mainLayout">
+    <div class="page-wrapper">
+      <header class="header fade-in-line">
+        <div class="header-inner">
+          <div class="pill-header">
+            <a href="index.html" class="logo">
+              <img id="logoIcon" src="media/logo.svg" alt="Logo" class="logo-icon" />
+
+
+            </a>
+
+            <nav class="nav">
+              <a href="work.html" class="cube-button">
+                <span class="face front">Works</span>
+                <span class="face top">Works</span>
+              </a>
+
+              <a href="about.html" class="cube-button">
+                <span class="face front">About</span>
+                <span class="face top">About</span>
+              </a>
+
+            </nav>
+          </div>
+        </div>
+      </header>
+
+
+      <!-- Content Section -->
+      <main class="hero-section fade-section">
+        <div class="text-column">
+          <p class="intro-paragraph">
+            <span class="font-bold">Jinghe</span><span class="inline-icon">
+              <img src="media/jinghe.svg" class="icon-default" />
+              <img src="media/jinghe_B.svg" class="icon-hover" />
+            </span><span class="font-light">is a </span> <span class="font-bold">product designer</span><span
+              class="font-light"> and </span> <span class="font-bold">HCI researcher</span><span
+              class="inline-icon icon-dogcat">
+              <img src="media/dog.svg" class="icon-default" />
+              <img src="media/cat.svg" class="icon-hover" /></span>
+            <span class="font-light"> specializing in </span> <span class="font-medium">affective computing</span><span
+              class="inline-icon">
+              <img src="media/computer.svg" class="icon-default" />
+              <img src="media/computer_B.svg" class="icon-hover" />
+            </span><span class="font-light">. She approaches design as a way to translate subtle human states into
+              interactions that feel </span>
+            <span class="font-medium">emotionally intelligent</span><span class="inline-icon">
+              <img src="media/emo.svg" class="icon-default" />
+              <img src="media/emo_B.svg" class="icon-hover" />
+            </span><span class="font-light">and </span><span class="font-medium">quietly powerful</span><span
+              class="inline-icon">
+              <img src="media/snowman.svg" class="icon-default" />
+              <img src="media/snowman_B.svg" class="icon-hover" />
+            </span><span class="font-light">.</span>
+          </p>
+
+        </div>
+
+
+        <!-- ✅ 底部滚动 Logo 条（上下有细线） -->
+        <div class="logo-ticker-wrapper">
+          <div class="logo-ticker" id="logoTicker">
+            <div class="logo-track">
+              <img src="media/logo_microsoft.png" />
+              <img src="media/logo_copilot.png" />
+              <img src="media/logo_samsung.png" />
+              <img src="media/logo_lepal.svg" />
+              <!-- 再复制一份，用于无缝滚动 -->
+              <img src="media/logo_microsoft.png" />
+              <img src="media/logo_copilot.png" />
+              <img src="media/logo_samsung.png" />
+              <img src="media/logo_lepal.svg" />
+              <!-- 再复制一份，用于无缝滚动 -->
+              <img src="media/logo_microsoft.png" />
+              <img src="media/logo_copilot.png" />
+              <img src="media/logo_samsung.png" />
+              <img src="media/logo_lepal.svg" />
+              <!-- 再复制一份，用于无缝滚动 -->
+              <img src="media/logo_microsoft.png" />
+              <img src="media/logo_copilot.png" />
+              <img src="media/logo_samsung.png" />
+              <img src="media/logo_lepal.svg" />
+            </div>
+          </div>
+        </div>
+
+
+
+      </main>
+
+      <section class="selected-works-section fade-section">
+        <div class="works-grid">
+
+          <div class="work-item">
+            <div class="work-image-wrapper">
+              <div class="work-image-inner tilted-one">
+                <img src="media/intro_MFST_A.svg" alt="Microsoft Muted" class="work-image image-muted" />
+                <img src="media/intro_MFST.svg" alt="Microsoft" class="work-image image-default" />
+                <img src="media/intro_MFST_B.svg" alt="Microsoft Hover" class="work-image image-hover" />
+              </div>
+            </div>
+            <div class="work-caption">
+              <div class="caption-title">Microsoft</div>
+              <div class="caption-subtitle">AI Design Toolkit</div>
+            </div>
+          </div>
+
+          <div class="work-item">
+            <div class="work-image-wrapper">
+              <div class="work-image-inner tilted-two">
+                <img src="media/intro_lepal_A.svg" alt="Lepal.ai Muted" class="work-image image-muted" />
+                <img src="media/intro_lepal.svg" alt="Lepal.ai" class="work-image image-default" />
+                <img src="media/intro_lepal_B.svg" alt="Lepal.ai Hover" class="work-image image-hover" />
+              </div>
+            </div>
+            <div class="work-caption">
+              <div class="caption-title">Lepal.ai</div>
+              <div class="caption-subtitle">
+                AI Wellness Companion</div>
+            </div>
+          </div>
+
+          <div class="work-item">
+            <div class="work-image-wrapper">
+              <div class="work-image-inner tilted-three">
+                <img src="media/intro_pink_A.svg" alt="Pink Panthers Muted" class="work-image image-muted" />
+                <img src="media/intro_pink.svg" alt="Pink Panthers" class="work-image image-default" />
+                <img src="media/intro_pink_B.svg" alt="Pink Panthers Hover" class="work-image image-hover" />
+              </div>
+            </div>
+            <div class="work-caption">
+              <div class="caption-title">Pink Panthers</div>
+              <div class="caption-subtitle">Menstrual Health Service</div>
+            </div>
+          </div>
+
+          <div class="work-item">
+            <div class="work-image-wrapper">
+              <div class="work-image-inner tilted-four">
+                <img src="media/intro_elder_A.svg" alt="ElderEase Muted" class="work-image image-muted" />
+                <img src="media/intro_elder.svg" alt="ElderEase" class="work-image image-default" />
+                <img src="media/intro_elder_B.svg" alt="ElderEase Hover" class="work-image image-hover" />
+              </div>
+            </div>
+            <div class="work-caption">
+              <div class="caption-title">ElderEase</div>
+              <div class="caption-subtitle">
+                Accessible Agent Design</div>
+            </div>
+          </div>
+
+        </div>
+
+
+
+        <!-- ✅ 正常流中的更多按钮区域 -->
+        <section class="more-section">
+          <a href="#" id="openShowreelBtn" class="more-wrapper">
+            <img src="media/more.svg" class="more-icon" data-hover="media/more_hover.gif" />
+            <span class="more-text">
+              <span class="face front">SHOWREEL</span>
+              <span class="face top">SHOWREEL</span>
+            </span>
+          </a>
+        </section>
+
+
+
+
+
+    </div>
+    </section>
+
+
+
+
+  </div>
+  <!-- Custom Cursor -->
+  <div id="custom-cursor"></div>
+  <div id="customCursorText" class="cursor-hidden">MORE</div>
+
+
+
+
+
+</body>
+
+</html>
