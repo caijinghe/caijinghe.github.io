@@ -245,6 +245,9 @@ class MeteorLayer {
   }
 }
 
+// =========================
+// 🌠 Shooting Stars (for .block.cover[data-meteors])
+// =========================
 function initMeteorSections() {
   if (PREFERS_REDUCED) return;
 
@@ -259,24 +262,33 @@ function initMeteorSections() {
         layer = new MeteorLayer(sec);
         layers.set(sec, layer);
       }
-      if (e.isIntersecting) layer.start();
-      else layer.stop();
+
+      // ⚡ 进入视口时启动，离开时停止
+      if (e.isIntersecting) {
+        layer.resize(); // 强制更新一次尺寸
+        layer.start();
+      } else {
+        layer.stop();
+      }
     }
   }, { threshold: 0.25 });
 
   sections.forEach(sec => {
     io.observe(sec);
 
-    // ✅ 刷新时立即检查是否在视口中
-    const rect = sec.getBoundingClientRect();
-    if (rect.top < window.innerHeight && rect.bottom > 0) {
-      let layer = layers.get(sec);
-      if (!layer) {
-        layer = new MeteorLayer(sec);
-        layers.set(sec, layer);
+    // ✅ 延迟检查一次，防止初始高度没加载好
+    setTimeout(() => {
+      const rect = sec.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        let layer = layers.get(sec);
+        if (!layer) {
+          layer = new MeteorLayer(sec);
+          layers.set(sec, layer);
+        }
+        layer.resize();
+        layer.start();
       }
-      layer.start();
-    }
+    }, 500);
   });
 
   window.addEventListener('beforeunload', () => {
@@ -285,7 +297,9 @@ function initMeteorSections() {
   });
 }
 
-window.addEventListener('DOMContentLoaded', initMeteorSections);
+// ✅ 改成 load 而不是 DOMContentLoaded
+window.addEventListener("load", initMeteorSections);
+
 
 
 // =========================
