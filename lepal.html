@@ -43,6 +43,27 @@
             /* 允许垂直滚动 */
         }
 
+        /* 🔵 Loading Overlay */
+        #loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            /* 在最上层 */
+        }
+
+        #loading-overlay video {
+            max-width: 60vw;
+            /* 居中缩放 */
+            max-height: 60vh;
+            border-radius: 12px;
+            /* 可选：小圆角 */
+        }
+
+
         /* 顶部返回按钮（沿用你的样式） */
         .logo-button {
             position: absolute;
@@ -633,6 +654,14 @@
 </head>
 
 <body>
+
+    <!-- 🔵 Loading Overlay -->
+    <div id="loading-overlay">
+        <video id="loading-video" autoplay muted playsinline>
+            <source src="media/loading.mp4" type="video/mp4" />
+        </video>
+    </div>
+
     <!-- 返回按钮 -->
     <a href="work.html" class="logo-button" aria-label="Back to Works">
         <img src="media/wander/logo_withe.svg" alt="Back" />
@@ -823,6 +852,23 @@
     </footer>
 
     <div id="custom-cursor"></div>
+
+    <script>
+  const overlay = document.getElementById("loading-overlay");
+  const loadingVideo = document.getElementById("loading-video");
+
+  // 视频播放完 → 淡出 overlay
+  loadingVideo.addEventListener("ended", () => {
+    overlay.style.transition = "opacity 0.6s ease";
+    overlay.style.opacity = 0;
+    setTimeout(() => overlay.remove(), 600); // 动画结束后移除
+  });
+
+  // 兜底：如果视频无法播放，直接去掉 overlay
+  loadingVideo.addEventListener("error", () => {
+    overlay.remove();
+  });
+</script>
 
 
 </body>
