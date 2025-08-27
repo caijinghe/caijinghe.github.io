@@ -17,7 +17,7 @@ document.addEventListener('mouseleave', () => {
 
 // ✅ 所有可点击元素 hover 时放大 cursor
 const hoverTargets = document.querySelectorAll(
-  'a, button, [role="button"], [onclick], .cube-button, .logo, .tab, .more-wrapper, .filter-wrapper, .showreel-controls, .work-item, .back-button, .grid-item img, .lightbox, .dot'
+  'a, button, [role="button"], [onclick], .cube-button, .logo, .tab, .more-wrapper, .filter-wrapper, .showreel-controls, .work-item, .back-button, .grid-item img, .lightbox, .dot, .video-overlay'
 );
 
 

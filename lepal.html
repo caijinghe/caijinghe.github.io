@@ -309,8 +309,8 @@
         }
 
         .overlay-2 .phone-right {
-            top: 66%;
-            right: 25%;
+            top: 65%;
+            right: 21%;
         }
 
 
@@ -403,8 +403,71 @@
             background: #fff;
         }
 
+        /* video */
+
+        /* 视频框 */
+        .phone-frame-sequence {
+            position: absolute;
+            top: 66.5%;
+            right: 20%;
+            transform: translateY(-50%);
+            width: 16vw;
+            aspect-ratio: 9 / 19;
+            border-radius: 2vw;
+            border: 1px solid #666;
+            overflow: hidden;
+            background: #000;
+    
+        }
+
+        .phone-frame-sequence video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
 
+        
+
+        /* 左边方块矩阵 */
+        .video-overlay-grid {
+            position: absolute;
+            top: 66%;
+            right: 12%;
+            transform: translateY(-50%);
+            display: grid;
+            grid-template-columns: repeat(2, 16vw);
+            grid-template-rows: repeat(3, 10vw);
+            /* 固定三行 */
+            gap: 2vw 2vw;
+        }
+
+        .video-overlay {
+            background: rgba(0, 0, 0, 0.8);
+            /* background: #d74c4c99; */
+            cursor: none;
+            transition: background 0.3s ease, opacity 0.3s ease;
+        }
+
+        .video-overlay[data-index="4"] {
+            width: 16vw;
+            /* 只占一列宽度 */
+            justify-self: start;
+            /* 靠左对齐 */
+        }
+
+
+
+
+
+        .video-overlay.wide {
+            grid-column: span 2;
+            /* 占两列 */
+        }
+
+        .video-overlay.active {
+            background: rgba(0, 0, 0, 0.0);
+        }
 
 
 
@@ -450,6 +513,7 @@
             border-top: 1px solid #222;
             color: #666;
         }
+
 
         .more-wrapper {
             text-decoration: none;
@@ -499,9 +563,7 @@
         }
 
 
-
-
-        @media (max-width: 768px) {
+        @media (max-width: 1400px) {
 
             /* 手机框通用样式 */
             .phone-frame {
@@ -509,11 +571,11 @@
                 top: 50%;
                 /* 默认垂直居中，可单独覆盖 */
                 transform: translateY(-50%);
-                width: 70px;
+                width: 16.4vw;
                 /* 手机宽度，可调 */
                 aspect-ratio: 9 / 19.4;
                 /* 常见手机屏比例 */
-                border-radius: 10px;
+                border-radius: 2vw;
                 /* 圆角 */
                 border: 0.8px solid #666;
                 /* 白色边框 */
@@ -632,7 +694,7 @@
 
             footer span {
                 font-size: 0.75rem;
-                color: #666;
+                color: #000000;
             }
 
             .more-text {
@@ -645,9 +707,6 @@
                 font-size: 0.75rem;
                 font-weight: 200;
             }
-
-
-
 
         }
     </style>
@@ -732,37 +791,43 @@
 
 
 
-        <section class="block showcase-overlay overlay-2">
-            <img src="media/lepal/showcase3.png" class="showcase-bg" alt="Intro shot" />
+  <section class="block showcase-overlay overlay-2">
+  <img src="media/lepal/showcase3.png" class="showcase-bg" alt="Intro shot" />
 
-            <!-- 左侧视频 -->
-            <div class="phone-frame phone-left">
-                <video class="lepal-video" playsinline muted loop preload="metadata">
-                    <source src="media/lepal/onboard1.mov" type="video/mp4" />
-                </video>
-            </div>
-
-            <!-- 右侧视频 -->
-            <!-- <div class="phone-frame phone-right">
-                <video class="lepal-video" playsinline muted loop preload="metadata">
-                    <source src="media/lepal/onboard2.mp4" type="video/mp4" />
-                </video>
-            </div> -->
-
-            <div class="phone-frame phone-right" id="video-sequence">
-                <!-- 第一个视频，默认显示 -->
-                <video id="video1" playsinline muted preload="metadata">
-                    <source src="media/lepal/onboard2-1.mp4" type="video/mp4" />
-                </video>
-
-                <!-- 第二个视频，初始隐藏 -->
-                <video id="video2" playsinline muted preload="metadata" style="display:none;">
-                    <source src="media/lepal/onboard2-2.mp4" type="video/mp4" />
-                </video>
-            </div>
+  <!-- 左边方块矩阵 -->
+  <div class="video-overlay-grid">
+    <div class="video-overlay" data-index="0"></div>
+    <div class="video-overlay" data-index="1"></div>
+    <div class="video-overlay" data-index="2"></div>
+    <div class="video-overlay" data-index="3"></div>
+    <div class="video-overlay wide" data-index="4"></div>
+  </div>
 
 
-        </section>
+  <!-- 新增：旁边的固定手机框 -->
+<div class="phone-frame-sequence" style="left: 15%;">
+  <video id="side-video" playsinline autoplay muted loop preload="auto">
+    <source src="media/lepal/onboard0.mov" type="video/mp4" />
+  </video>
+</div>
+
+  
+  <!-- 右边视频手机框（序列播放） -->
+  <div class="phone-frame-sequence" style="left: 34%;">
+    <video id="main-video" playsinline muted preload="metadata">
+      <source src="media/lepal/onboard1.mov" type="video/mp4" />
+    </video>
+  </div>
+
+
+</section>
+
+
+
+
+
+
+
 
 
 
@@ -854,21 +919,43 @@
     <div id="custom-cursor"></div>
 
     <script>
-  const overlay = document.getElementById("loading-overlay");
-  const loadingVideo = document.getElementById("loading-video");
+        const overlay = document.getElementById("loading-overlay");
+        const loadingVideo = document.getElementById("loading-video");
 
-  // 视频播放完 → 淡出 overlay
-  loadingVideo.addEventListener("ended", () => {
-    overlay.style.transition = "opacity 0.6s ease";
-    overlay.style.opacity = 0;
-    setTimeout(() => overlay.remove(), 600); // 动画结束后移除
-  });
+        let videoDone = false;
+        let pageDone = false;
 
-  // 兜底：如果视频无法播放，直接去掉 overlay
-  loadingVideo.addEventListener("error", () => {
-    overlay.remove();
-  });
-</script>
+        function tryRemoveOverlay() {
+            if (videoDone && pageDone) {
+                overlay.style.transition = "opacity 0.6s ease";
+                overlay.style.opacity = 0;
+                setTimeout(() => overlay.remove(), 600);
+                document.body.style.overflow = ""; // 恢复滚动
+            }
+        }
+
+        // 1️⃣ 视频结束
+        loadingVideo.addEventListener("ended", () => {
+            videoDone = true;
+            tryRemoveOverlay();
+        });
+
+        // 兜底：视频加载失败
+        loadingVideo.addEventListener("error", () => {
+            videoDone = true;
+            tryRemoveOverlay();
+        });
+
+        // 2️⃣ 页面资源加载完成
+        window.addEventListener("load", () => {
+            pageDone = true;
+            tryRemoveOverlay();
+        });
+
+        // 🔒 页面加载期间禁滚动，防止看到未渲染完成的内容
+        document.body.style.overflow = "hidden";
+
+    </script>
 
 
 </body>

@@ -451,3 +451,123 @@ function setupSequentialLoop(video1Id, video2Id) {
 document.addEventListener("DOMContentLoaded", () => {
   setupSequentialLoop("video1", "video2");
 });
+
+
+const overlay = document.getElementById("loading-overlay");
+const loadingVideo = document.getElementById("loading-video");
+
+let videoDone = false;
+let pageDone = false;
+
+function tryRemoveOverlay() {
+  if (videoDone && pageDone) {
+    overlay.style.transition = "opacity 0.6s ease";
+    overlay.style.opacity = 0;
+    setTimeout(() => overlay.remove(), 600);
+    document.body.style.overflow = ""; // 恢复滚动
+  }
+}
+
+// 视频能播放就计为 done（避免系统省电中断）
+loadingVideo.addEventListener("ended", () => {
+  videoDone = true;
+  tryRemoveOverlay();
+});
+
+loadingVideo.addEventListener("canplaythrough", () => {
+  // 如果用户切走导致 ended 不触发，也能继续
+  if (!videoDone) {
+    setTimeout(() => {
+      videoDone = true;
+      tryRemoveOverlay();
+    }, 1000); // 最多等1秒就算过渡
+  }
+});
+
+loadingVideo.addEventListener("error", () => {
+  videoDone = true;
+  tryRemoveOverlay();
+});
+
+// 页面加载完成
+window.addEventListener("load", () => {
+  pageDone = true;
+  tryRemoveOverlay();
+});
+
+// 禁止滚动
+document.body.style.overflow = "hidden";
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const mainVideo = document.getElementById("main-video");   // after
+  const sideVideo = document.getElementById("side-video");   // before
+  const overlays = document.querySelectorAll(".video-overlay-grid .video-overlay");
+
+  // 两组视频路径
+  const sourcesBefore = [
+    "media/lepal/before1.mov",
+    "media/lepal/before2.mov",
+    "media/lepal/before3.mov",
+    "media/lepal/before4.mov",
+    "media/lepal/before5.mov"
+  ];
+
+  const sourcesAfter = [
+    "media/lepal/onboard1.mov",
+    "media/lepal/onboard2.mov",
+    "media/lepal/onboard3.mov",
+    "media/lepal/onboard4.mov",
+    "media/lepal/onboard5.mov"
+  ];
+
+  let currentIndex = 0;   // 当前播放索引
+  let autoPlay = true;    // 自动顺序播放开关
+
+  // 同时切换两个视频
+  function playVideo(index) {
+    if (index < 0 || index >= sourcesAfter.length) return;
+    currentIndex = index;
+
+    // 切换 before
+    sideVideo.src = sourcesBefore[index];
+    sideVideo.currentTime = 0;
+    sideVideo.play().catch(() => {});
+
+    // 切换 after
+    mainVideo.src = sourcesAfter[index];
+    mainVideo.currentTime = 0;
+    mainVideo.play().catch(() => {});
+
+    updateActiveOverlay();
+  }
+
+  // 高亮当前块
+  function updateActiveOverlay() {
+    overlays.forEach((el, i) => {
+      el.classList.toggle("active", i === currentIndex);
+    });
+  }
+
+  // 自动播放：以 after 视频为基准
+  mainVideo.addEventListener("ended", () => {
+    if (autoPlay) {
+      currentIndex = (currentIndex + 1) % sourcesAfter.length;
+      playVideo(currentIndex);
+    }
+  });
+
+  // Hover 控制
+  overlays.forEach((el, i) => {
+    el.addEventListener("mouseenter", () => {
+      autoPlay = false;
+      playVideo(i);
+    });
+    el.addEventListener("mouseleave", () => {
+      autoPlay = true;
+    });
+  });
+
+  // 初始化
+  playVideo(0);
+});
