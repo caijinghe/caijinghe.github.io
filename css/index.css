@@ -8,6 +8,19 @@ body {
     cursor: none;
 }
 
+a {
+  text-decoration: none;   /* 去掉下划线 */
+  color: inherit;          /* 继承父元素文字颜色 */
+}
+
+a:hover,
+a:focus,
+a:active {
+  text-decoration: none;   /* 确保 hover 等状态也不出现下划线 */
+  color: inherit;          /* 保持颜色一致（除非你想 hover 时变色） */
+}
+
+
 /* 强化的修复方案，解决在不同屏幕尺寸下视频边缘出现缝隙的问题 */
 /* ✅ Overlay 遮罩层 */
 #showreelOverlay {
