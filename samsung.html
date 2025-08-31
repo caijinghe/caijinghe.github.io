@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>samsung</title>
+    <link rel="icon" href="media/logo.svg" type="image/svg+xml" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css" />
+
+    <script type="module" src="js/cursor.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        /* Loading Overlay */
+        #loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        #loading-overlay video {
+            max-width: 60vw;
+            max-height: 60vh;
+            border-radius: 12px;
+        }
+
+        /* 返回按钮 */
+        .logo-button {
+            position: absolute;
+            top: 3vw;
+            left: 4vw;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            border: 1px solid #ffffff80;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            text-decoration: none;
+            z-index: 10;
+            backdrop-filter: blur(2px);
+            transition: border-color .2s ease, transform .2s ease;
+        }
+
+        .logo-button img {
+            width: 36px;
+            height: 36px;
+        }
+
+        /* 主容器 */
+        .stack {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .block {
+            width: 100vw;
+            position: relative;
+        }
+
+        /* 全屏封面 & 大图 */
+        .block.cover {
+            overflow: hidden;
+        }
+
+        .block.cover img,
+        .block.cover video,
+        .block img,
+        .block video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+
+        .block.cover {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .block.cover video {
+            position: absolute;
+            /* 固定在容器底层 */
+            top: 10%;
+            left: 0;
+            z-index: 1;
+            /* 视频在底层 */
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+        }
+
+        .block.cover img {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 100%;
+            /* height: 100vh; */
+       
+            object-fit: cover;
+            /* 保持比例裁切 */
+            /* object-position: center top; */
+            /* 从下半部分对齐裁剪 */
+            display: block;
+        }
+
+
+        /* 中等视频段 */
+        .block.video-focus {
+            display: flex;
+            justify-content: center;
+            padding: 4vh 0;
+            background: #000;
+        }
+
+        .video-frame {
+            width: 80%;
+            max-width: 1100px;
+            aspect-ratio: 16/9;
+            overflow: hidden;
+            box-shadow: 0 10px 24px rgba(0, 0, 0, .35);
+        }
+
+        .video-frame>video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+
+        /* 标题 */
+        .center {
+            width: 100%;
+            text-align: center;
+            padding: 0 clamp(16px, 5vw, 10px) 170px;
+        }
+
+        #animated-text {
+            font-family: 'Nunito', sans-serif;
+            font-size: 3vw;
+            text-align: center;
+            background: linear-gradient(90deg, #8be9fd, #82cfff, #bd93f9, #ff79c6, #ffb6e6, #8be9fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 300% 100%;
+            display: inline-block;
+        }
+
+        /* Showcase 视频框 */
+        .showcase-overlay {
+            position: relative;
+            width: 100%;
+        }
+
+        .showcase-bg {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* 公用手机框组：整体居中，通过 gap 控制间距 */
+        .phone-frame-group {
+            position: absolute;
+            top: 65%;
+            /* 垂直位置 */
+            left: 50%;
+            /* 居中 */
+            transform: translate(-50%, -50%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15vw;
+            /* 👈 调这个控制两机之间的间距 */
+            z-index: 3;
+        }
+
+        /* 单个手机框 */
+        .phone-frame {
+            width: 16vw;
+            aspect-ratio: 9 / 19.4;
+            border-radius: 2vw;
+            border: 2px solid #2d2d2d;
+            overflow: hidden;
+            background: #000;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+        }
+
+        .phone-frame video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+
+
+        /* Phone Frame Sequence */
+        .phone-frame-sequence {
+            position: absolute;
+            top: 66.5%;
+            transform: translateY(-50%);
+            width: 16vw;
+            aspect-ratio: 9/19;
+            border-radius: 2vw;
+            border: 1px solid #666;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .phone-frame-sequence video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Overlay Grid */
+        .video-overlay-grid {
+            position: absolute;
+            top: 66%;
+            right: 12%;
+            transform: translateY(-50%);
+            display: grid;
+            grid-template-columns: repeat(2, 16vw);
+            grid-template-rows: repeat(3, 10vw);
+            gap: 2vw;
+        }
+
+        .video-overlay {
+            background: rgba(0, 0, 0, 0.8);
+            cursor: none;
+            transition: background 0.3s ease, opacity 0.3s ease;
+        }
+
+        .video-overlay[data-index="4"] {
+            width: 16vw;
+            justify-self: start;
+        }
+
+        .video-overlay.wide {
+            grid-column: span 2;
+        }
+
+        .video-overlay.active {
+            background: rgba(0, 0, 0, 0);
+        }
+
+        /* 只针对 overlay-3 的手机组，单独调整高度 */
+        .overlay-3 .phone-frame-group {
+            top: 61%;
+            /* 👈 这里调节高度 */
+        }
+
+
+        /* Carousel */
+        .poster-carousel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 8vw;
+            margin: 40px auto;
+        }
+
+        .poster-carousel .carousel-frame {
+            position: relative;
+            width: 100%;
+            max-width: 83%;
+            overflow: hidden;
+            border: 1px solid #555;
+            border-radius: 20px;
+            background: #000;
+            margin: 0 auto;
+        }
+
+        .poster-carousel .carousel-frame::before {
+            content: "";
+            display: block;
+            padding-top: 56.25%;
+        }
+
+        .poster-carousel .carousel-frame img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        .poster-carousel .carousel-frame img.active {
+            opacity: 1;
+            z-index: 1;
+        }
+
+        .carousel-dots {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+
+        .carousel-dots .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #666;
+        }
+
+        .carousel-dots .dot.active {
+            background: #fff;
+        }
+
+        /* Footer */
+        footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 4vw;
+            font-size: 0.8rem;
+            border-top: 0.8px solid #666;
+        }
+
+        footer span {
+            color: #666;
+            font-weight: 300;
+        }
+
+        .more-wrapper {
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .more-text {
+            position: relative;
+            width: 135px;
+            height: 38px;
+            border: 1px solid #ffffff;
+            border-radius: 999px;
+            overflow: hidden;
+            perspective: 600px;
+            display: inline-block;
+            cursor: none;
+        }
+
+        .more-text .face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 300;
+            color: #ffffff;
+            backface-visibility: hidden;
+            transform-style: preserve-3d;
+            transition: transform 1.5s cubic-bezier(0.22, 1.61, 0.36, 1);
+        }
+
+        .more-text .top {
+            transform: rotateX(90deg) translateY(-100%);
+            transform-origin: top;
+        }
+
+        .more-wrapper:hover .more-text .front {
+            transform: rotateX(-90deg) translateY(100%);
+            transform-origin: bottom;
+        }
+
+        .more-wrapper:hover .more-text .top {
+            transform: rotateX(0deg);
+            font-weight: 500;
+        }
+
+        .divider {
+            display: none;
+        }
+
+
+
+        @media (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 500px) {
+            header {
+                gap: 1.5rem;
+            }
+
+            header {
+                padding: 8vw 8vw 4vw 8vw;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6rem;
+            }
+
+            .header-top {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+            }
+
+
+
+            .back-button {
+                width: 45px;
+                height: 45px;
+                border-radius: 50%;
+                border: 1px solid #6e6e6e;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-decoration: none;
+                flex-shrink: 0;
+            }
+
+            .header-bottom {
+                display: flex;
+                flex-direction: row;
+                /* ✅ 关键：横向排列 */
+                align-items: center;
+                justify-content: space-between;
+                gap: 1rem;
+                flex-wrap: wrap;
+            }
+
+
+
+            .back-button img {
+                width: 30px;
+                height: 30px;
+            }
+
+            .project-title {
+                /* font-family: 'Sora', sans-serif; */
+                font-size: 1.8rem;
+                font-weight: 300;
+            }
+
+            .project-meta {
+                padding-top: 30px;
+                font-size: 0.7rem;
+                font-weight: 200;
+                line-height: 1.5;
+                color: #000000;
+            }
+
+            .title-group {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .chinese-title {
+                height: 140px;
+            }
+
+
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+
+            .grid-item {
+
+                padding: 8vw;
+            }
+
+            .center {
+
+                padding-top: 30px;
+                padding-bottom: 80px;
+            }
+
+            .logo-button {
+                top: 8vw;
+                left: 8vw;
+                width: 45px;
+                height: 45px;
+                border-radius: 50%;
+                border: 1px solid #ffffff;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-decoration: none;
+                flex-shrink: 0;
+            }
+
+            .logo-bottom {
+                display: flex;
+                flex-direction: row;
+                /* ✅ 关键：横向排列 */
+                align-items: center;
+                justify-content: space-between;
+                gap: 1rem;
+                flex-wrap: wrap;
+            }
+
+
+
+            .logo-button img {
+                width: 30px;
+                height: 30px;
+            }
+
+
+            footer {
+                margin-top: auto;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 20px 8vw;
+                font-size: 0.8rem;
+                /* border-top: 1px solid #ccc; */
+            }
+
+
+            footer span {
+                font-size: 0.75rem;
+                color: #000000;
+
+            }
+
+
+            .more-wrapper {
+                display: inline-block;
+                text-decoration: none;
+            }
+
+
+
+
+            .more-text {
+                width: 110px;
+                height: 30px;
+                border: 0.8px solid #ffffff;
+            }
+
+
+
+            .more-text .face {
+                font-size: 0.75rem;
+                font-weight: 200;
+            }
+
+            .poster-carousel .carousel-frame {
+
+                border-radius: 10px;
+
+            }
+
+            .carousel-dots {
+                display: flex;
+                gap: 8px;
+                justify-content: center;
+                margin-top: 15px;
+            }
+
+            .carousel-dots .dot {
+                width: 5px;
+                height: 5px;
+            }
+
+
+
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay">
+        <video id="loading-video" autoplay muted playsinline>
+            <source src="media/loading.mp4" type="video/mp4" />
+        </video>
+    </div>
+
+    <!-- 返回按钮 -->
+    <a href="work.html" class="logo-button"><img src="media/wander/logo_withe.svg" alt="Back" /></a>
+
+    <main class="stack" id="samsung-stack">
+        <!-- Cover -->
+        <!-- Cover -->
+        <section class="block cover" data-meteors>
+            <!-- 视频在底层 -->
+            <video class="bg-video" autoplay muted loop playsinline>
+                <source src="media/samsung/essential.mp4" type="video/mp4" />
+            </video>
+
+            <!-- 图片在上层 -->
+            <img src="media/samsung/cover.png" loading="eager" alt="Samsung Cover" />
+        </section>
+
+
+
+
+
+        <!-- 普通大图 -->
+        <section class="block"><img src="media/samsung/overview.png" alt="Intro shot" /></section>
+        <section class="block"><img src="media/samsung/challenge.png" alt="Intro shot" /></section>
+        <!-- <section class="block"><img src="media/samsung/overview3.png" alt="Intro shot" /></section>
+        <section class="block"><img src="media/samsung/designsystem.png" alt="Intro shot" /></section> -->
+
+       
+    </main>
+
+    <footer>
+        <span>© 2025 Jinghe Cai. All rights reserved.</span>
+        <a href="work.html" class="more-wrapper">
+            <span class="more-text">
+                <span class="face front">MORE WORKS</span>
+                <span class="face top">MORE WORKS</span>
+            </span>
+        </a>
+    </footer>
+
+    <div id="custom-cursor"></div>
+
+    <script>
+        const overlay = document.getElementById("loading-overlay");
+        const loadingVideo = document.getElementById("loading-video");
+
+        let videoDone = false, pageDone = false;
+
+        function tryRemoveOverlay() {
+            if (videoDone && pageDone) {
+                overlay.style.transition = "opacity 0.6s ease";
+                overlay.style.opacity = 0;
+                setTimeout(() => overlay.remove(), 600);
+                document.body.style.overflow = "";
+            }
+        }
+        loadingVideo.addEventListener("ended", () => { videoDone = true; tryRemoveOverlay(); });
+        loadingVideo.addEventListener("error", () => { videoDone = true; tryRemoveOverlay(); });
+        window.addEventListener("load", () => { pageDone = true; tryRemoveOverlay(); });
+
+        document.body.style.overflow = "hidden";
+    </script>
+</body>
+
+</html>

@@ -4,19 +4,15 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Jinghe Cai</title>
+    <title>Lepal</title>
     <link rel="icon" href="media/logo.svg" type="image/svg+xml" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet">
-
-
-
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/style.css" />
 
     <script type="module" src="js/cursor.js"></script>
     <script type="module" src="js/lepal.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-
 
     <style>
         * {
@@ -32,18 +28,15 @@
             font-family: 'Inter', sans-serif;
         }
 
-        /* ✅ 允许纵向滚动；保留 100vh 视觉但不锁死高度 */
         body {
             display: flex;
             flex-direction: column;
             min-height: 100vh;
             overflow-x: hidden;
-            /* 只禁水平滚动 */
             overflow-y: auto;
-            /* 允许垂直滚动 */
         }
 
-        /* 🔵 Loading Overlay */
+        /* Loading Overlay */
         #loading-overlay {
             position: fixed;
             inset: 0;
@@ -52,22 +45,17 @@
             justify-content: center;
             align-items: center;
             z-index: 9999;
-            /* 在最上层 */
         }
 
         #loading-overlay video {
             max-width: 60vw;
-            /* 居中缩放 */
             max-height: 60vh;
             border-radius: 12px;
-            /* 可选：小圆角 */
         }
 
-
-        /* 顶部返回按钮（沿用你的样式） */
+        /* 返回按钮 */
         .logo-button {
             position: absolute;
-            /* 固定方便随时返回 */
             top: 3vw;
             left: 4vw;
             width: 55px;
@@ -77,73 +65,73 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            text-decoration: none;
             background: transparent;
+            text-decoration: none;
             z-index: 10;
             backdrop-filter: blur(2px);
             transition: border-color .2s ease, transform .2s ease;
         }
-
-
 
         .logo-button img {
             width: 36px;
             height: 36px;
         }
 
-        /* 主容器：竖向堆叠 */
+        /* 主容器 */
         .stack {
             width: 100%;
             display: flex;
             flex-direction: column;
             gap: 0;
-            /* 大图无缝衔接 */
         }
 
-        /* 每一个版块（图/视频都用它包裹） */
         .block {
             width: 100vw;
             position: relative;
         }
 
+        /* 全屏封面 & 大图 */
+        .block.cover {
+            overflow: hidden;
+        }
+
+        .block.cover img,
+        .block.cover video,
+        .block img,
+        .block video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
 
 
+        .block.cover {
+            position: relative;
+            overflow: hidden;
+        }
 
+        .block.cover img {
+            position: relative;
+            z-index: 2;
+            /* 图片在上 */
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
 
-        /* 中间层：流星画布 */
         .meteor-canvas {
             position: absolute;
             inset: 0;
             z-index: 1;
             /* 在图片下方 */
             pointer-events: none;
+            /* 不挡鼠标交互 */
         }
 
-        /* 顶层：你的 PNG 封面图或视频 */
-        .block.cover>img,
-        .block.cover>video {
-            position: relative;
-            z-index: 2;
-        }
 
-        /* 全宽媒体：图片/视频统一规格 */
-        .block img {
-            display: block;
-            width: 100vw;
-            /* 全宽 */
-            height: auto;
-            /* 图片按比例 */
-        }
-
-        .block video {
-            display: block;
-            width: 100vw;
-            /* 全宽 */
-            height: auto;
-            /* 图片按比例 */
-        }
-
-        /* ✅ 中等尺寸的视频段（非全屏），居中显示 */
+        /* 中等视频段 */
         .block.video-focus {
             display: flex;
             justify-content: center;
@@ -151,108 +139,40 @@
             background: #000;
         }
 
-
         .video-frame {
             width: 80%;
-            /* 控制缩小比例，例如 70% */
             max-width: 1100px;
-            /* 设置一个最大宽度 */
-            aspect-ratio: 16 / 9;
+            aspect-ratio: 16/9;
             overflow: hidden;
             box-shadow: 0 10px 24px rgba(0, 0, 0, .35);
         }
-
 
         .video-frame>video {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            /* 需要完整画面可改为 contain */
         }
 
 
-        /* 如果你想要「固定高、充满裁切」的封面型段落，可给该 block 加 .cover */
-        .block.cover {
-            /* height: 100vh; */
-            overflow: hidden;
-        }
-
-        .block.cover img,
-        .block.cover video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* 1pt 白色分隔线（全宽、无额外间距） */
-        .divider {
-            height: 0.3pt;
-            width: 100vw;
-            background: #565656;
-            margin: 0;
-            /* 不增加上下空隙 */
-            pointer-events: none;
-            /* 不影响鼠标事件 */
-        }
-
-        /* 文案说明（偶尔需要时） */
-        .caption {
-            position: absolute;
-            font-size: 14px;
-            line-height: 1.5;
-            color: #ccc;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, .5);
-        }
-
-        /* 容器本身 */
-
+        /* 标题 */
         .center {
             width: 100%;
             text-align: center;
-            padding-inline: clamp(16px, 5vw, 80px);
-            padding-top: 0px;
-            /* 固定上间距 */
-            padding-bottom: 160px;
-            /* 固定下间距 */
-            box-sizing: border-box;
+            padding: 0 clamp(16px, 5vw, 10px) 170px;
         }
-
 
         #animated-text {
             font-family: 'Nunito', sans-serif;
             font-size: 3vw;
             text-align: center;
-            background: linear-gradient(90deg,
-                    #8be9fd,
-                    /* 浅蓝 */
-                    #82cfff,
-                    /* 天蓝 */
-                    #bd93f9,
-                    /* 淡紫 */
-                    #ff79c6,
-                    /* 粉 */
-                    #ffb6e6,
-                    /* 淡粉 */
-                    #8be9fd
-                    /* 回到浅蓝 */
-                );
+            background: linear-gradient(90deg, #8be9fd, #82cfff, #bd93f9, #ff79c6, #ffb6e6, #8be9fd);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-size: 300% 100%;
             display: inline-block;
-            position: relative;
         }
 
-        #animated-text span {
-            display: inline-block;
-            white-space: pre;
-            opacity: 1;
-            /* 打字机直接显现，不需要提前隐藏 */
-        }
-
-
-
-
+        /* Showcase 视频框 */
         .showcase-overlay {
             position: relative;
             width: 100%;
@@ -264,16 +184,27 @@
             display: block;
         }
 
-        .phone-frame {
+        /* 公用手机框组：整体居中，通过 gap 控制间距 */
+        .phone-frame-group {
             position: absolute;
-            top: 50%;
-            /* 默认放在图的中间，可调 */
-            transform: translateY(-50%);
-            width: 250px;
-            /* 手机宽度 */
+            top: 65%;
+            /* 垂直位置 */
+            left: 50%;
+            /* 居中 */
+            transform: translate(-50%, -50%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15vw;
+            /* 👈 调这个控制两机之间的间距 */
+            z-index: 3;
+        }
+
+        /* 单个手机框 */
+        .phone-frame {
+            width: 16vw;
             aspect-ratio: 9 / 19.4;
-            /* 高度自适应 */
-            border-radius: 35px;
+            border-radius: 2vw;
             border: 2px solid #2d2d2d;
             overflow: hidden;
             background: #000;
@@ -284,71 +215,82 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            /* 裁切掉黑边 */
         }
 
 
-        /* 左右分别调位置 */
-        .phone-left {
-            left: 25%;
-            top: 64.8%;
-            /* 比例越小越靠上，越大越靠下 */
+
+        /* Phone Frame Sequence */
+        .phone-frame-sequence {
+            position: absolute;
+            top: 66.5%;
+            transform: translateY(-50%);
+            width: 16vw;
+            aspect-ratio: 9/19;
+            border-radius: 2vw;
+            border: 1px solid #666;
+            overflow: hidden;
+            background: #000;
         }
 
-        .phone-right {
-            right: 25%;
-            top: 64.8%;
+        .phone-frame-sequence video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
-        /* 单独覆盖 overlay-2 的位置 */
-        .overlay-2 .phone-left {
+        /* Overlay Grid */
+        .video-overlay-grid {
+            position: absolute;
             top: 66%;
-            /* 新的高度 */
-            left: 25%;
-            /* 新的水平位置 */
+            right: 12%;
+            transform: translateY(-50%);
+            display: grid;
+            grid-template-columns: repeat(2, 16vw);
+            grid-template-rows: repeat(3, 10vw);
+            gap: 2vw;
         }
 
-        .overlay-2 .phone-right {
-            top: 65%;
-            right: 21%;
+        .video-overlay {
+            background: rgba(0, 0, 0, 0.8);
+            cursor: none;
+            transition: background 0.3s ease, opacity 0.3s ease;
+        }
+
+        .video-overlay[data-index="4"] {
+            width: 16vw;
+            justify-self: start;
+        }
+
+        .video-overlay.wide {
+            grid-column: span 2;
+        }
+
+        .video-overlay.active {
+            background: rgba(0, 0, 0, 0);
+        }
+
+        /* 只针对 overlay-3 的手机组，单独调整高度 */
+        .overlay-3 .phone-frame-group {
+            top: 61%;
+            /* 👈 这里调节高度 */
         }
 
 
-        /* 单独覆盖 overlay-3 的位置 */
-        .overlay-3 .phone-left {
-            top: 60%;
-            /* 新的高度 */
-            left: 25%;
-            /* 新的水平位置 */
-        }
-
-        .overlay-3 .phone-right {
-            top: 60%;
-            right: 25%;
-        }
-
-
-
-        /* === Poster Carousel === */
-        /* === Poster Carousel 容器 === */
+        /* Carousel */
         .poster-carousel {
             display: flex;
             flex-direction: column;
-            /* 框在上，点点在下 */
             align-items: center;
-            /* 居中 */
             padding: 0 8vw;
             margin: 40px auto;
-            box-sizing: border-box;
         }
 
-        /* 外框 */
         .poster-carousel .carousel-frame {
             position: relative;
             width: 100%;
             max-width: 83%;
             overflow: hidden;
-            border: 1px solid #555454;
+            border: 1px solid #555;
             border-radius: 20px;
             background: #000;
             margin: 0 auto;
@@ -358,11 +300,8 @@
             content: "";
             display: block;
             padding-top: 56.25%;
-            /* 16:9 = 9/16*100% */
         }
 
-
-        /* 所有图片叠在一起 */
         .poster-carousel .carousel-frame img {
             position: absolute;
             top: 0;
@@ -372,22 +311,18 @@
             object-fit: cover;
             opacity: 0;
             transition: opacity 1s ease;
-            /* ✅ 淡入淡出 */
         }
 
-        /* 当前显示的图片 */
         .poster-carousel .carousel-frame img.active {
             opacity: 1;
             z-index: 1;
         }
 
-        /* === 小点导航 === */
         .carousel-dots {
             display: flex;
             gap: 15px;
             justify-content: center;
             margin-top: 25px;
-            /* ✅ 框和点点之间的距离 */
         }
 
         .carousel-dots .dot {
@@ -395,127 +330,29 @@
             height: 12px;
             border-radius: 50%;
             background: #666;
-            cursor: none;
-            transition: background 0.3s ease;
         }
 
         .carousel-dots .dot.active {
             background: #fff;
         }
 
-        /* video */
-
-        /* 视频框 */
-        .phone-frame-sequence {
-            position: absolute;
-            top: 66.5%;
-            right: 20%;
-            transform: translateY(-50%);
-            width: 16vw;
-            aspect-ratio: 9 / 19;
-            border-radius: 2vw;
-            border: 1px solid #666;
-            overflow: hidden;
-            background: #000;
-    
-        }
-
-        .phone-frame-sequence video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-
-        
-
-        /* 左边方块矩阵 */
-        .video-overlay-grid {
-            position: absolute;
-            top: 66%;
-            right: 12%;
-            transform: translateY(-50%);
-            display: grid;
-            grid-template-columns: repeat(2, 16vw);
-            grid-template-rows: repeat(3, 10vw);
-            /* 固定三行 */
-            gap: 2vw 2vw;
-        }
-
-        .video-overlay {
-            background: rgba(0, 0, 0, 0.8);
-            /* background: #d74c4c99; */
-            cursor: none;
-            transition: background 0.3s ease, opacity 0.3s ease;
-        }
-
-        .video-overlay[data-index="4"] {
-            width: 16vw;
-            /* 只占一列宽度 */
-            justify-self: start;
-            /* 靠左对齐 */
-        }
-
-
-
-
-
-        .video-overlay.wide {
-            grid-column: span 2;
-            /* 占两列 */
-        }
-
-        .video-overlay.active {
-            background: rgba(0, 0, 0, 0.0);
-        }
-
-
-
-
-
-
-
-
-
-        .cursor {
-            display: inline-block;
-            width: 2px;
-            /* 光标宽度，细一点更自然 */
-            height: 1em;
-            /* ✅ 跟字体大小保持一致 */
-            background: #fff;
-            margin-left: 2px;
-            animation: blink 0.7s steps(1) infinite;
-            vertical-align: middle;
-            /* ✅ 用 middle 对齐，而不是 bottom */
-            position: relative;
-            top: 0.1em;
-            /* ✅ 微调，防止位移 */
-        }
-
-
-        @keyframes blink {
-            50% {
-                opacity: 0;
-            }
-        }
-
-
-
-
-        /* footer 先保留样式（注释掉 DOM），最后再启用 */
+        /* Footer */
         footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px 4vw;
-            font-size: 12px;
-            border-top: 1px solid #222;
-            color: #666;
+            padding: 1rem 4vw;
+            font-size: 0.8rem;
+            border-top: 0.8px solid #666;
         }
 
+        footer span {
+            color: #666;
+            font-weight: 300;
+        }
 
         .more-wrapper {
+            display: inline-block;
             text-decoration: none;
         }
 
@@ -523,28 +360,28 @@
             position: relative;
             width: 135px;
             height: 38px;
-            border: 1px solid #ffffff66;
+            border: 1px solid #ffffff;
             border-radius: 999px;
             overflow: hidden;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
             perspective: 600px;
+            display: inline-block;
             cursor: none;
         }
 
         .more-text .face {
             position: absolute;
-            inset: 0;
+            width: 100%;
+            height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 0.85rem;
+            font-family: 'Inter', sans-serif;
             font-weight: 300;
-            color: #fff;
+            color: #ffffff;
             backface-visibility: hidden;
             transform-style: preserve-3d;
-            transition: transform 1.2s cubic-bezier(0.22, 1.61, 0.36, 1);
+            transition: transform 1.5s cubic-bezier(0.22, 1.61, 0.36, 1);
         }
 
         .more-text .top {
@@ -562,100 +399,108 @@
             font-weight: 500;
         }
 
+        .divider {
+            display: none;
+        }
 
-        @media (max-width: 1400px) {
 
-            /* 手机框通用样式 */
-            .phone-frame {
-                position: absolute;
-                top: 50%;
-                /* 默认垂直居中，可单独覆盖 */
-                transform: translateY(-50%);
-                width: 16.4vw;
-                /* 手机宽度，可调 */
-                aspect-ratio: 9 / 19.4;
-                /* 常见手机屏比例 */
-                border-radius: 2vw;
-                /* 圆角 */
-                border: 0.8px solid #666;
-                /* 白色边框 */
-                overflow: hidden;
-                background: #000;
-                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-                z-index: 3;
-                /* 确保在图片上层 */
+
+        @media (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 500px) {
+            header {
+                gap: 1.5rem;
             }
 
-            /* 视频填充满手机框 */
-            .phone-frame video {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-            }
-
-
-
-
-            /* 轮播框 */
-            .poster-carousel .carousel-frame {
-                position: relative;
-                width: 100%;
-                max-width: 83%;
-                /* 最大宽度 */
-                overflow: hidden;
-                border-radius: 10px;
-                /* 圆角更明显 */
-                border: 0.8px solid #666;
-                /* 灰色边框 */
-                background: #000;
-                margin: 0 auto;
-                box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
-            }
-
-            /* 左右分别调位置 */
-            .phone-left {
-                left: 25%;
-                top: 64.8%;
-                /* 比例越小越靠上，越大越靠下 */
-            }
-
-            .phone-right {
-                right: 25%;
-                top: 64.8%;
-            }
-
-
-
-            .carousel-dots {
+            header {
+                padding: 8vw 8vw 4vw 8vw;
                 display: flex;
-                gap: 8px;
-                justify-content: center;
-                margin-top: 22px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6rem;
             }
 
-            .carousel-dots .dot {
-                width: 6px;
-                height: 6px;
+            .header-top {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+            }
+
+
+
+            .back-button {
+                width: 45px;
+                height: 45px;
                 border-radius: 50%;
-                background: #666;
-                cursor: pointer;
-                transition: background 0.3s ease, transform 0.2s ease;
+                border: 1px solid #6e6e6e;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-decoration: none;
+                flex-shrink: 0;
             }
 
+            .header-bottom {
+                display: flex;
+                flex-direction: row;
+                /* ✅ 关键：横向排列 */
+                align-items: center;
+                justify-content: space-between;
+                gap: 1rem;
+                flex-wrap: wrap;
+            }
+
+
+
+            .back-button img {
+                width: 30px;
+                height: 30px;
+            }
+
+            .project-title {
+                /* font-family: 'Sora', sans-serif; */
+                font-size: 1.8rem;
+                font-weight: 300;
+            }
+
+            .project-meta {
+                padding-top: 30px;
+                font-size: 0.7rem;
+                font-weight: 200;
+                line-height: 1.5;
+                color: #000000;
+            }
+
+            .title-group {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .chinese-title {
+                height: 140px;
+            }
+
+
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+
+            .grid-item {
+
+                padding: 8vw;
+            }
 
             .center {
-                width: 100%;
-                text-align: center;
-                padding-inline: clamp(16px, 5vw, 80px);
-                padding-top: 0px;
-                /* 固定上间距 */
-                padding-bottom: 70px;
-                /* 固定下间距 */
-                box-sizing: border-box;
+
+                padding-top: 30px;
+                padding-bottom: 80px;
             }
 
-
-            .logo-button {
+              .logo-button {
                 top: 8vw;
                 left: 8vw;
                 width: 45px;
@@ -687,15 +532,31 @@
             }
 
 
-
             footer {
+                margin-top: auto;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
                 padding: 20px 8vw;
+                font-size: 0.8rem;
+                /* border-top: 1px solid #ccc; */
             }
+
 
             footer span {
                 font-size: 0.75rem;
                 color: #000000;
+
             }
+
+
+            .more-wrapper {
+                display: inline-block;
+                text-decoration: none;
+            }
+
+
+
 
             .more-text {
                 width: 110px;
@@ -703,18 +564,39 @@
                 border: 0.8px solid #ffffff;
             }
 
+
+
             .more-text .face {
                 font-size: 0.75rem;
                 font-weight: 200;
             }
+
+            .poster-carousel .carousel-frame {
+
+                border-radius: 10px;
+
+            }
+
+            .carousel-dots {
+                display: flex;
+                gap: 8px;
+                justify-content: center;
+                margin-top: 15px;
+            }
+
+            .carousel-dots .dot {
+                width: 5px;
+                height: 5px;
+            }
+
+
 
         }
     </style>
 </head>
 
 <body>
-
-    <!-- 🔵 Loading Overlay -->
+    <!-- Loading Overlay -->
     <div id="loading-overlay">
         <video id="loading-video" autoplay muted playsinline>
             <source src="media/loading.mp4" type="video/mp4" />
@@ -722,153 +604,100 @@
     </div>
 
     <!-- 返回按钮 -->
-    <a href="work.html" class="logo-button" aria-label="Back to Works">
-        <img src="media/wander/logo_withe.svg" alt="Back" />
-    </a>
+    <a href="work.html" class="logo-button"><img src="media/wander/logo_withe.svg" alt="Back" /></a>
 
-    <!-- 纵向堆叠的媒体区 -->
     <main class="stack" id="lepal-stack">
-        <!-- ✅ 示例：全屏封面（裁切） -->
+        <!-- Cover -->
         <section class="block cover" data-meteors>
+            <!-- 图片在上层 -->
             <img src="media/lepal/cover.png" loading="eager" alt="LePal Cover" />
-        </section>
 
-
-        <!-- ✅ 示例：普通大图（不裁切） -->
-        <section class="block">
-            <img src="media/lepal/role.png" loading="lazy" alt="Intro shot" />
-        </section>
-
-
-
-        <section class="block">
-            <img src="media/lepal/overview1.png" loading="lazy" alt="Intro shot" />
-        </section>
-
-        <section class="block">
-            <img src="media/lepal/overview2.png" loading="lazy" alt="Intro shot" />
-        </section>
-
-        <section class="block">
-            <img src="media/lepal/overview3.png" loading="lazy" alt="Intro shot" />
+            <!-- 流星画布在图片下方 -->
+            <canvas class="meteor-canvas"></canvas>
         </section>
 
 
 
-        <section class="block">
-            <img src="media/lepal/designsystem.png" loading="lazy" alt="Intro shot" />
-        </section>
+        <!-- 普通大图 -->
+        <section class="block"><img src="media/lepal/role.png" alt="Intro shot" /></section>
+        <section class="block"><img src="media/lepal/overview1.png" alt="Intro shot" /></section>
+        <section class="block"><img src="media/lepal/overview2.png" alt="Intro shot" /></section>
+        <section class="block"><img src="media/lepal/overview3.png" alt="Intro shot" /></section>
+        <section class="block"><img src="media/lepal/designsystem.png" alt="Intro shot" /></section>
 
-
+        <!-- 中间标题 -->
         <div class="center">
-            <h1 class="gradient-text" id="animated-text">
-                “A Private Corner for Your Emotions”
-            </h1>
+            <h1 id="animated-text">“A Private Corner for Your Emotions”</h1>
         </div>
 
+        <!-- Showcase 1 -->
         <section class="block showcase-overlay">
             <img src="media/lepal/showcase1.png" class="showcase-bg" alt="Intro shot" />
+            <div class="phone-frame-group">
+                <div class="phone-frame"><video class="lepal-video" playsinline muted loop>
+                        <source src="media/lepal/home.mp4" type="video/mp4" />
+                    </video></div>
+                <div class="phone-frame"><video class="lepal-video" playsinline muted loop>
+                        <source src="media/lepal/home2.mp4" type="video/mp4" />
+                    </video></div>
+            </div>
+        </section>
 
-            <!-- 左侧视频 -->
-            <div class="phone-frame phone-left">
-                <video class="lepal-video" playsinline muted loop preload="metadata">
-                    <source src="media/lepal/home.mov" type="video/mp4" />
+        <!-- Showcase 2 -->
+        <section class="block"><img src="media/lepal/showcase2.png" alt="Intro shot" /></section>
+
+        <!-- Showcase 3 -->
+        <section class="block showcase-overlay overlay-2">
+            <img src="media/lepal/showcase3.png" class="showcase-bg" alt="Intro shot" />
+            <div class="video-overlay-grid">
+                <div class="video-overlay" data-index="0"></div>
+                <div class="video-overlay" data-index="1"></div>
+                <div class="video-overlay" data-index="2"></div>
+                <div class="video-overlay" data-index="3"></div>
+                <div class="video-overlay wide" data-index="4"></div>
+            </div>
+            <div class="phone-frame-sequence" style="left:15%;">
+                <video id="side-video" playsinline autoplay muted loop preload="auto">
+                    <source src="media/lepal/onboard0.mov" type="video/mp4" />
                 </video>
             </div>
-
-            <!-- 右侧视频 -->
-            <div class="phone-frame phone-right">
-                <video class="lepal-video" playsinline muted loop preload="metadata">
-                    <source src="media/lepal/home2.mov" type="video/mp4" />
+            <div class="phone-frame-sequence" style="left:34%;">
+                <video id="main-video" playsinline muted preload="metadata">
+                    <source src="media/lepal/onboard1.mov" type="video/mp4" />
                 </video>
             </div>
         </section>
 
-
-        <section class="block">
-            <img src="media/lepal/showcase2.png" loading="lazy" alt="Intro shot" />
-        </section>
-
-
-
-  <section class="block showcase-overlay overlay-2">
-  <img src="media/lepal/showcase3.png" class="showcase-bg" alt="Intro shot" />
-
-  <!-- 左边方块矩阵 -->
-  <div class="video-overlay-grid">
-    <div class="video-overlay" data-index="0"></div>
-    <div class="video-overlay" data-index="1"></div>
-    <div class="video-overlay" data-index="2"></div>
-    <div class="video-overlay" data-index="3"></div>
-    <div class="video-overlay wide" data-index="4"></div>
-  </div>
-
-
-  <!-- 新增：旁边的固定手机框 -->
-<div class="phone-frame-sequence" style="left: 15%;">
-  <video id="side-video" playsinline autoplay muted loop preload="auto">
-    <source src="media/lepal/onboard0.mov" type="video/mp4" />
-  </video>
-</div>
-
-  
-  <!-- 右边视频手机框（序列播放） -->
-  <div class="phone-frame-sequence" style="left: 34%;">
-    <video id="main-video" playsinline muted preload="metadata">
-      <source src="media/lepal/onboard1.mov" type="video/mp4" />
-    </video>
-  </div>
-
-
-</section>
-
-
-
-
-
-
-
-
-
-
-
+        <!-- Showcase 4 -->
         <section class="block showcase-overlay overlay-3">
             <img src="media/lepal/showcase4.png" class="showcase-bg" alt="Intro shot" />
-
-            <!-- 左侧视频 -->
-            <div class="phone-frame phone-left">
-                <video class="lepal-video" playsinline muted loop preload="metadata">
-                    <source src="media/lepal/return1.mov" type="video/mp4" />
-                </video>
-            </div>
-
-            <!-- 右侧视频 -->
-            <div class="phone-frame phone-right">
-                <video class="lepal-video" playsinline muted loop preload="metadata">
-                    <source src="media/lepal/return2.mov" type="video/mp4" />
-                </video>
+            <div class="phone-frame-group">
+                <div class="phone-frame"><video class="lepal-video" playsinline muted loop>
+                        <source src="media/lepal/return1.mov" type="video/mp4" />
+                    </video></div>
+                <div class="phone-frame"><video class="lepal-video" playsinline muted loop>
+                        <source src="media/lepal/return2.mov" type="video/mp4" />
+                    </video></div>
             </div>
         </section>
 
 
-        <!-- ✅ Poster Carousel -->
+        <!-- Poster Carousel -->
         <section class="block poster-carousel">
             <div class="carousel-frame">
                 <div class="carousel-track">
-                    <img src="media/lepal/poster1.png" alt="Poster 1" />
-                    <img src="media/lepal/poster2.png" alt="Poster 2" />
-                    <img src="media/lepal/poster3.png" alt="Poster 3" />
-                    <img src="media/lepal/poster4.png" alt="Poster 4" />
-                    <img src="media/lepal/poster5.png" alt="Poster 5" />
-                    <img src="media/lepal/poster6.png" alt="Poster 6" />
-                    <img src="media/lepal/poster7.png" alt="Poster 7" />
-                    <img src="media/lepal/poster8.png" alt="Poster 8" />
-                    <img src="media/lepal/poster9.png" alt="Poster 9" />
-                    <img src="media/lepal/poster10.png" alt="Poster 10" />
-                </div> <!-- ✅ 这里要补上关闭标签 -->
+                    <img src="media/lepal/poster1.png" />
+                    <img src="media/lepal/poster2.png" />
+                    <img src="media/lepal/poster3.png" />
+                    <img src="media/lepal/poster4.png" />
+                    <img src="media/lepal/poster5.png" />
+                    <img src="media/lepal/poster6.png" />
+                    <img src="media/lepal/poster7.png" />
+                    <img src="media/lepal/poster8.png" />
+                    <img src="media/lepal/poster9.png" />
+                    <img src="media/lepal/poster10.png" />
+                </div>
             </div>
-
-            <!-- 点点导航在框外 -->
             <div class="carousel-dots">
                 <span class="dot active" data-index="0"></span>
                 <span class="dot" data-index="1"></span>
@@ -883,27 +712,9 @@
             </div>
         </section>
 
-
-
-        <section class="block">
-            <img src="media/lepal/impact.png" loading="lazy" alt="Intro shot" />
-        </section>
-
-
-        <section class="block">
-            <img src="media/lepal/takeaway.png" loading="lazy" alt="Intro shot" />
-        </section>
-
-
-
-
-
-
-
-        <!-- ✅ 示例：视频段落（自动静音循环，进入视口自动播放） -->
-
-
-
+        <!-- End -->
+        <section class="block"><img src="media/lepal/impact.png" alt="Intro shot" /></section>
+        <section class="block"><img src="media/lepal/takeaway.png" alt="Intro shot" /></section>
     </main>
 
     <footer>
@@ -922,42 +733,22 @@
         const overlay = document.getElementById("loading-overlay");
         const loadingVideo = document.getElementById("loading-video");
 
-        let videoDone = false;
-        let pageDone = false;
+        let videoDone = false, pageDone = false;
 
         function tryRemoveOverlay() {
             if (videoDone && pageDone) {
                 overlay.style.transition = "opacity 0.6s ease";
                 overlay.style.opacity = 0;
                 setTimeout(() => overlay.remove(), 600);
-                document.body.style.overflow = ""; // 恢复滚动
+                document.body.style.overflow = "";
             }
         }
+        loadingVideo.addEventListener("ended", () => { videoDone = true; tryRemoveOverlay(); });
+        loadingVideo.addEventListener("error", () => { videoDone = true; tryRemoveOverlay(); });
+        window.addEventListener("load", () => { pageDone = true; tryRemoveOverlay(); });
 
-        // 1️⃣ 视频结束
-        loadingVideo.addEventListener("ended", () => {
-            videoDone = true;
-            tryRemoveOverlay();
-        });
-
-        // 兜底：视频加载失败
-        loadingVideo.addEventListener("error", () => {
-            videoDone = true;
-            tryRemoveOverlay();
-        });
-
-        // 2️⃣ 页面资源加载完成
-        window.addEventListener("load", () => {
-            pageDone = true;
-            tryRemoveOverlay();
-        });
-
-        // 🔒 页面加载期间禁滚动，防止看到未渲染完成的内容
         document.body.style.overflow = "hidden";
-
     </script>
-
-
 </body>
 
 </html>
