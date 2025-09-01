@@ -17,29 +17,90 @@ window.addEventListener('DOMContentLoaded', () => {
   applyStaggeredFadeIn();
 });
 
-// 项目卡片 hover 和点击逻辑
+// === Hover 行为（仅渐变高亮 + 切换 preview 图）===
 items.forEach(item => {
-  item.addEventListener('click', () => {
-    const link = item.getAttribute('data-link');
-    if (link) window.location.href = link;
-  });
-
   item.addEventListener('mouseenter', () => {
     const img = item.getAttribute('data-img');
     preview.src = `media/${img}`;
-    listWrapper.classList.add('hovering');
-    item.classList.add('hovering');
-    items.forEach(other => {
-      if (other !== item) other.classList.add('dimmed');
-    });
+
+    if (!item.classList.contains('expanded')) {
+      item.classList.add('hover-highlight'); // 加渐变背景
+    }
   });
 
   item.addEventListener('mouseleave', () => {
-    listWrapper.classList.remove('hovering');
-    item.classList.remove('hovering');
-    items.forEach(other => other.classList.remove('dimmed'));
     preview.src = defaultImg;
+    if (!item.classList.contains('expanded')) {
+      item.classList.remove('hover-highlight'); // 移除渐变背景
+    }
   });
+
+  // === Click 行为（展开/收起 + 灰掉其他）===
+  item.addEventListener('click', (e) => {
+    if (e.target.classList.contains('read-btn')) return;
+    const alreadyExpanded = item.classList.contains('expanded');
+
+    // 收起所有展开项
+    items.forEach(other => {
+      other.classList.remove('expanded', 'hovering', 'hover-highlight');
+      const btn = other.querySelector('.read-btn');
+      if (btn) btn.remove();
+    });
+    listWrapper.classList.remove('hovering');
+
+    if (!alreadyExpanded) {
+      // 展开当前项
+      item.classList.add('expanded');
+      item.classList.remove('hover-highlight'); // 展开后取消 hover 色
+
+      // 触发全局灰：让其他项灰掉
+      listWrapper.classList.add('hovering');
+      item.classList.add('hovering'); // 当前展开项保持正常色
+
+      // 插入 Read 按钮
+      // 插入 Read 翻转按钮（撑满描述宽度）
+      const desc = item.querySelector('.work-description');
+      if (desc) {
+        const link = item.getAttribute('data-link');
+        if (link) {
+          const btn = document.createElement('button');
+          btn.className = 'read-btn';
+
+          // 内部两层文字
+          const front = document.createElement('span');
+          front.className = 'face front';
+          front.textContent = 'UNFOLD';
+
+          const top = document.createElement('span');
+          top.className = 'face top';
+          top.textContent = 'UNFOLD';
+
+          btn.appendChild(front);
+          btn.appendChild(top);
+
+          btn.addEventListener('click', (ev) => {
+            ev.stopPropagation();
+            window.location.href = link;
+          });
+
+          desc.appendChild(btn);
+        }
+      }
+
+    }
+  });
+});
+
+// 点击外部时，收起并恢复正常
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.work-item')) {
+    listWrapper.classList.remove('hovering');
+    items.forEach(item => {
+      item.classList.remove('expanded', 'hovering', 'hover-highlight');
+      const btn = item.querySelector('.read-btn');
+      if (btn) btn.remove();
+    });
+  }
 });
 
 // 渲染所有 filter 选项并标记选中项
@@ -61,7 +122,7 @@ function renderFilterOptions(selected) {
     filterOptionsContainer.appendChild(option);
   });
 
-  // 绑定点击事件
+  // 绑定 filter 点击
   const optionElements = filterOptionsContainer.querySelectorAll('.filter-option');
   optionElements.forEach(option => {
     option.addEventListener('click', () => {
@@ -94,7 +155,9 @@ function renderFilterOptions(selected) {
           item.style.pointerEvents = 'none';
         }
 
-        item.classList.remove('first-visible', 'last-hovering');
+        item.classList.remove('first-visible', 'last-hovering', 'expanded', 'hovering', 'hover-highlight');
+        const btn = item.querySelector('.read-btn');
+        if (btn) btn.remove();
       });
 
       const visibleItems = Array.from(workItems).filter(item => item.style.visibility !== 'hidden');
@@ -126,7 +189,3 @@ function applyStaggeredFadeIn() {
     item.style.animationDelay = `${index * 100}ms`;
   });
 }
-
-
-const hoverSound = document.getElementById('hoverSound');
-

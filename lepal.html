@@ -500,7 +500,7 @@
                 padding-bottom: 80px;
             }
 
-              .logo-button {
+            .logo-button {
                 top: 8vw;
                 left: 8vw;
                 width: 45px;
@@ -598,7 +598,7 @@
 <body>
     <!-- Loading Overlay -->
     <div id="loading-overlay">
-        <video id="loading-video" autoplay muted playsinline>
+        <video id="loading-video" autoplay muted loop>
             <source src="media/loading.mp4" type="video/mp4" />
         </video>
     </div>
@@ -731,23 +731,18 @@
 
     <script>
         const overlay = document.getElementById("loading-overlay");
-        const loadingVideo = document.getElementById("loading-video");
 
-        let videoDone = false, pageDone = false;
+// 页面加载完毕 → 移除 overlay
+window.addEventListener("load", () => {
+    overlay.style.transition = "opacity 0.6s ease";
+    overlay.style.opacity = 0;
+    setTimeout(() => overlay.remove(), 600);
+    document.body.style.overflow = "";
+});
 
-        function tryRemoveOverlay() {
-            if (videoDone && pageDone) {
-                overlay.style.transition = "opacity 0.6s ease";
-                overlay.style.opacity = 0;
-                setTimeout(() => overlay.remove(), 600);
-                document.body.style.overflow = "";
-            }
-        }
-        loadingVideo.addEventListener("ended", () => { videoDone = true; tryRemoveOverlay(); });
-        loadingVideo.addEventListener("error", () => { videoDone = true; tryRemoveOverlay(); });
-        window.addEventListener("load", () => { pageDone = true; tryRemoveOverlay(); });
+// 初始禁止滚动
+document.body.style.overflow = "hidden";
 
-        document.body.style.overflow = "hidden";
     </script>
 </body>
 
