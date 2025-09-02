@@ -283,64 +283,31 @@
 
 
         /* Carousel */
-        .poster-carousel {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 0 8vw;
-            margin: 40px auto;
-        }
-
-        .poster-carousel .carousel-frame {
+        .carousel-frame {
             position: relative;
             width: 100%;
             max-width: 83%;
-            overflow: hidden;
+            margin: 40px auto;
+            background: transparent;
+            border: none;
+            padding: 0;
+            /* 不在这里加 padding */
+        }
+
+        .carousel-frame video {
+            width: 100%;
+            height: auto;
+            display: block;
             border: 1px solid #555;
             border-radius: 20px;
             background: #000;
-            margin: 0 auto;
         }
 
-        .poster-carousel .carousel-frame::before {
-            content: "";
-            display: block;
-            padding-top: 56.25%;
+        /* 让 section 控制留白 */
+        .block.video-block {
+            padding: 0 8vw;
         }
 
-        .poster-carousel .carousel-frame img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0;
-            transition: opacity 1s ease;
-        }
-
-        .poster-carousel .carousel-frame img.active {
-            opacity: 1;
-            z-index: 1;
-        }
-
-        .carousel-dots {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 25px;
-        }
-
-        .carousel-dots .dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #666;
-        }
-
-        .carousel-dots .dot.active {
-            background: #fff;
-        }
 
         /* Footer */
         footer {
@@ -631,10 +598,31 @@
 
         <!-- 普通大图 -->
         <section class="block"><img src="media/samsung/overview.png" alt="Intro shot" /></section>
-        <section class="block"><img src="media/samsung/essential.png" alt="Intro shot" /></section>
         <section class="block"><img src="media/samsung/goal.png" alt="Intro shot" /></section>
+        <section class="block"><img src="media/samsung/essential.png" alt="Intro shot" /></section>
+
+
+        <section class="block"><img src="media/samsung/showcase1.png" alt="Intro shot" /></section>
+        <section class="block"><img src="media/samsung/showcase2.png" alt="Intro shot" /></section>
+        <section class="block"><img src="media/samsung/showcase3.png" alt="Intro shot" /></section>
+
+        <section class="block video-block">
+  <div class="carousel-frame">
+    <video controls poster="media/samsung/cmfl.png">
+      <source src="media/samsung/cmfl.mp4" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+  </div>
+</section>
+
+
+
+
+
         <section class="block"><img src="media/samsung/process.png" alt="Intro shot" /></section>
-       
+        <section class="block"><img src="media/samsung/adjective1.png" alt="Intro shot" /></section>
+        <section class="block"><img src="media/samsung/adjective2.png" alt="Intro shot" /></section>
+
 
 
     </main>
@@ -654,16 +642,16 @@
     <script>
         const overlay = document.getElementById("loading-overlay");
 
-// 页面加载完毕 → 移除 overlay
-window.addEventListener("load", () => {
-    overlay.style.transition = "opacity 0.6s ease";
-    overlay.style.opacity = 0;
-    setTimeout(() => overlay.remove(), 600);
-    document.body.style.overflow = "";
-});
+        // 页面加载完毕 → 移除 overlay
+        window.addEventListener("load", () => {
+            overlay.style.transition = "opacity 0.6s ease";
+            overlay.style.opacity = 0;
+            setTimeout(() => overlay.remove(), 600);
+            document.body.style.overflow = "";
+        });
 
-// 初始禁止滚动
-document.body.style.overflow = "hidden";
+        // 初始禁止滚动
+        document.body.style.overflow = "hidden";
 
     </script>
 </body>
