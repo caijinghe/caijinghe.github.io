@@ -412,6 +412,23 @@ a:active {
     transition: transform 0.3s ease;
 }
 
+.work-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* 保证 caption 始终对齐在底部 */
+  height: 100%; /* 保持等高布局 */
+}
+
+
+.work-caption {
+  min-height: 70px;  /* 可调，保证两行文字都能容纳 */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* 保证标题、副标题从上开始排 */
+  align-items: center;         /* 居中对齐，看起来规整 */
+  text-align: center;
+}
+
 .work-image-wrapper {
     width: 100%;
     aspect-ratio: 383 / 446;

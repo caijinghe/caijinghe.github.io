@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>samsung</title>
+    <title>Samsung</title>
     <link rel="icon" href="media/logo.svg" type="image/svg+xml" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet" />
@@ -12,6 +12,7 @@
 
     <script type="module" src="js/cursor.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script type="module" src="js/samsung.js"></script>
 
     <style>
         * {
@@ -49,7 +50,7 @@
         #loading-overlay video {
             max-width: 60vw;
             max-height: 60vh;
-            border-radius: 12px;
+            border-radius: 1rem;
         }
 
         /* 返回按钮 */
@@ -148,7 +149,7 @@
         .video-frame {
             width: 80%;
             max-width: 1100px;
-            aspect-ratio: 16/9;
+            height: auto;
             overflow: hidden;
             box-shadow: 0 10px 24px rgba(0, 0, 0, .35);
         }
@@ -158,129 +159,6 @@
             height: 100%;
             object-fit: cover;
         }
-
-
-        /* 标题 */
-        .center {
-            width: 100%;
-            text-align: center;
-            padding: 0 clamp(16px, 5vw, 10px) 170px;
-        }
-
-        #animated-text {
-            font-family: 'Nunito', sans-serif;
-            font-size: 3vw;
-            text-align: center;
-            background: linear-gradient(90deg, #8be9fd, #82cfff, #bd93f9, #ff79c6, #ffb6e6, #8be9fd);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-size: 300% 100%;
-            display: inline-block;
-        }
-
-        /* Showcase 视频框 */
-        .showcase-overlay {
-            position: relative;
-            width: 100%;
-        }
-
-        .showcase-bg {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        /* 公用手机框组：整体居中，通过 gap 控制间距 */
-        .phone-frame-group {
-            position: absolute;
-            top: 65%;
-            /* 垂直位置 */
-            left: 50%;
-            /* 居中 */
-            transform: translate(-50%, -50%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15vw;
-            /* 👈 调这个控制两机之间的间距 */
-            z-index: 3;
-        }
-
-        /* 单个手机框 */
-        .phone-frame {
-            width: 16vw;
-            aspect-ratio: 9 / 19.4;
-            border-radius: 2vw;
-            border: 2px solid #2d2d2d;
-            overflow: hidden;
-            background: #000;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
-        }
-
-        .phone-frame video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-
-
-        /* Phone Frame Sequence */
-        .phone-frame-sequence {
-            position: absolute;
-            top: 66.5%;
-            transform: translateY(-50%);
-            width: 16vw;
-            aspect-ratio: 9/19;
-            border-radius: 2vw;
-            border: 1px solid #666;
-            overflow: hidden;
-            background: #000;
-        }
-
-        .phone-frame-sequence video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* Overlay Grid */
-        .video-overlay-grid {
-            position: absolute;
-            top: 66%;
-            right: 12%;
-            transform: translateY(-50%);
-            display: grid;
-            grid-template-columns: repeat(2, 16vw);
-            grid-template-rows: repeat(3, 10vw);
-            gap: 2vw;
-        }
-
-        .video-overlay {
-            background: rgba(0, 0, 0, 0.8);
-            cursor: none;
-            transition: background 0.3s ease, opacity 0.3s ease;
-        }
-
-        .video-overlay[data-index="4"] {
-            width: 16vw;
-            justify-self: start;
-        }
-
-        .video-overlay.wide {
-            grid-column: span 2;
-        }
-
-        .video-overlay.active {
-            background: rgba(0, 0, 0, 0);
-        }
-
-        /* 只针对 overlay-3 的手机组，单独调整高度 */
-        .overlay-3 .phone-frame-group {
-            top: 61%;
-            /* 👈 这里调节高度 */
-        }
-
 
         /* Carousel */
         .carousel-frame {
@@ -294,19 +172,134 @@
             /* 不在这里加 padding */
         }
 
-        .carousel-frame video {
+        .carousel-frame {
+            position: relative;
             width: 100%;
+            max-width: 83%;
+            margin: 0 auto;
+            /* border: 1px solid #555;
+            border-radius: 1rem; */
+            overflow: hidden;
+        }
+
+        .arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            font-size: 2rem;
+            line-height: 1;
+            /* 保证上下居中 */
+            color: #727272;
+            background: rgba(188, 188, 188, 0.3);
+            border: none;
+            border-radius: 50%;
+            border: 2px solid #ababab;
+            cursor: none;
+            z-index: 10;
+        }
+
+        .arrow.left {
+            left: 15px;
+            padding-bottom: 7px;
+        }
+
+        .arrow.right {
+            right: 15px;
+            padding-bottom: 7px;
+            /* 微调，避免 › 看起来偏左 */
+        }
+
+
+
+        .carousel-frame video {
+
+            width: 100%;
+            aspect-ratio: 16/9;
+            /* 或者和你 poster 一样的比例 */
             height: auto;
             display: block;
             border: 1px solid #555;
-            border-radius: 20px;
+            border-radius: 1rem;
             background: #000;
+            object-fit: cover;
+            /* 保证裁切一致 */
+
         }
 
         /* 让 section 控制留白 */
         .block.video-block {
             padding: 0 8vw;
         }
+
+
+
+
+        /* Carousel */
+        .poster-carousel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 8vw;
+            margin: 40px auto;
+        }
+
+        .poster-carousel .carousel-frame {
+            position: relative;
+            width: 100%;
+            max-width: 83%;
+            overflow: hidden;
+            border: 1px solid #555;
+            border-radius: 1rem;
+            background: #000;
+            margin: 0 auto;
+        }
+
+        .poster-carousel .carousel-frame::before {
+            content: "";
+            display: block;
+            padding-top: 56.25%;
+        }
+
+        .poster-carousel .carousel-frame img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        .poster-carousel .carousel-frame img.active {
+            opacity: 1;
+            z-index: 1;
+        }
+
+        .carousel-dots {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+
+        .carousel-dots .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #666;
+        }
+
+        .carousel-dots .dot.active {
+            background: #fff;
+        }
+
+
 
 
         /* Footer */
@@ -551,16 +544,18 @@
             }
 
             .carousel-dots {
-                display: flex;
-                gap: 8px;
-                justify-content: center;
-                margin-top: 15px;
+                display: none;
             }
 
-            .carousel-dots .dot {
-                width: 5px;
-                height: 5px;
-            }
+
+                 .carousel-frame video {
+
+     
+            border-radius: 10px;
+      
+
+        }
+
 
 
 
@@ -598,8 +593,144 @@
 
         <!-- 普通大图 -->
         <section class="block"><img src="media/samsung/overview.png" alt="Intro shot" /></section>
-        <section class="block"><img src="media/samsung/goal.png" alt="Intro shot" /></section>
         <section class="block"><img src="media/samsung/essential.png" alt="Intro shot" /></section>
+        <section class="block"><img src="media/samsung/challenge.png" alt="Intro shot" /></section>
+        <!-- <section class="block"><img src="media/samsung/process.png" alt="Intro shot" /></section> -->
+        <section class="block"><img src="media/samsung/adjective1.png" alt="Intro shot" /></section>
+        <section class="block"><img src="media/samsung/final.png" alt="Intro shot" /></section>
+        <section class="block"><img src="media/samsung/stimuli.png" alt="Intro shot" /></section>
+        <section class="block"><img src="media/samsung/survey.png" alt="Intro shot" /></section>
+        <section class="block"><img src="media/samsung/analysis1.png" alt="Intro shot" /></section>
+
+        <section class="block poster-carousel">
+            <div class="carousel-frame">
+                <div class="carousel-track">
+                    <img src="media/samsung/image1.png" />
+                    <img src="media/samsung/image2.png" />
+                    <img src="media/samsung/image3.png" />
+                    <img src="media/samsung/image4.png" />
+                    <img src="media/samsung/image5.png" />
+                    <img src="media/samsung/image6.png" />
+                    <img src="media/samsung/image7.png" />
+                    <img src="media/samsung/image8.png" />
+                    <img src="media/samsung/image9.png" />
+                    <img src="media/samsung/image10.png" />
+                    <img src="media/samsung/image11.png" />
+                    <img src="media/samsung/image12.png" />
+                    <img src="media/samsung/image13.png" />
+                    <img src="media/samsung/image14.png" />
+                    <img src="media/samsung/image15.png" />
+                    <img src="media/samsung/image16.png" />
+                    <img src="media/samsung/image17.png" />
+                    <img src="media/samsung/image18.png" />
+                    <img src="media/samsung/image19.png" />
+                    <img src="media/samsung/image20.png" />
+                    <img src="media/samsung/image21.png" />
+                    <img src="media/samsung/image22.png" />
+                    <img src="media/samsung/image23.png" />
+                    <img src="media/samsung/image24.png" />
+                    <img src="media/samsung/image25.png" />
+                    <img src="media/samsung/image26.png" />
+                    <img src="media/samsung/image27.png" />
+                    <img src="media/samsung/image28.png" />
+                    <img src="media/samsung/image29.png" />
+                    <img src="media/samsung/image30.png" />
+                    <img src="media/samsung/image31.png" />
+                    <img src="media/samsung/image32.png" />
+                    <img src="media/samsung/image33.png" />
+                    <img src="media/samsung/image34.png" />
+                    <img src="media/samsung/image35.png" />
+                    <img src="media/samsung/image36.png" />
+                    <img src="media/samsung/image37.png" />
+                    <img src="media/samsung/image38.png" />
+                    <img src="media/samsung/image39.png" />
+                    <img src="media/samsung/image40.png" />
+                    <img src="media/samsung/image41.png" />
+                    <img src="media/samsung/image42.png" />
+                    <img src="media/samsung/image43.png" />
+                    <img src="media/samsung/image44.png" />
+                    <img src="media/samsung/image45.png" />
+                    <img src="media/samsung/image46.png" />
+                    <img src="media/samsung/image47.png" />
+                    <img src="media/samsung/image48.png" />
+                    <img src="media/samsung/image49.png" />
+
+                </div>
+
+
+                <button class="arrow left">‹</button>
+                <button class="arrow right">›</button>
+            </div>
+
+            <div class="carousel-dots">
+                <span class="dot active" data-index="0"></span>
+                <span class="dot" data-index="1"></span>
+                <span class="dot" data-index="2"></span>
+                <span class="dot" data-index="3"></span>
+                <span class="dot" data-index="4"></span>
+                <span class="dot" data-index="5"></span>
+                <span class="dot" data-index="6"></span>
+                <span class="dot" data-index="7"></span>
+                <span class="dot" data-index="8"></span>
+                <span class="dot" data-index="9"></span>
+                <span class="dot" data-index="10"></span>
+                <span class="dot" data-index="11"></span>
+                <span class="dot" data-index="12"></span>
+                <span class="dot" data-index="13"></span>
+                <span class="dot" data-index="14"></span>
+                <span class="dot" data-index="15"></span>
+                <span class="dot" data-index="16"></span>
+                <span class="dot" data-index="17"></span>
+                <span class="dot" data-index="18"></span>
+                <span class="dot" data-index="19"></span>
+                <span class="dot" data-index="20"></span>
+                <span class="dot" data-index="21"></span>
+                <span class="dot" data-index="22"></span>
+                <span class="dot" data-index="23"></span>
+                <span class="dot" data-index="24"></span>
+                <span class="dot" data-index="25"></span>
+                <span class="dot" data-index="26"></span>
+                <span class="dot" data-index="27"></span>
+                <span class="dot" data-index="28"></span>
+                <span class="dot" data-index="29"></span>
+                <span class="dot" data-index="30"></span>
+                <span class="dot" data-index="31"></span>
+                <span class="dot" data-index="32"></span>
+                <span class="dot" data-index="33"></span>
+                <span class="dot" data-index="34"></span>
+                <span class="dot" data-index="35"></span>
+                <span class="dot" data-index="36"></span>
+                <span class="dot" data-index="37"></span>
+                <span class="dot" data-index="38"></span>
+                <span class="dot" data-index="39"></span>
+                <span class="dot" data-index="40"></span>
+                <span class="dot" data-index="41"></span>
+                <span class="dot" data-index="42"></span>
+                <span class="dot" data-index="43"></span>
+                <span class="dot" data-index="44"></span>
+                <span class="dot" data-index="45"></span>
+                <span class="dot" data-index="46"></span>
+                <span class="dot" data-index="47"></span>
+                <span class="dot" data-index="48"></span>
+            </div>
+
+        </section>
+
+        <section class="block"><img src="media/samsung/analysis3.png" alt="Intro shot" /></section>
+        <section class="block"><img src="media/samsung/analysis4.png" alt="Intro shot" /></section>
+        <section class="block"><img src="media/samsung/analysis5.png" alt="Intro shot" /></section>
+        <section class="block"><img src="media/samsung/analysis6.png" alt="Intro shot" /></section>
+        <section class="block"><img src="media/samsung/analysis7.png" alt="Intro shot" /></section>
+        <section class="block"><img src="media/samsung/analysis8.png" alt="Intro shot" /></section>
+        <section class="block"><img src="media/samsung/genz.png" alt="Intro shot" /></section>
+
+
+
+
+
+
+
+
 
 
         <section class="block"><img src="media/samsung/showcase1.png" alt="Intro shot" /></section>
@@ -607,21 +738,27 @@
         <section class="block"><img src="media/samsung/showcase3.png" alt="Intro shot" /></section>
 
         <section class="block video-block">
-  <div class="carousel-frame">
-    <video controls poster="media/samsung/cmfl.png">
-      <source src="media/samsung/cmfl.mp4" type="video/mp4" />
-      Your browser does not support the video tag.
-    </video>
-  </div>
-</section>
+            <div class="carousel-frame">
+                <video controls poster="media/samsung/cmfl.png">
+                    <source src="media/samsung/cmfl.mp4" type="video/mp4" />
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </section>
+
+        <section class="block"><img src="media/samsung/showcase4.png" alt="Intro shot" /></section>
+        <section class="block"><img src="media/samsung/takeaway.png" alt="Intro shot" /></section>
 
 
 
 
 
-        <section class="block"><img src="media/samsung/process.png" alt="Intro shot" /></section>
-        <section class="block"><img src="media/samsung/adjective1.png" alt="Intro shot" /></section>
-        <section class="block"><img src="media/samsung/adjective2.png" alt="Intro shot" /></section>
+
+
+
+
+
+
 
 
 
