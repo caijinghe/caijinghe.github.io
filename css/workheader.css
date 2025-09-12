@@ -1,0 +1,137 @@
+/* --- 全宽 Header --- */
+
+.header-full {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 998;
+    /* z-index 比 pill header 低一级，以防万一 */
+    padding: 15px 0;
+    background-color: rgba(255, 255, 255, 0);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+/* 内部内容容器 */
+.header-full-inner {
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 30px;
+    /* 两边留白 */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* 左侧 Logo */
+.header-full .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: #ffffff;
+}
+
+.header-full .logo-icon {
+    height: 21px;
+}
+
+.header-full .logo-name {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+/* 右侧导航 */
+.header-full .nav {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+}
+
+.header-full .nav-link {
+    text-decoration: none;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 400;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+
+/* 社交媒体图标链接样式 */
+.header-full .social-icon-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 修正：将 'svg' 改为 'img' */
+.header-full .social-icon-link img {
+    width: 18px;
+    /* 现在可以调整宽度了 */
+    height: 18px;
+    /* 现在可以调整高度了 */
+    transition: transform 0.3s ease;
+    /* 保留过渡效果 */
+}
+
+
+.nav-link.nav-button {
+    background-color: #000;
+    color: #fff;
+    padding: 6px 18px;
+    /* 调整内边距形成胶囊形状 */
+    border-radius: 999px;
+    /* 圆角形成胶囊 */
+    border: 1px solid #000;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .header-full-inner {
+    padding: 0 20px;
+  }
+
+  .header-full .logo-name {
+    display: none;
+  }
+
+  .header-full .nav {
+    gap: 25px;
+  }
+  
+  /* ✅ 新增：在小屏幕上重置 'About' 按钮的样式 */
+  .header-full .nav-link.nav-button {
+    background-color: transparent; /* 移除背景色 */
+    color: #ffffff; /* 恢复为普通链接颜色 */
+    border-color: transparent; /* 移除边框 */
+    padding: 0; /* 恢复为普通链接的 padding */
+    font-weight: 400; /* 恢复为普通链接的字重 */
+  }
+
+
+  /* 社交媒体图标链接样式 */
+  .header-full .social-icon-link {
+      display: none;
+  }
+}
+
+
+
+/* 淡入动画 */
+.fade-in {
+    animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+

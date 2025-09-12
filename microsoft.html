@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Microsoft</title>
+    <link rel="icon" href="media/logo.svg" type="image/svg+xml" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/workheader.css" />
+    <link rel="stylesheet" href="css/style.css" />
+
+
+    <script type="module" src="js/cursor.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script type="module" src="js/mfst.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            background: #ffffff;
+            color: #FCFBF4;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        /* Loading Overlay */
+        #loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        #loading-overlay video {
+            max-width: 60vw;
+            max-height: 60vh;
+            border-radius: 1rem;
+        }
+
+        .header-full .logo {
+            color: #000000;
+        }
+
+        .header-full .nav-link {
+            color: #000000;
+
+        }
+
+        .nav-link.nav-button {
+            background-color: #000;
+            color: #fff;
+            padding: 6px 18px;
+            /* 调整内边距形成胶囊形状 */
+            border-radius: 999px;
+            /* 圆角形成胶囊 */
+            border: 1px solid #000;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+
+
+
+
+        /* 主容器 */
+        .stack {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .block {
+            width: 100vw;
+            position: relative;
+        }
+
+        /* 全屏封面 & 大图 */
+        .block.cover {
+            overflow: hidden;
+        }
+
+        .block.cover img,
+        .block.cover video,
+        .block img,
+        .block video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+
+        .block.cover {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .block.cover video {
+            position: absolute;
+            /* 固定在容器底层 */
+            top: 10%;
+            left: 0;
+            z-index: 1;
+            /* 视频在底层 */
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+        }
+
+        .block.cover img {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 100%;
+            /* height: 100vh; */
+
+            object-fit: cover;
+            /* 保持比例裁切 */
+            /* object-position: center top; */
+            /* 从下半部分对齐裁剪 */
+            display: block;
+        }
+
+
+        /* 中等视频段 */
+        .block.video-focus {
+            display: flex;
+            justify-content: center;
+            padding: 4vh 0;
+            background: #000;
+        }
+
+        .video-frame {
+            width: 80%;
+            max-width: 1100px;
+            height: auto;
+            overflow: hidden;
+            box-shadow: 0 10px 24px rgba(0, 0, 0, .35);
+        }
+
+        .video-frame>video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Carousel */
+        .carousel-frame {
+            position: relative;
+            width: 100%;
+            max-width: 83%;
+            margin: 40px auto;
+            background: transparent;
+            border: none;
+            padding: 0;
+            /* 不在这里加 padding */
+        }
+
+        .carousel-frame {
+            position: relative;
+            width: 100%;
+            max-width: 83%;
+            margin: 0 auto;
+            /* border: 1px solid #555;
+            border-radius: 1rem; */
+            overflow: hidden;
+        }
+
+        .arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            font-size: 2rem;
+            line-height: 1;
+            /* 保证上下居中 */
+            color: #727272;
+            background: rgba(188, 188, 188, 0.3);
+            border: none;
+            border-radius: 50%;
+            border: 2px solid #ababab;
+            cursor: none;
+            z-index: 10;
+        }
+
+        .arrow.left {
+            left: 15px;
+            padding-bottom: 7px;
+        }
+
+        .arrow.right {
+            right: 15px;
+            padding-bottom: 7px;
+            /* 微调，避免 › 看起来偏左 */
+        }
+
+
+
+        .carousel-frame video {
+
+            width: 100%;
+            aspect-ratio: 16/9;
+            /* 或者和你 poster 一样的比例 */
+            height: auto;
+            display: block;
+            border-radius: 1rem;
+            background: #FCFBF4;
+            object-fit: cover;
+            /* 保证裁切一致 */
+
+        }
+
+        /* 让 section 控制留白 */
+        .block.video-block {
+            padding: 0 8vw;
+        }
+
+
+
+
+        /* Carousel */
+        .poster-carousel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 8vw;
+            margin: 40px auto;
+        }
+
+        .poster-carousel .carousel-frame {
+            position: relative;
+            width: 100%;
+            max-width: 83%;
+            overflow: hidden;
+            border-radius: 1rem;
+            background: transparent;
+            margin: 0 auto;
+        }
+
+        .poster-carousel .carousel-frame::before {
+            content: "";
+            display: block;
+            padding-top: 56.25%;
+        }
+
+        .poster-carousel .carousel-frame img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        .poster-carousel .carousel-frame img.active {
+            opacity: 1;
+            z-index: 1;
+        }
+
+        .carousel-dots {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+
+        .carousel-dots .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #bcbcbc;
+        }
+
+        .carousel-dots .dot.active {
+            background: #000000;
+        }
+
+
+
+
+        /* Footer */
+        footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 4vw;
+            font-size: 0.8rem;
+            border-top: 0.8px solid #666;
+        }
+
+        footer span {
+            color: #666;
+            font-weight: 300;
+        }
+
+        .more-wrapper {
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .more-text {
+            position: relative;
+            width: 135px;
+            height: 38px;
+            border: 1px solid #666;
+            border-radius: 999px;
+            overflow: hidden;
+            perspective: 600px;
+            display: inline-block;
+            cursor: none;
+        }
+
+        .more-text .face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 300;
+            color: #000000;
+            backface-visibility: hidden;
+            transform-style: preserve-3d;
+            transition: transform 1.5s cubic-bezier(0.22, 1.61, 0.36, 1);
+        }
+
+        .more-text .top {
+            transform: rotateX(90deg) translateY(-100%);
+            transform-origin: top;
+        }
+
+        .more-wrapper:hover .more-text .front {
+            transform: rotateX(-90deg) translateY(100%);
+            transform-origin: bottom;
+        }
+
+        .more-wrapper:hover .more-text .top {
+            transform: rotateX(0deg);
+            font-weight: 500;
+        }
+
+        .divider {
+            display: none;
+        }
+
+
+
+        @media (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 500px) {
+            header {
+                gap: 1.5rem;
+            }
+
+            header {
+                padding: 8vw 8vw 4vw 8vw;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6rem;
+            }
+
+            .header-top {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+            }
+
+
+
+            .back-button {
+                width: 45px;
+                height: 45px;
+                border-radius: 50%;
+                border: 1px solid #6e6e6e;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-decoration: none;
+                flex-shrink: 0;
+            }
+
+            .header-bottom {
+                display: flex;
+                flex-direction: row;
+                /* ✅ 关键：横向排列 */
+                align-items: center;
+                justify-content: space-between;
+                gap: 1rem;
+                flex-wrap: wrap;
+            }
+
+
+
+            .back-button img {
+                width: 30px;
+                height: 30px;
+            }
+
+            .project-title {
+                /* font-family: 'Sora', sans-serif; */
+                font-size: 1.8rem;
+                font-weight: 300;
+            }
+
+            .project-meta {
+                padding-top: 30px;
+                font-size: 0.7rem;
+                font-weight: 200;
+                line-height: 1.5;
+                color: #000000;
+            }
+
+            .title-group {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .chinese-title {
+                height: 140px;
+            }
+
+
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+
+            .grid-item {
+
+                padding: 8vw;
+            }
+
+            .center {
+
+                padding-top: 30px;
+                padding-bottom: 80px;
+            }
+
+            .logo-button {
+                top: 8vw;
+                left: 8vw;
+                width: 45px;
+                height: 45px;
+                border-radius: 50%;
+                border: 1px solid #ffffff;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-decoration: none;
+                flex-shrink: 0;
+            }
+
+            .logo-bottom {
+                display: flex;
+                flex-direction: row;
+                /* ✅ 关键：横向排列 */
+                align-items: center;
+                justify-content: space-between;
+                gap: 1rem;
+                flex-wrap: wrap;
+            }
+
+
+
+            .logo-button img {
+                width: 30px;
+                height: 30px;
+            }
+
+
+            footer {
+                margin-top: auto;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 20px 8vw;
+                font-size: 0.8rem;
+                /* border-top: 1px solid #ccc; */
+            }
+
+
+            footer span {
+                font-size: 0.75rem;
+                color: #000000;
+
+            }
+
+
+            .more-wrapper {
+                display: inline-block;
+                text-decoration: none;
+            }
+
+
+
+
+            .more-text {
+                width: 110px;
+                height: 30px;
+                border: 0.8px solid #ffffff;
+            }
+
+
+
+            .more-text .face {
+                font-size: 0.75rem;
+                font-weight: 200;
+            }
+
+            .poster-carousel .carousel-frame {
+
+                border-radius: 10px;
+
+            }
+
+            .carousel-dots {
+                display: none;
+            }
+
+
+            .carousel-frame video {
+
+
+                border-radius: 10px;
+
+
+            }
+
+
+
+
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay">
+        <video id="loading-video" autoplay muted loop>
+            <source src="media/loading.mp4" type="video/mp4" />
+        </video>
+    </div>
+
+    <!-- 返回按钮 -->
+    <!-- <a href="work.html" class="logo-button"><img src="media/wander/logo_withe.svg" alt="Back" /></a> -->
+    <header class="header-full fade-in">
+        <div class="header-full-inner">
+
+            <!-- 左侧 Logo -->
+            <a href="index.html" class="logo">
+                <img src="media/logo.svg" alt="Logo" class="logo-icon" />
+                <span class="logo-name">Jinghe Cai</span>
+            </a>
+
+            <!-- 右侧导航 -->
+            <nav class="nav">
+                <!-- LinkedIn 图标链接 -->
+                <a href="https://www.linkedin.com/in/jinghe-cai" target="_blank" class="social-icon-link">
+                    <img src="media/icon_linkedin.svg" alt="LinkedIn Icon" />
+                </a>
+
+                <!-- 文字链接 -->
+                <a href="work.html" class="nav-link">Works</a>
+                <a href="https://drive.google.com/file/d/1IsOUI2ZcsX_7XXkCw_bYc1aIiybE1FQT/view"
+                    class="nav-link">Resume</a>
+                <a href="about.html" class="nav-link nav-button">About</a>
+            </nav>
+
+        </div>
+    </header>
+
+    <main class="stack" id="samsung-stack">
+        <!-- Cover -->
+        <!-- Cover -->
+        <section class="block cover" data-meteors>
+
+            <!-- 图片在上层 -->
+            <img src="media/MFST/cover.jpg" loading="eager" alt="Samsung Cover" />
+        </section>
+
+
+
+
+
+        <!-- 普通大图 -->
+        <section class="block"><img src="media/MFST/overview.png" alt="Intro shot" /></section>
+        <section class="block"><img src="media/MFST/challenge.png" alt="Intro shot" /></section>
+        <!-- <section class="block"><img src="media/MFST/process.png" alt="Intro shot" /></section> -->
+        <section class="block"><img src="media/MFST/research.png" alt="Intro shot" /></section>
+        <section class="block"><img src="media/MFST/mapping.png" alt="Intro shot" /></section>
+        <section class="block"><img src="media/MFST/showcase1.png" alt="Intro shot" /></section>
+        <section class="block"><img src="media/MFST/showcase2.png" alt="Intro shot" /></section>
+    
+
+
+        <!-- Poster Carousel -->
+        <section class="block poster-carousel">
+            <div class="carousel-frame">
+                <div class="carousel-track">
+                    <img src="media/MFST/cradgame/1.png" />
+                    <img src="media/MFST/cradgame/2.png" />
+                    <img src="media/MFST/cradgame/3.png" />
+                    <img src="media/MFST/cradgame/4.png" />
+                    <img src="media/MFST/cradgame/5.png" />
+                    <img src="media/MFST/cradgame/6.png" />
+                    <img src="media/MFST/cradgame/7.png" />
+                    <img src="media/MFST/cradgame/8.png" />
+                    <img src="media/MFST/cradgame/9.png" />
+                    <img src="media/MFST/cradgame/10.png" />
+                    <img src="media/MFST/cradgame/11.png" />
+                    <img src="media/MFST/cradgame/12.png" />
+                    <img src="media/MFST/cradgame/13.png" />
+                    <img src="media/MFST/cradgame/14.png" />
+                    <img src="media/MFST/cradgame/15.png" />
+                    <img src="media/MFST/cradgame/16.png" />
+
+
+                </div>
+
+                  <!-- <button class="arrow left">‹</button>
+                        <button class="arrow right">›</button> -->
+            </div>
+            <div class="carousel-dots">
+                <span class="dot active" data-index="0"></span>
+                <span class="dot" data-index="1"></span>
+                <span class="dot" data-index="2"></span>
+                <span class="dot" data-index="3"></span>
+                <span class="dot" data-index="4"></span>
+                <span class="dot" data-index="5"></span>
+                <span class="dot" data-index="6"></span>
+                <span class="dot" data-index="7"></span>
+                <span class="dot" data-index="8"></span>
+                <span class="dot" data-index="9"></span>
+                <span class="dot" data-index="10"></span>
+                <span class="dot" data-index="11"></span>
+                <span class="dot" data-index="12"></span>
+                <span class="dot" data-index="13"></span>
+                <span class="dot" data-index="14"></span>
+                <span class="dot" data-index="15"></span>
+                <span class="dot" data-index="16"></span>
+            </div>
+        </section>
+
+
+
+            <!-- <section class="block"><img src="media/MFST/showcase4.png" alt="Intro shot" /></section> -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </main>
+
+    <footer>
+        <span>© 2025 Jinghe Cai. All rights reserved.</span>
+        <a href="work.html" class="more-wrapper">
+            <span class="more-text">
+                <span class="face front">MORE WORKS</span>
+                <span class="face top">MORE WORKS</span>
+            </span>
+        </a>
+    </footer>
+
+    <div id="custom-cursor"></div>
+
+    <script>
+        const overlay = document.getElementById("loading-overlay");
+
+        // 页面加载完毕 → 移除 overlay
+        window.addEventListener("load", () => {
+            overlay.style.transition = "opacity 0.6s ease";
+            overlay.style.opacity = 0;
+            setTimeout(() => overlay.remove(), 600);
+            document.body.style.overflow = "";
+        });
+
+        // 初始禁止滚动
+        document.body.style.overflow = "hidden";
+
+    </script>
+</body>
+
+</html>

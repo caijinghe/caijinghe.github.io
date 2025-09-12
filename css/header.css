@@ -12,16 +12,7 @@
   padding: 20px 0;
 }
 
-/* 内部容器居中 + 控最大宽度 */
-/* .header-inner {
-  width: 100%;
-  max-width: 1200px;
-  padding: 0 20px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-} */
+
 .header-inner {
   width: 100%;
   display: flex;

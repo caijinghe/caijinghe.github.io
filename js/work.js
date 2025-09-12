@@ -17,6 +17,34 @@ window.addEventListener('DOMContentLoaded', () => {
   applyStaggeredFadeIn();
 });
 
+// === Helper function to create buttons ===
+function createButton(text, link, isExternal) {
+  const btn = document.createElement('button');
+  btn.className = 'read-btn';
+
+  const front = document.createElement('span');
+  front.className = 'face front';
+  front.textContent = text;
+
+  const top = document.createElement('span');
+  top.className = 'face top';
+  top.textContent = text;
+
+  btn.appendChild(front);
+  btn.appendChild(top);
+
+  btn.addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    if (isExternal) {
+      window.open(link, '_blank');
+    } else {
+      window.location.href = link;
+    }
+  });
+  return btn;
+}
+
+
 // === Hover 行为（仅渐变高亮 + 切换 preview 图）===
 items.forEach(item => {
   item.addEventListener('mouseenter', () => {
@@ -37,14 +65,16 @@ items.forEach(item => {
 
   // === Click 行为（展开/收起 + 灰掉其他）===
   item.addEventListener('click', (e) => {
-    if (e.target.classList.contains('read-btn')) return;
+    // Stop if clicking on a button inside the item
+    if (e.target.closest('.read-btn')) return;
+
     const alreadyExpanded = item.classList.contains('expanded');
 
     // 收起所有展开项
     items.forEach(other => {
       other.classList.remove('expanded', 'hovering', 'hover-highlight');
-      const btn = other.querySelector('.read-btn');
-      if (btn) btn.remove();
+      const btnContainer = other.querySelector('.button-container');
+      if (btnContainer) btnContainer.remove();
     });
     listWrapper.classList.remove('hovering');
 
@@ -57,36 +87,25 @@ items.forEach(item => {
       listWrapper.classList.add('hovering');
       item.classList.add('hovering'); // 当前展开项保持正常色
 
-      // 插入 Read 按钮
-      // 插入 Read 翻转按钮（撑满描述宽度）
+      // --- 修改后的按钮插入逻辑 ---
       const desc = item.querySelector('.work-description');
       if (desc) {
         const link = item.getAttribute('data-link');
+
         if (link) {
-          const btn = document.createElement('button');
-          btn.className = 'read-btn';
+          const linkType = item.getAttribute('data-link-type') || 'internal';
+          const isExternal = linkType === 'external';
+          const buttonText = isExternal ? 'VIEW LIVE' : 'UNFOLD';
 
-          // 内部两层文字
-          const front = document.createElement('span');
-          front.className = 'face front';
-          front.textContent = 'UNFOLD';
-
-          const top = document.createElement('span');
-          top.className = 'face top';
-          top.textContent = 'UNFOLD';
-
-          btn.appendChild(front);
-          btn.appendChild(top);
-
-          btn.addEventListener('click', (ev) => {
-            ev.stopPropagation();
-            window.location.href = link;
-          });
-
-          desc.appendChild(btn);
+          const buttonContainer = document.createElement('div');
+          buttonContainer.className = 'button-container';
+          
+          const button = createButton(buttonText, link, isExternal);
+          
+          buttonContainer.appendChild(button);
+          desc.appendChild(buttonContainer);
         }
       }
-
     }
   });
 });
@@ -97,8 +116,8 @@ document.addEventListener('click', (e) => {
     listWrapper.classList.remove('hovering');
     items.forEach(item => {
       item.classList.remove('expanded', 'hovering', 'hover-highlight');
-      const btn = item.querySelector('.read-btn');
-      if (btn) btn.remove();
+      const btnContainer = item.querySelector('.button-container');
+      if (btnContainer) btnContainer.remove();
     });
   }
 });
@@ -106,23 +125,18 @@ document.addEventListener('click', (e) => {
 // 渲染所有 filter 选项并标记选中项
 function renderFilterOptions(selected) {
   filterLabel.textContent = selected.charAt(0).toUpperCase() + selected.slice(1);
-
   filterOptionsContainer.innerHTML = '';
-
   filterOrder.forEach(category => {
     const option = document.createElement('div');
     option.classList.add('filter-option');
     option.setAttribute('data-filter', category);
     option.textContent = category.charAt(0).toUpperCase() + category.slice(1);
-
     if (category === selected) {
       option.classList.add('selected');
     }
-
     filterOptionsContainer.appendChild(option);
   });
 
-  // 绑定 filter 点击
   const optionElements = filterOptionsContainer.querySelectorAll('.filter-option');
   optionElements.forEach(option => {
     option.addEventListener('click', () => {
@@ -130,7 +144,6 @@ function renderFilterOptions(selected) {
       if (newSelected === currentSelection) return;
       currentSelection = newSelected;
 
-      // 锁定 preview 尺寸防跳动
       const rect = workPreview.getBoundingClientRect();
       workPreview.style.minWidth = `${rect.width}px`;
       workPreview.style.minHeight = `${rect.height}px`;
@@ -138,7 +151,6 @@ function renderFilterOptions(selected) {
 
       renderFilterOptions(newSelected);
 
-      // 项目筛选逻辑
       workItems.forEach(item => {
         const categories = item.getAttribute('data-category').split(' ');
         const shouldShow = newSelected === 'all' || categories.includes(newSelected);
@@ -154,10 +166,9 @@ function renderFilterOptions(selected) {
           item.style.height = '0';
           item.style.pointerEvents = 'none';
         }
-
         item.classList.remove('first-visible', 'last-hovering', 'expanded', 'hovering', 'hover-highlight');
-        const btn = item.querySelector('.read-btn');
-        if (btn) btn.remove();
+        const btnContainer = item.querySelector('.button-container');
+        if (btnContainer) btnContainer.remove();
       });
 
       const visibleItems = Array.from(workItems).filter(item => item.style.visibility !== 'hidden');
@@ -168,7 +179,6 @@ function renderFilterOptions(selected) {
 
       applyStaggeredFadeIn();
 
-      // 解锁 preview 尺寸
       setTimeout(() => {
         workPreview.style.minWidth = '';
         workPreview.style.minHeight = '';
@@ -181,11 +191,11 @@ function renderFilterOptions(selected) {
 // 淡入动画触发
 function applyStaggeredFadeIn() {
   const visibleItems = Array.from(workItems).filter(item => item.style.visibility !== 'hidden');
-
   visibleItems.forEach((item, index) => {
     item.style.animation = 'none';
-    item.offsetHeight; // 强制重排
+    item.offsetHeight;
     item.style.animation = `fadeUp 0.6s ease forwards`;
     item.style.animationDelay = `${index * 100}ms`;
   });
 }
+
