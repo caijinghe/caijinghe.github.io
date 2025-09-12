@@ -41,7 +41,7 @@ body {
   width: 24px;
   height: 24px;
   display: block;
-  opacity: 0.8;
+  opacity: 0.9;
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
