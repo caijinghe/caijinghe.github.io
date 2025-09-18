@@ -114,8 +114,6 @@ function initShowreelOverlay() {
 
   overlay.classList.remove("preload");
 
-  const hasShown = sessionStorage.getItem("showreelShown") === "true";
-
   const hideControls = () => {
     videoControls.classList.add("hidden");
     videoContainer.classList.remove("force-show-sound");
@@ -126,43 +124,42 @@ function initShowreelOverlay() {
     updateSoundIcon();
   };
 
-  if (!hasShown) {
-    overlay.classList.remove("hidden");
-    loadingVideo.style.display = "block";
-    loadingVideo.loop = false;
-    hideControls();
-    mainVideo.style.zIndex = 1;
-    mainVideo.muted = true;
-    mainVideo.pause();
-    loadingVideo.currentTime = 0;
-    loadingVideo.play();
+  // 初始状态全部暂停
+  mainVideo.pause();
+  loadingVideo.pause();
+  loadingVideo.loop = false;
+  hideControls();
 
-    loadingVideo.addEventListener("ended", () => {
-      loadingVideo.style.display = "none";
-      mainVideo.style.zIndex = 2;
-      mainVideo.muted = true;
-      mainVideo.currentTime = 0;
-      mainVideo.play();
-      showControls();
-      sessionStorage.setItem("showreelShown", "true");
-    });
-  }
-
+  // ✅ 点击按钮后播放 loading.mp4，结束后无缝切换到 showreel.mp4（有声）
   if (openShowreelBtn) {
     openShowreelBtn.addEventListener("click", (e) => {
       e.preventDefault();
-      const hasShown = sessionStorage.getItem("showreelShown") === "true";
 
       overlay.classList.remove("hidden");
-      loadingVideo.style.display = "none";
-      mainVideo.style.zIndex = 2;
-      mainVideo.muted = !hasShown ? true : false;
-      mainVideo.currentTime = 0;
-      mainVideo.play();
-      showControls();
+      loadingVideo.style.display = "block";
+      mainVideo.style.zIndex = 1;
+
+      mainVideo.pause();
+      mainVideo.muted = false;
+
+      loadingVideo.currentTime = 0;
+      loadingVideo.play();
+
+      hideControls();
+
+      loadingVideo.addEventListener("ended", () => {
+        loadingVideo.style.display = "none";
+        mainVideo.style.zIndex = 2;
+        mainVideo.currentTime = 0;
+        mainVideo.muted = false; // ✅ 不静音
+        mainVideo.play();
+        showControls();
+        sessionStorage.setItem("showreelShown", "true");
+      }, { once: true });
     });
   }
 
+  // 播放/暂停控制
   playPauseBtn?.addEventListener("click", (e) => {
     e.stopPropagation();
     if (mainVideo.paused) {
@@ -232,6 +229,7 @@ function initShowreelOverlay() {
   updatePlayPauseIcon();
   updateSoundIcon();
 }
+
 
 
 

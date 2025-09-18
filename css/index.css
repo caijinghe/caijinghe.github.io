@@ -176,7 +176,7 @@ a:active {
 .video-controls {
   position: absolute;
   bottom: 14px;
-  right: 14px;
+  left: 14px;
   display: flex;
   gap: 12px;
   opacity: 0;
