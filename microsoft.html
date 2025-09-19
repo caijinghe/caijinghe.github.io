@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Microsoft</title>
-    
+
     <link rel="stylesheet" href="css/password.css" />
     <script src="js/password.js"></script>
 
@@ -14,7 +14,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/workheader.css" />
     <link rel="stylesheet" href="css/style.css" />
-    
+
     <script type="module" src="js/cursor.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script type="module" src="js/mfst.js"></script>
@@ -815,6 +815,7 @@
             <div class="carousel-frame">
                 <div class="carousel-track">
                     <img src="media/MFST/principle/1.png" />
+                    <img src="media/MFST/principle/2.png" />
                     <img src="media/MFST/principle/3.png" />
                     <img src="media/MFST/principle/4.png" />
                     <img src="media/MFST/principle/5.png" />
@@ -822,7 +823,7 @@
                     <img src="media/MFST/principle/7.png" />
                     <img src="media/MFST/principle/8.png" />
                     <img src="media/MFST/principle/9.png" />
-                    <img src="media/MFST/principle/10.png" />
+
                 </div>
 
 
@@ -838,8 +839,10 @@
                 <span class="dot" data-index="7"></span>
                 <span class="dot" data-index="8"></span>
                 <span class="dot" data-index="9"></span>
-
             </div>
+
+
+
         </section>
 
         <section class="block"><img src="media/MFST/poster-white-blue.png" alt="Intro shot" /></section>
@@ -884,28 +887,28 @@
         </a>
     </footer>
 
-    <div id="custom-cursor"></div>
+    <!-- <div id="custom-cursor"></div> -->
 
     <script>
 
 
 
-       // 密码保护逻辑 - 在页面完全加载前就开始运行
-    // 调用密码保护函数并传入密码
-    protectPageWithPassword("321");
-    
-    // 初始禁止滚动，确保密码界面能盖住页面
-    document.body.style.overflow = "hidden";
+        // 密码保护逻辑 - 在页面完全加载前就开始运行
+        // 调用密码保护函数并传入密码
+        protectPageWithPassword("321");
 
-    // 加载动画逻辑 - 页面加载完毕后才移除
-    const overlay = document.getElementById("loading-overlay");
-    window.addEventListener("load", () => {
-        overlay.style.transition = "opacity 0.6s ease";
-        overlay.style.opacity = 0;
-        setTimeout(() => overlay.remove(), 600);
-        // 注意：这里不要再设置 document.body.style.overflow = "";
-        // 因为这部分逻辑现在由 password.js 负责
-    });
+        // 初始禁止滚动，确保密码界面能盖住页面
+        document.body.style.overflow = "hidden";
+
+        // 加载动画逻辑 - 页面加载完毕后才移除
+        const overlay = document.getElementById("loading-overlay");
+        window.addEventListener("load", () => {
+            overlay.style.transition = "opacity 0.6s ease";
+            overlay.style.opacity = 0;
+            setTimeout(() => overlay.remove(), 600);
+            // 注意：这里不要再设置 document.body.style.overflow = "";
+            // 因为这部分逻辑现在由 password.js 负责
+        });
 
 
     </script>

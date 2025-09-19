@@ -8,11 +8,14 @@ document.addEventListener("DOMContentLoaded", () => {
     let interval;
 
     function goToSlide(i) {
-      slides.forEach(slide => slide.classList.remove("active"));
-      dots.forEach(dot => dot.classList.remove("active"));
-      slides[i].classList.add("active");
-      dots[i].classList.add("active");
-      index = i;
+      // 优化：添加一个安全检查，确保索引在范围内
+      if (i >= 0 && i < slides.length) {
+        slides.forEach(slide => slide.classList.remove("active"));
+        dots.forEach(dot => dot.classList.remove("active"));
+        slides[i].classList.add("active");
+        dots[i].classList.add("active");
+        index = i;
+      }
     }
 
     function startAutoPlay() {

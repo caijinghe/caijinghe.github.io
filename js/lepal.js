@@ -7,7 +7,7 @@ const obs = new IntersectionObserver((entries) => {
   entries.forEach((e) => {
     const v = e.target;
     if (e.isIntersecting && e.intersectionRatio >= 0.75) {
-      v.play().catch(() => {/* iOS 权限问题忽略 */});
+      v.play().catch(() => {});
     } else {
       v.pause();
     }
@@ -19,7 +19,6 @@ const obs = new IntersectionObserver((entries) => {
 
 videos.forEach(v => obs.observe(v));
 
-// 标签页不可见时暂停，恢复时按可见度决定是否播放
 document.addEventListener('visibilitychange', () => {
   videos.forEach(v => {
     if (document.hidden) {
@@ -50,7 +49,7 @@ document.querySelectorAll('img').forEach(img => {
 // =========================
 const PREFERS_REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const MAX_DPR = 2; 
-const METEOR_DIR = 'ltr'; // 'ltr' 左→右；改成 'rtl' 即右→左
+const METEOR_DIR = 'ltr';
 const METEOR_TOP_RATIO = 0.35;  
 const METEOR_TOP_MARGIN = 0.08; 
 
@@ -245,9 +244,6 @@ class MeteorLayer {
   }
 }
 
-// =========================
-// 🌠 Shooting Stars (for .block.cover[data-meteors])
-// =========================
 function initMeteorSections() {
   if (PREFERS_REDUCED) return;
 
@@ -263,9 +259,8 @@ function initMeteorSections() {
         layers.set(sec, layer);
       }
 
-      // ⚡ 进入视口时启动，离开时停止
       if (e.isIntersecting) {
-        layer.resize(); // 强制更新一次尺寸
+        layer.resize();
         layer.start();
       } else {
         layer.stop();
@@ -276,7 +271,6 @@ function initMeteorSections() {
   sections.forEach(sec => {
     io.observe(sec);
 
-    // ✅ 延迟检查一次，防止初始高度没加载好
     setTimeout(() => {
       const rect = sec.getBoundingClientRect();
       if (rect.top < window.innerHeight && rect.bottom > 0) {
@@ -297,10 +291,7 @@ function initMeteorSections() {
   });
 }
 
-// ✅ 改成 load 而不是 DOMContentLoaded
 window.addEventListener("load", initMeteorSections);
-
-
 
 // =========================
 // ❤️ Heartbeat animation
@@ -310,18 +301,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const fullText = textEl.textContent.trim();
   textEl.textContent = "";
 
-  // ✅ 创建光标
   const cursor = document.createElement("span");
   cursor.classList.add("cursor");
   cursor.textContent = "|";
   textEl.appendChild(cursor);
 
-  let typing = false; // 防止重复触发
+  let typing = false;
 
   function typeWriter() {
     if (typing) return;
     typing = true;
-    textEl.innerHTML = ""; // 清空
+    textEl.innerHTML = "";
     textEl.appendChild(cursor);
 
     let i = 0;
@@ -334,16 +324,14 @@ document.addEventListener("DOMContentLoaded", () => {
         i++;
         setTimeout(typeLetter, 120);
       } else {
-        // ✅ 打字完成后，隐藏光标
         cursor.style.display = "none";
         typing = false;
       }
     }
-    cursor.style.display = "inline-block"; // 重新显示光标
+    cursor.style.display = "inline-block";
     typeLetter();
   }
 
-  // ✅ 渐变背景流动
   gsap.to("#animated-text", {
     backgroundPosition: "200% center",
     duration: 6,
@@ -351,7 +339,6 @@ document.addEventListener("DOMContentLoaded", () => {
     repeat: -1
   });
 
-  // ✅ IntersectionObserver 检测进入视口时重新打字
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
@@ -363,7 +350,9 @@ document.addEventListener("DOMContentLoaded", () => {
   observer.observe(textEl);
 });
 
-
+// =========================
+// Poster Carousel
+// =========================
 document.addEventListener("DOMContentLoaded", () => {
   const carousel = document.querySelector(".poster-carousel");
   const slides = document.querySelectorAll(".poster-carousel .carousel-frame img");
@@ -372,15 +361,17 @@ document.addEventListener("DOMContentLoaded", () => {
   let interval;
 
   function goToSlide(i) {
-    slides.forEach(slide => slide.classList.remove("active"));
-    dots.forEach(dot => dot.classList.remove("active"));
-    slides[i].classList.add("active");
-    dots[i].classList.add("active");
-    index = i;
+    if (i >= 0 && i < slides.length) {
+      slides.forEach(slide => slide.classList.remove("active"));
+      dots.forEach(dot => dot.classList.remove("active"));
+      slides[i].classList.add("active");
+      dots[i].classList.add("active");
+      index = i;
+    }
   }
 
   function startAutoPlay() {
-    if (interval) return; // 避免重复启动
+    if (interval) return;
     interval = setInterval(() => {
       index = (index + 1) % slides.length;
       goToSlide(index);
@@ -392,7 +383,6 @@ document.addEventListener("DOMContentLoaded", () => {
     interval = null;
   }
 
-  // 点点点击
   dots.forEach(dot => {
     dot.addEventListener("click", () => {
       stopAutoPlay();
@@ -401,10 +391,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // 初始化第一个 slide
   goToSlide(0);
 
-  // ✅ 只在进入视口时才播放
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
@@ -413,46 +401,70 @@ document.addEventListener("DOMContentLoaded", () => {
         stopAutoPlay();
       }
     });
-  }, { threshold: 0.5 }); // 50% 可见才算进入
+  }, { threshold: 0.5 });
 
   observer.observe(carousel);
 });
 
 
+// =========================
+// Showcase 3 视频交互
+// =========================
+document.addEventListener("DOMContentLoaded", () => {
+  const mainVideo = document.getElementById("main-video");
+  const overlays = document.querySelectorAll(".video-overlay-grid .video-overlay");
 
+  const sources = [
+    "media/lepal/onboard1.mov",
+    "media/lepal/onboard2.mov",
+    "media/lepal/onboard3.mov",
+    "media/lepal/onboard4.mov",
+    "media/lepal/onboard5.mov"
+  ];
 
-function setupSequentialLoop(video1Id, video2Id) {
-  const v1 = document.getElementById(video1Id);
-  const v2 = document.getElementById(video2Id);
+  let currentIndex = 0;
+  let autoPlay = true;
 
-  function playSequential(first, second) {
-    first.currentTime = 0;
-    first.play();
-    first.addEventListener("ended", () => {
-      first.style.display = "none";
-      second.style.display = "block";
-      second.currentTime = 0;
-      second.play();
-    }, { once: true });
+  function playVideo(index) {
+    if (index < 0 || index >= sources.length) return;
+    currentIndex = index;
+
+    mainVideo.src = sources[index];
+    mainVideo.currentTime = 0;
+    mainVideo.play().catch(() => {});
+
+    updateActiveOverlay();
   }
 
-  // 初始从 v1 开始
-  playSequential(v1, v2);
+  function updateActiveOverlay() {
+    overlays.forEach((el, i) => {
+      el.classList.toggle("active", i === currentIndex);
+    });
+  }
 
-  // v2 结束后回到 v1
-  v2.addEventListener("ended", () => {
-    v2.style.display = "none";
-    v1.style.display = "block";
-    playSequential(v1, v2);
+  mainVideo.addEventListener("ended", () => {
+    if (autoPlay) {
+      currentIndex = (currentIndex + 1) % sources.length;
+      playVideo(currentIndex);
+    }
   });
-}
 
-// ✅ 页面加载后执行
-document.addEventListener("DOMContentLoaded", () => {
-  setupSequentialLoop("video1", "video2");
+  overlays.forEach((el, i) => {
+    el.addEventListener("mouseenter", () => {
+      autoPlay = false;
+      playVideo(i);
+    });
+    el.addEventListener("mouseleave", () => {
+      autoPlay = true;
+    });
+  });
+
+  playVideo(0);
 });
 
-
+// =========================
+// Page Loading Animation
+// =========================
 const overlay = document.getElementById("loading-overlay");
 const loadingVideo = document.getElementById("loading-video");
 
@@ -464,23 +476,21 @@ function tryRemoveOverlay() {
     overlay.style.transition = "opacity 0.6s ease";
     overlay.style.opacity = 0;
     setTimeout(() => overlay.remove(), 600);
-    document.body.style.overflow = ""; // 恢复滚动
+    document.body.style.overflow = "";
   }
 }
 
-// 视频能播放就计为 done（避免系统省电中断）
 loadingVideo.addEventListener("ended", () => {
   videoDone = true;
   tryRemoveOverlay();
 });
 
 loadingVideo.addEventListener("canplaythrough", () => {
-  // 如果用户切走导致 ended 不触发，也能继续
   if (!videoDone) {
     setTimeout(() => {
       videoDone = true;
       tryRemoveOverlay();
-    }, 1000); // 最多等1秒就算过渡
+    }, 1000);
   }
 });
 
@@ -489,7 +499,6 @@ loadingVideo.addEventListener("error", () => {
   tryRemoveOverlay();
 });
 
-// 页面加载完成
 window.addEventListener("load", () => {
   pageDone = true;
   tryRemoveOverlay();
@@ -497,77 +506,3 @@ window.addEventListener("load", () => {
 
 // 禁止滚动
 document.body.style.overflow = "hidden";
-
-
-document.addEventListener("DOMContentLoaded", () => {
-  const mainVideo = document.getElementById("main-video");   // after
-  const sideVideo = document.getElementById("side-video");   // before
-  const overlays = document.querySelectorAll(".video-overlay-grid .video-overlay");
-
-  // 两组视频路径
-  const sourcesBefore = [
-    "media/lepal/before1.mov",
-    "media/lepal/before2.mov",
-    "media/lepal/before3.mov",
-    "media/lepal/before4.mov",
-    "media/lepal/before5.mov"
-  ];
-
-  const sourcesAfter = [
-    "media/lepal/onboard1.mov",
-    "media/lepal/onboard2.mov",
-    "media/lepal/onboard3.mov",
-    "media/lepal/onboard4.mov",
-    "media/lepal/onboard5.mov"
-  ];
-
-  let currentIndex = 0;   // 当前播放索引
-  let autoPlay = true;    // 自动顺序播放开关
-
-  // 同时切换两个视频
-  function playVideo(index) {
-    if (index < 0 || index >= sourcesAfter.length) return;
-    currentIndex = index;
-
-    // 切换 before
-    sideVideo.src = sourcesBefore[index];
-    sideVideo.currentTime = 0;
-    sideVideo.play().catch(() => {});
-
-    // 切换 after
-    mainVideo.src = sourcesAfter[index];
-    mainVideo.currentTime = 0;
-    mainVideo.play().catch(() => {});
-
-    updateActiveOverlay();
-  }
-
-  // 高亮当前块
-  function updateActiveOverlay() {
-    overlays.forEach((el, i) => {
-      el.classList.toggle("active", i === currentIndex);
-    });
-  }
-
-  // 自动播放：以 after 视频为基准
-  mainVideo.addEventListener("ended", () => {
-    if (autoPlay) {
-      currentIndex = (currentIndex + 1) % sourcesAfter.length;
-      playVideo(currentIndex);
-    }
-  });
-
-  // Hover 控制
-  overlays.forEach((el, i) => {
-    el.addEventListener("mouseenter", () => {
-      autoPlay = false;
-      playVideo(i);
-    });
-    el.addEventListener("mouseleave", () => {
-      autoPlay = true;
-    });
-  });
-
-  // 初始化
-  playVideo(0);
-});

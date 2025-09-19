@@ -606,29 +606,30 @@
 
     <!-- 返回按钮 -->
     <!-- <a href="work.html" class="logo-button"><img src="media/wander/logo_withe.svg" alt="Back" /></a> -->
-             <header class="header-full fade-in">
-      <div class="header-full-inner">
-        
-        <!-- 左侧 Logo -->
-        <a href="index.html" class="logo">
-          <img src="media/logo_withe.svg" alt="Logo" class="logo-icon" />
-          <span class="logo-name">Jinghe Cai</span>
-        </a>
+    <header class="header-full fade-in">
+        <div class="header-full-inner">
 
-        <!-- 右侧导航 -->
-        <nav class="nav">
-          <!-- LinkedIn 图标链接 -->
-          <a href="www.linkedin.com/in/jinghe-cai" target="_blank" class="social-icon-link">
-            <img src="media/icon_linkedin_white.svg" alt="LinkedIn Icon" />
-          </a>
+            <!-- 左侧 Logo -->
+            <a href="index.html" class="logo">
+                <img src="media/logo_withe.svg" alt="Logo" class="logo-icon" />
+                <span class="logo-name">Jinghe Cai</span>
+            </a>
 
-          <!-- 文字链接 -->
-          <a href="work.html" class="nav-link">Works</a>
-          <a href="https://drive.google.com/file/d/1IsOUI2ZcsX_7XXkCw_bYc1aIiybE1FQT/view" class="nav-link">Resume</a>
-          <a href="about.html" class="nav-link nav-button">About</a>
-        </nav>
-        
-      </div>
+            <!-- 右侧导航 -->
+            <nav class="nav">
+                <!-- LinkedIn 图标链接 -->
+                <a href="https://www.linkedin.com/in/jinghe-cai" target="_blank" class="social-icon-link">
+                    <img src="media/icon_linkedin_white.svg" alt="LinkedIn Icon" />
+                </a>
+
+                <!-- 文字链接 -->
+                <a href="work.html" class="nav-link">Works</a>
+                <a href="https://drive.google.com/file/d/1IsOUI2ZcsX_7XXkCw_bYc1aIiybE1FQT/view"
+                    class="nav-link">Resume</a>
+                <a href="about.html" class="nav-link nav-button">About</a>
+            </nav>
+
+        </div>
     </header>
 
     <main class="stack" id="lepal-stack">
@@ -681,12 +682,7 @@
                 <div class="video-overlay" data-index="3"></div>
                 <div class="video-overlay wide" data-index="4"></div>
             </div>
-            <div class="phone-frame-sequence" style="left:15%;">
-                <video id="side-video" playsinline autoplay muted loop preload="auto">
-                    <source src="media/lepal/onboard0.mov" type="video/mp4" />
-                </video>
-            </div>
-            <div class="phone-frame-sequence" style="left:34%;">
+            <div class="phone-frame-sequence" style="left:32.5%; transform: translate(-50%, -50%);">
                 <video id="main-video" playsinline muted preload="metadata">
                     <source src="media/lepal/onboard1.mov" type="video/mp4" />
                 </video>
@@ -757,16 +753,16 @@
     <script>
         const overlay = document.getElementById("loading-overlay");
 
-// 页面加载完毕 → 移除 overlay
-window.addEventListener("load", () => {
-    overlay.style.transition = "opacity 0.6s ease";
-    overlay.style.opacity = 0;
-    setTimeout(() => overlay.remove(), 600);
-    document.body.style.overflow = "";
-});
+        // 页面加载完毕 → 移除 overlay
+        window.addEventListener("load", () => {
+            overlay.style.transition = "opacity 0.6s ease";
+            overlay.style.opacity = 0;
+            setTimeout(() => overlay.remove(), 600);
+            document.body.style.overflow = "";
+        });
 
-// 初始禁止滚动
-document.body.style.overflow = "hidden";
+        // 初始禁止滚动
+        document.body.style.overflow = "hidden";
 
     </script>
 </body>
