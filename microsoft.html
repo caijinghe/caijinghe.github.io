@@ -19,7 +19,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script type="module" src="js/mfst.js"></script>
 
-    <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q1VYN4W02W"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -198,6 +197,11 @@
             overflow: hidden;
         }
 
+        /* 新增：专门给绿色区域视频加的样式 */
+        .carousel-frame.green-border {
+            border: 1px solid #24C88B;
+        }
+
         .arrow {
             position: absolute;
             top: 50%;
@@ -248,7 +252,24 @@
 
         /* 让 section 控制留白 */
         .block.video-block {
-            padding: 0 8vw;
+            padding: 5vw 8vw 0 8vw;
+            background-color: #F7FFFC;
+            min-height: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 清除视频区内的底部空白：去掉走马灯的下边距、video 的下边距 */
+        .block.video-block .carousel-frame {
+            margin: 0;
+            padding: 0;
+        }
+
+        .block.video-block .carousel-frame video {
+            display: block;
+            margin: 0;
+            padding: 0;
         }
 
 
@@ -658,32 +679,25 @@
 </head>
 
 <body>
-    <!-- Loading Overlay -->
     <div id="loading-overlay">
         <video id="loading-video" autoplay muted loop>
             <source src="media/loading.mp4" type="video/mp4" />
         </video>
     </div>
 
-    <!-- 返回按钮 -->
-    <!-- <a href="work.html" class="logo-button"><img src="media/wander/logo_withe.svg" alt="Back" /></a> -->
     <header class="header-full fade-in">
         <div class="header-full-inner">
 
-            <!-- 左侧 Logo -->
             <a href="index.html" class="logo">
                 <img src="media/logo.svg" alt="Logo" class="logo-icon" />
                 <span class="logo-name">Jinghe Cai</span>
             </a>
 
-            <!-- 右侧导航 -->
             <nav class="nav">
-                <!-- LinkedIn 图标链接 -->
                 <a href="https://www.linkedin.com/in/jinghe-cai" target="_blank" class="social-icon-link">
                     <img src="media/icon_linkedin.svg" alt="LinkedIn Icon" />
                 </a>
 
-                <!-- 文字链接 -->
                 <a href="work.html" class="nav-link">Works</a>
                 <a href="https://drive.google.com/file/d/1IsOUI2ZcsX_7XXkCw_bYc1aIiybE1FQT/view"
                     class="nav-link">Resume</a>
@@ -694,11 +708,8 @@
     </header>
 
     <main class="stack" id="samsung-stack">
-        <!-- Cover -->
-        <!-- Cover -->
         <section class="block cover" data-meteors>
 
-            <!-- 图片在上层 -->
             <img src="media/MFST/cover.jpg" loading="eager" alt="Samsung Cover" />
         </section>
 
@@ -706,7 +717,6 @@
 
 
 
-        <!-- 普通大图 -->
         <section class="block"><img src="media/MFST/overview.png" alt="Intro shot" /></section>
         <section class="block"><img src="media/MFST/challenge.png" alt="Intro shot" /></section>
 
@@ -716,7 +726,6 @@
 
 
 
-        <!-- Poster Carousel -->
         <section class="block poster-carousel">
             <div class="carousel-frame">
                 <div class="carousel-track">
@@ -773,7 +782,10 @@
         <section class="block"><img src="media/MFST/poster-space.png" alt="Intro shot" /></section>
         <section class="block"><img src="media/MFST/showcase3.png" alt="Intro shot" /></section>
 
-        <!-- Poster Carousel -->
+
+
+ 
+
         <section class="block poster-carousel green-bg">
             <div class="carousel-frame">
                 <div class="carousel-track">
@@ -790,6 +802,7 @@
 
 
             </div>
+
             <div class="carousel-dots">
                 <span class="dot active" data-index="0"></span>
                 <span class="dot" data-index="1"></span>
@@ -799,13 +812,20 @@
             </div>
         </section>
 
+               <section class="block video-block">
+            <div class="carousel-frame green-border">
+                <video controls>
+                    <source src="media/MFST/demo.mp4" type="video/mp4" />
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </section>
 
         <section class="block"><img src="media/MFST/poster-space-green.png" alt="Intro shot" /></section>
         <section class="block"><img src="media/MFST/showcase4.png" alt="Intro shot" /></section>
 
 
 
-        <!-- Poster Carousel -->
         <section class="block poster-carousel blue-bg">
             <div class="carousel-frame">
                 <div class="carousel-track">
@@ -833,7 +853,6 @@
         <section class="block"><img src="media/MFST/poster-space-blue.png" alt="Intro shot" /></section>
         <section class="block"><img src="media/MFST/showcase5.png" alt="Intro shot" /></section>
 
-        <!-- Poster Carousel -->
         <section class="block poster-carousel yellow-bg">
             <div class="carousel-frame">
                 <div class="carousel-track">
@@ -865,8 +884,7 @@
                 <span class="dot" data-index="6"></span>
                 <span class="dot" data-index="7"></span>
                 <span class="dot" data-index="8"></span>
-                <!-- <span class="dot" data-index="9"></span> -->
-            </div>
+                </div>
 
 
 
@@ -913,8 +931,6 @@
             </span>
         </a>
     </footer>
-
-    <!-- <div id="custom-cursor"></div> -->
 
     <script>
 
