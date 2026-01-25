@@ -11,6 +11,7 @@ html, body {
   color: #000000;
   cursor: none;
   overflow-x: hidden;
+  /* overflow-y: hidden; */
   scroll-behavior: smooth;
 }
 
