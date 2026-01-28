@@ -494,22 +494,20 @@ a {
 
     .grid-container { column-count: 1; }
     
+    /* 手机端点击时去除缩放效果 */
     .work-item:not(.no-click):hover { transform: none; }
     
+    /* 🔥 核心修改：在手机端隐藏标签 */
     .work-tags-container { 
-        opacity: 1; 
-        transform: translateY(0); 
+        display: none !important;
     }
-    .work-item:not(.no-click) .tag-business::after { 
-        content: none; 
-    }
-    
+/*     
     .site-footer { 
         display: flex;
         flex-direction: column; 
         align-items: center; 
         gap: 20px; 
-    }
+    } */
 
     /* --- Showreel 移动端微调 --- */
     .showreel-frame {
