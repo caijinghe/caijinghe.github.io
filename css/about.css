@@ -1,6 +1,7 @@
 /* 基础设置 */
 
-html, body {
+html,
+body {
   background-color: #ffffff;
 }
 
@@ -32,29 +33,32 @@ body {
   position: relative;
   width: 100%;
   min-height: 100vh;
-  
+
   overflow: visible;
 
   /* 🔥 修改这里！把 -10vh 改成更大的负值，比如 -30vh 或 -40vh */
   /* 这会让下面的内容覆盖到上面的书架区域 */
-  margin-top: -15vh;  /* <--- 试着调整这个数字 */
+  margin-top: -15vh;
+  /* <--- 试着调整这个数字 */
 
-  align-items: flex-start; 
+  align-items: flex-start;
 }
 
 *.sticky-left {
-/* 🔥 关键修复 2：兼容性写法 */
-position: -webkit-sticky;
-position: sticky;
-top: 0;
+  /* 🔥 关键修复 2：兼容性写法 */
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
 
-height: 100vh; /* 必须定义高度 */
-width: 50%;    /* 建议改为 50% 以配合右侧 */
+  height: 100vh;
+  /* 必须定义高度 */
+  width: 50%;
+  /* 建议改为 50% 以配合右侧 */
 
-display: flex;
-align-items: center;
-justify-content: center;
-background: rgba(255, 255, 255, 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0);
 }
 
 /* 图片叠加容器 */
@@ -67,20 +71,26 @@ background: rgba(255, 255, 255, 0);
 /* 每一张图 */
 /* 每一张图 */
 .photo {
-position: absolute;
-top: 0; left: 0; width: 100%; height: 100%;
-opacity: 0; transition: opacity 0.8s ease;
-z-index: 1;
-display: flex; align-items: center; justify-content: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .photo img {
-max-width: 60vh;
-padding-left: 100px;
-height: auto;
-object-fit: contain;
-pointer-events: none;
-cursor: default;
+  max-width: 60vh;
+  padding-left: 100px;
+  height: auto;
+  object-fit: contain;
+  pointer-events: none;
+  cursor: default;
 }
 
 
@@ -93,66 +103,68 @@ cursor: default;
 }
 
 *.about-panel {
-display: flex;
-flex-direction: column;
-justify-content: center;
-min-height: 100vh; /* 改为 min-height 防止内容过多时溢出 */
-padding-left: 20px;
-box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100vh;
+  /* 改为 min-height 防止内容过多时溢出 */
+  padding-left: 20px;
+  box-sizing: border-box;
 }
 
 /* 修改第一个文字面板 */
 /* Modify this section in your CSS */
 #panel1 {
   /* OLD: min-height: 80vh; */
-  
+
   /* NEW: Increase height to create a scroll buffer */
-  min-height: 100vh; 
+  min-height: 100vh;
   max-width: 500px;
   display: flex;
   flex-direction: column;
-  
+
   /* Keep text centered in the viewport initially */
-  justify-content: flex-start; 
-  padding-top: 35vh; /* Push text down to center it initially */
-  
+  justify-content: flex-start;
+  padding-top: 35vh;
+  /* Push text down to center it initially */
+
   margin-top: 0;
 }
 
 #panel2 {
-height: auto !important;
-min-height: 0 !important;
-display: flex;
-flex-direction: column;
-justify-content: flex-start;
-margin-bottom: 100px;
+  height: auto !important;
+  min-height: 0 !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  margin-bottom: 100px;
 }
 
 .about-panel h1 {
-font-size: 1.5rem;
-font-weight: 600;
-line-height: 1.4;
-margin-bottom: 20px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 20px;
 }
 
 .about-panel h2 {
-font-size: 1.2rem;
-line-height: 1.5;
-margin-bottom: 20px;
-font-weight: 200;
+  font-size: 1.2rem;
+  line-height: 1.5;
+  margin-bottom: 20px;
+  font-weight: 200;
 }
 
 .about-panel p {
-font-size: 1rem;
-line-height: 1;
-margin-bottom: 20px;
-font-weight: 200;
+  font-size: 1rem;
+  line-height: 1;
+  margin-bottom: 20px;
+  font-weight: 200;
 }
 
 .sora {
-font-family: 'Sora', sans-serif;
-font-size: 1.5rem;
-font-weight: 600;
+  font-family: 'Sora', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
 }
 
 .award-block {
@@ -163,7 +175,8 @@ font-weight: 600;
 
 .award-row {
   display: grid;
-  grid-template-columns: 60px 1fr; /* 左列固定，右列自适应 */
+  grid-template-columns: 60px 1fr;
+  /* 左列固定，右列自适应 */
   gap: 16px;
   margin-bottom: 12px;
   align-items: start;
@@ -210,7 +223,8 @@ font-weight: 600;
 .ticker-track {
   display: inline-block;
   white-space: nowrap;
-  animation: none; /* 默认无动画 */
+  animation: none;
+  /* 默认无动画 */
 }
 
 .ticker-track.animate-scroll {
@@ -221,6 +235,7 @@ font-weight: 600;
   0% {
     transform: translateX(0);
   }
+
   100% {
     transform: translateX(calc(-1 * var(--scroll-width)));
   }
@@ -239,27 +254,27 @@ font-weight: 600;
 
 
 .shelf-section {
-height: 100vh;
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: flex-start;
-position: relative;
-z-index: 1;
-width: 100vw;
-max-width: 1800px;
-margin-left: auto;
-margin-right: auto;
-margin-top: 0px;
-padding-top: 0px;
-overflow: visible;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  z-index: 1;
+  width: 100vw;
+  max-width: 1800px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 0px;
+  padding-top: 0px;
+  overflow: visible;
 }
 
 
 .shelf-section h1 {
-font-size: 1.5rem;
-margin-bottom: 60px;
-z-index: 3;
+  font-size: 1.5rem;
+  margin-bottom: 60px;
+  z-index: 3;
 }
 
 
@@ -276,27 +291,27 @@ z-index: 3;
 }
 
 .svg-books-row {
-display: flex;
-justify-content: center;
-align-items: flex-end;
-height: auto;
-position: relative;
-z-index: 2;
-margin-bottom: 28vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  height: auto;
+  position: relative;
+  z-index: 2;
+  margin-bottom: 28vh;
 }
 
 .book-svg {
-height: auto;
-max-height: 380px;
-max-width: 100%;
-align-self: flex-end;
-margin-bottom: 0;
-opacity: 1;
-pointer-events: auto;
-will-change: opacity, transform;
-transform: translateZ(0);
--webkit-transform: translateZ(0);
-transition: transform 0.8s ease-in-out, opacity 0.8s ease-in-out;
+  height: auto;
+  max-height: 380px;
+  max-width: 100%;
+  align-self: flex-end;
+  margin-bottom: 0;
+  opacity: 1;
+  pointer-events: auto;
+  will-change: opacity, transform;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  transition: transform 0.8s ease-in-out, opacity 0.8s ease-in-out;
 }
 
 
@@ -355,13 +370,13 @@ transition: transform 0.8s ease-in-out, opacity 0.8s ease-in-out;
 Timeline Ruler
 ========================================= */
 .timeline-ruler {
-position: absolute;
-bottom: 23vh;
-left: 50%;
-transform: translateX(-50%);
-display: flex;
-gap: 9.5px;
-z-index: 0;
+  position: absolute;
+  bottom: 23vh;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 9.5px;
+  z-index: 0;
 }
 
 .tick {
@@ -385,31 +400,56 @@ z-index: 0;
 }
 
 .year-label {
-position: absolute;
-top: 25px;
-left: 50%;
-transform: translateX(-50%);
-font-size: 1rem;
-font-weight: 300;
-white-space: nowrap;
-color: #000000;
-opacity: 1;
-transition: opacity 0.3s ease;
-will-change: opacity;
-transform: translateZ(0);
--webkit-transform: translateZ(0);
-cursor: pointer;
+  position: absolute;
+  top: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1rem;
+  font-weight: 300;
+  white-space: nowrap;
+  color: #000000;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+  will-change: opacity;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  cursor: pointer;
 }
 
-.year-label.faded { opacity: 0.1; transition: opacity 0.4s ease; }
-.tick.faded { background: hsla(0, 0%, 0%, 0.15); opacity: 1; }
+.year-label.faded {
+  opacity: 0.1;
+  transition: opacity 0.4s ease;
+}
 
-.year-label.highlighted, .tick.highlighted { opacity: 1 !important; font-weight: 300; }
-.year-label.dimmed, .tick.dimmed { opacity: 0; transition: opacity 0.3s ease; }
-.year-label.hidden, .tick.major.hidden, .tick.minor.hidden { opacity: 0; pointer-events: none; }
 .tick.faded {
-  background: hsla(0, 0%, 0%, 0.15); /* 黑色，透明度 15% */
-  opacity: 1;                        /* 保持不变 */
+  background: hsla(0, 0%, 0%, 0.15);
+  opacity: 1;
+}
+
+.year-label.highlighted,
+.tick.highlighted {
+  opacity: 1 !important;
+  font-weight: 300;
+}
+
+.year-label.dimmed,
+.tick.dimmed {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.year-label.hidden,
+.tick.major.hidden,
+.tick.minor.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tick.faded {
+  background: hsla(0, 0%, 0%, 0.15);
+  /* 黑色，透明度 15% */
+  opacity: 1;
+  /* 保持不变 */
 }
 
 
@@ -422,8 +462,7 @@ cursor: pointer;
 
 /* ✅ 如果你需要隐藏某些年份/线条（非 hover 相关） */
 .year-label.dimmed,
-.tick.dimmed
- {
+.tick.dimmed {
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -439,22 +478,22 @@ cursor: pointer;
 /* 内容 */
 
 .year-info {
-position: absolute;
-top: 30%;
-left: 50%;
-transform: translateX(-50%);
-flex-direction: column;
-align-items: center;
-gap: 16px;
-z-index: 5;
-padding: 0;
-opacity: 0;
-pointer-events: none;
-transition: opacity 0.3s ease;
-display: flex;
-will-change: opacity;
-max-width: 1000px;
-width: 90%;
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  z-index: 5;
+  padding: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  display: flex;
+  will-change: opacity;
+  max-width: 1000px;
+  width: 90%;
 }
 
 
@@ -474,11 +513,11 @@ width: 90%;
 }
 
 .info-images img {
-height: 150px;
-width: auto;
-border-radius: 10px;
-border: none;
-object-fit: contain;
+  height: 150px;
+  width: auto;
+  border-radius: 10px;
+  border: none;
+  object-fit: contain;
 }
 
 .info-text {
@@ -582,7 +621,7 @@ object-fit: contain;
 
 .site-footer {
   position: fixed;
-  bottom: 30px; 
+  bottom: 30px;
   padding: 0 32px;
   left: 0;
   right: 0;
@@ -626,7 +665,7 @@ object-fit: contain;
     display: none;
   }
 
- 
+
 
   .infinite-ticker {
     display: none;
@@ -660,7 +699,7 @@ object-fit: contain;
 
 
   #panel1 {
-    padding-top: 0px;
+    padding-top: 50vh;
     padding-right: 20px;
   }
 
@@ -696,64 +735,23 @@ object-fit: contain;
 
 
 
+/* 针对手机端的大标题 */
   .about-panel h1 {
-    font-size: 1.2rem;
+    font-size: 1.5rem !important;
+    line-height: 1.3;
+    
+    /* 🔥 核心修改：想往下掉，就加正数的 margin-top */
+    margin-top: 10vh; /* 这会让它往下掉屏幕高度的 10% */
+    /* 或者用像素： margin-top: 50px; */
+    word-wrap: break-word;
   }
 
-  .about-panel h2 {
-    font-size: 1rem;
-  }
-
-.award-year {
-  font-size: 0.9rem;
+  .about-panel h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 20px;
 }
-
-.award-text {
-  font-size: 0.9rem;
-}
-
-
-  /* 调整社交图标位置 */
-  .social-icons-fixed {
-    gap: 24px;
-  }
-
-  .social-icon img {
-    width: 20px;
-    height: 20px;
-  }
-
-  .social-icons-fixed {
-    position: fixed;
-    bottom: 20px;
-    /* 距离底部 */
-    top: auto;
-    flex-direction: row;
-    /* 改为横排 */
-    gap: 24px;
-    /* 调整图标间距 */
-    z-index: 999;
-
-
-  }
-
-
-
-
-  .infinite-ticker {
-    display: none;
-  }
-
-  #footer-trigger {
-    display: none;
-  }
-
-
-    .about-panel p {
-    display: none;
-  }
-
-
 
 
 }
