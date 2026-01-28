@@ -430,58 +430,17 @@ a {
   opacity: 1;
   visibility: visible;
 }
-.video-container.force-show-sound .video-controls #playPauseBtn {
-  opacity: 0;
-  visibility: hidden;
+/* ✅ 仅在静音状态下强制显示音量图标，但不应隐藏播放键 */
+.video-container.force-show-sound .video-controls {
+    opacity: 1;
+    pointer-events: auto;
 }
 
-
-/* =========================================
-   9. 自定义光标提示 (MORE / BACK)
-   ========================================= */
-#customCursorText {
-    position: fixed;
-    top: 0;
-    left: 0;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    z-index: 10000;
-    font-family: 'Inter', sans-serif;
-    font-size: 1rem;
-    font-weight: 400;
-    color: rgb(255, 255, 255);
-    background-color: #bababa;
-    padding: 6px 10px;
-    border-radius: 999px;
-    border: none;
-    user-select: none;
-    text-transform: uppercase;
+/* 如果你希望静音时依然能看到播放键，请删除之前的 opacity: 0 规则 */
+.video-container.force-show-sound .video-controls #soundToggleBtn {
+    opacity: 1;
+    visibility: visible;
 }
-
-.cursor-hidden {
-    opacity: 0;
-}
-
-/* 隐藏系统光标 */
-.cursor-hide-system *,
-.cursor-hide-system *::before,
-.cursor-hide-system *::after {
-    cursor: none !important;
-}
-
-/* =========================================
-   🚨 强制修复鼠标显示 (Force Cursor Visible)
-   ========================================= */
-
-
-/* 5. 确保在 Overlay 里，JS 生成的自定义文字光标被隐藏 (既然我们要用系统鼠标) */
-#showreelOverlay:hover ~ #customCursorText {
-    opacity: 0 !important;
-}
-#showreelOverlay:hover ~ #custom-cursor {
-    opacity: 0 !important;
-}
-
 
 /* =========================================
    10. 移动端适配

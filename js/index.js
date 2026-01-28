@@ -3,16 +3,20 @@ document.addEventListener("DOMContentLoaded", () => {
     if (typeof Flip !== 'undefined') gsap.registerPlugin(Flip);
 
     // 1. Lenis 平滑滚动
-    const lenis = new Lenis({ duration: 1.2, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smoothWheel: true });
+    const lenis = new Lenis({ 
+        duration: 1.2, 
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
+        smoothWheel: true 
+    });
     function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
     requestAnimationFrame(raf);
 
-    // 2. Scroll Reveal (保持不变)
+    // 2. Scroll Reveal (卡片淡入)
     const revealObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
     }, { threshold: 0.1 });
 
-    // 3. Work Items (保持不变)
+    // 3. Work Items 初始化
     const workItems = document.querySelectorAll('.work-item');
     workItems.forEach((item, index) => {
         item.style.transitionDelay = `${index % 3 * 0.1}s`;
@@ -32,114 +36,143 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // 4. Showreel & 5. 辅助功能
+    // 4. 执行所有初始化
     initShowreelOverlay();
     initCursorAndOverlayHints();
-    initLogoTicker();
-    initIconHoverSwap();
-
-    // =========================================
-    // ✅ 6. 核心：简单暴力的筛选 (display: none)
-    // =========================================
     initProjectFilter();
+    initLogoTicker();    
+    initIconHoverSwap();  
 });
 
-
 /* -------------------------------------------------------------------------- */
-/* ✅ 核心修改区：直接 none 掉不需要的卡片                                  */
+/* ✅ 5. Showreel 覆盖层功能（修复黑色画面 Bug 版） **/
 /* -------------------------------------------------------------------------- */
-function initProjectFilter() {
-    const workItems = document.querySelectorAll('.work-item');
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    const nameLogo = document.querySelector('.my-name');
-    const gridContainer = document.querySelector('.grid-container');
+function initShowreelOverlay() {
+  const overlay = document.getElementById("showreelOverlay");
+  const mainVideo = document.getElementById("showreelVideo");
+  const loadingVideo = document.getElementById("loadingVideo");
+  const videoContainer = document.querySelector(".video-container");
+  const playPauseBtn = document.getElementById("playPauseBtn");
+  const soundBtn = document.getElementById("soundToggleBtn");
+  const closeBtn = document.getElementById("closeShowreelBtn");
+  
+  // 确保绑定到 HTML 里的卡片 ID
+  const openShowreelBtn = document.getElementById("open-showreel"); 
+  const videoControls = document.querySelector(".video-controls");
 
-    if (!gridContainer || workItems.length === 0) return;
+  if (!overlay || !mainVideo || !loadingVideo || !videoContainer) return;
 
-    // 记录原始索引
-    workItems.forEach((item, index) => {
-        item.dataset.originalIndex = index;
+  overlay.classList.remove("preload");
+  const hasShown = sessionStorage.getItem("showreelShown") === "true";
+
+  const hideControls = () => {
+    if (videoControls) videoControls.classList.add("hidden");
+    videoContainer.classList.remove("force-show-sound");
+  };
+
+  const showControls = () => {
+    if (videoControls) videoControls.classList.remove("hidden");
+    updateSoundIcon();
+  };
+
+  // 网页首次加载自动播放 Loading 逻辑
+  if (!hasShown) {
+    overlay.classList.remove("hidden");
+    loadingVideo.style.display = "block";
+    loadingVideo.loop = false;
+    hideControls();
+    
+    // 初始状态：主视频完全透明并置于底层
+    mainVideo.style.opacity = "0"; 
+    mainVideo.style.zIndex = 1;
+    mainVideo.muted = true;
+    mainVideo.pause();
+    
+    loadingVideo.currentTime = 0;
+    loadingVideo.play().catch(e => console.log("Auto-play blocked"));
+
+    loadingVideo.addEventListener("ended", () => {
+      loadingVideo.style.display = "none";
+      
+      // 🔥 核心修复：强制主视频可见
+      mainVideo.style.display = "block";
+      mainVideo.style.opacity = "1"; 
+      mainVideo.style.zIndex = 2;
+      
+      mainVideo.muted = true;
+      mainVideo.currentTime = 0;
+      mainVideo.play();
+      showControls();
+      sessionStorage.setItem("showreelShown", "true");
     });
+  }
 
-    function filterProjects(category) {
-        // 1. 记录动画前状态
-        const state = Flip.getState(workItems);
-
-        // 2. 排序：把符合条件的排在数组前面 (为了让它们在瀑布流里靠上)
-        const sortedItems = Array.from(workItems).sort((a, b) => {
-            const catA = a.getAttribute('data-category');
-            const catB = b.getAttribute('data-category');
-            const isShowreelA = a.id === 'open-showreel';
-            const isShowreelB = b.id === 'open-showreel';
-
-            const isMatchA = category === 'all' || (catA && catA.includes(category)) || isShowreelA;
-            const isMatchB = category === 'all' || (catB && catB.includes(category)) || isShowreelB;
-
-            // Showreel 永远第一
-            if (isShowreelA && !isShowreelB) return -1;
-            if (!isShowreelA && isShowreelB) return 1;
-
-            // 匹配的在前
-            if (isMatchA && !isMatchB) return -1;
-            if (!isMatchA && isMatchB) return 1;
-
-            // 原始顺序
-            return a.dataset.originalIndex - b.dataset.originalIndex;
-        });
-
-        // 3. DOM 操作：关键在这里！
-        sortedItems.forEach(item => {
-            const itemCategory = item.getAttribute('data-category');
-            const isShowreel = item.id === 'open-showreel';
-            
-            // 判断是否匹配
-            const isMatch = category === 'all' || (itemCategory && itemCategory.includes(category)) || isShowreel;
-
-            if (isMatch) {
-                // ✅ 匹配：显示出来！
-                // inline-block 是配合 column-count 最好的属性
-                item.style.display = 'inline-block'; 
-                item.classList.remove('is-inactive');
-            } else {
-                // ❌ 不匹配：直接消失！不占位置！
-                // 这样 CSS 瀑布流就会自动把下面的顶上来，没有任何缝隙
-                item.style.display = 'none'; 
-                item.classList.add('is-inactive');
-            }
-
-            // 重新插入 DOM (为了让匹配的跑到最上面)
-            gridContainer.appendChild(item);
-        });
-
-        // 4. 动画
-        // Flip 会检测到有的元素 display 变成了 none，有的位置变了，自动做动画
-        Flip.from(state, {
-            duration: 0.8,
-            ease: "power2.inOut",
-            absolute: false, // ⚠️ 瀑布流布局不要开 absolute: true，容易崩
-            
-            // 简单的淡入淡出
-            onEnter: el => gsap.fromTo(el, {opacity: 0, scale: 0.9}, {opacity: 1, scale: 1, duration: 0.8}),
-            onLeave: el => gsap.to(el, {opacity: 0, duration: 0.5}) 
-        });
-    }
-
-    // 绑定事件
-    filterBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const filterType = btn.getAttribute('data-filter');
-            filterProjects(filterType);
-            filterBtns.forEach(b => b.style.opacity = '0.4');
-            btn.style.opacity = '1';
-        });
+  // 点击卡片手动播放逻辑
+  if (openShowreelBtn) {
+    openShowreelBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const currentShown = sessionStorage.getItem("showreelShown") === "true";
+      overlay.classList.remove("hidden");
+      
+      // 🔥 核心修复：手动打开时也强制主视频可见
+      loadingVideo.style.display = "none";
+      mainVideo.style.display = "block";
+      mainVideo.style.opacity = "1";
+      mainVideo.style.zIndex = 2;
+      
+      mainVideo.muted = !currentShown ? true : false;
+      mainVideo.currentTime = 0;
+      mainVideo.play();
+      showControls();
     });
+  }
 
-    if (nameLogo) {
-        nameLogo.addEventListener('click', (e) => {
-            e.preventDefault();
-            filterProjects('all');
-            filterBtns.forEach(b => b.style.opacity = '1');
-        });
+  // 控制按钮逻辑（保持原样）
+  playPauseBtn?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    mainVideo.paused ? mainVideo.play() : mainVideo.pause();
+    updatePlayPauseIcon();
+  });
+
+  soundBtn?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    mainVideo.muted = !mainVideo.muted;
+    updateSoundIcon();
+  });
+
+  videoContainer.addEventListener("click", (e) => {
+    if (e.target.closest(".video-controls")) return;
+    mainVideo.paused ? mainVideo.play() : mainVideo.pause();
+    updatePlayPauseIcon();
+  });
+
+  const stopShowreel = () => {
+    overlay.classList.add("hidden");
+    mainVideo.pause();
+    sessionStorage.setItem("showreelShown", "true");
+    updatePlayPauseIcon();
+  };
+
+  closeBtn?.addEventListener("click", (e) => { e.stopPropagation(); stopShowreel(); });
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) stopShowreel(); });
+
+  function updatePlayPauseIcon() {
+    if (!playPauseBtn) return;
+    playPauseBtn.src = mainVideo.paused ? "media/video_play.svg" : "media/video_pause.svg";
+  }
+
+  function updateSoundIcon() {
+    if (!soundBtn) return;
+    soundBtn.src = mainVideo.muted ? "media/video_noaudio.svg" : "media/video_audio.svg";
+    if (mainVideo.muted && loadingVideo.style.display === "none") {
+      videoContainer.classList.add("force-show-sound");
+    } else {
+      videoContainer.classList.remove("force-show-sound");
     }
+  }
+
+  mainVideo.addEventListener("ended", stopShowreel);
+  updatePlayPauseIcon();
+  updateSoundIcon();
 }
+
