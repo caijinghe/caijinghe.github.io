@@ -17,7 +17,6 @@
     <link rel="stylesheet" href="css/style.css" />
 
 
-    <script type="module" src="js/cursor.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script type="module" src="js/samsung.js"></script>
 
@@ -88,11 +87,13 @@
             z-index: 10;
             backdrop-filter: blur(2px);
             transition: border-color .2s ease, transform .2s ease;
+            cursor: pointer;
         }
 
         .logo-button img {
             width: 36px;
             height: 36px;
+           
         }
 
         /* 主容器 */
@@ -217,7 +218,7 @@
             border: none;
             border-radius: 50%;
             border: 1.5px solid #000000;
-            cursor: none;
+            cursor: pointer;
             z-index: 10;
         }
 
@@ -320,72 +321,6 @@
 
 
 
-        /* Footer */
-        footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 4vw;
-            font-size: 0.8rem;
-            border-top: 0.8px solid #666;
-        }
-
-        footer span {
-            color: #666;
-            font-weight: 300;
-        }
-
-        .more-wrapper {
-            display: inline-block;
-            text-decoration: none;
-        }
-
-        .more-text {
-            position: relative;
-            width: 135px;
-            height: 38px;
-            border: 1px solid #ffffff;
-            border-radius: 999px;
-            overflow: hidden;
-            perspective: 600px;
-            display: inline-block;
-            cursor: none;
-        }
-
-        .more-text .face {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.85rem;
-            font-family: 'Inter', sans-serif;
-            font-weight: 300;
-            color: #ffffff;
-            backface-visibility: hidden;
-            transform-style: preserve-3d;
-            transition: transform 1.5s cubic-bezier(0.22, 1.61, 0.36, 1);
-        }
-
-        .more-text .top {
-            transform: rotateX(90deg) translateY(-100%);
-            transform-origin: top;
-        }
-
-        .more-wrapper:hover .more-text .front {
-            transform: rotateX(-90deg) translateY(100%);
-            transform-origin: bottom;
-        }
-
-        .more-wrapper:hover .more-text .top {
-            transform: rotateX(0deg);
-            font-weight: 500;
-        }
-
-        .divider {
-            display: none;
-        }
 
 
 
@@ -589,33 +524,21 @@
         </video>
     </div>
 
-    <!-- 返回按钮 -->
-    <!-- <a href="work.html" class="logo-button"><img src="media/wander/logo_withe.svg" alt="Back" /></a> -->
-    <header class="header-full fade-in">
-        <div class="header-full-inner">
-
-            <!-- 左侧 Logo -->
-            <a href="index.html" class="logo">
-                <img src="media/logo_withe.svg" alt="Logo" class="logo-icon" />
-                <span class="logo-name">Jinghe Cai</span>
-            </a>
-
-            <!-- 右侧导航 -->
-            <nav class="nav">
-                <!-- LinkedIn 图标链接 -->
-                <a href="www.linkedin.com/in/jinghe-cai" target="_blank" class="social-icon-link">
-                    <img src="media/icon_linkedin_white.svg" alt="LinkedIn Icon" />
-                </a>
-
-                <!-- 文字链接 -->
-                <a href="work.html" class="nav-link">Works</a>
-                <a href="https://drive.google.com/file/d/1IsOUI2ZcsX_7XXkCw_bYc1aIiybE1FQT/view"
-                    class="nav-link">Resume</a>
-                <a href="about.html" class="nav-link nav-button">About</a>
+        <header class="site-header">
+            <div class="header-col-1">
+                <a href="index.html" class="my-name">Jinghe Cai</a>
+            </div>
+            <nav class="header-col-2">
+                <!-- <a href="#ux">Design</a>
+                <a href="#visual">Visual</a>
+                <a href="https://scholar.google.com/citations?user=USR_nP8AAAAJ&hl=en" target="_blank">Research</a> -->
             </nav>
-
-        </div>
-    </header>
+            <nav class="header-col-3">
+                <a href="about.html">Info</a>
+                <a href="https://drive.google.com/file/d/1IsOUI2ZcsX_7XXkCw_bYc1aIiybE1FQT/view?usp=sharing"
+                    target="_blank">Résumé</a>
+            </nav>
+        </header>
 
     <main class="stack" id="samsung-stack">
         <!-- Cover -->
@@ -810,17 +733,8 @@
 
     </main>
 
-    <footer>
-        <span>© 2025 Jinghe Cai. All rights reserved.</span>
-        <a href="work.html" class="more-wrapper">
-            <span class="more-text">
-                <span class="face front">MORE WORKS</span>
-                <span class="face top">MORE WORKS</span>
-            </span>
-        </a>
-    </footer>
 
-    <div id="custom-cursor"></div>
+
 
     <script>
 

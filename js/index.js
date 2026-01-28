@@ -1,451 +1,368 @@
 document.addEventListener("DOMContentLoaded", () => {
-  initIconHoverSwap();
-  initMoreSectionIntersection();
-  initMoreButtonScroll();
-  initLogoTicker();
-  initShowreelOverlay();
-  initCursorAndOverlayHints();
-  initMoreIconHover();
 
-});
-
-
-
-/** ✅ 1. 小图标悬停切换效果 **/
-function initIconHoverSwap() {
-  document.querySelectorAll('.inline-icon').forEach((icon) => {
-    let toggled = false;
-    const defaultImg = icon.querySelector('.icon-default');
-    const hoverImg = icon.querySelector('.icon-hover');
-
-    icon.addEventListener('mouseenter', () => {
-      if (!toggled) {
-        defaultImg.style.opacity = '0';
-        hoverImg.style.opacity = '1';
-        toggled = true;
-      } else {
-        defaultImg.style.opacity = '1';
-        hoverImg.style.opacity = '0';
-        toggled = false;
-      }
+    // =========================================
+    // 1. Lenis 平滑滚动 (新版逻辑)
+    // =========================================
+    const lenis = new Lenis({
+        duration: 1.2,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        smoothWheel: true,
     });
-  });
-}
 
-/** ✅ 2. 作品区进入视口时触发动画 **/
-function initMoreSectionIntersection() {
-  const section = document.querySelector('.more-section');
-  const button = document.querySelector('.more-wrapper');
-
-  if (!section || !button) return;
-
-  const observer = new IntersectionObserver(
-    ([entry]) => {
-      if (entry.isIntersecting) {
-        button.classList.add('visible');
-      } else {
-        button.classList.remove('visible');
-      }
-    },
-    {
-      threshold: 0.5
+    function raf(time) {
+        lenis.raf(time);
+        requestAnimationFrame(raf);
     }
-  );
-
-  observer.observe(section);
-}
-
-/** ✅ 3. 滚动到底部时显示 "More" 按钮 **/
-function initMoreButtonScroll() {
-  const moreBtn = document.getElementById("moreButton");
-  if (!moreBtn) return;
-
-  window.addEventListener("scroll", () => {
-    const scrollTop = window.scrollY;
-    const windowHeight = window.innerHeight;
-    const pageHeight = document.body.scrollHeight;
-
-    if (scrollTop + windowHeight >= pageHeight - 120) {
-      moreBtn.classList.add("visible");
-    } else {
-      moreBtn.classList.remove("visible");
-    }
-  });
-}
-
-/** ✅ 4. 循环滚动品牌 Ticker **/
-function initLogoTicker() {
-  const ticker = document.getElementById("logoTicker");
-  if (!ticker) return;
-
-  const track = ticker.querySelector(".logo-track");
-  let scrollX = 0;
-  const speed = 0.5;
-  let paused = false;
-
-  ticker.addEventListener("mouseenter", () => paused = true);
-  ticker.addEventListener("mouseleave", () => paused = false);
-
-  function animate() {
-    if (!paused) {
-      scrollX += speed;
-      if (scrollX >= track.scrollWidth / 2) scrollX = 0;
-      ticker.scrollLeft = scrollX;
-    }
-    requestAnimationFrame(animate);
-  }
-
-  animate();
-}
-
-/** ✅ 5. Showreel 覆盖层功能（播放控制等） **/
-function initShowreelOverlay() {
-  const overlay = document.getElementById("showreelOverlay");
-  const mainVideo = document.getElementById("showreelVideo");
-  const loadingVideo = document.getElementById("loadingVideo");
-  const videoContainer = document.querySelector(".video-container");
-  const playPauseBtn = document.getElementById("playPauseBtn");
-  const soundBtn = document.getElementById("soundToggleBtn");
-  const closeBtn = document.getElementById("closeShowreelBtn");
-  const openShowreelBtn = document.getElementById("openShowreelBtn");
-  const videoControls = document.querySelector(".video-controls");
-
-  if (!overlay || !mainVideo || !loadingVideo || !videoContainer) return;
-
-  overlay.classList.remove("preload");
-
-  const hasShown = sessionStorage.getItem("showreelShown") === "true";
-
-  const hideControls = () => {
-    videoControls.classList.add("hidden");
-    videoContainer.classList.remove("force-show-sound");
-  };
-
-  const showControls = () => {
-    videoControls.classList.remove("hidden");
-    updateSoundIcon();
-  };
-
-  if (!hasShown) {
-    overlay.classList.remove("hidden");
-    loadingVideo.style.display = "block";
-    loadingVideo.loop = false;
-    hideControls();
-    mainVideo.style.zIndex = 1;
-    mainVideo.muted = true;
-    mainVideo.pause();
-    loadingVideo.currentTime = 0;
-    loadingVideo.play();
-
-    loadingVideo.addEventListener("ended", () => {
-      loadingVideo.style.display = "none";
-      mainVideo.style.zIndex = 2;
-      mainVideo.muted = true;
-      mainVideo.currentTime = 0;
-      mainVideo.play();
-      showControls();
-      sessionStorage.setItem("showreelShown", "true");
-    });
-  }
-
-  if (openShowreelBtn) {
-    openShowreelBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      const hasShown = sessionStorage.getItem("showreelShown") === "true";
-
-      overlay.classList.remove("hidden");
-      loadingVideo.style.display = "none";
-      mainVideo.style.zIndex = 2;
-      mainVideo.muted = !hasShown ? true : false;
-      mainVideo.currentTime = 0;
-      mainVideo.play();
-      showControls();
-    });
-  }
-
-  playPauseBtn?.addEventListener("click", (e) => {
-    e.stopPropagation();
-    if (mainVideo.paused) {
-      mainVideo.muted = false;
-      mainVideo.play();
-    } else {
-      mainVideo.pause();
-    }
-    updatePlayPauseIcon();
-    updateSoundIcon();
-  });
-
-  soundBtn?.addEventListener("click", (e) => {
-    e.stopPropagation();
-    mainVideo.muted = !mainVideo.muted;
-    updateSoundIcon();
-  });
-
-  videoContainer.addEventListener("click", (e) => {
-    const isOnControls = e.target.closest(".video-controls");
-    if (isOnControls) return;
-    if (mainVideo.paused) {
-      mainVideo.muted = false;
-      mainVideo.play();
-    } else {
-      mainVideo.pause();
-    }
-    updatePlayPauseIcon();
-    updateSoundIcon();
-  });
-
-  closeBtn?.addEventListener("click", () => {
-    overlay.classList.add("hidden");
-    mainVideo.pause();
-    sessionStorage.setItem("showreelShown", "true");
-    updatePlayPauseIcon();
-    updateSoundIcon();
-  });
-
-  function updatePlayPauseIcon() {
-    if (!playPauseBtn) return;
-    playPauseBtn.src = mainVideo.paused
-      ? "media/video_play.svg"
-      : "media/video_pause.svg";
-  }
-
-  function updateSoundIcon() {
-    if (!soundBtn) return;
-    const isMuted = mainVideo.muted;
-    soundBtn.src = isMuted
-      ? "media/video_audio.svg"
-      : "media/video_noaudio.svg";
-    if (isMuted && loadingVideo.style.display === "none") {
-      videoContainer.classList.add("force-show-sound");
-    } else {
-      videoContainer.classList.remove("force-show-sound");
-    }
-  }
-
-  mainVideo.addEventListener("ended", () => {
-    overlay.classList.add("hidden");
-    sessionStorage.setItem("showreelShown", "true");
-    updatePlayPauseIcon();
-    updateSoundIcon();
-  });
-
-  updatePlayPauseIcon();
-  updateSoundIcon();
-}
-
-
-
-
-/** ✅ 6. 自定义鼠标文字提示 + 视频外部点击关闭功能合并 **/
-function initCursorAndOverlayHints() {
-  const cursor = document.getElementById('custom-cursor');
-  const cursorText = document.getElementById('customCursorText');
-  const overlay = document.getElementById('showreelOverlay');
-  const videoContainer = document.querySelector('.video-container');
-  const video = document.getElementById('showreelVideo');
-  const closeBtn = document.getElementById('closeShowreelBtn');
-
-
-
-
-  document.addEventListener('mousemove', (e) => {
-    const insideOverlay = overlay && !overlay.classList.contains('hidden');
-    const rect = videoContainer?.getBoundingClientRect();
-    const insideVideo = rect &&
-      e.clientX >= rect.left &&
-      e.clientX <= rect.right &&
-      e.clientY >= rect.top &&
-      e.clientY <= rect.bottom;
-
-    // 控制文字提示与光标显示
-    const isOnControls = e.target.closest('.showreel-frame');
-
-    if (insideOverlay && !insideVideo && !isOnControls) {
-      cursorText.textContent =
-        sessionStorage.getItem('showreelShown') === 'true' ? 'BACK' : 'MORE';
-      cursorText.style.left = `${e.clientX}px`;
-      cursorText.style.top = `${e.clientY}px`;
-      cursorText.style.opacity = 1;
-      cursor.style.opacity = 0;
-      document.body.style.cursor = 'none';
-    } else {
-      cursorText.style.opacity = 0;
-      cursor.style.opacity = 1;
-      document.body.style.cursor = 'none';
-    }
-
-
-    const hoverTargets = document.querySelectorAll(
-      // 'a, button, [role="button"], [onclick], .cube-button, .logo, .tab, .inline-icon, .work-item, .more-text'
-      'a, button, [role="button"], [onclick], .cube-button, .logo, .tab, .more-wrapper, .filter-wrapper, .showreel-controls, .showreel-frame'
-    );
-
-
-    hoverTargets.forEach(el => {
-      el.addEventListener('mouseenter', () => {
-        document.body.classList.add('hovering-ui');
-      });
-      el.addEventListener('mouseleave', () => {
-        document.body.classList.remove('hovering-ui');
-      });
-    });
-
-    // 自定义 cursor 跟随鼠标
-    cursor.style.left = `${e.clientX}px`;
-    cursor.style.top = `${e.clientY}px`;
-  });
-
-  document.addEventListener('mouseenter', () => {
-    cursor.style.opacity = 1;
-  });
-
-  document.addEventListener('mouseleave', () => {
-    cursor.style.opacity = 0;
-    cursorText.style.opacity = 0;
-  });
-
-
-
-
-
-
-
-  // ✅ 点击视频外部关闭 overlay
-  // ✅ 仅点击 overlay 背景自身时关闭
-  // ✅ 点击视频外部区域 或关闭按钮 关闭 overlay
-  if (overlay && video) {
-    // ✅ 预加载关闭图标，防止首次 hover 时图片 404 裂图
-    const preloadCloseIcon = new Image();
-    preloadCloseIcon.src = "media/video_next_close.svg";
-
-    // ✅ 点击 overlay 背景区域关闭
-    overlay.addEventListener("click", (e) => {
-      const isInsideFrame = e.target.closest(".showreel-frame");
-      if (!isInsideFrame) {
-        overlay.classList.add("hidden");
-        video.pause();
-        sessionStorage.setItem("showreelShown", "true");
-      }
-    });
-
-    // ✅ 点击关闭按钮关闭
-    closeBtn?.addEventListener("click", (e) => {
-      e.stopPropagation();
-      overlay.classList.add("hidden");
-      video.pause();
-      sessionStorage.setItem("showreelShown", "true");
-    });
-
-    // ✅ Hover 切换关闭按钮图标
-    closeBtn?.addEventListener("mouseenter", () => {
-      closeBtn.src = "media/video_next_close.svg";
-    });
-    closeBtn?.addEventListener("mouseleave", () => {
-      closeBtn.src = "media/video_next.svg";
-    });
-  }
-
-
-}
-
-
-
-/** ✅ 7. Hover 更换 more icon **/
-function initMoreIconHover() {
-  const moreWrapper = document.querySelector('.more-wrapper');
-  const moreIcon = document.querySelector('.more-icon');
-  if (!moreWrapper || !moreIcon) return;
-
-  const hoverGif = moreIcon.dataset.hover;
-  const originalSrc = moreIcon.src;
-
-  let gifLoadSuccess = false;
-
-  // ⬇️ 删除 isSafari 检测，允许所有浏览器尝试加载 hover 图
-  const testImage = new Image();
-  testImage.src = hoverGif;
-
-  testImage.onload = () => {
-    gifLoadSuccess = true;
-  };
-
-  testImage.onerror = () => {
-    gifLoadSuccess = false;
-    console.warn("⚠️ Hover image failed to load — will not be used.");
-  };
-
-  moreWrapper.addEventListener('mouseenter', () => {
-    if (gifLoadSuccess) {
-      moreIcon.src = hoverGif;
-      moreIcon.classList.add("is-gif");
-    } else {
-      moreIcon.src = originalSrc;
-      moreIcon.classList.remove("is-gif");
-    }
-  });
-
-  moreWrapper.addEventListener('mouseleave', () => {
-    moreIcon.src = originalSrc;
-    moreIcon.classList.remove("is-gif");
-  });
-}
-
-
-
-// ------------------------
-
-
-document.addEventListener("DOMContentLoaded", function () {
-  initScrollFade();
-  initCardBounce();
-  initHeroIcons();
-
-});
-
-/** ✅ 1. 淡入动画 **/
-function initScrollFade() {
-  const sections = document.querySelectorAll(".fade-section");
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      entry.target.classList.toggle("visible", entry.isIntersecting);
-    });
-  }, { threshold: 0.2 });
-  sections.forEach((section) => observer.observe(section));
-}
-
-/** ✅ 2. 卡片弹回动画 **/
-function initCardBounce() {
-  const cards = document.querySelectorAll(".work-image-inner");
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("animate-rebound");
-        entry.target.addEventListener("animationend", () => {
-          entry.target.classList.remove("animate-rebound");
-        }, { once: true });
-      }
-    });
-  }, { threshold: 0.6 });
-  cards.forEach(card => observer.observe(card));
-}
-
-/** ✅ 3. hero section icon 弹跳动画 **/
-function initHeroIcons() {
-  const heroSection = document.querySelector(".hero-section");
-  const icons = heroSection?.querySelectorAll(".inline-icon") || [];
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        icons.forEach((icon, index) => {
-          icon.style.animationDelay = `${index * 0.1}s`;
-          icon.classList.add("animate-bounce");
-          setTimeout(() => {
-            icon.classList.remove("animate-bounce");
-            icon.style.animationDelay = "";
-          }, 800 + index * 100);
+    requestAnimationFrame(raf);
+
+
+    // =========================================
+    // 2. 下滑浮现动画 (Scroll Reveal) (新版逻辑)
+    // =========================================
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1
+    };
+
+    const revealObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
         });
-      }
+    }, observerOptions);
+
+
+    // =========================================
+    // 3. Work Items 核心逻辑 (标签定位 + 视频悬停)
+    // =========================================
+    const workItems = document.querySelectorAll('.work-item');
+
+    workItems.forEach((item, index) => {
+        // --- A. 绑定浮现动画 ---
+        item.style.transitionDelay = `${index % 3 * 0.1}s`;
+        revealObserver.observe(item);
+
+        // --- B. 绑定智能标签定位 ---
+        item.addEventListener('mouseenter', () => {
+            const tags = item.querySelector('.work-tags-container');
+            if (!tags) return;
+
+            const rect = item.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
+            const threshold = windowHeight - 20;
+
+            if (rect.bottom > threshold) {
+                tags.classList.add('pos-top');
+            } else {
+                tags.classList.remove('pos-top');
+            }
+        });
+
+        // --- C. 绑定悬停播放视频 ---
+        const hoverVideo = item.querySelector('.hover-video');
+        if (hoverVideo) {
+            hoverVideo.pause();
+            item.addEventListener('mouseenter', () => {
+                const playPromise = hoverVideo.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => console.log('Video playback error:', error));
+                }
+            });
+            item.addEventListener('mouseleave', () => {
+                hoverVideo.pause();
+                hoverVideo.currentTime = 0;
+            });
+        }
     });
-  }, { threshold: 0.3 });
-  if (heroSection) observer.observe(heroSection);
+
+
+    // =========================================
+    // 4. Showreel Overlay 逻辑 (从旧版移植并修复)
+    // =========================================
+    initShowreelOverlay();
+
+
+    // =========================================
+    // 5. 其他辅助功能 (光标、Logo滚动等)
+    // =========================================
+    initCursorAndOverlayHints();
+    initLogoTicker(); // 如果页面上有 Logo 条的话
+    initIconHoverSwap(); // 如果页面上有小图标的话
+
+});
+
+
+
+/* -------------------------------------------------------------------------- */
+/* 功能函数定义区                               */
+/* -------------------------------------------------------------------------- */
+
+/** * ✅ Showreel 覆盖层功能 
+ * 包含了：打开/关闭、Loading视频切换、静音控制、Session记录
+ */
+/** * ✅ Showreel 覆盖层功能 
+ * 包含了：首次自动打开、点击打开/关闭、Loading视频切换、静音控制、Session记录
+ */
+function initShowreelOverlay() {
+    const overlay = document.getElementById("showreelOverlay");
+    const mainVideo = document.getElementById("showreelVideo");
+    const loadingVideo = document.getElementById("loadingVideo");
+    const videoContainer = document.querySelector(".video-container");
+    
+    const playPauseBtn = document.getElementById("playPauseBtn");
+    const soundBtn = document.getElementById("soundToggleBtn");
+    const closeBtn = document.getElementById("closeShowreelBtn");
+    const openShowreelBtn = document.getElementById("open-showreel"); 
+    
+    const videoControls = document.querySelector(".video-controls");
+
+    if (!overlay || !mainVideo || !loadingVideo || !videoContainer) return;
+
+    overlay.classList.remove("preload");
+
+    // 1. 检查是否已经看过
+    const hasShown = sessionStorage.getItem("showreelShown") === "true";
+
+    // 辅助函数：隐藏控件
+    const hideControls = () => {
+        if(videoControls) videoControls.classList.add("hidden");
+        videoContainer.classList.remove("force-show-sound");
+    };
+
+    // 辅助函数：显示控件
+    const showControls = () => {
+        if(videoControls) videoControls.classList.remove("hidden");
+        updateSoundIcon();
+    };
+
+    // ============================================================
+    // ✅ 新增逻辑：如果是第一次访问（hasShown 为 false），自动打开
+    // ============================================================
+    if (!hasShown) {
+        overlay.classList.remove("hidden"); // 立即显示遮罩
+        
+        // 设置为 Loading 模式
+        loadingVideo.style.display = "block";
+        mainVideo.style.zIndex = 1; 
+        loadingVideo.currentTime = 0;
+        
+        // 尝试自动播放 Loading
+        const playPromise = loadingVideo.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(error => console.log("Auto-play blocked:", error));
+        }
+        
+        hideControls();
+
+        // Loading 播完后切主视频
+        loadingVideo.onended = () => {
+            loadingVideo.style.display = "none";
+            mainVideo.style.zIndex = 2;
+            
+            // ⚠️ 浏览器策略：自动播放的主视频通常必须静音
+            mainVideo.muted = true; 
+            mainVideo.currentTime = 0;
+            mainVideo.play();
+            
+            showControls();
+            
+            // 标记为已看过，下次刷新就不会自动弹出了
+            sessionStorage.setItem("showreelShown", "true");
+        };
+    }
+
+    // ============================================================
+    // ✅ 点击按钮打开逻辑 (手动触发)
+    // ============================================================
+    if (openShowreelBtn) {
+        openShowreelBtn.addEventListener("click", (e) => {
+            e.preventDefault(); 
+            // 重新获取状态（因为可能刚刚自动播放过变成了 true）
+            const currentHasShown = sessionStorage.getItem("showreelShown") === "true";
+
+            overlay.classList.remove("hidden");
+            
+            // 如果是手动点击，且之前没看完 loading（极少情况），或者想重置逻辑：
+            // 这里我们简化逻辑：手动点击一律直接看主视频，或者你可以保留 Loading 逻辑
+            
+            if (!currentHasShown) {
+                // 如果极其快速地点击了按钮，导致自动播放还没记录 session
+                loadingVideo.style.display = "block";
+                mainVideo.style.zIndex = 1;
+                loadingVideo.currentTime = 0;
+                loadingVideo.play();
+                hideControls();
+                
+                loadingVideo.onended = () => {
+                    loadingVideo.style.display = "none";
+                    mainVideo.style.zIndex = 2;
+                    mainVideo.muted = false; // 手动点击可以开启声音
+                    mainVideo.currentTime = 0;
+                    mainVideo.play();
+                    showControls();
+                    sessionStorage.setItem("showreelShown", "true");
+                };
+            } else {
+                // 以前看过，直接播主视频
+                loadingVideo.style.display = "none";
+                mainVideo.style.zIndex = 2;
+                mainVideo.muted = false; // 手动点击，开启声音
+                mainVideo.currentTime = 0;
+                mainVideo.play();
+                showControls();
+            }
+        });
+    }
+
+    // --- 播放/暂停按钮 ---
+    playPauseBtn?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (mainVideo.paused) {
+            mainVideo.play();
+        } else {
+            mainVideo.pause();
+        }
+        updatePlayPauseIcon();
+    });
+
+    // --- 静音按钮 ---
+    soundBtn?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        mainVideo.muted = !mainVideo.muted;
+        updateSoundIcon();
+    });
+
+    // --- 点击视频区域控制播放 ---
+    videoContainer.addEventListener("click", (e) => {
+        const isOnControls = e.target.closest(".video-controls");
+        if (isOnControls) return;
+        if (mainVideo.paused) {
+            mainVideo.play();
+        } else {
+            mainVideo.pause();
+        }
+        updatePlayPauseIcon();
+    });
+
+    // --- 关闭功能 ---
+    const closeOverlay = () => {
+        overlay.classList.add("hidden");
+        mainVideo.pause();
+        sessionStorage.setItem("showreelShown", "true"); // 确保关闭时记录已看过
+    };
+
+    closeBtn?.addEventListener("click", closeOverlay);
+    
+    overlay.addEventListener("click", (e) => {
+        if (e.target === overlay) {
+            closeOverlay();
+        }
+    });
+
+    // --- 图标更新逻辑 ---
+    function updatePlayPauseIcon() {
+        if (!playPauseBtn) return;
+        playPauseBtn.src = mainVideo.paused
+            ? "media/video_play.svg"
+            : "media/video_pause.svg";
+    }
+
+    function updateSoundIcon() {
+        if (!soundBtn) return;
+        const isMuted = mainVideo.muted;
+        soundBtn.src = isMuted
+            ? "media/video_noaudio.svg"
+            : "media/video_audio.svg";
+    }
+
+    mainVideo.addEventListener("ended", closeOverlay);
+}
+
+/** ✅ 自定义鼠标文字提示 (BACK / MORE) */
+function initCursorAndOverlayHints() {
+    const cursor = document.getElementById('custom-cursor');
+    const cursorText = document.getElementById('customCursorText');
+    const overlay = document.getElementById('showreelOverlay');
+    const videoContainer = document.querySelector('.video-container');
+
+    // 如果页面没放 cursor 元素，直接返回，防报错
+    if (!cursor || !cursorText) return;
+
+    document.addEventListener('mousemove', (e) => {
+        const insideOverlay = overlay && !overlay.classList.contains('hidden');
+        
+        let insideVideo = false;
+        if (videoContainer) {
+            const rect = videoContainer.getBoundingClientRect();
+            insideVideo = e.clientX >= rect.left && e.clientX <= rect.right &&
+                          e.clientY >= rect.top && e.clientY <= rect.bottom;
+        }
+
+        const isOnControls = e.target.closest('.showreel-frame');
+
+        // 如果在 Overlay 上，但不在视频区域内 -> 显示 "BACK"
+        if (insideOverlay && !insideVideo && !isOnControls) {
+            cursorText.textContent = 'BACK';
+            cursorText.style.left = `${e.clientX}px`;
+            cursorText.style.top = `${e.clientY}px`;
+            cursorText.style.opacity = 1;
+            cursor.style.opacity = 0;
+            document.body.style.cursor = 'none';
+        } else {
+            cursorText.style.opacity = 0;
+            cursor.style.opacity = 1;
+            // 恢复默认光标逻辑，或者让 CSS 控制
+            // document.body.style.cursor = 'auto'; 
+        }
+
+        // 简单的跟随
+        cursor.style.left = `${e.clientX}px`;
+        cursor.style.top = `${e.clientY}px`;
+    });
+}
+
+
+/** ✅ Logo Ticker 循环滚动 */
+function initLogoTicker() {
+    const ticker = document.getElementById("logoTicker");
+    if (!ticker) return;
+
+    const track = ticker.querySelector(".logo-track");
+    let scrollX = 0;
+    const speed = 0.5;
+    let paused = false;
+
+    ticker.addEventListener("mouseenter", () => paused = true);
+    ticker.addEventListener("mouseleave", () => paused = false);
+
+    function animate() {
+        if (!paused && track) {
+            scrollX += speed;
+            // 简单循环逻辑：假设内容足够长
+            if (scrollX >= track.scrollWidth / 2) scrollX = 0;
+            ticker.scrollLeft = scrollX;
+        }
+        requestAnimationFrame(animate);
+    }
+    animate();
+}
+
+/** ✅ 小图标悬停切换 */
+function initIconHoverSwap() {
+    document.querySelectorAll('.inline-icon').forEach((icon) => {
+        const defaultImg = icon.querySelector('.icon-default');
+        const hoverImg = icon.querySelector('.icon-hover');
+        if(!defaultImg || !hoverImg) return;
+
+        icon.addEventListener('mouseenter', () => {
+            defaultImg.style.opacity = '0';
+            hoverImg.style.opacity = '1';
+        });
+        icon.addEventListener('mouseleave', () => {
+            defaultImg.style.opacity = '1';
+            hoverImg.style.opacity = '0';
+        });
+    });
 }

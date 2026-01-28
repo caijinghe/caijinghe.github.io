@@ -1,64 +1,43 @@
-/* 基础设置 */
-
-html, body {
-  background-color: #FFFCF2;
+/* =========================================
+   1. 基础设置 (Global Reset)
+   ========================================= */
+html,
+body {
+  background-color: #ffffff;
+  
+  /* ✅ 强制开启垂直滚动，覆盖掉 style.css 可能存在的 hidden */
+  overflow-y: auto !important; 
+  
+  /* 确保高度自适应，而不是被锁死在 100vh */
+  height: auto !important;
+  
+  /* 如果你用了 Lenis，建议先关掉 CSS Snap，防止打架 */
+  /* scroll-snap-type: y mandatory; */ 
+  scroll-behavior: auto; /* 让 Lenis 接管平滑滚动 */
 }
-
 
 body {
   margin: 0;
   padding: 0;
   font-family: 'Inter', sans-serif;
-  overflow-x: hidden;
-  cursor: none;
+  overflow-x: hidden; /* 保持水平不滚动 */
 }
-
-
 * {
   box-sizing: border-box;
 }
 
-.social-icons-fixed {
-  position: fixed;
-  top: 50%;
-  right: 50px;
-  transform: translate(350%, -50%); /* ⛔️ 初始滑出屏幕右侧 */
-  display: flex;
-  flex-direction: column;
-  gap: 40px;
-  z-index: 999;
-  transition: transform 0.6s ease;
-  opacity: 1; /* 可有可无 */
-}
 
-.social-icons-fixed.slide-in {
-  transform: translate(0%, -50%); /* ✅ 滑入原位 */
-}
-
-
-
-.social-icon img {
-  width: 24px;
-  height: 24px;
-  display: block;
-  opacity: 0.9;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-
-.social-icons-fixed.fade-out {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.6s ease;
-}
-
-
-/* 布局：左右两栏 */
+/* =========================================
+   布局：左右两栏
+   ========================================= */
 .section-container {
   display: flex;
   position: relative;
   width: 100%;
   min-height: 100vh;
+  overflow: visible;
+  /* 向上提 10vh */
+  margin-top: -10vh;
 }
 
 /* 左侧 Sticky 图像区域 */
@@ -66,10 +45,11 @@ body {
   position: sticky;
   top: 0;
   height: 100vh;
-  width: 50%;
+  width: 60%;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: rgba(255, 255, 255, 0);
 }
 
 /* 图片叠加容器 */
@@ -95,14 +75,13 @@ body {
 }
 
 .photo img {
-  max-width: 70vh;
-  padding-top: 35px;
+  max-width: 60vh;
   padding-left: 100px;
   height: auto;
   object-fit: contain;
   pointer-events: none;
+  cursor: default;
 }
-
 
 /* 右侧文字区域 */
 .scroll-right {
@@ -121,30 +100,49 @@ body {
   box-sizing: border-box;
 }
 
+/* 修改第一个文字面板 */
 #panel1 {
-  padding-top: 70px;
-  /* padding-right: 280px; */
+  min-height: 80vh;
   max-width: 500px;
+  
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  
+  padding-top: 0;
+  margin-top: 0;
+}
+
+#panel2 {
+  height: auto !important;
+  min-height: 0 !important;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+
+  margin-top: -100px;
+  padding-bottom: 120px;
 }
 
 .about-panel h1 {
-  font-size: 2rem;
+  font-size: 1.6rem;
   font-weight: 600;
   line-height: 1.4;
   margin-bottom: 20px;
 }
 
 .about-panel h2 {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   line-height: 1.5;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   font-weight: 200;
 }
 
 .about-panel p {
   font-size: 1rem;
   line-height: 1;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   font-weight: 200;
 }
 
@@ -154,15 +152,15 @@ body {
   font-weight: 600;
 }
 
+/* 奖项列表 */
 .award-block {
   margin-top: 30px;
   margin-bottom: 8vh;
 }
 
-
 .award-row {
   display: grid;
-  grid-template-columns: 60px 1fr; /* 左列固定，右列自适应 */
+  grid-template-columns: 60px 1fr;
   gap: 16px;
   margin-bottom: 12px;
   align-items: start;
@@ -180,14 +178,11 @@ body {
 .award-text {
   font-size: 1.1rem;
   font-weight: 200;
-  line-height: 1.4;
+  line-height: 1.1;
   word-break: break-word;
-
 }
 
-
-
-
+/* 跑马灯 */
 .infinite-ticker {
   width: 100%;
   overflow: hidden;
@@ -201,15 +196,12 @@ body {
   margin-top: 0px;
   border-top: 1px solid #6e6e6e;
   border-bottom: 1px solid #6e6e6e;
-
 }
-
-
 
 .ticker-track {
   display: inline-block;
   white-space: nowrap;
-  animation: none; /* 默认无动画 */
+  animation: none;
 }
 
 .ticker-track.animate-scroll {
@@ -217,66 +209,43 @@ body {
 }
 
 @keyframes scrollLoop {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(calc(-1 * var(--scroll-width)));
-  }
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(-1 * var(--scroll-width))); }
 }
 
 .ticker-item {
   display: inline-block;
   margin: 10px 35px;
-  /* font-family: 'Sora', sans-serif; */
   font-family: 'Inter', sans-serif;
   font-weight: 200;
   font-size: 1.2rem;
   line-height: 1;
 }
 
-
-#footer-trigger {
-  width: 100%;
-  height: 1px;
-  margin-top: 0px;
-}
-
-
-
+/* =========================================
+   Shelf Section (书架区域)
+   ========================================= */
 .shelf-section {
   height: 100vh;
-  padding: 0;
-  margin: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   position: relative;
-  overflow: visible;
+  z-index: 1;
+  width: 100vw;
+  max-width: 1800px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 0px;
+  padding-top: 0px;
 }
-
 
 .shelf-section h1 {
-  font-size: 2rem;
-  padding-top: 0;
-  /* padding-bottom: 0; */
-  margin-top: 180px;
-  /* margin-bottom: 0px; */
+  font-size: 1.5rem;
+  margin-bottom: 60px;
   z-index: 3;
-  /* line-height: 0.1; */
 }
-
-/* .shelf-section h4 {
-  font-size: 1rem;
-  font-weight: 300;
-  align-items: center;
-  padding-top: 0;  
-  color: #6e6e6e;
-  z-index: 3;
-  line-height: 1.1;
-  text-align: center
-} */
 
 .shelf-viewport {
   width: 100%;
@@ -293,63 +262,47 @@ body {
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  height: 80%;
+  height: auto;
   position: relative;
   z-index: 2;
-  margin-bottom: 20vh;
+  margin-bottom: 28vh;
 }
 
+/* --- 🌟 Safari 修复核心区域: .book-svg --- */
+/* --- 🌟 修改部分 --- */
 .book-svg {
   height: auto;
   max-height: 380px;
   max-width: 100%;
   align-self: flex-end;
   margin-bottom: 0;
-  transition: transform 0.8s ease-in-out;
+  
   opacity: 1;
   pointer-events: auto;
   
+  will-change: opacity, transform;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+
+  /* ✅ 关键修改在这里： */
+  /* 同时定义 transform 和 opacity 的过渡 */
+  /* 当 .faded 类被移除时，opacity 会用这里的 0.6s 慢慢变回 1 */
+  transition: transform 0.8s ease-in-out, opacity 0.8s ease-in-out; 
 }
 
-
 .book-svg.faded {
-  opacity: 0.3;
+  opacity: 0; /* 完全消失 */
   transition: opacity 0.4s ease;
 }
 
-
-.item-2019 {
-  margin-left: -15px;
-  margin-right: 50px;
-}
-
-.item-2020 {
-  margin-left: -50px;
-  margin-right: -12px;
-}
-
-.item-2021 {
-  margin-left: 8px;
-}
-
-.item-2022 {
-  margin-left: -5px;
-  margin-right: 0px;
-}
-
-.item-2023 {
-  margin-left: 0px;
-  margin-right: 0px;
-}
-
-.item-2024 {
-  margin-left: -35px;
-}
-
-.item-2025 {
-  margin-left: 5px;
-  margin-right: -35px;
-}
+/* 书本位置微调 */
+.item-2019 { margin-left: -15px; margin-right: 50px; }
+.item-2020 { margin-left: -50px; margin-right: -12px; }
+.item-2021 { margin-left: 8px; }
+.item-2022 { margin-left: -5px; margin-right: 0px; }
+.item-2023 { margin-left: 0px; margin-right: 0px; }
+.item-2024 { margin-left: -35px; }
+.item-2025 { margin-left: 5px; margin-right: -35px; }
 
 .book-line {
   width: 110%;
@@ -362,11 +315,12 @@ body {
   z-index: 1;
 }
 
-
-/* 📏 Timeline Ruler */
+/* =========================================
+   Timeline Ruler
+   ========================================= */
 .timeline-ruler {
   position: absolute;
-  bottom: 16vh;
+  bottom: 23vh;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -374,80 +328,55 @@ body {
   z-index: 0;
 }
 
+/* --- 🌟 Safari 修复核心区域: .tick --- */
 .tick {
   width: 2px;
   background: #000;
   position: relative;
   border-radius: 999px;
+  
   transition: opacity 0.3s ease;
   will-change: opacity;
+  
+  /* ✅ 新增：强制开启硬件加速 */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
-.tick.minor {
-  height: 7px;
-  opacity: 0.8;
-}
+.tick.minor { height: 7px; opacity: 0.8; }
+.tick.major { height: 12px; width: 3px; opacity: 0.8; }
 
-.tick.major {
-  height: 12px;
-  width: 3px;
-  opacity: 0.8;
-}
-
+/* --- 🌟 Safari 修复核心区域: .year-label --- */
 .year-label {
   position: absolute;
   top: 25px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 300;
   white-space: nowrap;
   color: #000000;
   opacity: 1;
+  
   transition: opacity 0.3s ease;
   will-change: opacity;
-}
-/* ✅ 非高亮 tick 和 label：仅降低透明度 */
-.year-label.faded{
-  opacity: 0.1;
-  transition: opacity 0.4s ease;
-}
-
-
-.tick.faded {
-  background: hsla(0, 0%, 0%, 0.15); /* 黑色，透明度 15% */
-  opacity: 1;                        /* 保持不变 */
+  
+  /* ✅ 新增：强制开启硬件加速 */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
+.year-label.faded { opacity: 0.1; transition: opacity 0.4s ease; }
+.tick.faded { background: hsla(0, 0%, 0%, 0.15); opacity: 1; }
 
-/* ✅ 高亮年份：完全不透明，字体可加重 */
-.year-label.highlighted,
-.tick.highlighted {
-  opacity: 1 !important;
-  font-weight: 300;
-}
+.year-label.highlighted, .tick.highlighted { opacity: 1 !important; font-weight: 300; }
+.year-label.dimmed, .tick.dimmed { opacity: 0; transition: opacity 0.3s ease; }
+.year-label.hidden, .tick.major.hidden, .tick.minor.hidden { opacity: 0; pointer-events: none; }
 
-/* ✅ 如果你需要隐藏某些年份/线条（非 hover 相关） */
-.year-label.dimmed,
-.tick.dimmed
- {
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.year-label.hidden,
-.tick.major.hidden,
-.tick.minor.hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-
-
-/* 内容 */
-
+/* 内容弹窗 */
 .year-info {
   position: absolute;
-  top: 40%;
+  top: 30%;
   left: 50%;
   transform: translateX(-50%);
   flex-direction: column;
@@ -460,21 +389,11 @@ body {
   transition: opacity 0.3s ease;
   display: flex;
   will-change: opacity;
-
-  /* ✅ 新增宽度设置 */
   max-width: 1000px;
-  /* 或者你可以改成更大的值 */
   width: 90%;
-  /* 适配响应式宽度 */
 }
 
-
-.year-info.active {
-  opacity: 1;
-  pointer-events: none;
-}
-
-
+.year-info.active { opacity: 1; pointer-events: none; }
 
 .info-images {
   width: 100%;
@@ -488,7 +407,7 @@ body {
   height: 150px;
   width: auto;
   border-radius: 10px;
-  border: 1px solid #000;
+  border: none;
   object-fit: contain;
 }
 
@@ -501,259 +420,124 @@ body {
   color: #111;
 }
 
-.book-svg.faded {
-  opacity: 0;
-  transition: opacity 0.3s ease;
+/* 各年份信息布局 */
+.layout-2019 { left: 65%; }
+.layout-2020 { left: 80%; }
+.layout-2021 { left: 87%; }
+.layout-2024 { left: 60%; }
+.layout-2025 { left: 62%; }
+
+.layout-2022 .info-images img:first-child { margin-left: 30px; }
+.layout-2022 .info-images img:nth-child(2) { margin-right: 260px; }
+.layout-2022 .info-text-split { display: flex; justify-content: space-between; align-items: flex-start; gap: 180px; margin-top: 0px; width: 100%; max-width: 1000px; margin-left: 30px; margin-right: auto; }
+
+.layout-2023 .info-images img:first-child { margin-left: 100px; }
+.layout-2023 .info-images img:nth-child(2) { margin-right: 165px; }
+.layout-2023 .info-text-split { display: flex; justify-content: space-between; align-items: flex-start; gap: 60px; margin-top: 0px; width: 120%; max-width: 1200px; margin-left: 100px; margin-right: auto; }
+
+.info-images, .info-text-split { position: relative; z-index: 1; }
+.info-images img { pointer-events: none; }
+
+/* =========================================
+   交互与动画
+   ========================================= */
+.shelf-section, .timeline-ruler, .year-info {
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
 }
 
-.layout-2019 {
-  left: 65%;
+.book-svg, .year-label, .tick, .info-images img {
+  cursor: de·fault;
+  pointer-events: auto;
 }
 
-.layout-2020 {
-  left: 80%;
+/* 小手修正 */
+.year-label, .tick { cursor: pointer !important; pointer-events: auto; }
+.book-svg { cursor: default !important; }
+
+/* 2019 呼吸动画 */
+@keyframes softPulse {
+  0% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.3); }
+  100% { opacity: 0.5; transform: scale(1); }
 }
 
-.layout-2021 {
-  left: 87%;
+.tick.pulse-cue .year-label,
+.tick.pulse-cue {
+  animation: softPulse 2s infinite ease-in-out;
+  background-color: #000;
+}
+.year-label.pulse-cue-text {
+  font-weight: 600;
+  animation: softPulse 2s infinite ease-in-out;
 }
 
-.layout-2024 {
-  left: 60%;
-}
-
-.layout-2025 {
-  left: 62%;
-}
-
-/* 针对 2022 年的图像间距微调 */
-
-.layout-2022 .info-images img:first-child {
-  margin-left: 30px;
-  /* 根据你喜欢的间距调整 */
-}
-
-.layout-2022 .info-images img:nth-child(2) {
-  margin-right: 260px;
-  /* 根据你喜欢的间距调整 */
-}
-
-.layout-2022 .info-text-split {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 180px;
-  margin-top: 0px;
+/* =========================================
+   Footer
+   ========================================= */
+.site-footer {
+  position: fixed;
+  /* 离底部距离 */
+  bottom: 30px; 
+  padding: 0 32px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  margin-bottom: 0;
   width: 100%;
-  max-width: 1000px;
-  margin-left: 30px;
-  margin-right: auto;
-}
-
-/* 针对 2023 年的图像间距微调 */
-.layout-2023 .info-images img:first-child {
-  margin-left: 100px;
-  /* 根据你喜欢的间距调整 */
-}
-
-.layout-2023 .info-images img:nth-child(2) {
-  margin-right: 165px;
-  /* 根据你喜欢的间距调整 */
-}
-
-.layout-2023 .info-text-split {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 60px;
-  margin-top: 0px;
-  width: 120%;
-  max-width: 1200px;
-  margin-left: 100px;
-  margin-right: auto;
-}
-
-.info-images,
-.info-text-split {
-  position: relative;
-  z-index: 1;
-}
-
-.info-text-split {
-  position: relative;
-  z-index: 1;
-}
-
-.info-images img {
+  max-width: 1800px;
+  
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  align-items: end;
+  
+  font-size: 15px;
+  font-weight: 300;
+  background: transparent;
+  color: #ffffff;
+  mix-blend-mode: difference;
+  
+  z-index: 1000;
   pointer-events: none;
 }
 
-
-
-
-.page-footer {
-  text-align: center;
-  padding-bottom: 5vh;
-  /* padding-top: 0px; */
-  font-size: 0.8rem;
-  font-weight: 300;
-  color: #6e6e6e;
-}
-
-
-
-
+/* =========================================
+   响应式
+   ========================================= */
 @media (max-width: 1200px) {
-
-  .section-container {
-    display: flex;
-    position: relative;
-    width: 100%;
-    padding-left: 100px;
-  }
-
-  .scroll-right {
-    width: 100%;
-  }
-
-
-
-  .sticky-left {
-    display: none;
-  }
-
-  .shelf-section {
-    display: none;
-  }
-
- 
-
-  .infinite-ticker {
-    display: none;
-  }
-
-
-  #footer-trigger {
-    display: none;
-  }
-
-
+  .section-container { display: flex; position: relative; width: 100%; padding-left: 100px; }
+  .scroll-right { width: 100%; }
+  .sticky-left { display: none; }
+  .shelf-section { display: none; }
+  .infinite-ticker { display: none; }
 }
 
-
-
-
-
-
-
-/* 🌐 响应式媒体查询：平板和手机适配 */
 @media (max-width: 600px) {
-  /* 隐藏 Sticky 图片区域 */
-
-
-  .section-container {
-    display: flex;
-    position: relative;
-    width: 100%;
-    padding: 30px;
-  }
-
-
-  #panel1 {
-    padding-top: 0px;
-    padding-right: 20px;
-  }
-
-  .sticky-left {
-    display: none;
-  }
-
-  .shelf-section {
-    display: none;
-  }
-
-  /* 右侧文字区域改为100%宽度 */
-  .scroll-right {
-    width: 100%;
-  }
-
-  /* #panel2 {
-  display: none;
-} */
-
-  .about-panel p {
-    font-size: 14px;
-    line-height: 1.5;
-    margin-bottom: 3px;
-    font-weight: 300;
-  }
-
-
-  /* 调整 about-panel 文字内边距 */
-  .about-panel {
-    padding: 20px 10px;
-  }
-
-
-
-  .about-panel h1 {
-    font-size: 1.2rem;
-  }
-
-  .about-panel h2 {
-    font-size: 1rem;
-  }
-
-.award-year {
-  font-size: 0.9rem;
-}
-
-.award-text {
-  font-size: 0.9rem;
-}
-
-
-  /* 调整社交图标位置 */
+  .section-container { display: flex; position: relative; width: 100%; padding: 30px; }
+  #panel1 { padding-top: 0px; padding-right: 20px; }
+  .sticky-left { display: none; }
+  .shelf-section { display: none; }
+  .scroll-right { width: 100%; }
+  .about-panel p { font-size: 14px; line-height: 1.5; margin-bottom: 3px; font-weight: 300; }
+  .about-panel { padding: 20px 10px; }
+  .about-panel h1 { font-size: 1.2rem; }
+  .about-panel h2 { font-size: 1rem; }
+  .award-year { font-size: 0.9rem; }
+  .award-text { font-size: 0.9rem; }
+  
   .social-icons-fixed {
     gap: 24px;
-  }
-
-  .social-icon img {
-    width: 20px;
-    height: 20px;
-  }
-
-  .social-icons-fixed {
     position: fixed;
     bottom: 20px;
-    /* 距离底部 */
     top: auto;
     flex-direction: row;
-    /* 改为横排 */
-    gap: 24px;
-    /* 调整图标间距 */
     z-index: 999;
-
-
   }
-
-
-
-
-  .infinite-ticker {
-    display: none;
-  }
-
-  #footer-trigger {
-    display: none;
-  }
-
-
-    .about-panel p {
-    display: none;
-  }
-
-
-
-
+  .social-icon img { width: 20px; height: 20px; }
+  
+  .infinite-ticker { display: none; }
+  #footer-trigger { display: none; }
+  .about-panel p { display: none; }
 }

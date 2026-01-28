@@ -62,7 +62,7 @@ function protectPageWithPassword(password) {
 
     const logoEl = passwordBox.querySelector('.logo');
     if (logoEl) {
-        logoEl.style.cursor = 'none';
+        logoEl.style.cursor = 'pointer';
         logoEl.addEventListener('click', () => {
             window.location.href = 'index.html';
         });

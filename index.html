@@ -2,301 +2,205 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jinghe Cai</title>
-  <!-- Favicon -->
-  <link rel="icon" href="media/logo.svg" type="image/svg+xml" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap"
-    rel="stylesheet">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jinghe Cai</title>
 
+    <link rel="icon" href="media/logo.svg" type="image/svg+xml" />
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="css/header.css" />
-  <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/index.css" />
-  <img src="media/more_hover.gif" style="display: none;" />
-  <link rel="preload" href="media/more_hover.gif" as="image" />
+    <link rel="stylesheet" href="css/index.css" />
+    <link rel="stylesheet" href="css/header.css" />
 
-
-  <!-- JS -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/SplitText.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.35/bundled/lenis.min.js"></script>
-
-
-  <script type="module" src="js/animation.js"></script>
-  <script type="module" src="js/index.js"></script>
-
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-Q1VYN4W02W"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-Q1VYN4W02W');
-</script>
-
+    <style>
+        /* 防止加载时的闪烁，配合 CSS 中的动画 */
+        .work-item {
+            opacity: 0;
+            transform: translateY(60px);
+        }
+    </style>
 </head>
 
-<!-- Showreel Overlay Card -->
-
-<!-- Showreel Overlay -->
-<div id="showreelOverlay" class="preload hidden">
-  <div class="showreel-frame">
-    <!-- ✅ 顶部 Header -->
-    <div class="showreel-header">
-      <img id="closeShowreelBtn" src="media/video_next.svg" alt="Close" class="close-btn" />
-      <div class="header-center">Jinghe Cai</div>
-      <div class="header-right">SHOWREEL</div>
-    </div>
-
-    <!-- ✅ 视频内容 -->
-    <div class="showreel-card">
-      <div class="video-container">
-        <!-- ✅ Loading 视频，自动播放静音 -->
-        <video id="loadingVideo" autoplay muted playsinline class="loading-video">
-          <source src="media/loading.mp4" type="video/mp4" />
-        </video>
-
-        <!-- ✅ 主视频 -->
-        <video id="showreelVideo" autoplay playsinline muted class="main-video">
-          <source src="media/showreel.mp4" type="video/mp4" />
-        </video>
-
-        <!-- ✅ 控制按钮 -->
-        <div class="video-controls">
-          <img id="soundToggleBtn" src="media/video_noaudio.svg" alt="Sound Toggle" />
-          <img id="playPauseBtn" src="media/video_play.svg" alt="Play" />
-        </div>
-      </div>
-
-
-    </div>
-  </div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
 <body>
-  <div class="layout" id="mainLayout">
-    <div class="page-wrapper">
-      <header class="header fade-in-line">
-        <div class="header-inner">
-          <div class="pill-header">
-            <a href="index.html" class="logo">
-              <img id="logoIcon" src="media/logo.svg" alt="Logo" class="logo-icon" />
 
+    <div class="layout">
 
-            </a>
-
-            <nav class="nav">
-              <a href="work.html" class="cube-button">
-                <span class="face front">Works</span>
-                <span class="face top">Works</span>
-              </a>
-
-              <a href="about.html" class="cube-button">
-                <span class="face front">About</span>
-                <span class="face top">About</span>
-              </a>
-
+        <header class="site-header">
+            <div class="header-col-1">
+                <a href="index.html" class="my-name">Jinghe Cai</a>
+            </div>
+            <nav class="header-col-2">
+                <a href="#ux">Design</a>
+                <a href="#visual">Visual</a>
+                <a href="https://scholar.google.com/citations?user=USR_nP8AAAAJ&hl=en" target="_blank">Research</a>
             </nav>
-          </div>
-        </div>
-      </header>
+            <nav class="header-col-3">
+                <a href="about.html">Info</a>
+                <a href="https://drive.google.com/file/d/1IsOUI2ZcsX_7XXkCw_bYc1aIiybE1FQT/view?usp=sharing"
+                    target="_blank">Résumé</a>
+            </nav>
+        </header>
 
 
-      <!-- Content Section -->
-      <main class="hero-section fade-section">
-        <div class="text-column">
-          <p class="intro-paragraph">
-            <span class="font-bold">Jinghe</span><span class="inline-icon">
-              <img src="media/jinghe.svg" class="icon-default" />
-              <img src="media/jinghe_B.svg" class="icon-hover" />
-            </span><span class="font-light">is a </span> <span class="font-bold">visual designer</span><span
-              class="font-light"> and </span> <span class="font-bold">design strategist</span><span
-              class="inline-icon icon-dogcat">
-              <img src="media/dog.svg" class="icon-default" />
-              <img src="media/cat.svg" class="icon-hover" /></span>
-            <span class="font-light"> specializing in </span> <span class="font-medium">affective computing</span><span
-              class="inline-icon">
-              <img src="media/computer.svg" class="icon-default" />
-              <img src="media/computer_B.svg" class="icon-hover" />
-            </span><span class="font-light">. She approaches design as a way to translate subtle human states into
-              interactions that feel </span>
-            <span class="font-medium">emotionally intelligent</span><span class="inline-icon">
-              <img src="media/emo.svg" class="icon-default" />
-              <img src="media/emo_B.svg" class="icon-hover" />
-            </span><span class="font-light">and </span><span class="font-medium">quietly powerful</span><span
-              class="inline-icon">
-              <img src="media/snowman.svg" class="icon-default" />
-              <img src="media/snowman_B.svg" class="icon-hover" />
-            </span><span class="font-light">.</span>
-          </p>
+        <main>
+            <section class="works-section" id="work">
+                <div class="grid-container">
 
-        </div>
+                    <a href="#" id="open-showreel" class="work-item video-item">
+                        <div class="work-image-wrapper">
+                            <video src="media/index/logo.mp4" autoplay muted loop playsinline></video>
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-business">Showreel 2025 </span>
+                        </div>
+                    </a>
 
 
-        <!-- ✅ 底部滚动 Logo 条（上下有细线） -->
-        <div class="logo-ticker-wrapper">
-          <div class="logo-ticker" id="logoTicker">
-            <div class="logo-track">
-              <img src="media/logo_microsoft.png" />
-              <img src="media/logo_copilot.png" />
-              <img src="media/logo_samsung.png" />
-              <img src="media/logo_lepal.svg" />
-              <!-- 再复制一份，用于无缝滚动 -->
-              <img src="media/logo_microsoft.png" />
-              <img src="media/logo_copilot.png" />
-              <img src="media/logo_samsung.png" />
-              <img src="media/logo_lepal.svg" />
-              <!-- 再复制一份，用于无缝滚动 -->
-              <img src="media/logo_microsoft.png" />
-              <img src="media/logo_copilot.png" />
-              <img src="media/logo_samsung.png" />
-              <img src="media/logo_lepal.svg" />
-              <!-- 再复制一份，用于无缝滚动 -->
-              <img src="media/logo_microsoft.png" />
-              <img src="media/logo_copilot.png" />
-              <img src="media/logo_samsung.png" />
-              <img src="media/logo_lepal.svg" />
-            </div>
-          </div>
-        </div>
+                    <a href="samsung.html" class="work-item">
+                        <div class="work-image-wrapper">
+                            <img src="media/index/samsung.png" alt="Samsung" />
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-name">Samsung</span>
+                            <span class="tag-business">Branding Strategy </span>
+                        </div>
+                    </a>
 
 
+                    <div class="work-item" style="cursor: default; transform: none !important; transition: none;">
+                        <div class="work-image-wrapper">
+                            <img src="media/index/linko.png" alt="Visual" />
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-business">Learning Community，Design System </span>
+                        </div>
+                    </div>
 
-      </main>
 
-      <section class="selected-works-section fade-section">
-        <div class="works-grid">
+                    <a href="microsoft.html" class="work-item">
+                        <div class="work-image-wrapper">
+                            <img src="media/index/mfst.png" alt="Microsoft" />
+                            <video class="hover-video" src="media/index/mfst2.mp4" muted loop playsinline></video>
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-name">Microsoft</span>
+                            <span class="tag-business">Internal AI Design Toolkit </span>
+                        </div>
+                    </a>
 
 
+                    <a href="lepal.html" class="work-item">
+                        <div class="work-image-wrapper">
+                            <img src="media/index/lepal.png" alt="LePal" />
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-name">Lepal.ai</span>
+                            <span class="tag-business">AI Companion for Gen Z </span>
+                        </div>
+                    </a>
 
 
-          <div class="work-item">
-          <a href="microsoft.html" class="work-item">
-            <div class="work-image-wrapper">
-              <div class="work-image-inner tilted-one">
-                <img src="media/intro_MFST_A.svg" alt="Microsoft Muted" class="work-image image-muted" />
-                <img src="media/intro_MFST.svg" alt="Microsoft" class="work-image image-default" />
-                <img src="media/intro_MFST_B.svg" alt="Microsoft Hover" class="work-image image-hover" />
-              </div>
-            </div>
-            <div class="work-caption">
-              <div class="caption-title">Microsoft</div>
-              <div class="caption-subtitle">AI Design Toolkit</div>
-            </div>
-            </a>
+                    <a href="bibf.html" class="work-item">
+                        <div class="work-image-wrapper">
+                            <img src="media/index/BIBF.png" alt="Research" />
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-name">BIBF</span>
+                            <span class="tag-business">Global Reading Fest VI Design </span>
+                        </div>
+                    </a>
 
-          </div>
 
-          <div class="work-item">
-            <a href="lepal.html" class="work-item">
-              <div class="work-image-wrapper">
-                <div class="work-image-inner tilted-two">
-                  <img src="media/intro_lepal_A.svg" alt="Lepal.ai Muted" class="work-image image-muted" />
-                  <img src="media/intro_lepal.svg" alt="Lepal.ai" class="work-image image-default" />
-                  <img src="media/intro_lepal_B.svg" alt="Lepal.ai Hover" class="work-image image-hover" />
+                    <a href="naivevil.html" class="work-item">
+                        <div class="work-image-wrapper">
+                            <img src="media/index/naive.png" alt="Naivevil" />
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-business">Chinese Ink Painting </span>
+                        </div>
+                    </a>
+
+
+                    <a href="redwing.html" class="work-item">
+                        <div class="work-image-wrapper">
+                            <video src="media/index/redwing.mp4" autoplay muted loop playsinline></video>
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-business">Red Wing, Concept Art </span>
+                        </div>
+                    </a>
+
+
+                    <a href="wander.html" class="work-item">
+                        <div class="work-image-wrapper">
+                            <img src="media/index/wander.png" alt="Wander" />
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-business">Gamified Sleep Experience, Published Research </span>
+                        </div>
+                    </a>
+
+
+                    <a href="https://www.indigoaward.com/winners/10754" class="work-item" target="_blank">
+                        <div class="work-image-wrapper">
+                            <img src="media/index/pink.svg" alt="Motion" />
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-business">Menstrual Health, Service Design </span>
+                        </div>
+                    </a>
+
                 </div>
-              </div>
-              <div class="work-caption">
-                <div class="caption-title">Lepal.ai</div>
-                <div class="caption-subtitle">AI Wellness Companion</div>
-              </div>
-            </a>
+            </section>
+        </main>
 
-          </div>
-
-
-          
-          <div class="work-item">
-            <a href="samsung.html" class="work-item">
-            <div class="work-image-wrapper">
-              <div class="work-image-inner tilted-three">
-                <img src="media/intro_samsung_A.svg" alt="ElderEase Muted" class="work-image image-muted" />
-                <img src="media/intro_samsung.svg" alt="ElderEase" class="work-image image-default" />
-                <img src="media/intro_samsung_B.svg" alt="ElderEase Hover" class="work-image image-hover" />
-              </div>
+        <footer class="site-footer" id="info">
+            <div class="footer-left">
+                <a href="mailto:jcai25@student.scad.edu">Contact</a>
             </div>
-            <div class="work-caption">
-              <div class="caption-title">Samsung</div>
-              <div class="caption-subtitle">
-                Branding Strategy</div>
+            <div class="footer-center">
+                <span>2026</span>
             </div>
-            </a>
-            
-          </div>
+        </footer>
 
+    </div> <div id="showreelOverlay" class="preload hidden">
+        <div class="showreel-frame">
+            <div class="showreel-header">
+                <img id="closeShowreelBtn" src="media/video_next.svg" alt="Close" class="close-btn" style="cursor: pointer;" />
+                 
+                <div class="header-center">Jinghe Cai</div>
+                <div class="header-right">SHOWREEL</div>
+            </div>
 
+            <div class="showreel-card">
+                <div class="video-container">
+                    <video id="loadingVideo" autoplay muted playsinline class="loading-video">
+                        <source src="media/loading.mp4" type="video/mp4" />
+                    </video>
 
+                    <video id="showreelVideo" autoplay playsinline muted class="main-video">
+                        <source src="media/showreel.mp4" type="video/mp4" />
+                    </video>
 
-<div class="work-item">
-  <a href="https://www.indigoaward.com/winners/10754" class="work-item-link" target="_blank"> 
-    
-    <div class="work-image-wrapper">
-      <div class="work-image-inner tilted-four">
-        <img src="media/intro_pink_A.svg" alt="Pink Panthers Muted" class="work-image image-muted" />
-        <img src="media/intro_pink.svg" alt="Pink Panthers" class="work-image image-default" />
-        <img src="media/intro_pink_B.svg" alt="Pink Panthers Hover" class="work-image image-hover" />
-      </div>
-    </div>
-    <div class="work-caption">
-      <div class="caption-title">Pink Panthers</div>
-      <div class="caption-subtitle">Menstrual Health Service</div>
-    </div>
-  
-  </a> 
-</div>
-
-
+                    <div class="video-controls">
+                        <img id="soundToggleBtn" src="media/video_noaudio.svg" alt="Sound Toggle" />
+                        <img id="playPauseBtn" src="media/video_play.svg" alt="Play" />
+                    </div>
+                </div>
+            </div>
         </div>
-
-
-
-        <!-- ✅ 正常流中的更多按钮区域 -->
-        <section class="more-section">
-          <a href="#" id="openShowreelBtn" class="more-wrapper">
-            <img src="media/more.svg" class="more-icon" data-hover="media/more_hover.gif" />
-            <span class="more-text">
-              <span class="face front">SHOWREEL</span>
-              <span class="face top">SHOWREEL</span>
-            </span>
-          </a>
-        </section>
-
-
-
-
-
     </div>
-    </section>
+    
+    <div id="custom-cursor"></div>
+    <div id="customCursorText" class="cursor-hidden">MORE</div>
 
 
-
-
-  </div>
-  <!-- Custom Cursor -->
-  <div id="custom-cursor"></div>
-  <div id="customCursorText" class="cursor-hidden">MORE</div>
-
-
-
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://unpkg.com/lenis@1.0.45/dist/lenis.min.js"></script>
+    <script src="js/index.js"></script>
 
 </body>
 

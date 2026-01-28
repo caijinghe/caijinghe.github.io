@@ -9,7 +9,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet" />
 
     <link rel="stylesheet" href="css/style.css" />
-    <script type="module" src="js/cursor.js"></script>
+    <link rel="stylesheet" href="css/index.css" />
+
+
+
 
     <style>
         * {
@@ -46,19 +49,12 @@
 
         .left-panel {
             flex: 1;
-            padding: 8vw 0 calc(8vw - 2rem) 4vw;
+            padding: 4vw 0 20vw 6vw;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
 
         }
-
-        /* .left-panel {
-            padding: 8vw 4vw;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-        } */
 
 
 
@@ -88,7 +84,7 @@
         }
 
         .award {
-            width: 14vh;
+            width: 16vh;
         }
 
         .right-panel {
@@ -97,7 +93,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 4vw;
+            padding: 6vw;
             padding-left: 0;
         }
 
@@ -125,26 +121,31 @@
             max-width: 100%;
             object-fit: contain;
             display: none;
+            border-radius: 15px;
         }
 
         .carousel img.active {
             display: block;
         }
 
+
+
+
+
         .dots {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin-top: 2.5rem;
+            gap: 12px;
+            margin-top: 2rem;
         }
 
         .dot {
             width: 10px;
             height: 10px;
             border-radius: 50%;
-            background-color: transparent;
-            border: 1px solid #000;
-            cursor: none;
+            background-color: #cecece;
+            /* border: 1px solid #000; */
+            cursor: pointer;
             transition: background-color 0.3s;
         }
 
@@ -152,94 +153,8 @@
             background-color: #000;
         }
 
-        .logo-button {
-            position: absolute;
-            top: 3vw;
-            left: 4vw;
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
-            border: 1px solid #6e6e6e;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            background: transparent;
-            z-index: 10;
-        }
 
-        .logo-button img {
-            width: 36px;
-            height: 36px;
-        }
-
-        footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 4vw;
-            font-size: 0.8rem;
-            border-top: 1px solid #ccc;
-        }
-
-        footer span {
-            color: #6e6e6e;
-            font-weight: 300;
-        }
-
-        .more-wrapper {
-            display: inline-block;
-            text-decoration: none;
-        }
-
-        .more-text {
-            position: relative;
-            width: 135px;
-            height: 38px;
-            border: 1px solid #6e6e6e;
-            border-radius: 999px;
-            overflow: hidden;
-            perspective: 600px;
-            display: inline-block;
-            cursor: none;
-        }
-
-        .more-text .face {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.85rem;
-            font-family: 'Inter', sans-serif;
-            font-weight: 300;
-            color: #000;
-            backface-visibility: hidden;
-            transform-style: preserve-3d;
-            transition: transform 1.5s cubic-bezier(0.22, 1.61, 0.36, 1);
-        }
-
-        .more-text .top {
-            transform: rotateX(90deg) translateY(-100%);
-            transform-origin: top;
-        }
-
-        .more-wrapper:hover .more-text .front {
-            transform: rotateX(-90deg) translateY(100%);
-            transform-origin: bottom;
-        }
-
-        .more-wrapper:hover .more-text .top {
-            transform: rotateX(0deg);
-            font-weight: 500;
-        }
-
-        .divider {
-            display: none;
-        }
-
-        @media (max-width: 1000px) {
+    @media (max-width: 1000px) {
             html {
                 height: auto !important;
                 overflow-x: hidden;
@@ -266,7 +181,7 @@
                 align-items: flex-start;
                 justify-content: space-between;
                 gap: 1vw;
-                margin-top: 0vh;
+                margin-top: 15vh;
             }
 
             .project-info h1 {
@@ -283,19 +198,17 @@
             }
 
             .award {
-                margin-top: 5.2rem;
-                width: 90px;
+                width: 80px;
+                margin-top: 10px;
             }
 
-            .divider {
-                display: block;
-                width: 100%;
-                height: 1px;
-                background-color: #ccc;
-                border: none;
-            }
+
+
+
 
             .right-panel {
+
+                margin-top: 10vw;
                 padding: 8vw;
             }
 
@@ -314,7 +227,7 @@
             .dots {
                 display: flex;
                 justify-content: center;
-                gap: 5px;
+                gap: 6px;
                 margin-top: 3vh;
             }
 
@@ -322,8 +235,7 @@
                 width: 8px;
                 height: 8px;
                 border-radius: 50%;
-                background-color: transparent;
-                border: 0.5px solid #000;
+                background-color: #cecece;;
                 cursor: none;
                 transition: background-color 0.3s;
             }
@@ -333,153 +245,112 @@
             }
 
 
-            .logo-button {
-                top: 8vw;
-                left: 8vw;
-                width: 45px;
-                height: 45px;
-                border-radius: 50%;
-                border: 1px solid #6e6e6e;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                text-decoration: none;
-                flex-shrink: 0;
-            }
 
-            .logo-bottom {
-                display: flex;
-                flex-direction: row;
-                /* ✅ 关键：横向排列 */
-                align-items: center;
-                justify-content: space-between;
-                gap: 1rem;
-                flex-wrap: wrap;
-            }
-
-
-
-            .logo-button img {
-                width: 30px;
-                height: 30px;
-            }
-
-
-
-            footer {
-                padding: 20px 8vw;
-            }
-
-            footer span {
-                font-size: 0.75rem;
-                color: #FFFCF2;
-            }
-
-            .more-text {
-                width: 110px;
-                height: 30px;
-                border: 0.8px solid #000000;
-            }
-
-            .more-text .face {
-                font-size: 0.75rem;
-                font-weight: 200;
-            }
         }
     </style>
 </head>
 
 <body>
-    <div class="content">
-        <div class="left-panel">
-            <a href="work.html" class="logo-button">
-                <img src="media/logo.svg" alt="Back" />
-            </a>
-            <div class="info-award-wrapper">
-                <div class="project-info">
-                    <img src="media/bibf/bibf.png" alt="Award" class="award" />
-                    <p>Beijing International Book Fair<br /> <br />Key Visual Design<br />Sep 2020, Client Work</p>
-                </div>
 
+
+    <header class="project-hero">
+
+        <div class="site-header">
+            <div class="header-col-1">
+                <a href="index.html" class="my-name">Jinghe Cai</a>
+            </div>
+            <nav class="header-col-2">
+                <!-- <a href="index.html#ux">Design</a>
+            <a href="index.html#visual">Visual</a>
+            <a href="https://scholar.google.com/citations?user=USR_nP8AAAAJ&hl=en" target="_blank">Research</a> -->
+            </nav>
+            <nav class="header-col-3">
+                <a href="about.html">Info</a>
+                <a href="https://drive.google.com/file/d/1IsOUI2ZcsX_7XXkCw_bYc1aIiybE1FQT/view?usp=sharing"
+                    target="_blank">Résumé</a>
+            </nav>
+        </div>
+
+
+        <div class="content">
+            <div class="left-panel">
+                <!-- <a href="work.html" class="logo-button">
+                <img src="media/logo.svg" alt="Back" /> -->
+                </a>
+                <div class="info-award-wrapper">
+                    <div class="project-info">
+                        <img src="media/bibf/bibf.png" alt="Award" class="award" />
+                        <p>Beijing International Book Fair<br /> <br />Key Visual Design<br />Sep 2020, Client Work</p>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <div class="right-panel">
+                <div class="carousel-wrapper">
+                    <div class="carousel">
+                        <img src="media/bibf/bibf1.jpg" class="carousel-image active" />
+                        <img src="media/bibf/bibf2.jpg" class="carousel-image" />
+                        <img src="media/bibf/bibf3.jpg" class="carousel-image" />
+                        <img src="media/bibf/bibf4.jpg" class="carousel-image" />
+                        <img src="media/bibf/bibf5.jpg" class="carousel-image" />
+                        <img src="media/bibf/bibf6.jpg" class="carousel-image" />
+                        <img src="media/bibf/bibf7.jpg" class="carousel-image" />
+                        <img src="media/bibf/bibf8.jpg" class="carousel-image" />
+                    </div>
+                </div>
+                <div class="dots"></div>
             </div>
         </div>
 
-        <hr class="divider" />
 
-        <div class="right-panel">
-            <div class="carousel-wrapper">
-                <div class="carousel">
-                    <img src="media/bibf/bibf1.jpg" class="carousel-image active" />
-                    <img src="media/bibf/bibf2.jpg" class="carousel-image" />
-                    <img src="media/bibf/bibf3.jpg" class="carousel-image" />
-                    <img src="media/bibf/bibf4.jpg" class="carousel-image" />
-                    <img src="media/bibf/bibf5.jpg" class="carousel-image" />
-                    <img src="media/bibf/bibf6.jpg" class="carousel-image" />
-                    <img src="media/bibf/bibf7.jpg" class="carousel-image" />
-                    <img src="media/bibf/bibf8.jpg" class="carousel-image" />
-                </div>
-            </div>
-            <div class="dots"></div>
-        </div>
-    </div>
 
-    <footer>
-        <span>© 2025 Jinghe Cai. All rights reserved.</span>
-        <a href="work.html" class="more-wrapper">
-            <span class="more-text">
-                <span class="face front">MORE WORKS</span>
-                <span class="face top">MORE WORKS</span>
-            </span>
-        </a>
-    </footer>
+        <script>
+            const images = document.querySelectorAll('.carousel-image');
+            const dotsContainer = document.querySelector('.dots');
+            let current = 0;
+            let interval;
 
-    <div id="custom-cursor"></div>
-
-    <script>
-        const images = document.querySelectorAll('.carousel-image');
-        const dotsContainer = document.querySelector('.dots');
-        let current = 0;
-        let interval;
-
-        function showImage(index) {
-            images.forEach((img, i) => {
-                img.classList.toggle('active', i === index);
-            });
-            document.querySelectorAll('.dot').forEach((dot, i) => {
-                dot.classList.toggle('active', i === index);
-            });
-            current = index;
-        }
-
-        function createDots() {
-            images.forEach((_, i) => {
-                const dot = document.createElement('div');
-                dot.classList.add('dot');
-                if (i === 0) dot.classList.add('active');
-                dot.addEventListener('click', () => {
-                    showImage(i);
-                    resetInterval();
+            function showImage(index) {
+                images.forEach((img, i) => {
+                    img.classList.toggle('active', i === index);
                 });
-                dotsContainer.appendChild(dot);
-            });
-        }
+                document.querySelectorAll('.dot').forEach((dot, i) => {
+                    dot.classList.toggle('active', i === index);
+                });
+                current = index;
+            }
 
-        function nextImage() {
-            showImage((current + 1) % images.length);
-        }
+            function createDots() {
+                images.forEach((_, i) => {
+                    const dot = document.createElement('div');
+                    dot.classList.add('dot');
+                    if (i === 0) dot.classList.add('active');
+                    dot.addEventListener('click', () => {
+                        showImage(i);
+                        resetInterval();
+                    });
+                    dotsContainer.appendChild(dot);
+                });
+            }
 
-        function startInterval() {
-            interval = setInterval(nextImage, 4000);
-        }
+            function nextImage() {
+                showImage((current + 1) % images.length);
+            }
 
-        function resetInterval() {
-            clearInterval(interval);
+            function startInterval() {
+                interval = setInterval(nextImage, 4000);
+            }
+
+            function resetInterval() {
+                clearInterval(interval);
+                startInterval();
+            }
+
+            createDots();
             startInterval();
-        }
-
-        createDots();
-        startInterval();
-    </script>
+        </script>
 </body>
 
 </html>

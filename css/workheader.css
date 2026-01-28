@@ -135,3 +135,120 @@
     }
 }
 
+/* =========================================
+   2. Header (3列 Grid) - 零位移按钮版
+   ========================================= */
+.site-header {
+    /* --- 1. 严格保留你的原版基础设置 --- */
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 1800px;
+    
+    padding: 24px 32px; 
+    z-index: 1000;
+    
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    
+    font-size: 15px;
+    font-weight: 300; 
+    pointer-events: none;
+    
+    background: transparent;
+    color: #ffffff;
+    mix-blend-mode: difference;
+}
+
+/* --- 2. 链接基础样式 --- */
+.site-header a {
+    pointer-events: auto;
+    text-decoration: none;
+    color: currentColor;
+    
+    /* ✅ 关键设置：设置为相对定位，作为背景框的参考点 */
+    position: relative;
+    z-index: 1; /* 保证文字在背景之上 */
+    
+    /* 保持 display 为 inline 或 inline-block，不加 padding，保证零位移 */
+    display: inline-block;
+    
+    transition: opacity 0.3s ease;
+}
+
+/* --- 3. 使用伪元素制作“假”背景 (不占位置) --- */
+.site-header a::before {
+    content: '';
+    position: absolute;
+    z-index: -1; /* 放在文字背后 */
+    
+    /* ✅ 在这里调整按钮的大小，完全不会影响布局间距 */
+    /* 负值表示向外扩张：上下扩 6px，左右扩 12px */
+    top: -6px;
+    bottom: -6px;
+    left: -12px;
+    right: -12px;
+    
+    /* 圆角和背景 */
+    border-radius: 99px;
+    background-color: rgba(255, 255, 255, 0.111); 
+    /* border: 1px solid rgba(255, 255, 255, 0.2); 可选：如果你想要边框 */
+    
+    /* 磨砂效果 */
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    
+    /* 初始状态：完全透明 + 稍微缩小 */
+    opacity: 0;
+    transform: scale(0.9);
+    
+    /* 动画过渡 */
+    transition: all 0.3s ease;
+}
+
+/* --- 4. Hover 交互 --- */
+
+/* Hover 时文字保持清晰 (或者你想保持原来的 0.5 也行，但通常按钮背景出来后文字要亮一点) */
+.site-header a:hover {
+    opacity: 1; 
+}
+
+/* Hover 时显示背景框 */
+.site-header a:hover::before {
+    opacity: 1;
+    transform: scale(1); /* 恢复正常大小 */
+}
+
+/* --- 5. 严格保留你的列布局 --- */
+.header-col-1 { justify-self: start; }
+/* 关键点：Header 的第二列是靠左对齐 (start) */
+.header-col-2 { justify-self: start; display: flex; gap: 24px; }
+.header-col-3 { justify-self: end; display: flex; gap: 24px; }
+/* =========================================
+   Index Footer (流式布局)
+   ========================================= */
+.site-footer {
+    position: relative;
+    width: 100%;
+    max-width: 1800px;
+    margin: 0 auto;
+    padding: 60px 32px 40px;
+    
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    
+    font-size: 15px;
+    font-weight: 300;
+    background: transparent;
+    /* color: #ffffff; */
+    /* mix-blend-mode: difference; */
+}
+
+.site-footer a {
+    pointer-events: auto;
+}
+

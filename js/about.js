@@ -24,6 +24,42 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /** -------------------------------
+   * Panel 1 滚动吸附 (Pinning) 效果
+   * -------------------------------- */
+function initPanelPinning() {
+    const panel = document.getElementById('panel1');
+    if (!panel) return;
+
+    // 1. 创建轨道
+    const track = document.createElement('div');
+    track.classList.add('pin-track');
+    panel.parentNode.insertBefore(track, panel);
+    track.appendChild(panel);
+
+    // 🔴 修改这里：减小数值
+    // 原来是 '160vh' (停顿很久)
+    // 改成 '120vh' (稍微停顿一下) 或者 '110vh' (几乎不停顿)
+    track.style.height = '120vh'; 
+    
+    track.style.position = 'relative';
+
+    // 3. 设置 Panel 样式
+    panel.style.position = 'sticky';
+    panel.style.width = '100%';
+    
+    // 居中设置 (保持不变)
+    panel.style.height = '80vh';  
+    panel.style.top = '10vh';     
+    
+    // 4. 清理干扰
+    panel.style.marginTop = '0';
+    panel.style.marginBottom = '0';
+    panel.style.paddingTop = '0'; 
+  }
+  // 运行这个函数
+  initPanelPinning();
+
+  /** -------------------------------
    * Timeline 尺寸标尺生成
    -------------------------------- */
   function generateTimeline(startYear = 2019, endYear = 2025) {
@@ -143,15 +179,7 @@ function stopAutoHover() {
   });
 
 
-  // if (booksRow) {
-  //   booksRow.addEventListener('mouseenter', () => {
-  //     stopAutoHover();
-  //     clearYearInfo();
-  //   });
-  //   booksRow.addEventListener('mouseleave', () => {
-  //     startAutoHover();
-  //   });
-  // }
+
 
   startAutoHover();
 
@@ -185,35 +213,6 @@ function stopAutoHover() {
     observer.observe(shelfSection);
   }
 
-  /** -------------------------------
-   * 社交图标 滑入/淡出控制
-   -------------------------------- */
-  const socialIcons = document.querySelector('.social-icons-fixed');
-  const trigger1 = document.querySelector('#footer-trigger');
-  const trigger2 = document.querySelector('.shelf-section');
-
-  let footerVisible = false;
-  let shelfVisible = false;
-
-  function updateIconVisibility() {
-    if (!footerVisible && !shelfVisible) {
-      socialIcons.classList.add('slide-in');
-    } else {
-      socialIcons.classList.remove('slide-in');
-    }
-  }
-
-  if (socialIcons && trigger1 && trigger2) {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.target === trigger1) footerVisible = entry.isIntersecting;
-        if (entry.target === trigger2) shelfVisible = entry.isIntersecting;
-        updateIconVisibility();
-      });
-    }, { threshold: 0.1 });
-    observer.observe(trigger1);
-    observer.observe(trigger2);
-  }
 
   /** -------------------------------
    * 鼠标跟随 & hover 放大指针
@@ -237,7 +236,7 @@ function stopAutoHover() {
   });
 
   const hoverTargets = document.querySelectorAll(
-    'a, button, [role="button"], [onclick], .cube-button, .logo, .tab, .more-wrapper, .filter-wrapper, .showreel-controls, .year-label, .work-item'
+    
   );
 
   hoverTargets.forEach(el => {
@@ -249,3 +248,5 @@ function stopAutoHover() {
     });
   });
 });
+
+

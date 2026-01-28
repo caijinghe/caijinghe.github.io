@@ -17,7 +17,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.35/bundled/lenis.min.js"></script>
     
     <link rel="stylesheet" href="css/style.css" />
-    <script type="module" src="js/cursor.js"></script>
+    <link rel="stylesheet" href="css/index.css" />
+  
 
 
     <style>
@@ -26,16 +27,16 @@
             padding: 0;
             font-family: Inter, sans-serif;
             /* background-color: #FFFCF2; */
-            background-color: #fff;
+            background-color: #f3f2ef;
             color: #111;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            cursor: none;
+            cursor: default;
         }
 
         header {
-            padding: 3vw 4vw 4vw 4vw;
+            padding: 20vw 4vw 4vw 4vw;
             display: flex;
             flex-direction: column;
             align-items: flex-start;
@@ -96,33 +97,48 @@
             height: 250px;
         }
 
-        .grid-container {
+.grid-container {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             padding: 0;
-            border-top: 1px solid #ccc;
-            border-left: 1px solid #ccc;
+            
+            /* ✅ 修改开始：使用 gap 来制作分割线 */
+            background-color: #ccc; /* 这里定义线条的颜色 */
+            gap: 1px;               /* 这里定义线条的粗细 */
+            border: 1px solid #ccc; /* 这里定义最外圈的边框 */
+            
+            /* ❌ 删除旧的边框写法 */
+            /* border-top: 1px solid #ccc; */
+            /* border-left: 1px solid #ccc; */
         }
 
-        .grid-item {
+.grid-item {
             aspect-ratio: 1 / 1;
-            border-right: 1px solid #ccc;
-            border-bottom: 1px solid #ccc;
+            
+            /* ❌ 删除旧的边框写法 */
+            /* border-right: 1px solid #ccc; */
+            /* border-bottom: 1px solid #ccc; */
+
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 4vw;
-            background-color: transparent;
+            
+            /* ✅ 修改开始：遮盖底色 */
+            /* 必须设置背景色，且颜色要和 body 背景色(#f3f2ef)一致 */
+            /* 这样才能盖住 container 的灰色背景，只漏出 gap 的缝隙作为线条 */
+            background-color: #f3f2ef; 
+            
             box-sizing: border-box;
-            cursor: none;
+            cursor: default;
         }
-
         
 
         .grid-item img {
             max-width: 100%;
             max-height: 100%;
             object-fit: cover;
+            cursor: pointer;
         }
 
         .lightbox {
@@ -188,7 +204,7 @@
             /* ✅ 关键：限制内部 face 的翻转范围 */
             perspective: 600px;
             display: inline-block;
-            cursor: none;
+            cursor: default;
         }
 
 
@@ -371,22 +387,32 @@
 </head>
 
 <body>
-    <header>
-        <div class="header-top">
-            <a href="work.html" class="back-button">
-                <img src="media/logo.svg" alt="Back" class="back-icon" data-default="media/work_logo.svg"
-                    data-hover="media/logo.svg" />
-            </a>
+<header class="project-hero">
+    
+    <div class="site-header">
+        <div class="header-col-1">
+            <a href="index.html" class="my-name">Jinghe Cai</a>
+        </div>
+        <nav class="header-col-2">
+            <!-- <a href="index.html#ux">Design</a>
+            <a href="index.html#visual">Visual</a>
+            <a href="https://scholar.google.com/citations?user=USR_nP8AAAAJ&hl=en" target="_blank">Research</a> -->
+        </nav>
+        <nav class="header-col-3">
+            <a href="about.html">Info</a>
+            <a href="https://drive.google.com/file/d/1IsOUI2ZcsX_7XXkCw_bYc1aIiybE1FQT/view?usp=sharing" target="_blank">Résumé</a>
+        </nav>
+    </div>
 
+    <div class="header-bottom">
+        <div class="title-group">
+            <div class="project-title">Naïvevil</div>
+            <div class="project-meta">Chinese Ink Painting<br />Jul 2019, Individual Work</div>
         </div>
-        <div class="header-bottom">
-            <div class="title-group">
-                <div class="project-title">Naïvevil</div>
-                <div class="project-meta">Chinese Ink Painting<br />Jul 2019, Individual Work</div>
-            </div>
-            <img src="media/naivevil/naive_name.svg" alt="Naïevil Chinese Name" class="chinese-title" />
-        </div>
-    </header>
+        <img src="media/naivevil/naive_name.svg" alt="Naïevil Chinese Name" class="chinese-title" />
+    </div>
+
+</header>
 
     <div class="grid-container">
         <div class="grid-item"><img src="media/naivevil/naivevil1.jpg" alt="naivevil1" /></div>
@@ -409,15 +435,15 @@
 
     <footer>
         <span>© 2025 Jinghe Cai. All rights reserved.</span>
-        <a href="work.html" class="more-wrapper">
+        <!-- <a href="work.html" class="more-wrapper">
             <span class="more-text">
                 <span class="face front">MORE WORKS</span>
                 <span class="face top">MORE WORKS</span>
             </span>
-        </a>
+        </a> -->
     </footer>
 
-    <div id="custom-cursor"></div>
+  
 
 
     <script>

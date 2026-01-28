@@ -8,8 +8,7 @@
     <link rel="icon" href="media/logo.svg" type="image/svg+xml" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet" />
 
-    <link rel="stylesheet" href="css/style.css" />
-    <script type="module" src="js/cursor.js"></script>
+    <link rel="stylesheet" href="css/workheader2.css" />
 
     <style>
         * {
@@ -22,8 +21,8 @@
             padding: 0;
             height: 100vh;
             font-family: 'Inter', sans-serif;
-            background-color: #000000;
-            color: #ffffff;
+            background-color: #ffffff;
+            color: #000000;
         }
 
         body {
@@ -46,7 +45,7 @@
 
         .left-panel {
             flex: 1;
-            padding: 8vw 4vw 3vw 4vw;
+            padding: 8vw 4vw 9vw 5vw;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
@@ -111,18 +110,19 @@
             font-family: inherit;
             font-size: 13px;
             padding: 4px 10px;
-            margin-top: 6px;
-            border: 1px solid #111;
-            background: #b6b6b6;
-            color: #000000;
-            border-radius: 6px;
-            cursor: none;
-            transition: background 0.3s ease;
+            margin-top: 10px;
+
+            background: #e4e4e4;
+            color: rgb(109, 109, 109);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.5s ease;
+            border: none;
         }
 
         .paper-button:hover {
-            background: #ffffff;
-            color: #000000;
+            background: #7e7e7e;
+            color: #ffffff;
         }
 
 
@@ -139,7 +139,7 @@
         .video {
 
             max-width: 60vw;
-            border-radius: 8px;
+            border-radius: 12px;
         }
 
         .logo-button {
@@ -163,71 +163,7 @@
             height: 36px;
         }
 
-        footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 4vw;
-            font-size: 0.8rem;
-            border-top: 0.8px solid #666;
-        }
 
-        footer span {
-            color: #666;
-            font-weight: 300;
-        }
-
-        .more-wrapper {
-            display: inline-block;
-            text-decoration: none;
-        }
-
-        .more-text {
-            position: relative;
-            width: 135px;
-            height: 38px;
-            border: 1px solid #ffffff;
-            border-radius: 999px;
-            overflow: hidden;
-            perspective: 600px;
-            display: inline-block;
-            cursor: none;
-        }
-
-        .more-text .face {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.85rem;
-            font-family: 'Inter', sans-serif;
-            font-weight: 300;
-            color: #ffffff;
-            backface-visibility: hidden;
-            transform-style: preserve-3d;
-            transition: transform 1.5s cubic-bezier(0.22, 1.61, 0.36, 1);
-        }
-
-        .more-text .top {
-            transform: rotateX(90deg) translateY(-100%);
-            transform-origin: top;
-        }
-
-        .more-wrapper:hover .more-text .front {
-            transform: rotateX(-90deg) translateY(100%);
-            transform-origin: bottom;
-        }
-
-        .more-wrapper:hover .more-text .top {
-            transform: rotateX(0deg);
-            font-weight: 500;
-        }
-
-        .divider {
-            display: none;
-        }
 
         @media (max-width: 1300px) {
             html {
@@ -278,13 +214,7 @@
                 width: 200px;
             }
 
-            .divider {
-                display: none;
-                width: 100%;
-                height: 0.8px;
-                background-color: #8f8f8f;
-                border: none;
-            }
+
 
             .right-panel {
                 padding: 4vw 8vw 15vw 8vw;
@@ -362,11 +292,30 @@
 </head>
 
 <body>
+
+    <!-- Header -->
+    <header class="site-header">
+        <div class="header-col-1">
+            <a href="index.html" class="my-name">Jinghe Cai</a>
+        </div>
+
+        <nav class="header-col-2">
+            <!-- <a href="#ux">Design</a>
+                <a href="#visual">Visual</a>
+                <a href="https://scholar.google.com/citations?user=USR_nP8AAAAJ&hl=en" target="_blank">Research</a> -->
+        </nav>
+        <nav class="header-col-3">
+            <a href="about.html">Info</a>
+            <a href="https://drive.google.com/file/d/1IsOUI2ZcsX_7XXkCw_bYc1aIiybE1FQT/view?usp=sharing"
+                target="_blank">Résumé</a>
+        </nav>
+    </header>
+
+
+
     <div class="content">
         <div class="left-panel">
-            <a href="work.html" class="logo-button">
-                <img src="media/wander/logo_withe.svg" alt="Back" />
-            </a>
+
             <div class="info-award-wrapper">
                 <div class="project-info">
                     <!-- <img src="media/wander/chiplay.svg" alt="Award" class="award" /> -->
@@ -380,14 +329,13 @@
                         Oct 2021, Research Work</p>
 
                     <h2>
-                        Nighttime phone use is a major cause of sleep disorders. Our approach is to introduce
-                        lightweight interventions across the sleep cycle to gently modify this behavior. The core of
-                        this strategy is a breath-controlled audio game that reframes the smartphone as a sleep aid. It
-                        uses gamification to guide users through breathing exercises, turning the source of the problem
-                        into the solution for a healthier sleep habit.
+                        Nighttime phone use is a major cause of sleep disorders. We introduce lightweight interventions
+                        across the sleep cycle to gently modify this behavior. At its core is a breath-controlled audio
+                        game that reframes the smartphone as a sleep aid. By gamifying breathing exercises, it turns the
+                        source of the problem into the solution for healthier sleep.
                     </h2>
 
-                    <a href="https://scholar.google.com/citations?view_op=view_citation&hl=en&user=USR_nP8AAAAJ&citation_for_view=USR_nP8AAAAJ:u-x6o8ySG0sC"
+                    <a href="https://drive.google.com/file/u/0/d/1wOOOeP6lsSFb5pxlyFuNeut2zyGPdYnq/view"
                         target="_blank">
                         <button class="paper-button">Paper Download</button>
                     </a><br /><br />
@@ -407,7 +355,7 @@
 
         </div>
 
-        <hr class="divider" />
+
 
         <div class="right-panel">
             <video controls class="video">
@@ -418,17 +366,9 @@
 
     </div>
 
-    <footer>
-        <span>© 2025 Jinghe Cai. All rights reserved.</span>
-        <a href="work.html" class="more-wrapper">
-            <span class="more-text">
-                <span class="face front">MORE WORKS</span>
-                <span class="face top">MORE WORKS</span>
-            </span>
-        </a>
-    </footer>
 
-    <div id="custom-cursor"></div>
+
+
 
     <script>
         const images = document.querySelectorAll('.carousel-image');
