@@ -1,153 +1,16 @@
-/* --- 全宽 Header --- */
-
-.header-full {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 998;
-    /* z-index 比 pill header 低一级，以防万一 */
-    padding: 15px 0;
-    background-color: rgba(255, 255, 255, 0);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-}
-
-/* 内部内容容器 */
-.header-full-inner {
-    width: 100%;
-    margin: 0 auto;
-    padding: 0 30px;
-    /* 两边留白 */
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-/* 左侧 Logo */
-.header-full .logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    text-decoration: none;
-    color: #ffffff;
-}
-
-.header-full .logo-icon {
-    height: 21px;
-}
-
-.header-full .logo-name {
-    font-size: 16px;
-    font-weight: 500;
-}
-
-/* 右侧导航 */
-.header-full .nav {
-    display: flex;
-    align-items: center;
-    gap: 40px;
-}
-
-.header-full .nav-link {
-    text-decoration: none;
-    color: #ffffff;
-    font-size: 14px;
-    font-weight: 400;
-    position: relative;
-    transition: color 0.3s ease;
-}
-
-
-/* 社交媒体图标链接样式 */
-.header-full .social-icon-link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* 修正：将 'svg' 改为 'img' */
-.header-full .social-icon-link img {
-    width: 18px;
-    /* 现在可以调整宽度了 */
-    height: 18px;
-    /* 现在可以调整高度了 */
-    transition: transform 0.3s ease;
-    /* 保留过渡效果 */
-}
-
-
-.nav-link.nav-button {
-    background-color: #000;
-    color: #fff;
-    padding: 6px 18px;
-    /* 调整内边距形成胶囊形状 */
-    border-radius: 999px;
-    /* 圆角形成胶囊 */
-    border: 1px solid #000;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .header-full-inner {
-    padding: 0 20px;
-  }
-
-  .header-full .logo-name {
-    display: none;
-  }
-
-  .header-full .nav {
-    gap: 25px;
-  }
-  
-  /* ✅ 新增：在小屏幕上重置 'About' 按钮的样式 */
-  .header-full .nav-link.nav-button {
-    background-color: transparent; /* 移除背景色 */
-    color: #ffffff; /* 恢复为普通链接颜色 */
-    border-color: transparent; /* 移除边框 */
-    padding: 0; /* 恢复为普通链接的 padding */
-    font-weight: 400; /* 恢复为普通链接的字重 */
-  }
-
-
-  /* 社交媒体图标链接样式 */
-  .header-full .social-icon-link {
-      display: none;
-  }
-}
-
-
-
-/* 淡入动画 */
-.fade-in {
-    animation: fadeIn 1s ease-in-out;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
-}
-
 /* =========================================
-   2. Header (3列 Grid) - 零位移按钮版
+   项目详情页统一 Header 样式
+   基于 index.html 的布局，支持黑白背景切换
    ========================================= */
+
 .site-header {
-    /* --- 1. 严格保留你的原版基础设置 --- */
     position: fixed;
     top: 0;
     left: 50%;
     transform: translateX(-50%);
     width: 100%;
-    max-width: 1800px;
-    
-    padding: 24px 32px; 
+    /* 移除 max-width 限制，让边距随页面拉伸 */
+    padding: 24px var(--page-gutter, 24px); 
     z-index: 1000;
     
     display: grid;
@@ -160,67 +23,43 @@
     
     background: transparent;
     color: #ffffff;
-    mix-blend-mode: difference;
+    mix-blend-mode: difference; /* 关键：自动适应底色 */
 }
 
-/* --- 2. 链接基础样式 --- */
+/* 链接基础样式 */
 .site-header a {
     pointer-events: auto;
     text-decoration: none;
     color: currentColor;
-    
-    /* ✅ 关键设置：设置为相对定位，作为背景框的参考点 */
-    position: relative;
-    z-index: 1; /* 保证文字在背景之上 */
-    
-    /* 保持 display 为 inline 或 inline-block，不加 padding，保证零位移 */
     display: inline-block;
-    
     transition: opacity 0.3s ease;
 }
 
-/* --- 3. 使用伪元素制作“假”背景 (不占位置) --- */
-
-/* --- 4. Hover 交互 --- */
-
-/* Hover 时文字保持清晰 (或者你想保持原来的 0.5 也行，但通常按钮背景出来后文字要亮一点) */
+/* 悬停效果：仅改变透明度，不产生圆圈或背景 */
 .site-header a:hover {
     opacity: 0.5; 
 }
 
-/* Hover 时显示背景框 */
-.site-header a:hover::before {
-    opacity: 1;
-    transform: scale(1); /* 恢复正常大小 */
+/* 彻底禁用任何可能存在的伪元素（如圆圈、背景框） */
+.site-header a::before,
+.site-header a::after {
+    content: none !important;
+    display: none !important;
 }
 
-/* --- 5. 严格保留你的列布局 --- */
+/* 列对齐设置 */
 .header-col-1 { justify-self: start; }
-/* 关键点：Header 的第二列是靠左对齐 (start) */
 .header-col-2 { justify-self: start; display: flex; gap: 24px; }
 .header-col-3 { justify-self: end; display: flex; gap: 24px; }
-/* =========================================
-   Index Footer (流式布局)
-   ========================================= */
-.site-footer {
-    position: relative;
-    width: 100%;
-    max-width: 1800px;
-    margin: 0 auto;
-    padding: 60px 32px 40px;
-    
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    
-    font-size: 15px;
-    font-weight: 300;
-    background: transparent;
-    /* color: #ffffff; */
-    /* mix-blend-mode: difference; */
-}
 
-.site-footer a {
-    pointer-events: auto;
+/* 响应式适配 */
+@media (max-width: 768px) {
+    .site-header {
+        display: flex;
+        justify-content: space-between;
+        padding: 20px 16px;
+    }
+    .header-col-2 {
+        display: none; /* 移动端隐藏中间列 */
+    }
 }
-
