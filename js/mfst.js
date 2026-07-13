@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+function initMfstCarousels() {
   // 1. 获取页面上所有的轮播图组件
   const carousels = document.querySelectorAll(".poster-carousel");
 
@@ -70,4 +70,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // 初始化显示第一张（这会自动触发隐藏左箭头的逻辑）
     goToSlide(0);
   });
-});
+}
+
+// 内容加密后，正文是解锁时才注入的，所以在解锁事件里初始化。
+// 同时保留 DOMContentLoaded（未加密页面时仍可用；加密页会安全退出）。
+document.addEventListener("DOMContentLoaded", initMfstCarousels);
+document.addEventListener("protected:unlocked", initMfstCarousels);

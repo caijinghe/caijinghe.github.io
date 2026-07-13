@@ -1,8 +1,9 @@
-document.addEventListener("DOMContentLoaded", () => {
+function initSamsungCarousel() {
   const carousel = document.querySelector(".poster-carousel");
-  
+
   // 安全检查：如果没有找到轮播图元素，直接返回，避免报错
-  if (!carousel) return; 
+  // （内容被加密时，解锁前 DOM 里没有轮播，这里会安全退出）
+  if (!carousel) return;
 
   const slides = carousel.querySelectorAll(".carousel-frame img");
   const dots = carousel.querySelectorAll(".dot");
@@ -65,4 +66,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 初始化：显示第一张，这也会自动触发隐藏左箭头的逻辑
   goToSlide(0);
-});
+}
+
+// 内容加密后，正文是解锁时才注入的，所以在解锁事件里初始化。
+// 同时保留 DOMContentLoaded（未加密页面时仍可用；加密页会安全退出）。
+document.addEventListener("DOMContentLoaded", initSamsungCarousel);
+document.addEventListener("protected:unlocked", initSamsungCarousel);

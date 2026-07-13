@@ -1,0 +1,10 @@
+# Claude Code session data (never commit to the public site repo)
+.claude/
+
+# Local encryption tool — contains the PLAINTEXT of the locked pages.
+# Must never be pushed to the public site or the encryption is pointless.
+tools/
+
+# macOS noise
+.DS_Store
+**/.DS_Store
