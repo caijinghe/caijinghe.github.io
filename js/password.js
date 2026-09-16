@@ -100,6 +100,14 @@
         var inputContainer = passwordOverlay.querySelector(".input-container");
 
         function revealContent(html) {
+            if (options.document) {
+                // Restore the complete document so its scripts and load events
+                // run normally, only after authenticated decryption succeeds.
+                document.open();
+                document.write(html);
+                document.close();
+                return;
+            }
             if (mountEl) {
                 mountEl.innerHTML = html;
             }
