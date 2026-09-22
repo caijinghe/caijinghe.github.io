@@ -35,11 +35,9 @@ body {
   min-height: 100vh;
 
   overflow: visible;
-
-  /* 🔥 修改这里！把 -10vh 改成更大的负值，比如 -30vh 或 -40vh */
-  /* 这会让下面的内容覆盖到上面的书架区域 */
-  margin-top: -15vh;
-  /* <--- 试着调整这个数字 */
+  margin-top: 0;
+  background-color: #ffffff;
+  z-index: 3;
 
   align-items: flex-start;
 }
@@ -154,6 +152,44 @@ body {
   font-weight: 200;
 }
 
+.scholar-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background-color: #ededed;
+  color: #111111;
+  padding: 3px 9px 3px 10px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 400;
+  line-height: 1.1;
+  text-decoration: none;
+  vertical-align: 0.12em;
+  margin: 0 1px;
+  white-space: nowrap;
+  transition: background-color 0.2s ease, transform 0.15s ease, color 0.2s ease;
+}
+
+.scholar-pill:hover {
+  background-color: #dfdfe2;
+  color: #000000;
+  transform: translateY(-1px);
+}
+
+.scholar-pill svg {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  flex-shrink: 0;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  transition: transform 0.2s ease;
+}
+
+.scholar-pill:hover svg {
+  transform: translate(1px, -1px);
+}
+
 .about-panel p {
   font-size: 1rem;
   line-height: 1;
@@ -254,11 +290,7 @@ body {
 
 
 .shelf-section {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
+  height: 350vh;
   position: relative;
   z-index: 1;
   width: 100vw;
@@ -272,9 +304,66 @@ body {
 
 
 .shelf-section h1 {
-  font-size: 1.5rem;
-  margin-bottom: 60px;
-  z-index: 3;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.6rem;
+  margin-bottom: 0;
+  z-index: 10;
+  text-align: center;
+  white-space: nowrap;
+  animation: heroTitleIntro 2.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes heroTitleIntro {
+  0% {
+    top: 48%;
+    transform: translate(-50%, -50%) scale(1.6);
+  }
+  15% {
+    top: 48%;
+    transform: translate(-50%, -50%) scale(1.6);
+  }
+  48% {
+    top: 48%;
+    transform: translate(-50%, -50%) scale(1.6);
+  }
+  100% {
+    top: 18vh;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+.title-word {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(16px) scale(0.9);
+  animation: cuteWordPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  margin-right: 0.28em;
+}
+
+.title-word:last-child {
+  margin-right: 0;
+}
+
+.title-word:nth-child(1) { animation-delay: 0.08s; }
+.title-word:nth-child(2) { animation-delay: 0.18s; }
+.title-word:nth-child(3) { animation-delay: 0.30s; }
+.title-word:nth-child(4) { animation-delay: 0.42s; }
+
+@keyframes cuteWordPop {
+  0% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.9);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(-3px) scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 
@@ -282,12 +371,17 @@ body {
 .shelf-viewport {
   width: 100%;
   max-width: 1200px;
-  position: relative;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
   height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+  will-change: transform;
 }
 
 .svg-books-row {
@@ -298,6 +392,16 @@ body {
   position: relative;
   z-index: 2;
   margin-bottom: 28vh;
+  animation: shelfFadeIn 1.1s cubic-bezier(0.16, 1, 0.3, 1) 1.25s backwards;
+}
+
+@keyframes shelfFadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 .book-svg {
@@ -307,17 +411,20 @@ body {
   align-self: flex-end;
   margin-bottom: 0;
   opacity: 1;
-  pointer-events: auto;
-  will-change: opacity, transform;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  will-change: opacity;
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
-  transition: transform 0.8s ease-in-out, opacity 0.8s ease-in-out;
+  transition: opacity 0.5s ease;
 }
 
 
 .book-svg.faded {
-  opacity: 0.3;
-  transition: opacity 0.4s ease;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
 }
 
 
@@ -375,92 +482,109 @@ Timeline Ruler
   left: 50%;
   transform: translateX(-50%);
   display: flex;
+  align-items: flex-start;
   gap: 9.5px;
   z-index: 0;
+  pointer-events: none;
+  user-select: none;
+  animation: rulerFadeIn 1.1s cubic-bezier(0.16, 1, 0.3, 1) 1.4s backwards;
+}
+
+@keyframes rulerFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%);
+  }
 }
 
 .tick {
   width: 2px;
-  background: #000;
+  background: hsla(0, 0%, 0%, 0.18);
   position: relative;
   border-radius: 999px;
-  transition: opacity 0.3s ease;
-  will-change: opacity;
+  transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.22s ease;
+  transform-origin: top;
+  will-change: opacity, transform;
+  pointer-events: none;
+  cursor: default;
 }
 
 .tick.minor {
   height: 7px;
-  opacity: 0.8;
 }
 
 .tick.major {
   height: 12px;
   width: 3px;
-  opacity: 0.8;
+  background: hsla(0, 0%, 0%, 0.28);
 }
 
 .year-label {
   position: absolute;
   top: 25px;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translateZ(0);
+  -webkit-transform: translateX(-50%) translateZ(0);
   font-size: 1rem;
   font-weight: 300;
   white-space: nowrap;
   color: #000000;
   opacity: 1;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease, font-weight 0.2s ease, top 0.22s ease;
   will-change: opacity;
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
-  cursor: pointer;
+  pointer-events: none;
+  cursor: default;
+  user-select: none;
 }
 
 .year-label.faded {
-  opacity: 0.1;
-  transition: opacity 0.4s ease;
-}
-
-.tick.faded {
-  background: hsla(0, 0%, 0%, 0.15);
-  opacity: 1;
-}
-
-.year-label.highlighted,
-.tick.highlighted {
-  opacity: 1 !important;
-  font-weight: 300;
-}
-
-.year-label.dimmed,
-.tick.dimmed {
-  opacity: 0;
+  opacity: 0.15;
   transition: opacity 0.3s ease;
 }
 
-.year-label.hidden,
-.tick.major.hidden,
-.tick.minor.hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-
 .tick.faded {
   background: hsla(0, 0%, 0%, 0.15);
-  /* 黑色，透明度 15% */
   opacity: 1;
-  /* 保持不变 */
 }
 
+/* 靠近当前滑动刻度的相邻波纹过渡（向下延伸） */
+.tick.near-active {
+  background: hsla(0, 0%, 0%, 0.55) !important;
+  transform: scaleY(1.35);
+}
 
-/* ✅ 高亮年份：完全不透明，字体可加重 */
-.year-label.highlighted,
+/* 当前滑动位置精确经过的刻度（朝底下更长，充满动感） */
+.tick.active-tick,
 .tick.highlighted {
+  background: #000000 !important;
   opacity: 1 !important;
-  font-weight: 300;
 }
 
-/* ✅ 如果你需要隐藏某些年份/线条（非 hover 相关） */
+.tick.minor.active-tick {
+  transform: scaleY(1.75); /* 向下伸展至约 12px，与大刻度比肩 */
+}
+
+.tick.major.active-tick,
+.tick.major.highlighted {
+  transform: scaleY(1.4); /* 向下伸展至约 16.8px */
+}
+
+.tick.major.active-tick .year-label,
+.tick.major.highlighted .year-label {
+  top: 18px; /* 18px * 1.4 = 25.2px，保持年份数字水平基准线完全对齐 */
+  opacity: 1 !important;
+  font-weight: 500;
+}
+
+.year-label.highlighted {
+  opacity: 1 !important;
+  font-weight: 500;
+}
+
 .year-label.dimmed,
 .tick.dimmed {
   opacity: 0;
@@ -518,6 +642,31 @@ Timeline Ruler
   border-radius: 10px;
   border: none;
   object-fit: contain;
+  opacity: 0;
+  transform: translateY(18px) scale(0.96);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.year-info.active .info-images img {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.year-info.active .info-images img:nth-child(1) {
+  transition-delay: 0.04s;
+}
+
+.year-info.active .info-images img:nth-child(2) {
+  transition-delay: 0.12s;
+}
+
+.year-info.active .info-images img:nth-child(3) {
+  transition-delay: 0.20s;
+}
+
+.year-info.active .info-images img:nth-child(4) {
+  transition-delay: 0.28s;
 }
 
 .info-text {
@@ -527,11 +676,15 @@ Timeline Ruler
   font-size: 1rem;
   line-height: 1.5;
   color: #111;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.14s, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.14s;
+  will-change: opacity, transform;
 }
 
-.book-svg.faded {
-  opacity: 0;
-  transition: opacity 0.3s ease;
+.year-info.active .info-text {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .layout-2019 {

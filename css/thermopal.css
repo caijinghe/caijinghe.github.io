@@ -1,0 +1,1220 @@
+/* ==========================================================================
+   ThermoPal Project Detail Styles
+   Faithfully replicated from source design with Inter typography
+   ========================================================================== */
+
+:root {
+  --page-gutter: min(1.5%, 24px);
+  --color-orange: #FF6B09;
+  --color-stripe-orange: #FF8D28;
+  --color-stripe-blue: #49AFFB;
+  --color-stripe-green: #B9E836;
+  --color-blue: #0099FF;
+  --color-cyan: #00AFFF;
+  --color-purple: #9E42FF;
+  --color-green: #ACD92F;
+  --color-dim: #818181;
+  --color-text: #000000;
+  --bg-card-yellow: #FFF79A;
+  --bg-card-blue: #A5DFFF;
+  --bg-card-cream: #F7F4EF;
+  --bg-card-ivory: #FFFDEA;
+  --bg-card-gold: #FFE76F;
+  --bg-card-sage: #CCDF80;
+}
+
+/* Continuous type scaling for the preview: preserve the same visual ratio at different window sizes. */
+html.is-preview .intro-col-1 h1 { font-size: clamp(20px, 1.8vw, 28px); }
+html.is-preview .meta-title,
+html.is-preview .meta-subtitle,
+html.is-preview .intro-col-2 .meta-heading,
+html.is-preview .intro-col-2 li { font-size: clamp(11px, 0.85vw, 13px); }
+html.is-preview .showcase-badge { font-size: clamp(15px, 1.3vw, 20px); padding: clamp(7px, 0.7vw, 10px) clamp(15px, 1.5vw, 22px); }
+html.is-preview .showcase-brand { font-size: clamp(16px, 1.4vw, 20px); }
+html.is-preview .feature-eyebrow { font-size: clamp(13px, 1.1vw, 16px); }
+html.is-preview .feature-title,
+html.is-preview .nest-title { font-size: clamp(30px, 2.65vw, 38px); line-height: 1.03; }
+html.is-preview .feature-desc { font-size: clamp(16px, 1.4vw, 20px); line-height: 1.2; }
+html.is-preview .subfeature-title { font-size: clamp(19px, 1.67vw, 24px); line-height: 1.17; }
+html.is-preview .subfeature-desc { font-size: clamp(15px, 1.25vw, 18px); line-height: 1.33; }
+html.is-preview .nest-state-label { font-size: clamp(15px, 1.32vw, 19px); }
+html.is-preview .nest-callout-text { font-size: clamp(15px, 1.25vw, 18px); }
+html.is-preview .nest-state-label { transform: translateY(-35px); }
+html.is-preview .nest-logo-icon { width: clamp(40px, 4.8vw, 69px); height: clamp(40px, 4.8vw, 69px); }
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scrollbar-gutter: stable;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: #ffffff;
+  color: var(--color-text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html.is-preview .site-header,
+body.is-preview .site-header {
+  display: none !important;
+}
+
+html.is-preview .site-footer,
+body.is-preview .site-footer {
+  display: none !important;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+html.is-preview .site-header,
+body.is-preview .site-header {
+  display: none !important;
+}
+
+html.is-preview .intro-grid,
+body.is-preview .intro-grid {
+  padding-top: 80px;
+}
+
+/* ==========================================================================
+   Main Layout & Typography
+   ========================================================================== */
+
+.thermopal {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* LePal-style project cover and loading state */
+#loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  opacity: 1;
+  transition: opacity 0.6s ease;
+}
+
+#loading-overlay video {
+  width: min(65vw, 390px);
+  height: min(65vw, 390px);
+  object-fit: contain;
+  background: transparent;
+  /* The shared loading clip is white-on-black; invert it for ThermoPal's white cover. */
+  filter: invert(1);
+  mix-blend-mode: normal;
+  pointer-events: none;
+}
+
+.thermostat-cover {
+  width: 100%;
+  overflow: hidden;
+  background: #fff;
+}
+
+.thermostat-cover img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: none;
+}
+
+.thermopal-role-image {
+  width: 100%;
+  overflow: hidden;
+  background: #fff;
+}
+
+.thermopal-role-image img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: none;
+}
+
+.thermopal img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* ==========================================================================
+   Section 1: Project Intro
+   ========================================================================== */
+
+.project-intro {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 2.4fr;
+  gap: 40px;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 160px max(32px, 5vw) 60px;
+}
+
+.intro-col-1 h1 {
+  font-family: 'Avenir Next', 'Avenir', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  margin: 0 0 20px;
+  line-height: 1.2;
+}
+
+.intro-col-1 h1 .brand-accent {
+  color: #ACD92F;
+}
+
+.meta-group {
+  margin-bottom: 4px;
+}
+
+.meta-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: #000;
+  margin: 0 0 2px;
+}
+
+.meta-subtitle {
+  font-size: 13px;
+  font-weight: 400;
+  color: #666;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.intro-col-2 .meta-block {
+  margin-bottom: 24px;
+}
+
+.intro-col-2 .meta-heading {
+  font-size: 13px;
+  font-weight: 600;
+  color: #000;
+  margin: 0 0 4px;
+}
+
+.intro-col-2 ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.intro-col-2 li {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-dim);
+}
+
+.intro-col-3 .project-summary {
+  font-size: 14px;
+  line-height: 1.65;
+  color: #000;
+}
+
+.intro-col-3 .project-summary strong {
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   Section 2: Hero Showcase Demo (Phone Video + Screen Mockup)
+   ========================================================================== */
+
+.hero-showcase {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: stretch;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  min-height: clamp(540px, 45vw, 700px);
+}
+
+.hero-phone-wrap {
+  width: 100%;
+  background: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 24px;
+}
+
+.hero-phone-wrap video {
+  width: clamp(210px, 18vw, 240px);
+  height: auto;
+  aspect-ratio: 474 / 952;
+  border-radius: 0;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+  display: block;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+  clip-path: inset(2px);
+}
+
+.hero-screens-wrap {
+  width: 100%;
+  background-color: #FE7C36;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px clamp(24px, 4vw, 60px);
+  overflow: hidden;
+}
+
+.hero-screens-wrap img {
+  width: 100%;
+  max-width: 720px;
+  height: auto;
+  max-height: 650px;
+  object-fit: contain;
+  display: block;
+}
+
+/* ==========================================================================
+   Section 3: Full Bleed Banner & Overlay Headline
+   ========================================================================== */
+
+.hero-banner-wrap {
+  position: relative;
+  width: 100%;
+  background: #111;
+  overflow: hidden;
+}
+
+.hero-banner-img {
+  width: 100%;
+  height: auto;
+  min-height: 480px;
+  max-height: 720px;
+  object-fit: cover;
+  display: block;
+}
+
+.hero-banner-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 100px max(32px, 6vw) 48px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.4) 50%, transparent 100%);
+  display: flex;
+  justify-content: center;
+}
+
+.hero-banner-overlay h2 {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0;
+  font-size: clamp(26px, 3.4vw, 48px);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.5px;
+  color: #ffffff;
+}
+
+/* Tri-color Accent Bar */
+.accent-stripe-bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: 100%;
+  height: 18px;
+}
+
+.stripe-orange {
+  background-color: var(--color-stripe-orange);
+}
+
+.stripe-blue {
+  background-color: var(--color-stripe-blue);
+}
+
+.stripe-green {
+  background-color: var(--color-stripe-green);
+}
+
+/* ==========================================================================
+   Section 4: Background & High Stakes Stats
+   ========================================================================== */
+
+.background-section {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 24px;
+  width: 100%;
+  margin: 0;
+  padding: 100px 16px 60px;
+}
+
+.section-label {
+  font-size: 19px;
+  font-weight: 500;
+  letter-spacing: -0.2px;
+  margin: 0 0 8px;
+  color: #000;
+}
+
+.section-subtitle {
+  font-size: 14px;
+  font-weight: 400;
+  color: #666;
+  margin: 0;
+}
+
+.stats-container {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.stat-icon {
+  width: 62px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-icon img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.stat-number {
+  font-size: 38px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  min-width: 175px;
+  flex-shrink: 0;
+}
+
+.stat-item.orange .stat-number {
+  color: var(--color-orange);
+}
+
+.stat-item.blue .stat-number {
+  color: var(--color-blue);
+}
+
+.stat-item.purple .stat-number {
+  color: var(--color-purple);
+}
+
+.stat-desc {
+  font-size: 18px;
+  line-height: 1.55;
+  color: #000;
+  margin: 0;
+}
+
+.stat-desc .highlight-orange {
+  color: var(--color-orange);
+  font-weight: 600;
+}
+
+.stat-desc .highlight-blue {
+  color: var(--color-blue);
+  font-weight: 600;
+}
+
+.stat-desc .highlight-purple {
+  color: var(--color-purple);
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   Section 5: HMW Section
+   ========================================================================== */
+
+.hmw-section {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 24px;
+  width: 100%;
+  margin: 0;
+  padding: 20px 16px 100px;
+}
+
+.hmw-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.hmw-item {
+  font-size: 18px;
+  line-height: 1.6;
+  color: #000;
+  margin: 0;
+}
+
+.hmw-item strong {
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   Section 6: Statement ("What is ThermoPal")
+   ========================================================================== */
+
+.statement-section {
+  text-align: center;
+  padding: 100px 24px 110px;
+}
+
+.showcase-badge {
+  display: inline-block;
+  background-color: #ACD92F;
+  color: #000000;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 10px 22px;
+  border-radius: 999px;
+  margin: 0 auto;
+  letter-spacing: -0.2px;
+}
+
+.showcase-brand {
+  font-family: 'Avenir Next', 'Avenir', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.2px;
+  color: #000000;
+  margin: 22px 0 54px;
+}
+
+.showcase-brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 22px 0 24px;
+}
+
+.showcase-brand-lockup .showcase-brand {
+  margin: 0;
+  transform: translateY(2px);
+}
+
+.showcase-brand-logo {
+  width: clamp(24px, 2.4vw, 34px);
+  height: clamp(24px, 2.4vw, 34px);
+  object-fit: contain;
+  transform: translateY(1px);
+}
+
+.showcase-brand .brand-accent {
+  color: #ACD92F;
+}
+
+.statement-quote-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(16px, 2.5vw, 32px);
+  max-width: 1100px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.statement-flower {
+  display: inline-block;
+  width: clamp(28px, 3.2vw, 44px);
+  height: clamp(28px, 3.2vw, 44px);
+  flex-shrink: 0;
+  color: #ACD92F;
+  transform-origin: center center;
+  opacity: 0;
+  filter: blur(8px);
+  transform: scale(0.6) rotate(-15deg);
+  transition: opacity 0.75s ease, filter 0.8s ease, transform 0.8s cubic-bezier(.2,.8,.2,1);
+}
+
+.statement-quote-wrap.is-visible .statement-flower {
+  opacity: 1;
+  filter: blur(0);
+  transform: scale(1) rotate(0deg);
+  transition-delay: 0.72s;
+  animation: statement-flower-spin 12s linear 1.55s infinite;
+}
+
+@keyframes statement-flower-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.statement-quote {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: clamp(26px, 3.4vw, 44px);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.4px;
+  color: #ACD92F;
+  text-align: center;
+  margin: 0;
+}
+
+.statement-word {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.55em) rotate(1.5deg);
+  filter: blur(4px);
+  transition: opacity 0.7s ease, transform 0.8s cubic-bezier(.2,.8,.2,1), filter 0.7s ease;
+}
+
+.statement-quote.is-visible .statement-word {
+  opacity: 1;
+  transform: translateY(0) rotate(0);
+  filter: blur(0);
+}
+
+.statement-quote.is-visible .statement-word:nth-of-type(1) { transition-delay: 0.05s; }
+.statement-quote.is-visible .statement-word:nth-of-type(2) { transition-delay: 0.13s; }
+.statement-quote.is-visible .statement-word:nth-of-type(3) { transition-delay: 0.21s; }
+.statement-quote.is-visible .statement-word:nth-of-type(4) { transition-delay: 0.32s; }
+.statement-quote.is-visible .statement-word:nth-of-type(5) { transition-delay: 0.40s; }
+.statement-quote.is-visible .statement-word:nth-of-type(6) { transition-delay: 0.48s; }
+
+.statement-word--orange { color: #ff7a2f; }
+.statement-word--blue { color: #1688e8; }
+.statement-word--green { color: #ACD92F; }
+.statement-word--yellow { color: #f2c84b; }
+
+@media (prefers-reduced-motion: reduce) {
+  .statement-word {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
+  }
+
+  .statement-flower {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    animation: none;
+    transition: none;
+  }
+}
+
+/* ==========================================================================
+   Feature Cards (Uniform 590px height cards with custom backgrounds)
+   ========================================================================== */
+
+/* ==========================================================================
+   Feature Cards & Grouped Typography (Features 1, 2, 3, 4, 5)
+   成组统一样式：所有 Feature 共享统一的字号、字重、行高与间距规则
+   ========================================================================== */
+
+.feature-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: stretch;
+  width: 100%;
+  min-height: 590px;
+}
+
+.feature-media-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px clamp(24px, 4vw, 64px);
+  min-height: 590px;
+}
+
+.feature-media-card img {
+  max-width: 100%;
+  max-height: 510px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.feature-copy-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px clamp(32px, 6vw, 90px);
+}
+
+/* Feature 统一上标编号 (Feature #1, #2, #3, #4, #5) */
+.feature-eyebrow {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 1.2;
+  letter-spacing: -0.15px;
+  color: #000000;
+  margin: 0 0 12px 0;
+}
+
+/* Feature 统一主标题 (38px / 600 / line-height: 39px / letter-spacing: -0.25px) */
+.feature-title {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 38px;
+  font-weight: 600;
+  line-height: 39px;
+  letter-spacing: -0.25px;
+  margin: 0 0 42px 0;
+  color: #000000;
+}
+
+/* Feature 统一描述正文 (20px / 600 / line-height: 24px / letter-spacing: -0.13px) */
+.feature-desc {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: -0.13px;
+  color: #000000;
+  margin: 0;
+  max-width: 520px;
+  text-wrap: pretty;
+}
+
+/* Feature 标题定制色彩 */
+.title-feature-1 { color: var(--color-orange) !important; }
+.title-feature-2 { color: var(--color-cyan) !important; }
+.title-feature-3 { color: var(--color-orange) !important; }
+.title-feature-4 { color: #00CA62 !important; }
+.title-feature-5 { color: #8FBE45 !important; }
+
+/* Feature 卡片背景色 */
+.bg-feature-1 { background-color: var(--bg-card-yellow); }
+.bg-feature-2 { background-color: var(--bg-card-blue); }
+.bg-feature-3 { background-color: var(--bg-card-cream); }
+.bg-feature-4-full { background-color: var(--bg-card-yellow); }
+.bg-feature-companion { background-color: var(--bg-card-ivory); }
+.bg-feature-collective { background-color: var(--bg-card-gold); }
+.bg-feature-5 { background-color: var(--bg-card-sage); }
+
+/* 子板块标题与描述 (Friendly Companionship & Collective Impact) */
+.subfeature-title {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 28px;
+  letter-spacing: -0.16px;
+  margin: 0 0 42px 0;
+  color: #000000;
+}
+
+.subfeature-desc {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 18px;
+  font-weight: 300;
+  line-height: 24px;
+  letter-spacing: -0.1px;
+  margin: 0;
+  max-width: 500px;
+  color: #767676;
+  text-wrap: pretty;
+  hyphens: none;
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+/* ==========================================================================
+   Section 7: Nest Home & Menu
+   ========================================================================== */
+
+.nest-section {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 50px clamp(32px, 6vw, 90px) 75px;
+}
+
+.nest-title {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 38px;
+  font-weight: 600;
+  line-height: 39px;
+  letter-spacing: -0.25px;
+  margin: 0 0 120px 0;
+  color: #000000;
+}
+
+.nest-states-flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  max-width: 1050px;
+  margin: 0 auto 100px;
+  padding: 0;
+}
+
+.nest-state-node {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 0 0 clamp(150px, 18vw, 211px);
+}
+
+.nest-state-img {
+  position: relative;
+  z-index: 1;
+  max-height: clamp(150px, 18vw, 211px);
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  margin-bottom: 25px;
+  border-radius: 0;
+}
+
+.nest-state-label {
+  position: relative;
+  z-index: 1;
+  font-size: 19px;
+  font-weight: 300;
+  font-style: italic;
+  letter-spacing: -0.2px;
+  color: #000;
+  margin: 0;
+}
+
+.nest-arrow {
+  width: clamp(28px, 3vw, 36px);
+  height: 11px;
+  object-fit: contain;
+  flex-shrink: 0;
+  margin-bottom: 28px;
+  margin-left: -55px;
+  margin-right: -55px;
+}
+
+@keyframes nest-flow-appear {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.nest-states-flow > .nest-state-node,
+.nest-states-flow > .nest-arrow {
+  opacity: 0;
+  animation: nest-flow-appear 0.65s ease-out forwards;
+  animation-play-state: paused;
+}
+
+.nest-states-flow.is-visible > .nest-state-node,
+.nest-states-flow.is-visible > .nest-arrow {
+  animation-play-state: running;
+}
+
+.nest-states-flow > :nth-child(1) { animation-delay: 0s; }
+.nest-states-flow > :nth-child(2) { animation-delay: 0.65s; }
+.nest-states-flow > :nth-child(3) { animation-delay: 0.65s; }
+.nest-states-flow > :nth-child(4) { animation-delay: 1.3s; }
+.nest-states-flow > :nth-child(5) { animation-delay: 1.3s; }
+.nest-states-flow > :nth-child(6) { animation-delay: 1.95s; }
+.nest-states-flow > :nth-child(7) { animation-delay: 1.95s; }
+
+.nest-description-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 28px;
+  max-width: 1080px;
+  margin: 0 auto 80px;
+}
+
+.nest-logo-icon {
+  width: 69px;
+  height: 69px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.nest-callout-text {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.45;
+  letter-spacing: -0.25px;
+  color: #000000;
+  margin: 0;
+  max-width: 980px;
+}
+
+.nest-menu-graphic {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 56px auto 24px;
+}
+
+.nest-menu-graphic img {
+  width: 100%;
+  max-width: 65vw;
+  height: auto;
+  display: block;
+}
+
+/* ==========================================================================
+   Section 8: Design Process Gallery (4 Large Boards)
+   ========================================================================== */
+
+.design-gallery {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  max-width: none;
+  margin: 0 auto;
+  padding: 0 clamp(32px, 6vw, 90px) 75px;
+}
+
+.gallery-card {
+  width: 100%;
+  overflow: hidden;
+  background: transparent;
+  border: 1px solid #dedede;
+  border-radius: clamp(8px, 1.2vw, 18px);
+}
+
+.gallery-card img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+
+.site-footer {
+  padding: 60px var(--page-gutter) 30px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  align-items: end;
+  font-size: 15px;
+  font-weight: 300;
+  mix-blend-mode: difference;
+  color: #ffffff;
+}
+
+.site-footer a {
+  color: currentColor;
+  text-decoration: none;
+  transition: opacity 0.3s ease;
+}
+
+.site-footer a:hover {
+  opacity: 0.5;
+}
+
+.footer-left {
+  justify-self: start;
+}
+
+.footer-center {
+  justify-self: start;
+}
+
+/* Accessibility */
+a:focus-visible,
+video:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}
+
+/* ==========================================================================
+   Responsive Adaptations
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+  .project-intro {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+  .intro-col-3 {
+    grid-column: 1 / -1;
+  }
+  .hero-showcase {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+  .nest-states-flow {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 24px;
+  }
+  .nest-arrow:nth-child(4) {
+    display: none;
+  }
+}
+
+/* Keep the Home & Menu sequence in one horizontal row inside the project preview. */
+@media (max-width: 1024px) {
+  html.is-preview .nest-states-flow {
+    display: flex;
+    grid-template-columns: none;
+    flex-wrap: nowrap;
+    gap: 0;
+  }
+
+  html.is-preview .nest-states-flow .nest-arrow {
+    display: block;
+  }
+}
+
+@media (max-width: 1024px) {
+  html.is-preview .feature-eyebrow {
+    font-size: 14px;
+  }
+
+  html.is-preview .feature-title,
+  html.is-preview .nest-title {
+    font-size: 33px;
+    line-height: 35px;
+  }
+
+  html.is-preview .feature-desc {
+    font-size: 17px;
+    line-height: 21px;
+  }
+
+  html.is-preview .subfeature-title {
+    font-size: 20px;
+    line-height: 24px;
+  }
+
+  html.is-preview .subfeature-desc {
+    font-size: 16px;
+    line-height: 21px;
+  }
+
+  html.is-preview .hero-showcase {
+    grid-template-columns: 1fr 1fr;
+    min-height: clamp(420px, 45vw, 700px);
+  }
+
+  html.is-preview .nest-states-flow {
+    display: flex;
+    flex-wrap: nowrap;
+    grid-template-columns: none;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto clamp(30px, 5vw, 70px);
+    padding: 0;
+    gap: 0;
+    box-sizing: border-box;
+  }
+
+  html.is-preview .nest-state-node {
+    flex: 1 1 0;
+    max-width: clamp(160px, 23vw, 245px);
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+  }
+
+  html.is-preview .nest-state-img {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    max-height: none;
+    aspect-ratio: 738 / 740;
+    object-fit: contain;
+    display: block;
+    margin: 0;
+  }
+
+  html.is-preview .nest-arrow {
+    display: block;
+    width: clamp(18px, 2.4vw, 30px);
+    height: auto;
+    object-fit: contain;
+    flex-shrink: 0;
+    margin-left: clamp(-52px, -4.8vw, -22px);
+    margin-right: clamp(-52px, -4.8vw, -22px);
+    margin-bottom: clamp(18px, 2.5vw, 26px);
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  html.is-preview .nest-state-label {
+    font-size: clamp(13px, 1.3vw, 17px);
+    font-weight: 300;
+    font-style: italic;
+    letter-spacing: -0.2px;
+    color: #000;
+    text-align: center;
+    white-space: nowrap;
+    margin: 0;
+    transform: translateY(clamp(-32px, -3vw, -12px));
+  }
+
+  html.is-preview .nest-menu-graphic img {
+    max-width: 65vw;
+  }
+}
+
+@media (min-width: 1025px) {
+  html.is-preview .nest-states-flow {
+    display: flex;
+    flex-wrap: nowrap;
+    grid-template-columns: none;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 1150px;
+    margin: 0 auto 100px;
+    gap: 0;
+    box-sizing: border-box;
+  }
+
+  html.is-preview .nest-state-node {
+    flex: 0 0 350px;
+    max-width: 350px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  html.is-preview .nest-state-img {
+    width: 350px;
+    max-height: 350px;
+    object-fit: contain;
+    display: block;
+    margin: 0;
+  }
+
+  html.is-preview .nest-arrow {
+    display: block;
+    width: 36px;
+    height: 11px;
+    object-fit: contain;
+    flex-shrink: 0;
+    margin-left: -75px;
+    margin-right: -75px;
+    margin-bottom: 28px;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  html.is-preview .nest-state-label {
+    font-size: 19px;
+    font-weight: 300;
+    font-style: italic;
+    letter-spacing: -0.2px;
+    color: #000;
+    text-align: center;
+    white-space: nowrap;
+    margin: 0;
+    transform: translateY(-55px);
+  }
+}
+
+@media (max-width: 768px) {
+  .project-intro {
+    grid-template-columns: 1fr;
+    padding-top: 120px;
+  }
+  .hero-showcase {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+  .hero-phone-wrap {
+    padding: 40px 20px;
+  }
+  .hero-screens-wrap {
+    padding: 30px 20px;
+  }
+  .hero-banner-overlay {
+    padding: 60px 24px 32px;
+  }
+  .hero-banner-overlay h2 {
+    font-size: 24px;
+  }
+  .background-section,
+  .hmw-section {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding-top: 60px;
+    padding-bottom: 60px;
+  }
+  .stat-item {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .stat-number {
+    min-width: auto;
+  }
+  .feature-row {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+  /* On mobile, keep image on top, copy below */
+  .feature-row.reverse .feature-media-card {
+    order: -1;
+  }
+  .feature-media-card {
+    min-height: 380px;
+    padding: 32px 20px;
+  }
+  .feature-copy-card {
+    padding: 40px 24px;
+  }
+  .nest-states-flow {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px 16px;
+  }
+  .nest-arrow {
+    display: none;
+  }
+  .nest-description-callout {
+    flex-direction: column;
+    gap: 16px;
+  }
+  .nest-menu-graphic img,
+  html.is-preview .nest-menu-graphic img {
+    max-width: 92vw;
+  }
+  .design-gallery {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 0 24px 24px;
+  }
+  .site-footer {
+    padding: 40px 16px 20px;
+  }
+}
+

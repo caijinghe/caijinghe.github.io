@@ -58,6 +58,55 @@
             });
     }
 
+    function prepareDocument(html) {
+        // document.write can paint the restored body before its external CSS
+        // arrives. Install this guard before any of the page's styles/scripts.
+        function waitForStyles() {
+            var guard = document.getElementById("unlock-style-guard");
+            var settled = new WeakSet();
+            var pending = new Set();
+            var parsed = false;
+            var revealed = false;
+            var fallback;
+
+            function reveal() {
+                if (revealed) return;
+                revealed = true;
+                clearTimeout(fallback);
+                document.removeEventListener("load", onSettled, true);
+                document.removeEventListener("error", onSettled, true);
+                document.removeEventListener("DOMContentLoaded", onParsed);
+                if (guard) guard.remove();
+            }
+
+            function onSettled(event) {
+                if (event.target.tagName !== "LINK") return;
+                settled.add(event.target);
+                pending.delete(event.target);
+                if (parsed && pending.size === 0) reveal();
+            }
+
+            function onParsed() {
+                document.querySelectorAll('link[rel~="stylesheet"]').forEach(function (link) {
+                    if (!link.disabled && !link.sheet && !settled.has(link)) pending.add(link);
+                });
+                parsed = true;
+                if (pending.size === 0) reveal();
+            }
+
+            document.addEventListener("load", onSettled, true);
+            document.addEventListener("error", onSettled, true);
+            document.addEventListener("DOMContentLoaded", onParsed, { once: true });
+            // A failed third-party request must never leave the site hidden.
+            // Do not wait for window.load: large images/videos are unrelated.
+            fallback = setTimeout(reveal, 10000);
+        }
+
+        var guard = '<style id="unlock-style-guard">body{visibility:hidden!important}</style>' +
+            '<script>(' + waitForStyles.toString() + ')();<\/script>';
+        return html.replace(/<head\b[^>]*>/i, function (head) { return head + guard; });
+    }
+
     function protectPage(options) {
         options = options || {};
         var storageKey = options.storageKey || "protected-page-unlocked";
@@ -75,11 +124,16 @@
 
         var cryptoReady = !!(window.crypto && window.crypto.subtle);
 
-        // Overlay UI — identical markup/styles to the previous version.
+        var isDark = document.body.classList.contains("dark-theme") ||
+                     document.documentElement.classList.contains("dark-theme") ||
+                     (new URLSearchParams(location.search).get("theme") === "dark");
+        var logoSrc = isDark ? "media/logo_withe.svg" : "media/logo.svg";
+
+        // Overlay UI — identical markup/styles to the previous version with optional dark-theme.
         var overlayHTML =
-            '<div id="password-overlay">' +
+            '<div id="password-overlay"' + (isDark ? ' class="dark-theme"' : '') + '>' +
             '    <div class="password-box">' +
-            '        <img src="media/logo.svg" alt="Logo" class="logo" />' +
+            '        <img src="' + logoSrc + '" alt="Logo" class="logo" />' +
             '        <div class="input-container">' +
             '            <input type="password" id="password-input" placeholder="•••" />' +
             '            <button id="password-submit">' +
@@ -104,7 +158,7 @@
                 // Restore the complete document so its scripts and load events
                 // run normally, only after authenticated decryption succeeds.
                 document.open();
-                document.write(html);
+                document.write(prepareDocument(html));
                 document.close();
                 return;
             }
@@ -216,7 +270,19 @@
         if (logoEl) {
             logoEl.style.cursor = "pointer";
             logoEl.addEventListener("click", function () {
-                window.location.href = "index.html";
+                if (window.parent !== window) {
+                    window.parent.postMessage({ type: "project-preview-close" }, location.origin);
+                } else {
+                    window.location.href = "index.html";
+                }
+            });
+        }
+
+        if (window.parent !== window) {
+            window.addEventListener("keydown", function (e) {
+                if (e.key === "Escape") {
+                    window.parent.postMessage({ type: "project-preview-close" }, location.origin);
+                }
             });
         }
 

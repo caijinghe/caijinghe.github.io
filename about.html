@@ -1,16 +1,266 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Jinghe Cai</title>
     <link rel="icon" href="media/logo.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="css/password.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Sora:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Sora:wght@100;200;300;400;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.35/bundled/lenis.min.js"></script>
+    <link rel="stylesheet" href="css/index.css" />
+    <link rel="stylesheet" href="css/about.css?v=20260922-4" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q1VYN4W02W"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-Q1VYN4W02W');
+    </script>
 </head>
+
 <body>
-    <noscript>Please enable JavaScript to unlock this website.</noscript>
-    <script type="application/json" id="site-payload">{"v":1,"salt":"eR7ZElLlVMJRtT4pTeJvkg==","iv":"lp3ICRRttbgIEGYm","ct":"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"}</script>
-    <script src="js/password.js?v=20260916-2"></script>
-    <script>protectPage({ storageKey: "site-unlocked-v1", payload: "#site-payload", document: true });</script>
+    <div class="layout" id="mainLayout">
+        <div class="page-wrapper">
+            <header class="site-header">
+                <div class="header-col-1">
+                    <a href="index.html" class="my-name">Jinghe Cai</a>
+                </div>
+
+                <nav class="header-col-2">
+                    <a href="index.html#work">Work</a>
+                    <a href="https://scholar.google.com/citations?user=USR_nP8AAAAJ&hl=en" target="_blank">Research</a>
+                </nav>
+
+                <nav class="header-col-3">
+                    <a href="about.html">Info</a>
+                    <a href="https://drive.google.com/file/d/1IsOUI2ZcsX_7XXkCw_bYc1aIiybE1FQT/view?usp=sharing"
+                        target="_blank">Résumé</a>
+                </nav>
+            </header>
+            <main class="about">
+                <section class="shelf-section" id="section3">
+                    <div class="shelf-viewport">
+                        <h1 class="sora"><span class="title-word">HI,</span><span class="title-word">I'M</span><span class="title-word">JINGHE</span><span class="title-word">CAI</span></h1>
+                        <div class="svg-books-row">
+                            <div class="book-line"></div>
+                            <img src="media/life-2019.svg" class="book-svg item-2019" alt="2019" />
+                            <img src="media/life-2020.svg" class="book-svg item-2020" alt="2020" />
+                            <img src="media/life-2021.svg" class="book-svg item-2021" alt="2021" />
+                            <img src="media/life-2022.svg" class="book-svg item-2022" alt="2022" />
+                            <img src="media/life-2023.svg" class="book-svg item-2023" alt="2023" />
+                            <img src="media/life-2024.svg" class="book-svg item-2024" alt="2024" />
+                            <img src="media/life-2025.svg" class="book-svg item-2025" alt="2025" />
+                        </div>
+
+                        <div class="year-info layout-2019" id="info-2019">
+                            <div class="info-images">
+                                <img src="media/photo-2019-1.png" alt="Photo 1" />
+                                <img src="media/photo-2019-2.png" alt="Photo 2" />
+                            </div>
+                            <div class="info-text">
+                                <p>I graduated from Xiamen University with a BFA in Fine Arts.<br>
+                                    Twelve of my paintings lined the hallway for my graduation show.<br>
+                                    They were all sold on the first day.</p>
+                            </div>
+                        </div>
+
+                        <div class="year-info layout-2020" id="info-2020">
+                            <div class="info-images">
+                                <img src="media/photo-2020-1.png" alt="Photo 3" />
+                                <img src="media/photo-2020-2.png" alt="Photo 4" />
+                            </div>
+                            <div class="info-text">
+                                <p>My first comic book was published.<br>
+                                    A friend went to a bookstore just to find it.<br>
+                                    She texted me, “I’m proud of you.”</p>
+                            </div>
+                        </div>
+
+                        <div class="year-info layout-2021" id="info-2021">
+                            <div class="info-images">
+                                <img src="media/photo-2021-1.png" alt="Photo 5" />
+                                <img src="media/photo-2021-2.png" alt="Photo 6" />
+                                <img src="media/photo-2021-3.png" alt="Photo 7" />
+                            </div>
+                            <div class="info-text">
+                                <p>Dove into affective computing. Days and nights blurred in the lab.<br>
+                                    I attended conferences and published my first first-author paper.<br>
+                                    It felt like a step closer to a PhD.</p>
+                            </div>
+                        </div>
+
+                        <div class="year-info layout-2022" id="info-2022">
+                            <div class="info-images">
+                                <img src="media/photo-2022-1.png" alt="Photo 9" />
+                                <img src="media/photo-2022-2.png" alt="Photo 10" />
+                                <img src="media/photo-2022-3.png" alt="Photo 11" />
+                                <img src="media/photo-2022-4.png" alt="Photo 12" />
+                            </div>
+                            <div class="info-text-split">
+                                <div class="info-text left">
+                                    <p>
+                                        Multiple paper rejections made me reflect:<br>
+                                        whether research ever reached the real world.
+                                    </p>
+                                </div>
+                                <div class="info-text right">
+                                    <p>
+                                        I wavered between staying in academia<br>
+                                        and moving toward industry.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="year-info layout-2023" id="info-2023">
+                            <div class="info-images">
+                                <img src="media/photo-2023-1.png" alt="Photo 13" />
+                                <img src="media/photo-2023-2.png" alt="Photo 14" />
+                                <img src="media/photo-2023-3.png" alt="Photo 15" />
+                            </div>
+                            <div class="info-text-split">
+                                <div class="info-text left">
+                                    <p>
+                                        I brought my work to CHI 2023 and quietly stepped away<br>
+                                        from academia. In the years after, I stayed on as a reviewer<br>
+                                        for ACM CHI and MM. A soft goodbye.<br>
+                                    </p>
+                                </div>
+                                <div class="info-text right">
+                                    <p>
+                                        That year, I graduated from<br>
+                                        Tsinghua University with a<br>
+                                        MCS in Computer Science.<br>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="year-info layout-2024" id="info-2024">
+                            <div class="info-images">
+                                <img src="media/photo-2024-1.png" alt="Photo 16" />
+                                <img src="media/photo-2024-2.png" alt="Photo 17" />
+                                <img src="media/photo-2024-3.png" alt="Photo 18" />
+                            </div>
+                            <div class="info-text">
+                                <p>
+                                    I took a half-year gap to publish my second book.<br>
+                                    Then I came to the U.S., ready to explore design in the real world.<br>
+                                    Now I’m a UX Design grad student at SCAD!<br>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="year-info layout-2025" id="info-2025">
+                            <div class="info-images">
+                                <img src="media/photo-2025-1.png" alt="Photo 19" />
+                                <img src="media/photo-2025-2.png" alt="Photo 20" />
+                                <img src="media/photo-2025-3.png" alt="Photo 21" />
+                                <img src="media/photo-2025-4.png" alt="Photo 22" />
+                            </div>
+                            <div class="info-text">
+                                <p>
+                                    Years of HCI research shaped how I think and design, helping me stand out.<br>
+                                    I led client projects with Microsoft and Samsung, turning design into impact.<br>
+                                    One apple at a time, the story continues...<br>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-ruler" id="timelineRuler"></div>
+                    </div>
+                </section>
+
+                <div class="section-container">
+                    <div class="sticky-left">
+                        <div class="image-wrapper">
+                            <div class="photo" id="photo1">
+                                <img src="media/about_detect.svg" alt="Detect" class="about-img-sm" />
+                            </div>
+                            <div class="photo" id="photo2">
+                                <img src="media/dance.svg" alt="Dance" class="about-img-sm" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="scroll-right">
+                        <section class="about-panel" id="panel1">
+                            <h1 class="sora">Designing with Empathy & Logic</h1>
+                            <h2>Approaching design with an artist’s eye and a researcher’s rigor, I blend 5+ years of HCI discipline with visual thinking.</h2>
+                            <h2>From publishing comic books to reviewing for top conferences <a href="https://scholar.google.com/citations?user=USR_nP8AAAAJ&amp;hl=en" target="_blank" rel="noopener noreferrer" class="scholar-pill">Google Scholar<svg viewBox="4.5 4.5 11 11" width="9" height="9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 14.5 14.5 5.5M5.5 5.5h9v9"/></svg></a>, I transform complex technologies into meaningful digital experiences.</h2>
+                        </section>
+
+                        <section class="about-panel" id="panel2">
+                            <br><br><br><br><br><br><br>
+                            <h1 class="sora">Designing is My Thinking<br>Crafting is My Language</h1>
+                            <div class="award-block">
+                                <div class="award-row">
+                                    <div class="award-year">2026</div>
+                                    <div class="award-text">Indigo Design Awards, Gold Winner in Digital Design</div>
+                                </div>
+                                <div class="award-row">
+                                    <div class="award-year">2025</div>
+                                    <div class="award-text">MUSE Design Awards, Gold Winner in User Experience</div>
+                                </div>
+                                <div class="award-row">
+                                    <div class="award-year">2025</div>
+                                    <div class="award-text">NY Product Awards, Gold Winner in Product Design</div>
+                                </div>
+                                <div class="award-row">
+                                    <div class="award-year">2025</div>
+                                    <div class="award-text">Student Service Design Challenge Finalist</div>
+                                </div>
+                                <div class="award-row">
+                                    <div class="award-year">2025</div>
+                                    <div class="award-text">Indigo Design Awards, Bronze Winner in Service Design</div>
+                                </div>
+                                <div class="award-row">
+                                    <div class="award-year">2025</div>
+                                    <div class="award-text">IDEA Design Awards, Finalist in Product Design</div>
+                                </div>
+                                <div class="award-row">
+                                    <div class="award-year">2025</div>
+                                    <div class="award-text">IDA Design Awards, Honorable Mention in User Experience
+                                    </div>
+                                </div>
+                                <div class="award-row">
+                                    <div class="award-year">2023</div>
+                                    <div class="award-text">SCAD Challenge Awards, 2nd place in 2D/3D Design</div>
+                                </div>
+                                <div class="award-row">
+                                    <div class="award-year">2023</div>
+                                    <div class="award-text">China Illustration Annual Competition, Exhibition work</div>
+                                </div>
+                                <div class="award-row">
+                                    <div class="award-year">2020</div>
+                                    <div class="award-text">National Postgraduate Animation Competition, 1st Place</div>
+                                </div>
+                                <div class="award-row">
+                                    <div class="award-year">2020</div>
+                                    <div class="award-text">International Student Animation Festival, Best Comic</div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </main>
+
+            <footer class="site-footer" id="info">
+                <div class="footer-left">
+                    <a href="mailto:jinghe-cai@outlook.com">Contact</a>
+                </div>
+        </div>
+        </footer>
+
+        <script type="module" src="js/animation.js"></script>
+        <script type="module" src="js/about.js"></script>
+    </div>
+    </div>
 </body>
+
 </html>

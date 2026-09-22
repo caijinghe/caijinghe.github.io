@@ -1,10 +1,16 @@
 html {
-    /* 强制预留滚动条的空间，防止页面跳动 */
-    scrollbar-gutter: stable;
+    scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
 }
 
 :root {
-    --page-gutter: min(1.5%, 24px);
+    --page-gutter: 8px;
 }
 
 /* =========================================
@@ -35,10 +41,10 @@ a {
 .site-header {
     position: fixed;
     top: 0;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 0;
+    transform: none;
     width: 100%;
-    padding: 24px var(--page-gutter);
+    padding: 16px 16px 12px;
     z-index: 1000;
     
     display: grid;
@@ -72,7 +78,7 @@ a {
    3. 真·瀑布流布局 (CSS Columns)
    ========================================= */
 .works-section {
-    padding: 65px 0 40px; 
+    padding: 48px 0 40px; 
     width: 100%;
 }
 
@@ -91,9 +97,12 @@ a {
    ========================================= */
 .site-footer {
     position: relative;
+    bottom: auto;
+    left: auto;
+    right: auto;
     width: 100%;
-    margin: 0 auto;
-    padding: 60px var(--page-gutter) 30px;
+    margin: 0;
+    padding: 320px 16px 16px;
     
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -170,11 +179,41 @@ a {
 }
 
 .work-image-wrapper img,
-.work-image-wrapper video {
+.work-image-wrapper video,
+.work-image-wrapper canvas {
     width: 100%;
     height: auto; 
     display: block;
 }
+
+.nestify-card-stage {
+    width: 100%;
+    aspect-ratio: 1532 / 862;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+.nestify-card-stage canvas {
+  width: 33%;
+    height: auto;
+    transform-origin: center bottom;
+    animation: nestifyBirdSway 3.6s ease-in-out infinite;
+    animation-play-state: paused;
+  }
+
+  .nestify-card-stage:hover canvas {
+    animation-play-state: running;
+}
+
+@keyframes nestifyBirdSway {
+    0%, 100% {
+        transform: rotate(-2deg);
+    }
+    50% {
+        transform: rotate(2deg);
+    }
+  }
 
 
 /* =========================================
@@ -212,12 +251,21 @@ a {
     transform: translateY(0);
 }
 
+.work-item:not(.no-click) .tag-business {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
 .work-item:not(.no-click) .tag-business::after {
-    content: " ↗"; 
-    font-size: 1.1em;
-    line-height: 1;
+    content: "";
     display: inline-block;
-    transform: translateY(1px);
+    width: .72em;
+    height: .72em;
+    flex: 0 0 .72em;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='4.5 4.5 11 11'%3E%3Cpath d='M5.5 14.5 14.5 5.5M5.5 5.5h9v9' fill='none' stroke='black' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center / contain;
+    background-color: currentColor;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='4.5 4.5 11 11'%3E%3Cpath d='M5.5 14.5 14.5 5.5M5.5 5.5h9v9' fill='none' stroke='black' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center / contain;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='4.5 4.5 11 11'%3E%3Cpath d='M5.5 14.5 14.5 5.5M5.5 5.5h9v9' fill='none' stroke='black' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center / contain;
 }
 
 .work-item.no-click .tag-business::after {
@@ -288,74 +336,119 @@ a {
 
 /* ✅ 外层边框容器 */
 .showreel-frame {
+  --control-inset: 14px;
+  --control-size: 40px;
   position: relative;
-  width: 95vw;
-  max-width: 960px;
+  width: min(95vw, 960px, calc(90dvh * 16 / 9));
   padding: 0px 0px;
-  border: 2px solid #ffffff;
+  border: 0;
   border-radius: 24px;
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(16px);
+  background: transparent;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
   box-sizing: border-box;
 }
 
 /* ✅ 顶部 Header 栏 */
 .showreel-header {
-  position: relative;
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 3;
+  background: transparent;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65);
+  pointer-events: none;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 48px;
-  border-bottom: 1px solid #ffffff;
+  height: calc(var(--control-size) + 2 * var(--control-inset));
+  opacity: 1;
+  border: 0;
   font-family: 'Inter', sans-serif;
   font-size: 1rem;
   font-weight: 300;
 }
 
 /* Header 中间标题 */
-.header-center {
-  font-weight: 300;
+.showreel-header .header-center {
+  max-width: calc(100% - 2 * (var(--control-inset) + var(--control-size) + 12px));
+  padding: 9px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(70, 70, 70, 0.5);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 400;
+  color: #fff;
+  text-shadow: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   pointer-events: none;
 }
 
 /* Header 右侧文字 */
 .header-right {
   position: absolute;
-  right: 20px;
+  right: var(--control-inset);
   font-weight: 200;
 }
 
 /* ✅ 关闭按钮 (左侧) */
 .close-btn {
+  pointer-events: auto;
   position: absolute;
-  left: 20px;
-  width: 25px;
-  height: 25px;
+  left: var(--control-inset);
+  width: var(--control-size);
+  height: var(--control-size);
+  display: grid;
+  place-items: center;
+  border: 0;
   border-radius: 50%;
-  background: rgba(157, 157, 157, 0);
-  backdrop-filter: blur(16px);
+  background: transparent;
   padding: 0;
   cursor: pointer;
-  transition: background 0.3s ease;
   z-index: 10;
 }
 
-.close-btn:hover {
-  background-color: rgba(0, 0, 0);
+.close-btn span,
+.player-control span {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(70, 70, 70, 0.5);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: background 0.2s ease;
 }
+
+.close-btn span::before {
+  content: "";
+  width: 10px;
+  height: 1.5px;
+  border-radius: 1px;
+  background: #fff;
+}
+
+.close-btn:hover span,
+.player-control:hover span { background: rgba(40, 40, 40, 0.65); }
+.close-btn:focus-visible,
+.player-control:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 
 /* ✅ 视频容器 (16:9) */
 .video-container {
   width: 100%; 
   aspect-ratio: 16 / 9;
-  border-radius: 0px 0px 24px 24px;
+  border-radius: 24px;
   overflow: hidden;
   position: relative;
-  box-shadow: inset 0 0 0 1px black; /* 防止边缘溢出 */
   backface-visibility: hidden;
   transform: translateZ(0);
-  background-color: #000;
+  background-color: #ffffff;
 }
 
 /* 视频元素通用样式 */
@@ -377,8 +470,15 @@ a {
   position: absolute;
   top: 0;
   left: 0;
+  width: 100%;
+  height: 100%;
   z-index: 2;
   pointer-events: none;
+  background-color: #ffffff;
+  object-fit: cover;
+  border: none;
+  border-radius: 0;
+  filter: contrast(1.05) brightness(1.02);
 }
 
 /* 主视频默认在底层 */
@@ -389,8 +489,8 @@ a {
 /* ✅ 视频控制按钮 (播放/静音) */
 .video-controls {
   position: absolute;
-  bottom: 14px;
-  left: 14px;
+  bottom: var(--control-inset);
+  left: var(--control-inset);
   display: flex;
   gap: 12px;
   opacity: 0;
@@ -399,46 +499,24 @@ a {
   pointer-events: none;
 }
 
-/* Hover 时显示控制栏 */
-.video-container:hover .video-controls {
-  opacity: 1;
-  pointer-events: auto;
-}
 
 /* 控制按钮样式 */
-.video-controls img {
-  width: 40px;
-  height: 40px;
+.player-control {
+  display: grid;
+  place-items: center;
+  width: var(--control-size);
+  height: var(--control-size);
+  padding: 0;
+  border: 0;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(16px);
-  padding: 0px;
-  transition: background 0.3s ease;
+  background: transparent;
   cursor: pointer;
 }
-.video-controls img:hover {
-  background: transparent;
-}
-
-/* 静音状态下强制显示 */
-.video-container.force-show-sound .video-controls {
-  opacity: 1;
-  pointer-events: auto;
-}
-.video-container.force-show-sound .video-controls #soundToggleBtn {
-  opacity: 1;
-  visibility: visible;
-}
-/* ✅ 仅在静音状态下强制显示音量图标，但不应隐藏播放键 */
-.video-container.force-show-sound .video-controls {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-/* 如果你希望静音时依然能看到播放键，请删除之前的 opacity: 0 规则 */
-.video-container.force-show-sound .video-controls #soundToggleBtn {
-    opacity: 1;
-    visibility: visible;
+.video-controls img {
+  display: block;
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
 }
 
 /* =========================================
@@ -475,16 +553,184 @@ a {
 
     .showreel-header {
         font-size: 0.9rem;
-        height: 40px;
     }
 
     .video-container {
-        border-radius: 0px 0px 16px 16px;
+        border-radius: 16px;
     }
 
-    .close-btn {
-        width: 24px;
-        height: 24px;
-        left: 10px;
-    }
+}
+
+/* Thin white frame with controls floating inside the video. */
+.showreel-frame {
+  width: min(95vw, 960px, calc((90dvh - 4px) * 16 / 9 + 4px));
+  padding: 0;
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  overflow: hidden;
+}
+.showreel-header {
+  position: absolute;
+  inset: 0 0 auto;
+  padding: 0 10px;
+  height: 60px;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) 40px;
+  gap: 8px;
+  pointer-events: auto;
+  text-shadow: none;
+}
+.showreel-header .close-btn { position: static; }
+.showreel-header .header-center {
+  max-width: 100%;
+  justify-self: center;
+  padding: 8px 14px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: none;
+  font-size: 14px;
+  font-weight: 500;
+}
+.header-actions { display: flex; gap: 8px; justify-content: flex-end; }
+.header-actions img { width: 16px; height: 16px; display: block; }
+.showreel-frame .video-container { border-radius: 0; box-shadow: none; }
+.showreel-frame .video-controls {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 28px 18px 12px;
+  align-items: center;
+  gap: 12px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 3;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.45));
+}
+.player-time { color: #fff; font-size: 12px; font-variant-numeric: tabular-nums; }
+.player-progress {
+  --progress: 0%;
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  height: 24px;
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+.player-progress::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(to right, #fff var(--progress), #ffffff50 var(--progress));
+}
+.player-progress::-moz-range-track { height: 4px; border-radius: 999px; background: #ffffff50; }
+.player-progress::-moz-range-progress { height: 4px; border-radius: 999px; background: #fff; }
+.player-progress::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  margin-top: -4px;
+  border-radius: 50%;
+  border: 0;
+  background: #fff;
+}
+.player-progress::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; border: 0; background: #fff; }
+.player-progress:focus-visible { outline: 2px solid #fff; outline-offset: 2px; border-radius: 4px; }
+.player-progress:disabled { cursor: default; opacity: 0.5; }
+@media (max-width: 600px) {
+  .showreel-header { padding: 0 6px; }
+  .showreel-header { height: 54px; grid-template-columns: 40px minmax(0, 1fr) 40px; gap: 2px; }
+  .header-actions { gap: 0; }
+  .showreel-header .header-center { font-size: 12px; }
+  .showreel-frame .video-controls { padding: 22px 10px 6px; gap: 8px; }
+}
+
+/* Light glass surface and centered playback control. */
+.showreel-header,
+.showreel-header .header-center { color: #303030; }
+.showreel-header .close-btn span,
+.showreel-header .player-control span { background: rgba(255, 255, 255, 0.55); }
+.showreel-header .close-btn span::before { background: #303030; }
+.showreel-header .player-control img { filter: brightness(0); opacity: 0.8; }
+.showreel-header .close-btn:hover span,
+.showreel-header .player-control:hover span { background: rgba(255, 255, 255, 0.9); }
+.showreel-header button:focus-visible { outline-color: #303030; }
+.video-controls .player-control { flex-shrink: 0; }
+.video-controls .player-control span { background: rgba(255, 255, 255, 0.65); }
+.video-controls .player-control:hover span { background: rgba(255, 255, 255, 0.85); }
+.video-controls .player-control img { filter: brightness(0); opacity: 0.8; }
+
+/* One shared state and timing for the complete player interface. */
+#showreelOverlay .showreel-header,
+#showreelOverlay .video-controls {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  filter: blur(3px);
+  transition: transform 600ms cubic-bezier(0.65, 0, 0.25, 1),
+              opacity 450ms ease,
+              filter 600ms ease,
+              visibility 0s linear 600ms;
+}
+#showreelOverlay .showreel-header {
+  transform-origin: 50% 0;
+  transform: translateY(-100%) scale(0.8, 0.45);
+}
+#showreelOverlay .video-controls {
+  transform-origin: 50% 100%;
+  transform: translateY(100%) scale(0.8, 0.45);
+}
+#showreelOverlay:not(.showreel-controls-visible) .showreel-header button,
+#showreelOverlay:not(.showreel-controls-visible) .video-controls button { pointer-events: none; }
+#showreelOverlay.showreel-controls-visible .showreel-header,
+#showreelOverlay.showreel-controls-visible .video-controls {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  filter: blur(0);
+  transform: translateY(0) scale(1);
+  transition: transform 600ms cubic-bezier(0.2, 0.8, 0.2, 1),
+              opacity 450ms ease,
+              filter 600ms ease,
+              visibility 0s;
+}
+#showreelOverlay.showreel-title-visible .showreel-header {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: none;
+  filter: blur(0);
+  transform: translateY(0) scale(1);
+  transition: transform 600ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 450ms ease, filter 600ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  #showreelOverlay .showreel-header,
+  #showreelOverlay .video-controls { transform: none; filter: none; transition: none; }
+}
+
+/* Title centered above a single bottom row of playback controls. */
+.showreel-frame .showreel-header { grid-template-columns: minmax(0, 1fr); }
+.showreel-frame .video-controls { gap: 8px; }
+
+.playback-button-group {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-shrink: 0;
+  margin-right: 12px;
+}
+.playback-button-group .player-control { width: 34px; }
+
+.work-tags-container .tag-name {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.work-tags-container .tag-year {
+    margin-left: 4px;
+    color: #929292;
+    font-weight: 400;
+    white-space: nowrap;
 }

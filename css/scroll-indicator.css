@@ -1,0 +1,96 @@
+/* =========================================
+   Apple-Style Edge Overlay Scrollbar
+   ========================================= */
+
+/* Ensure native scrollbars are hidden */
+html {
+  scrollbar-width: none;
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* Floating edge track container with 32px insets so rounded corners never clip it */
+.page-scroll-indicator {
+  position: fixed;
+  top: 32px;
+  bottom: 32px;
+  right: 4px;
+  width: 14px;
+  z-index: 990;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+/* Only visible when scrolling, hovering, or dragging */
+.page-scroll-indicator.is-visible.is-active,
+.page-scroll-indicator.is-visible:hover,
+.page-scroll-indicator.is-visible.is-dragging {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Apple-style floating rounded capsule thumb */
+.page-scroll-thumb {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 6px;
+  min-height: 36px;
+  border-radius: 9999px;
+  background: rgba(0, 0, 0, 0.35);
+  transform: translateY(0);
+  will-change: transform, height, width;
+  transition: width 140ms cubic-bezier(0.2, 0, 0, 1), background-color 200ms ease, opacity 200ms ease;
+  cursor: default;
+}
+
+/* Hover & Dragging state: slightly wider, more prominent */
+.page-scroll-indicator:hover .page-scroll-thumb,
+.page-scroll-indicator.is-dragging .page-scroll-thumb {
+  width: 8.5px;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+/* =========================================
+   Dark Theme (for black pages or dark sections)
+   ========================================= */
+.page-scroll-indicator--dark .page-scroll-thumb {
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.page-scroll-indicator--dark:hover .page-scroll-thumb,
+.page-scroll-indicator--dark.is-dragging .page-scroll-thumb {
+  width: 8.5px;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+/* Responsive on mobile screens */
+@media (max-width: 600px) {
+  .page-scroll-indicator {
+    right: 2px;
+    top: 24px;
+    bottom: 24px;
+    width: 10px;
+  }
+  .page-scroll-thumb {
+    width: 4px;
+    min-height: 28px;
+  }
+  .page-scroll-indicator:hover .page-scroll-thumb,
+  .page-scroll-indicator.is-dragging .page-scroll-thumb {
+    width: 6px;
+  }
+}
+
+/* Hide main page scroll indicator when a modal dialog is open */
+body:has(dialog[open]) .page-scroll-indicator {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}

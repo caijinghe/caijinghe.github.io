@@ -4,6 +4,7 @@ function initMfstCarousels() {
 
   // 2. 遍历每一个轮播图，给它们单独绑定逻辑
   carousels.forEach(carousel => {
+    carousel.classList.add("js-initialized");
     const slides = carousel.querySelectorAll(".carousel-frame img");
     const dots = carousel.querySelectorAll(".dot");
     // 获取当前这个轮播图里的箭头
@@ -74,5 +75,9 @@ function initMfstCarousels() {
 
 // 内容加密后，正文是解锁时才注入的，所以在解锁事件里初始化。
 // 同时保留 DOMContentLoaded（未加密页面时仍可用；加密页会安全退出）。
-document.addEventListener("DOMContentLoaded", initMfstCarousels);
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initMfstCarousels);
+} else {
+  initMfstCarousels();
+}
 document.addEventListener("protected:unlocked", initMfstCarousels);

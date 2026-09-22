@@ -1,16 +1,447 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Jinghe Cai</title>
+
     <link rel="icon" href="media/logo.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="css/password.css" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/index.css?v=20260922-1" />
+    <link rel="stylesheet" href="css/header.css" />
+    <!-- 开站密码开关：当前已停用。之后如需重新启用告诉我“打开开站密码”即可 -->
+    <script>window.siteLocked = false;</script>
+
+    <style>
+        /* 简单的淡入预设 */
+        .work-item {
+            opacity: 0;
+            transition: opacity 0.8s ease,
+                        transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .work-item.visible {
+            opacity: 1;
+        }
+    </style>
+    <link rel="stylesheet" href="css/concept-gallery.css?v=20260921-37" />
+    <script src="js/concept-gallery.js?v=20260921-22" defer></script>
+    <script src="js/project-preview.js?v=20260922-3" defer></script>
 </head>
+
 <body>
-    <noscript>Please enable JavaScript to unlock this website.</noscript>
-    <script type="application/json" id="site-payload">{"v":1,"salt":"eR7ZElLlVMJRtT4pTeJvkg==","iv":"nOVapjEldrWa0V9x","ct":"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"}</script>
-    <script src="js/password.js?v=20260916-2"></script>
-    <script>protectPage({ storageKey: "site-unlocked-v1", payload: "#site-payload", document: true });</script>
+
+    <!-- 开站密码遮罩（已注释停用）：
+    <div id="password-overlay" role="dialog" aria-label="Enter password">
+        <div class="password-box">
+            <video class="logo" autoplay muted loop playsinline aria-label="Loading logo">
+                <source src="media/index/logo.mp4" type="video/mp4" />
+            </video>
+            <div class="input-container">
+                <input id="password-input" type="password" placeholder="•••" autocomplete="off" aria-label="Password" />
+                <button id="password-submit" type="button" aria-label="Submit password"><img src="media/go.svg" alt="" /></button>
+            </div>
+            <p id="password-error" class="error-message">Incorrect password. Please try again.</p>
+        </div>
+    </div>
+    -->
+
+    <div class="layout">
+
+        <header class="site-header">
+            <div class="header-col-1">
+                <a href="index.html" class="my-name">Jinghe Cai</a>
+            </div>
+
+            <nav class="header-col-2">
+                <a href="#work">Work</a>
+                <a href="https://scholar.google.com/citations?user=USR_nP8AAAAJ&hl=en" target="_blank">Research</a>
+            </nav>
+
+            <nav class="header-col-3">
+                <a href="about.html">Info</a>
+                <a href="https://drive.google.com/file/d/1IsOUI2ZcsX_7XXkCw_bYc1aIiybE1FQT/view?usp=sharing"
+                    target="_blank">Résumé</a>
+            </nav>
+        </header>
+
+        <main>
+            <section class="works-section" id="work">
+                <div class="grid-container">
+
+                    <a href="#" id="open-showreel" class="work-item video-item">
+                        <div class="work-image-wrapper">
+                            <video src="media/index/logo.mp4" autoplay muted loop playsinline></video>
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-business">Showreel<span class="tag-year">2020-2025</span></span>
+                        </div>
+                    </a>
+
+                    <a href="samsung.html" id="open-samsung" class="work-item" aria-haspopup="dialog">
+                        <div class="work-image-wrapper">
+                            <img src="media/index/samsung.png" alt="Samsung" />
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-name">Samsung<span class="tag-year">2025</span></span>
+                            <span class="tag-business">Branding Strategy</span>
+                        </div>
+                    </a>
+
+                    <div class="work-item no-click">
+                        <div class="work-image-wrapper">
+                            <img src="media/index/linko.png" alt="Linko — Indigo Design Award" />
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-business">Learning Community, Design System</span>
+                        </div>
+                    </div>
+
+                    <a href="microsoft.html" id="open-microsoft" class="work-item" aria-haspopup="dialog">
+                        <div class="work-image-wrapper">
+                            <img src="media/index/mfst.png" alt="Microsoft" />
+                            <video class="hover-video" src="media/index/mfst2.mp4" muted loop playsinline></video>
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-name">Microsoft<span class="tag-year">2025</span></span>
+                            <span class="tag-business">Internal AI Design Toolkit</span>
+                        </div>
+                    </a>
+
+                    <a href="lepal.html?v=20260920-3" id="open-lepal" class="work-item" aria-haspopup="dialog">
+                        <div class="work-image-wrapper">
+                            <img src="media/index/lepal.png" alt="LePal" />
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-name">Lepal.ai<span class="tag-year">2024</span></span>
+                            <span class="tag-business">AI Companion for Gen Z</span>
+                        </div>
+                    </a>
+
+                    <a href="bibf.html" id="open-bibf" class="work-item" aria-haspopup="dialog">
+                        <div class="work-image-wrapper">
+                            <img src="media/index/BIBF.png" alt="BIBF" />
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-name">BIBF<span class="tag-year">2020</span></span>
+                            <span class="tag-business">Global Reading Fest VI Design</span>
+                        </div>
+                    </a>
+
+                    <a href="naivevil.html?v=20260920-8" id="open-naivevil" class="work-item" aria-haspopup="dialog">
+                        <div class="work-image-wrapper">
+                            <img src="media/index/naive.png" alt="Naivevil" />
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-name">Naivevil<span class="tag-year">2019</span></span>
+                            <span class="tag-business">Chinese Ink Painting</span>
+                        </div>
+                    </a>
+
+                    <a href="redwing.html" id="open-concept-gallery" class="work-item" aria-haspopup="dialog">
+                        <div class="work-image-wrapper">
+                            <video src="media/index/redwing.mp4" autoplay muted loop playsinline></video>
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-business">Concept Art<span class="tag-year">2020</span></span>
+                        </div>
+                    </a>
+
+                    <a href="https://www.nestifyapp.org/" id="open-nestify" class="work-item" aria-label="Nestify — Voice-first Family AI Copilot" target="_blank" rel="noopener noreferrer">
+                        <div class="work-image-wrapper">
+                            <div class="nestify-card-stage">
+                                <canvas id="nestify-card-bird" width="800" height="600" aria-label="Animated Nestify bird" role="img"></canvas>
+                            </div>
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-name">Nestify<span class="tag-year">2026</span></span>
+                            <span class="tag-business">Voice-first Family AI Copilot</span>
+                        </div>
+                    </a>
+
+                    <a href="thermopal.html" id="open-thermopal" class="work-item thermopal-card" aria-label="ThermoPal — Design System" aria-haspopup="dialog">
+                        <div class="work-image-wrapper">
+                            <img src="media/index/thermopal.png?v=20260921-6" alt="ThermoPal" />
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-name">ThermoPal<span class="tag-year">2025</span></span>
+                            <span class="tag-business">Design System</span>
+                        </div>
+                    </a>
+
+                    <a href="https://www.indigoaward.com/winners/10754" id="open-pink" class="work-item" target="_blank" rel="noopener noreferrer">
+                        <div class="work-image-wrapper">
+                            <img src="media/index/pink.svg" alt="Pink Panthers — Menstrual Health, Service Design" />
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-business">Menstrual Health, Service Design</span>
+                        </div>
+                    </a>
+
+                    <!-- Wander temporarily hidden from the homepage.
+                    <a href="wander.html" class="work-item">
+                        <div class="work-image-wrapper">
+                            <img src="media/index/wander.png" alt="Wander" />
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-business">Gamified Sleep Experience, Published Reserch</span>
+                        </div>
+                    </a>
+                    -->
+
+                </div>
+            </section>
+        </main>
+
+        <footer class="site-footer" id="info">
+            <div class="footer-left">
+                <a href="mailto:jinghe-cai@outlook.com">Contact</a>
+            </div>
+            <div class="footer-center">
+                <span>2026</span>
+            </div>
+        </footer>
+
+    </div>
+
+    <div id="showreelOverlay" class="preload hidden">
+        <div class="showreel-frame" tabindex="0" aria-label="Showreel video player">
+            <div class="showreel-header">
+                <div class="header-center" title="Jinghe Cai · Showreel 2020-2025">Jinghe Cai · Showreel 2020-2025</div>
+            </div>
+            <div class="showreel-card">
+                <div class="video-container">
+                    <video id="loadingVideo" autoplay muted playsinline class="loading-video">
+                        <source src="media/loading.mp4" type="video/mp4" />
+                    </video>
+                    <video id="showreelVideo" autoplay playsinline muted class="main-video">
+                        <source src="media/showreel.mp4" type="video/mp4" />
+                    </video>
+                    <div class="video-controls">
+                        <div class="playback-button-group">
+                            <button id="playPauseBtn" class="player-control" type="button" aria-label="Play"><span><img src="media/player-play.svg?v=filled-1" alt="" /></span></button>
+                            <button id="soundToggleBtn" class="player-control" type="button" aria-label="Unmute"><span><img src="media/player-muted.svg?v=filled-1" alt="" /></span></button>
+                        </div>
+                        <span id="showreelElapsed" class="player-time">0:00</span>
+                        <input id="showreelProgress" class="player-progress" type="range" min="0" max="100" step="0.1" value="0" aria-label="Video progress" disabled />
+                        <span id="showreelDuration" class="player-time">0:00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <dialog id="concept-gallery" class="concept-gallery" aria-label="Red Wing — Concept Art" data-lenis-prevent>
+        <header class="concept-gallery__header">
+            <button class="concept-gallery__expand" type="button" aria-label="Expand gallery" aria-pressed="false"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path class="gallery-expand-icon" d="M4 4h7v2H7.4l4.3 4.3-1.4 1.4L6 7.4V11H4V4Zm16 16h-7v-2h3.6l-4.3-4.3 1.4-1.4 4.3 4.3V13h2v7Z"/><path class="gallery-restore-icon" d="M11 11H4V9h3.6L3.3 4.7l1.4-1.4L9 7.6V4h2v7Zm2 2h7v2h-3.6l4.3 4.3-1.4 1.4-4.3-4.3V20h-2v-7Z"/></svg><img class="concept-gallery__brand concept-gallery__brand--solid" src="media/logo.svg" alt="Jinghe Cai logo" width="32" height="32" /><img class="concept-gallery__brand concept-gallery__brand--hover" src="media/logo_light.svg?v=20260920-1" alt="" width="32" height="32" aria-hidden="true" /></button>
+            <nav class="concept-gallery__breadcrumbs" aria-label="Project breadcrumb" inert>
+                <button type="button" class="concept-gallery__back">Work</button>
+                <span aria-hidden="true">›</span>
+                <span aria-current="page">Red Wing</span>
+            </nav>
+        </header>
+        <div class="concept-gallery__stage" tabindex="0" role="region" aria-label="Concept Art gallery. Scroll or use arrow keys to browse.">
+                <section class="concept-gallery__slide concept-gallery__info-slide" data-aspect="1" aria-label="Project information">
+                    <div class="concept-gallery__info">
+                        <h2>Red Wing</h2>
+                        <p class="concept-gallery__description">Concept Art</p>
+                        <p class="concept-gallery__details">Mar 2020, Individual Work</p>
+                        <img class="concept-gallery__info-award" src="media/redwing/aniwow.svg" alt="ANIWOW 2020 China — Finalist" />
+                    </div>
+                </section>
+                <figure class="concept-gallery__slide" data-aspect="1.41091658"><img width="1370" height="971" src="media/redwing/redwing1.png" alt="Red Wing — illustration 1 of 9" loading="lazy" decoding="async" draggable="false" /></figure>
+                <figure class="concept-gallery__slide" data-aspect="1.00000000"><img width="587" height="587" src="media/redwing/redwing2.png" alt="Red Wing — illustration 2 of 9" loading="lazy" decoding="async" draggable="false" /></figure>
+                <figure class="concept-gallery__slide" data-aspect="1.23679727"><img width="726" height="587" src="media/redwing/redwing3.png" alt="Red Wing — illustration 3 of 9" loading="lazy" decoding="async" draggable="false" /></figure>
+                <figure class="concept-gallery__slide" data-aspect="1.41443299"><img width="1372" height="970" src="media/redwing/redwing4.png" alt="Red Wing — illustration 4 of 9" loading="lazy" decoding="async" draggable="false" /></figure>
+                <figure class="concept-gallery__slide" data-aspect="0.70654297"><img width="2894" height="4096" src="media/redwing/redwing5.png" alt="Red Wing — illustration 5 of 9" loading="lazy" decoding="async" draggable="false" /></figure>
+                <figure class="concept-gallery__slide" data-aspect="0.70695553"><img width="2480" height="3508" src="media/redwing/redwing6.png" alt="Red Wing — illustration 6 of 9" loading="lazy" decoding="async" draggable="false" /></figure>
+                <figure class="concept-gallery__slide" data-aspect="0.70654297"><img width="2894" height="4096" src="media/redwing/redwing7.png" alt="Red Wing — illustration 7 of 9" loading="lazy" decoding="async" draggable="false" /></figure>
+                <figure class="concept-gallery__slide" data-aspect="0.70654297"><img width="2894" height="4096" src="media/redwing/redwing8.png" alt="Red Wing — illustration 8 of 9" loading="lazy" decoding="async" draggable="false" /></figure>
+                <figure class="concept-gallery__slide" data-aspect="0.70703125"><img width="2896" height="4096" src="media/redwing/redwing9.png" alt="Red Wing — illustration 9 of 9" loading="lazy" decoding="async" draggable="false" /></figure>
+                <section class="concept-gallery__slide concept-gallery__info-slide" data-aspect="1" aria-label="Project information">
+                    <div class="concept-gallery__info">
+                        <h2>Red Wing</h2>
+                        <p class="concept-gallery__description">Concept Art</p>
+                        <p class="concept-gallery__details">Mar 2020, Individual Work</p>
+                        <img class="concept-gallery__info-award" src="media/redwing/aniwow.svg" alt="ANIWOW 2020 China — Finalist" />
+                    </div>
+                </section>
+        </div>
+<footer class="concept-gallery__footer">
+            <div class="concept-gallery__navigation">
+            <div class="concept-gallery__steps" aria-label="Choose gallery page">
+                    <button class="concept-gallery__step" type="button" aria-label="View project introduction" aria-current="true"></button>
+                    <button class="concept-gallery__step" type="button" aria-label="View illustration 1" aria-current="false"></button>
+                    <button class="concept-gallery__step" type="button" aria-label="View illustration 2" aria-current="false"></button>
+                    <button class="concept-gallery__step" type="button" aria-label="View illustration 3" aria-current="false"></button>
+                    <button class="concept-gallery__step" type="button" aria-label="View illustration 4" aria-current="false"></button>
+                    <button class="concept-gallery__step" type="button" aria-label="View illustration 5" aria-current="false"></button>
+                    <button class="concept-gallery__step" type="button" aria-label="View illustration 6" aria-current="false"></button>
+                    <button class="concept-gallery__step" type="button" aria-label="View illustration 7" aria-current="false"></button>
+                    <button class="concept-gallery__step" type="button" aria-label="View illustration 8" aria-current="false"></button>
+                    <button class="concept-gallery__step" type="button" aria-label="View illustration 9" aria-current="false"></button>
+                    <button class="concept-gallery__step" type="button" aria-label="View project information" aria-current="false"></button>
+            </div>
+            </div>
+        </footer>
+    </dialog>
+
+
+    <dialog id="bibf-dialog" class="concept-gallery" aria-label="BIBF — Global Reading Fest VI Design" data-lenis-prevent>
+        <header class="concept-gallery__header">
+            <button class="concept-gallery__expand" type="button" aria-label="Expand project" aria-pressed="false"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path class="gallery-expand-icon" d="M4 4h7v2H7.4l4.3 4.3-1.4 1.4L6 7.4V11H4V4Zm16 16h-7v-2h3.6l-4.3-4.3-1.4 1.4 4.3 4.3-1.4 1.4L20 20h-2v-7Z"/><path class="gallery-restore-icon" d="M11 11H4V9h3.6L3.3 4.7l1.4-1.4L9 7.6V4h2v7Zm2 2h7v2h-3.6l4.3 4.3-1.4 1.4L20 20h-2v-7Z"/></svg><img class="concept-gallery__brand concept-gallery__brand--solid" src="media/logo.svg" alt="Jinghe Cai logo" width="32" height="32"><img class="concept-gallery__brand concept-gallery__brand--hover" src="media/logo-line.svg?v=20260921-3" alt="" width="32" height="32" aria-hidden="true"></button>
+            <nav class="concept-gallery__breadcrumbs" aria-label="Project breadcrumb" inert>
+                <button type="button" class="concept-gallery__back">Work</button>
+                <span aria-hidden="true">›</span>
+                <span aria-current="page">BIBF</span>
+            </nav>
+        </header>
+        <div class="concept-gallery__stage" tabindex="0" role="region" aria-label="BIBF gallery">
+            <section class="concept-gallery__slide concept-gallery__info-slide" data-aspect="1"><div class="concept-gallery__info"><p class="bibf-title">Beijing International Book Fair</p><img class="bibf-gallery-logo" src="media/bibf/bibf.png" alt="BIBF logo"><p class="bibf-subtitle">Global Reading Festival VI</p><p class="concept-gallery__details">Jun 2020, Individual Work</p></div></section>
+            <figure class="concept-gallery__slide" data-aspect="0.707"><img src="media/bibf/bibf1.jpg" alt="BIBF image 1" loading="lazy"></figure>
+            <figure class="concept-gallery__slide" data-aspect="0.707"><img src="media/bibf/bibf2.jpg" alt="BIBF image 2" loading="lazy"></figure>
+            <figure class="concept-gallery__slide" data-aspect="0.707"><img src="media/bibf/bibf3.jpg" alt="BIBF image 3" loading="lazy"></figure>
+            <figure class="concept-gallery__slide" data-aspect="0.707"><img src="media/bibf/bibf4.jpg" alt="BIBF image 4" loading="lazy"></figure>
+            <figure class="concept-gallery__slide" data-aspect="0.707"><img src="media/bibf/bibf5.jpg" alt="BIBF image 5" loading="lazy"></figure>
+            <figure class="concept-gallery__slide" data-aspect="0.707"><img src="media/bibf/bibf6.jpg" alt="BIBF image 6" loading="lazy"></figure>
+            <figure class="concept-gallery__slide" data-aspect="0.707"><img src="media/bibf/bibf7.jpg" alt="BIBF image 7" loading="lazy"></figure>
+            <figure class="concept-gallery__slide" data-aspect="0.707"><img src="media/bibf/bibf8.jpg" alt="BIBF image 8" loading="lazy"></figure>
+            <section class="concept-gallery__slide concept-gallery__info-slide" data-aspect="1"><div class="concept-gallery__info"><p class="bibf-title">Beijing International Book Fair</p><img class="bibf-gallery-logo" src="media/bibf/bibf.png" alt="BIBF logo"><p class="bibf-subtitle">Global Reading Festival VI</p><p class="concept-gallery__details">Jun 2020, Individual Work</p></div></section>
+        </div>
+        <footer class="concept-gallery__footer"><div class="concept-gallery__steps" aria-label="Choose gallery page"><button class="concept-gallery__step" type="button" aria-label="View project introduction" aria-current="true"></button><button class="concept-gallery__step" type="button" aria-label="View image 1"></button><button class="concept-gallery__step" type="button" aria-label="View image 2"></button><button class="concept-gallery__step" type="button" aria-label="View image 3"></button><button class="concept-gallery__step" type="button" aria-label="View image 4"></button><button class="concept-gallery__step" type="button" aria-label="View image 5"></button><button class="concept-gallery__step" type="button" aria-label="View image 6"></button><button class="concept-gallery__step" type="button" aria-label="View image 7"></button><button class="concept-gallery__step" type="button" aria-label="View image 8"></button><button class="concept-gallery__step" type="button" aria-label="View project closing page"></button></div></footer>
+    </dialog>
+
+    <dialog id="naivevil-dialog" class="concept-gallery project-preview" aria-label="Naivevil — Chinese Ink Painting" data-lenis-prevent>
+        <header class="concept-gallery__header">
+            <button class="concept-gallery__expand" type="button" aria-label="Expand gallery" aria-pressed="false"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path class="gallery-expand-icon" d="M4 4h7v2H7.4l4.3 4.3-1.4 1.4L6 7.4V11H4V4Zm16 16h-7v-2h3.6l-4.3-4.3 1.4-1.4 4.3 4.3V13h2v7Z"/><path class="gallery-restore-icon" d="M11 11H4V9h3.6L3.3 4.7l1.4-1.4L9 7.6V4h2v7Zm2 2h7v2h-3.6l4.3 4.3-1.4 1.4-4.3-4.3V20h-2v-7Z"/></svg><img class="concept-gallery__brand concept-gallery__brand--solid" src="media/logo.svg" alt="Jinghe Cai logo" width="32" height="32" /><img class="concept-gallery__brand concept-gallery__brand--hover" src="media/logo_light.svg?v=20260920-1" alt="" width="32" height="32" aria-hidden="true" /></button>
+            <nav class="concept-gallery__breadcrumbs" aria-label="Project breadcrumb" inert>
+                <button type="button" class="concept-gallery__back">Work</button>
+                <span aria-hidden="true">›</span>
+                <span aria-current="page">Naivevil</span>
+            </nav>
+        </header>
+        <iframe class="project-preview__frame" title="Naivevil project" data-src="naivevil.html?v=20260921-12&amp;preview=1"></iframe>
+    </dialog>
+
+    <dialog id="lepal-dialog" class="concept-gallery project-preview project-preview--dark" aria-label="Lepal.ai — AI Companion for Gen Z" data-lenis-prevent>
+        <header class="concept-gallery__header">
+            <button class="concept-gallery__expand" type="button" aria-label="Expand gallery" aria-pressed="false"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path class="gallery-expand-icon" d="M4 4h7v2H7.4l4.3 4.3-1.4 1.4L6 7.4V11H4V4Zm16 16h-7v-2h3.6l-4.3-4.3 1.4-1.4 4.3 4.3V13h2v7Z"/><path class="gallery-restore-icon" d="M11 11H4V9h3.6L3.3 4.7l1.4-1.4L9 7.6V4h2v7Zm2 2h7v2h-3.6l4.3 4.3-1.4 1.4-4.3-4.3V20h-2v-7Z"/></svg><img class="concept-gallery__brand concept-gallery__brand--solid" src="media/logo_withe.svg" alt="Jinghe Cai logo" width="32" height="32" /><img class="concept-gallery__brand concept-gallery__brand--hover" src="media/logo_light.svg?v=20260920-1" alt="" width="32" height="32" aria-hidden="true" /></button>
+            <nav class="concept-gallery__breadcrumbs" aria-label="Project breadcrumb" inert>
+                <button type="button" class="concept-gallery__back">Work</button>
+                <span aria-hidden="true">›</span>
+                <span aria-current="page">Lepal.ai</span>
+            </nav>
+        </header>
+        <iframe class="project-preview__frame" title="Lepal.ai project" data-src="lepal.html?v=20260920-11&amp;preview=1"></iframe>
+    </dialog>
+
+    <dialog id="samsung-dialog" class="concept-gallery project-preview project-preview--dark" aria-label="Samsung — Branding Strategy" data-lenis-prevent>
+        <header class="concept-gallery__header">
+            <button class="concept-gallery__expand" type="button" aria-label="Expand gallery" aria-pressed="false"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path class="gallery-expand-icon" d="M4 4h7v2H7.4l4.3 4.3-1.4 1.4L6 7.4V11H4V4Zm16 16h-7v-2h3.6l-4.3-4.3 1.4-1.4 4.3 4.3V13h2v7Z"/><path class="gallery-restore-icon" d="M11 11H4V9h3.6L3.3 4.7l1.4-1.4L9 7.6V4h2v7Zm2 2h7v2h-3.6l4.3 4.3-1.4 1.4-4.3-4.3V20h-2v-7Z"/></svg><img class="concept-gallery__brand concept-gallery__brand--solid" src="media/logo_withe.svg" alt="Jinghe Cai logo" width="32" height="32" /><img class="concept-gallery__brand concept-gallery__brand--hover" src="media/logo_light.svg?v=20260920-1" alt="" width="32" height="32" aria-hidden="true" /></button>
+            <nav class="concept-gallery__breadcrumbs" aria-label="Project breadcrumb" inert>
+                <button type="button" class="concept-gallery__back">Work</button>
+                <span aria-hidden="true">›</span>
+                <span aria-current="page">Samsung</span>
+            </nav>
+        </header>
+        <iframe class="project-preview__frame" title="Samsung project" data-src="samsung.html?v=20260922-5&amp;preview=1"></iframe>
+    </dialog>
+
+    <dialog id="microsoft-dialog" class="concept-gallery project-preview" aria-label="Microsoft — Internal AI Design Toolkit" data-lenis-prevent>
+        <header class="concept-gallery__header">
+            <button class="concept-gallery__expand" type="button" aria-label="Expand gallery" aria-pressed="false"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path class="gallery-expand-icon" d="M4 4h7v2H7.4l4.3 4.3-1.4 1.4L6 7.4V11H4V4Zm16 16h-7v-2h3.6l-4.3-4.3 1.4-1.4 4.3 4.3V13h2v7Z"/><path class="gallery-restore-icon" d="M11 11H4V9h3.6L3.3 4.7l1.4-1.4L9 7.6V4h2v7Zm2 2h7v2h-3.6l4.3 4.3-1.4 1.4-4.3-4.3V20h-2v-7Z"/></svg><img class="concept-gallery__brand concept-gallery__brand--solid" src="media/logo.svg" alt="Jinghe Cai logo" width="32" height="32" /><img class="concept-gallery__brand concept-gallery__brand--hover" src="media/logo_light.svg?v=20260920-1" alt="" width="32" height="32" aria-hidden="true" /></button>
+            <nav class="concept-gallery__breadcrumbs" aria-label="Project breadcrumb" inert>
+                <button type="button" class="concept-gallery__back">Work</button>
+                <span aria-hidden="true">›</span>
+                <span aria-current="page">Microsoft</span>
+            </nav>
+        </header>
+        <iframe class="project-preview__frame" title="Microsoft project" data-src="microsoft.html?v=20260922-5&amp;preview=1"></iframe>
+    </dialog>
+
+    <dialog id="nestify-dialog" class="concept-gallery project-preview" aria-label="Nestify — Voice-first Family AI Copilot" data-lenis-prevent>
+        <header class="concept-gallery__header">
+            <button class="concept-gallery__expand" type="button" aria-label="Expand gallery" aria-pressed="false"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path class="gallery-expand-icon" d="M4 4h7v2H7.4l4.3 4.3-1.4 1.4L6 7.4V11H4V4Zm16 16h-7v-2h3.6l-4.3-4.3 1.4-1.4 4.3 4.3V13h2v7Z"/><path class="gallery-restore-icon" d="M11 11H4V9h3.6L3.3 4.7l1.4-1.4L9 7.6V4h2v7Zm2 2h7v2h-3.6l4.3 4.3-1.4 1.4-4.3-4.3V20h-2v-7Z"/></svg><img class="concept-gallery__brand concept-gallery__brand--solid" src="media/logo.svg" alt="Jinghe Cai logo" width="32" height="32" /><img class="concept-gallery__brand concept-gallery__brand--hover" src="media/logo_light.svg?v=20260920-1" alt="" width="32" height="32" aria-hidden="true" /></button>
+            <nav class="concept-gallery__breadcrumbs" aria-label="Project breadcrumb" inert>
+                <button type="button" class="concept-gallery__back">Work</button>
+                <span aria-hidden="true">›</span>
+                <span aria-current="page">Nestify</span>
+            </nav>
+        </header>
+        <iframe class="project-preview__frame" title="Nestify project" data-src="nestify.html?v=20260922-4&amp;preview=1"></iframe>
+    </dialog>
+
+        <dialog id="thermopal-dialog" class="concept-gallery project-preview" aria-label="ThermoPal — Design System" data-lenis-prevent>
+        <header class="concept-gallery__header">
+            <button class="concept-gallery__expand" type="button" aria-label="Expand gallery" aria-pressed="false"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path class="gallery-expand-icon" d="M4 4h7v2H7.4l4.3 4.3-1.4 1.4L6 7.4V11H4V4Zm16 16h-7v-2h3.6l-4.3-4.3-4.3-4.3-1.4 1.4L20 20h-2v-7Z"/><path class="gallery-restore-icon" d="M11 11H4V9h3.6L3.3 4.7l1.4-1.4L9 7.6V4h2v7Zm2 2h7v2h-3.6l4.3 4.3-4.3-4.3-1.4 1.4L20 20h-2v-7Z"/></svg><img class="concept-gallery__brand concept-gallery__brand--solid" src="media/logo.svg" alt="Jinghe Cai logo" width="32" height="32" /><img class="concept-gallery__brand concept-gallery__brand--hover" src="media/logo_light.svg?v=20260920-1" alt="" width="32" height="32" aria-hidden="true" /></button>
+            <nav class="concept-gallery__breadcrumbs" aria-label="Project breadcrumb" inert>
+                <button type="button" class="concept-gallery__back">Work</button>
+                <span aria-hidden="true">›</span>
+                <span aria-current="page">ThermoPal</span>
+            </nav>
+        </header>
+        <iframe class="project-preview__frame" title="ThermoPal project" data-src="thermopal.html?v=20260921-34&amp;preview=1"></iframe>
+    </dialog>
+
+    <div id="custom-cursor"></div>
+    <!-- <div id="customCursorText" class="cursor-hidden">MORE</div> -->
+
+    <script src="vendor/gsap/gsap.min.js"></script>
+    <script src="https://unpkg.com/lenis@1.0.45/dist/lenis.min.js"></script>
+    <script src="https://unpkg.com/@rive-app/canvas@2.31.6"></script>
+    <script src="js/index.js?v=20260921-2"></script>
+    <script>
+        new rive.Rive({
+            src: 'media/nestify/bird-blink.riv',
+            canvas: document.getElementById('nestify-card-bird'),
+            autoplay: true,
+            fit: rive.Fit.Contain,
+            alignment: rive.Alignment.Center
+        });
+    </script>
+    <!-- 开站密码验证逻辑（已注释停用。之后如需重新启用告诉我“打开开站密码”即可）：
+    <script>
+        (() => {
+            const overlay = document.getElementById('password-overlay');
+            if (!overlay) return;
+            const input = document.getElementById('password-input');
+            const submit = document.getElementById('password-submit');
+            const error = document.getElementById('password-error');
+            const inputContainer = overlay.querySelector('.input-container');
+            const key = 'site-unlocked';
+            const unlock = () => {
+                overlay.classList.add('hidden');
+                document.body.classList.remove('site-locked');
+                window.siteLocked = false;
+                sessionStorage.setItem(key, '1');
+                if (sessionStorage.getItem('showreelShown') !== 'true') {
+                    document.getElementById('open-showreel')?.click();
+                }
+            };
+            const check = () => {
+                if (input.value === '321') unlock();
+                else {
+                    error.style.visibility = 'hidden';
+                    input.value = '';
+                    inputContainer.classList.remove('shake-animation');
+                    void inputContainer.offsetWidth;
+                    inputContainer.classList.add('shake-animation');
+                    inputContainer.addEventListener('animationend', () => inputContainer.classList.remove('shake-animation'), { once: true });
+                    input.focus();
+                }
+            };
+            if (sessionStorage.getItem(key) === '1') unlock();
+            else { document.body.classList.add('site-locked'); input.focus(); }
+            submit.addEventListener('click', check);
+            input.addEventListener('keydown', (event) => { if (event.key === 'Enter') check(); });
+        })();
+    </script>
+    -->
+
 </body>
+
 </html>

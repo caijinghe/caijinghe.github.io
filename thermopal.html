@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ThermoPal — Jinghe Cai</title>
+    <link rel="icon" href="media/logo.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/workheader2.css">
+    <link rel="stylesheet" href="css/thermopal.css?v=20260921-28">
+    <link rel="stylesheet" href="css/scroll-indicator.css?v=20260920-1">
+    <script src="js/scroll-indicator.js?v=20260920-1" defer></script>
+    <script>
+        if (new URLSearchParams(location.search).has('preview')) {
+            document.documentElement.classList.add('is-preview');
+        }
+    </script>
+</head>
+<body>
+    <div id="loading-overlay" aria-label="Loading">
+        <video id="loading-video" autoplay muted loop playsinline>
+            <source src="media/index/logo_dark.mp4" type="video/mp4">
+        </video>
+    </div>
+    <header class="site-header">
+        <div class="header-col-1">
+            <a href="index.html" class="my-name">Jinghe Cai</a>
+        </div>
+
+        <nav class="header-col-2">
+        </nav>
+
+        <div class="header-col-3">
+            <a href="about.html">Info</a>
+            <a href="https://drive.google.com/file/d/1IsOUI2ZcsX_7XXkCw_bYc1aIiybE1FQT/view?usp=sharing" target="_blank">Résumé</a>
+        </div>
+    </header>
+
+    <main class="thermopal">
+        <!-- ThermoPal cover -->
+        <section class="thermostat-cover" aria-label="ThermoPal cover">
+            <img src="media/thermopal/thermostat-cover.png?v=20260921-6" alt="ThermoPal project cover" width="4680" height="3740" loading="eager" decoding="async">
+        </section>
+
+        <!-- Role overview -->
+        <section class="thermopal-role-image" aria-label="ThermoPal role overview">
+            <img src="media/thermopal/role.png?v=20260921-4" alt="ThermoPal role overview" width="3510" height="965" loading="eager" decoding="async">
+        </section>
+
+        <!-- Section 2: Hero Showcase Demo (Phone Video + Screen Mockup) -->
+        <section class="hero-showcase">
+            <div class="hero-phone-wrap">
+                <video autoplay muted loop playsinline preload="auto" poster="media/thermopal/demo1-poster.jpg" aria-label="ThermoPal app demo">
+                    <source src="media/thermopal/demo1.mp4" type="video/mp4">
+                </video>
+            </div>
+            <div class="hero-screens-wrap">
+                <img src="media/thermopal/image-3512315a-d507-41f7-bdf3-90774977acc9.png" alt="ThermoPal app overview" width="1200" height="1161" loading="lazy" decoding="async">
+            </div>
+        </section>
+
+        <!-- Section 3: Full Bleed Banner & Overlay Headline -->
+        <section class="hero-banner-wrap">
+            <img class="hero-banner-img" src="media/thermopal/image-f10b6b8f-6aa3-448e-b5c4-d1e1b8957ec5.jpg" alt="ThermoPal shared workspace" width="2880" height="1620" loading="lazy" decoding="async">
+            <div class="hero-banner-overlay">
+                <h2>Bridging the Comfort Gap: Reimagining workspace thermal management for shared efficiency.</h2>
+            </div>
+        </section>
+
+        <!-- Tri-color Accent Bar -->
+        <div class="accent-stripe-bar" aria-hidden="true">
+            <div class="stripe-orange"></div>
+            <div class="stripe-blue"></div>
+            <div class="stripe-green"></div>
+        </div>
+
+        <!-- Section 4: Background & High Stakes Stats -->
+        <!-- Removed from the project page. -->
+        <!--
+        <section class="background-section">
+            <div class="background-header">
+                <h2 class="section-label">Background</h2>
+                <p class="section-subtitle">&quot;The High Stakes of Thermal Discomfort&quot;</p>
+            </div>
+            <div class="stats-container">
+                <div class="stat-item orange">
+                    <div class="stat-icon">
+                        <img src="media/thermopal/image-b863e6b1-e4a8-496a-934c-69074d81d98f.png" alt="" width="61" height="48" loading="lazy" decoding="async">
+                    </div>
+                    <div class="stat-number">54%</div>
+                    <p class="stat-desc">of employees are <span class="highlight-orange">dissatisfied</span> with office temperature.</p>
+                </div>
+                <div class="stat-item blue">
+                    <div class="stat-icon">
+                        <img src="media/thermopal/image-b9eed52c-653e-44af-b915-e111190104fe.png" alt="" width="35" height="39" loading="lazy" decoding="async">
+                    </div>
+                    <div class="stat-number">48%</div>
+                    <p class="stat-desc"><span class="highlight-blue">lower focus</span> and <span class="highlight-blue">productivity</span> than in comfortable environments.</p>
+                </div>
+                <div class="stat-item purple">
+                    <div class="stat-icon">
+                        <img src="media/thermopal/image-85074661-d13e-4574-aabd-f908154b8ba2.png" alt="" width="54" height="52" loading="lazy" decoding="async">
+                    </div>
+                    <div class="stat-number">$11 Billion</div>
+                    <p class="stat-desc">Annual <span class="highlight-purple">energy loss</span> in U.S. companies from inefficient temperature.</p>
+                </div>
+            </div>
+        </section>
+
+        Section 5: HMW Section
+        <section class="hmw-section">
+            <div class="hmw-header">
+                <h2 class="section-label">HMW</h2>
+            </div>
+            <div class="hmw-content">
+                <p class="hmw-item"><strong>#1</strong> How might we harmonize diverse individual preferences within shared office spaces to mitigate thermal friction?</p>
+                <p class="hmw-item"><strong>#2</strong> How might we transform energy-saving into an engaging, cheerful, and shared team journey?</p>
+            </div>
+        </section>
+
+        -->
+
+        <!-- Section 6: Showcase Header & Statement -->
+        <section class="statement-section">
+            <!-- <div class="showcase-badge">Showcase</div> -->
+            <div class="showcase-brand-lockup">
+                <img class="showcase-brand-logo" src="media/thermopal/logo.png?v=20260921-1" alt="ThermoPal logo" width="122" height="122" loading="lazy" decoding="async">
+                <h3 class="showcase-brand">Therm<span class="brand-accent">&oacute;</span>Pal</h3>
+            </div>
+            <div class="statement-quote-wrap">
+                <svg class="statement-flower" viewBox="0 0 44 44" fill="currentColor" aria-hidden="true">
+                    <rect x="19.25" y="2" width="5.5" height="40" rx="0.5" />
+                    <rect x="19.25" y="2" width="5.5" height="40" rx="0.5" transform="rotate(45 22 22)" />
+                    <rect x="19.25" y="2" width="5.5" height="40" rx="0.5" transform="rotate(90 22 22)" />
+                    <rect x="19.25" y="2" width="5.5" height="40" rx="0.5" transform="rotate(135 22 22)" />
+                </svg>
+                <h2 class="statement-quote" aria-label="Where Thermal Comfort Meets Playful Engagement">
+                    <span class="statement-word statement-word--orange">Where</span>
+                    <span class="statement-word">Thermal</span>
+                    <span class="statement-word statement-word--blue">Comfort</span><br>
+                    <span class="statement-word statement-word--green">Meets</span>
+                    <span class="statement-word statement-word--yellow">Playful</span>
+                    <span class="statement-word">Engagement</span>
+                </h2>
+                <svg class="statement-flower" viewBox="0 0 44 44" fill="currentColor" aria-hidden="true">
+                    <rect x="19.25" y="2" width="5.5" height="40" rx="0.5" />
+                    <rect x="19.25" y="2" width="5.5" height="40" rx="0.5" transform="rotate(45 22 22)" />
+                    <rect x="19.25" y="2" width="5.5" height="40" rx="0.5" transform="rotate(90 22 22)" />
+                    <rect x="19.25" y="2" width="5.5" height="40" rx="0.5" transform="rotate(135 22 22)" />
+                </svg>
+            </div>
+        </section>
+
+        <!-- Section 7: Feature #1 -->
+        <section class="feature-row">
+            <div class="feature-media-card bg-feature-1">
+                <img src="media/thermopal/image-837a3ce6-c6b5-4a6f-915c-a6d36582fd99.png" alt="Personalized Comfort Setup" width="1000" height="936" loading="lazy" decoding="async">
+            </div>
+            <div class="feature-copy-card">
+                <p class="feature-eyebrow">Feature #1</p>
+                <h2 class="feature-title title-feature-1">Personalized Comfort Setup</h2>
+                <p class="feature-desc">Easily set your preferred temperature for each season and keep your comfort just the way you like it.</p>
+            </div>
+        </section>
+
+        <!-- Section 8: Feature #2 -->
+        <section class="feature-row reverse">
+            <div class="feature-copy-card">
+                <p class="feature-eyebrow">Feature #2</p>
+                <h2 class="feature-title title-feature-2">Smart Auto-Balance</h2>
+                <p class="feature-desc">The system automatically calculates and applies the average preferred temperature for group bookings.</p>
+            </div>
+            <div class="feature-media-card bg-feature-2">
+                <img src="media/thermopal/image-3749fc26-a776-4617-a007-007d5a70ee84.png" alt="Smart Auto-Balance" width="1106" height="854" loading="lazy" decoding="async">
+            </div>
+        </section>
+
+        <!-- Section 9: Feature #3 -->
+        <section class="feature-row">
+            <div class="feature-media-card bg-feature-3">
+                <img src="media/thermopal/image-a68ff7bf-53ea-4bf7-b16e-7f14b5ef71cc.png?v=20260921-3" alt="Room Match Indicator" width="2412" height="2277" loading="lazy" decoding="async">
+            </div>
+            <div class="feature-copy-card">
+                <p class="feature-eyebrow">Feature #3</p>
+                <h2 class="feature-title title-feature-3">Room Match Indicator</h2>
+                <p class="feature-desc">Before booking, ThermoPal shows whether the conference room matches the user’s desired temperature, using clear color cues.</p>
+            </div>
+        </section>
+
+        <!-- Section 10: Feature #4 (Grand Full Width Hero Card) -->
+        <section class="feature-row bg-feature-4-full">
+            <div class="feature-copy-card">
+                <p class="feature-eyebrow">Feature #4</p>
+                <h2 class="feature-title title-feature-4">Eco Gamification</h2>
+                <p class="feature-desc">ThermoPal rewards energy-saving habits through playful competition. Users can also customize their own virtual pets.</p>
+            </div>
+            <div class="feature-media-card">
+                <img src="media/thermopal/image-521fb822-82d6-4d33-bb43-24dbfb1fb212.png" alt="Eco Gamification" width="994" height="1028" loading="lazy" decoding="async">
+            </div>
+        </section>
+
+        <!-- Section 11: Subfeature 4A: Friendly Companionship -->
+        <section class="feature-row">
+            <div class="feature-media-card bg-feature-companion">
+                <img src="media/thermopal/image-e0ac0cc7-e298-4e15-af96-75dd8edfc715.png" alt="Friendly Companionship" width="1050" height="850" loading="lazy" decoding="async">
+            </div>
+            <div class="feature-copy-card">
+                <h2 class="subfeature-title">Friendly Companionship</h2>
+                <p class="subfeature-desc">Turning rigid controls into an ongoing relationship. Caring for a digital pet builds an emotional bond, bringing joy and support to everyday thermostat interactions.</p>
+            </div>
+        </section>
+
+        <!-- Section 12: Subfeature 4B: Connect through collective impact -->
+        <section class="feature-row reverse">
+            <div class="feature-copy-card">
+                <h2 class="subfeature-title">Connect through collective impact</h2>
+                <p class="subfeature-desc">Beyond simple rankings, this space highlights our journey as a team, bringing the office closer through cheerful interactions and eco-conscious habits.</p>
+            </div>
+            <div class="feature-media-card bg-feature-collective">
+                <img src="media/thermopal/image-ae5d1f96-6c2a-4051-a2a4-a33e707db989.png" alt="Connect through collective impact" width="998" height="974" loading="lazy" decoding="async">
+            </div>
+        </section>
+
+        <!-- Section 13: Feature #5 -->
+        <section class="feature-row">
+            <div class="feature-media-card bg-feature-5">
+                <img src="media/thermopal/image-afa90c10-1aa2-4087-b62a-2f40b2aa7c80.png" alt="Reward System" width="934" height="826" loading="lazy" decoding="async">
+            </div>
+            <div class="feature-copy-card">
+                <p class="feature-eyebrow">Feature #5</p>
+                <h2 class="feature-title title-feature-5">Reward System</h2>
+                <p class="feature-desc">Mindful energy habits lead to cheerful recognition and fun rewards for everyone, turning sustainability into a shared, joyful adventure.</p>
+            </div>
+        </section>
+
+        <!-- Section 14: Home & Menu -->
+        <section class="nest-section">
+            <h2 class="nest-title">Thermostat Home &amp; Menu</h2>
+            <div class="nest-states-flow">
+                <div class="nest-state-node">
+                    <img class="nest-state-img" src="media/thermopal/image-7d4e2179-e3f5-4f32-96cc-5ac6f276a41e.png?v=20260921-5" alt="Far Sight" width="738" height="740" loading="lazy" decoding="async">
+                    <p class="nest-state-label">Far Sight</p>
+                </div>
+                <img class="nest-arrow" src="media/thermopal/image-3faca923-9629-4514-a088-e72dc995259e.png" alt="" width="43" height="11" loading="lazy" decoding="async">
+                <div class="nest-state-node">
+                    <img class="nest-state-img" src="media/thermopal/image-a68360df-a06d-4b91-9583-b7807c725e51.png?v=20260921-5" alt="Closer" width="738" height="740" loading="lazy" decoding="async">
+                    <p class="nest-state-label">Closer</p>
+                </div>
+                <img class="nest-arrow" src="media/thermopal/image-3faca923-9629-4514-a088-e72dc995259e.png" alt="" width="43" height="11" loading="lazy" decoding="async">
+                <div class="nest-state-node">
+                    <img class="nest-state-img" src="media/thermopal/image-c2bf89ee-e9c0-47ff-b2b8-ddb4dbcdadfd.png?v=20260921-5" alt="Changing" width="738" height="740" loading="lazy" decoding="async">
+                    <p class="nest-state-label">Changing</p>
+                </div>
+                <img class="nest-arrow" src="media/thermopal/image-3faca923-9629-4514-a088-e72dc995259e.png" alt="" width="43" height="11" loading="lazy" decoding="async">
+                <div class="nest-state-node">
+                    <img class="nest-state-img" src="media/thermopal/image-ff2c27cc-eb5d-4afc-b2f1-df9d7555cfc0.png?v=20260921-6" alt="Heating" width="738" height="740" loading="lazy" decoding="async">
+                    <p class="nest-state-label">Heating</p>
+                </div>
+            </div>
+
+            <div class="nest-description-callout">
+                <img class="nest-logo-icon" src="media/thermopal/image-16af6365-5f50-4632-87e2-c6a84cda1bb3.png" alt="Nest Thermostat icon" width="69" height="69" loading="lazy" decoding="async">
+                <p class="nest-callout-text">The ThermoPal serves as the shared touchpoint in the workspace, offering simple temperature controls and clear team-level feedback. Subtle animations and eco prompts encourage positive behavior, turning the device into a friendly presence that supports comfort and harmony across the office.</p>
+            </div>
+
+            <div class="nest-menu-graphic">
+                <img src="media/thermopal/image-42cd582f-3b3a-40ec-9bf7-808d2fb60c2e.png?v=20260921-4" alt="Nest thermostat interface and menu architecture" width="3480" height="1804" loading="lazy" decoding="async">
+            </div>
+        </section>
+
+        <!-- Section 15: Design Process Gallery -->
+        <section class="design-gallery" aria-label="ThermoPal design process">
+            <div class="gallery-card">
+                <img src="media/thermopal/image-e41b62f5-d5ca-405c-b391-73efbc9db24e.jpg" alt="ThermoPal design process board 1" width="1374" height="1946" loading="lazy" decoding="async">
+            </div>
+            <div class="gallery-card">
+                <img src="media/thermopal/image-4dc7a336-4d5e-4176-b6d0-512e3ce2edae.jpg" alt="ThermoPal design process board 2" width="1376" height="1946" loading="lazy" decoding="async">
+            </div>
+            <div class="gallery-card">
+                <img src="media/thermopal/image-488802b8-8a53-49b7-8cc6-b57c34c9a4fc.jpg" alt="ThermoPal design process board 3" width="1374" height="1944" loading="lazy" decoding="async">
+            </div>
+            <div class="gallery-card">
+                <img src="media/thermopal/image-cbafa4d5-d21b-4ea8-b049-16150735f1a8.jpg" alt="ThermoPal design process board 4" width="1376" height="1948" loading="lazy" decoding="async">
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer" id="info">
+        <div class="footer-left">
+            <a href="mailto:jinghe-cai@outlook.com">Contact</a>
+        </div>
+        <div class="footer-center">
+            <span>2026</span>
+        </div>
+    </footer>
+
+    <script>
+        const statementQuote = document.querySelector('.statement-quote');
+        if (statementQuote && 'IntersectionObserver' in window) {
+            const statementObserver = new IntersectionObserver((entries, observer) => {
+                if (entries.some(entry => entry.isIntersecting)) {
+                    statementQuote.classList.add('is-visible');
+                    statementQuote.parentElement?.classList.add('is-visible');
+                    observer.disconnect();
+                }
+            }, { threshold: 0.15 });
+            statementObserver.observe(statementQuote);
+        } else if (statementQuote) {
+            statementQuote.classList.add('is-visible');
+            statementQuote.parentElement?.classList.add('is-visible');
+        }
+
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const loadingVideo = document.getElementById('loading-video');
+        const loadingStartedAt = Date.now();
+        loadingVideo?.play().catch(() => {});
+        window.addEventListener('load', () => {
+            const wait = Math.max(0, 800 - (Date.now() - loadingStartedAt));
+            setTimeout(() => {
+                if (!loadingOverlay) return;
+                loadingOverlay.style.opacity = '0';
+                loadingOverlay.style.pointerEvents = 'none';
+                setTimeout(() => loadingOverlay.remove(), 600);
+            }, wait);
+        });
+
+        const nestFlow = document.querySelector('.nest-states-flow');
+        if (nestFlow && 'IntersectionObserver' in window) {
+            const nestObserver = new IntersectionObserver((entries, observer) => {
+                if (entries.some(entry => entry.isIntersecting)) {
+                    nestFlow.classList.add('is-visible');
+                    observer.disconnect();
+                }
+            }, { threshold: 0.2 });
+            nestObserver.observe(nestFlow);
+        } else if (nestFlow) {
+            nestFlow.classList.add('is-visible');
+        }
+    </script>
+</body>
+</html>

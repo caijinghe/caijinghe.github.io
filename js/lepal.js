@@ -355,10 +355,15 @@ document.addEventListener("DOMContentLoaded", () => {
 // =========================
 document.addEventListener("DOMContentLoaded", () => {
   const carousel = document.querySelector(".poster-carousel");
-  const slides = document.querySelectorAll(".poster-carousel .carousel-frame img");
-  const dots = document.querySelectorAll(".poster-carousel .dot");
+  if (!carousel) return;
+  const frame = carousel.querySelector(".carousel-frame");
+  const slides = carousel.querySelectorAll(".carousel-frame img");
+  const dots = carousel.querySelectorAll(".carousel-dots .dot");
+  const prevBtn = carousel.querySelector(".carousel-nav--prev");
+  const nextBtn = carousel.querySelector(".carousel-nav--next");
   let index = 0;
   let interval;
+  let isIntersecting = false;
 
   function goToSlide(i) {
     if (i >= 0 && i < slides.length) {
@@ -371,7 +376,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function startAutoPlay() {
-    if (interval) return;
+    if (interval || !isIntersecting) return;
     interval = setInterval(() => {
       index = (index + 1) % slides.length;
       goToSlide(index);
@@ -379,15 +384,38 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function stopAutoPlay() {
-    clearInterval(interval);
-    interval = null;
+    if (interval) {
+      clearInterval(interval);
+      interval = null;
+    }
   }
+
+  function restartAutoPlay() {
+    stopAutoPlay();
+    startAutoPlay();
+  }
+
+  prevBtn?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    goToSlide((index - 1 + slides.length) % slides.length);
+    restartAutoPlay();
+  });
+
+  nextBtn?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    goToSlide((index + 1) % slides.length);
+    restartAutoPlay();
+  });
+
+  frame?.addEventListener("mouseenter", stopAutoPlay);
+  frame?.addEventListener("mouseleave", () => {
+    if (isIntersecting) startAutoPlay();
+  });
 
   dots.forEach(dot => {
     dot.addEventListener("click", () => {
-      stopAutoPlay();
       goToSlide(Number(dot.dataset.index));
-      startAutoPlay();
+      restartAutoPlay();
     });
   });
 
@@ -395,13 +423,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
+      isIntersecting = entry.isIntersecting;
       if (entry.isIntersecting) {
         startAutoPlay();
       } else {
         stopAutoPlay();
       }
     });
-  }, { threshold: 0.5 });
+  }, { threshold: 0.3 });
 
   observer.observe(carousel);
 });

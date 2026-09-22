@@ -38,141 +38,191 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 4. 执行所有初始化
     initShowreelOverlay();
-    initCursorAndOverlayHints();
-    initProjectFilter();
-    initLogoTicker();    
-    initIconHoverSwap();  
+    initCursorAndOverlayHints?.();
+    initProjectFilter?.();
+    initLogoTicker?.();    
+    initIconHoverSwap?.();  
 });
 
 /* -------------------------------------------------------------------------- */
-/* ✅ 5. Showreel 覆盖层功能（修复黑色画面 Bug 版） **/
+/* ✅ 5. Showreel 覆盖层功能 **/
 /* -------------------------------------------------------------------------- */
 function initShowreelOverlay() {
-  const overlay = document.getElementById("showreelOverlay");
-  const mainVideo = document.getElementById("showreelVideo");
-  const loadingVideo = document.getElementById("loadingVideo");
-  const videoContainer = document.querySelector(".video-container");
-  const playPauseBtn = document.getElementById("playPauseBtn");
-  const soundBtn = document.getElementById("soundToggleBtn");
-  const closeBtn = document.getElementById("closeShowreelBtn");
-  
-  // 确保绑定到 HTML 里的卡片 ID
-  const openShowreelBtn = document.getElementById("open-showreel"); 
-  const videoControls = document.querySelector(".video-controls");
+  const overlay = document.getElementById('showreelOverlay');
+  const mainVideo = document.getElementById('showreelVideo');
+  const loadingVideo = document.getElementById('loadingVideo');
+  const container = document.querySelector('.video-container');
+  const play = document.getElementById('playPauseBtn');
+  const sound = document.getElementById('soundToggleBtn');
+  const open = document.getElementById('open-showreel');
+  const progress = document.getElementById('showreelProgress');
+  const elapsed = document.getElementById('showreelElapsed');
+  const duration = document.getElementById('showreelDuration');
+  if (!overlay || !mainVideo || !loadingVideo || !container) return;
 
-  if (!overlay || !mainVideo || !loadingVideo || !videoContainer) return;
+  let activeVideo = mainVideo;
+  let opened = false;
+  let controlsTimer;
+  let initialTitleTimer = null;
+  let dragging = false;
+  const frame = overlay.querySelector('.showreel-frame');
 
-  overlay.classList.remove("preload");
-  const hasShown = sessionStorage.getItem("showreelShown") === "true";
+  function controlsInUse() {
+    return dragging || (frame.contains(document.activeElement) && document.activeElement.matches(':focus-visible'));
+  }
 
-  const hideControls = () => {
-    if (videoControls) videoControls.classList.add("hidden");
-    videoContainer.classList.remove("force-show-sound");
-  };
+  function hideControls() {
+    if (!opened) return;
+    if (controlsInUse()) {
+      controlsTimer = setTimeout(hideControls, 2400);
+      return;
+    }
+    overlay.classList.remove('showreel-controls-visible');
+  }
 
-  const showControls = () => {
-    if (videoControls) videoControls.classList.remove("hidden");
-    updateSoundIcon();
-  };
+  function showControlsBriefly(duration = 2400) {
+    if (!opened) return;
+    clearTimeout(controlsTimer);
+    overlay.classList.add('showreel-controls-visible');
+    controlsTimer = setTimeout(hideControls, duration);
+  }
 
-  // 网页首次加载自动播放 Loading 逻辑
-  if (!hasShown) {
-    overlay.classList.remove("hidden");
-    loadingVideo.style.display = "block";
-    loadingVideo.loop = false;
+  for (const event of ['pointerenter', 'pointermove', 'pointerdown', 'focusin', 'keydown']) {
+    frame.addEventListener(event, () => showControlsBriefly());
+  }
+
+  frame.addEventListener('pointerleave', () => {
+    clearTimeout(controlsTimer);
     hideControls();
-    
-    // 初始状态：主视频完全透明并置于底层
-    mainVideo.style.opacity = "0"; 
-    mainVideo.style.zIndex = 1;
-    mainVideo.muted = true;
-    mainVideo.pause();
-    
-    loadingVideo.currentTime = 0;
-    loadingVideo.play().catch(e => console.log("Auto-play blocked"));
-
-    loadingVideo.addEventListener("ended", () => {
-      loadingVideo.style.display = "none";
-      
-      // 🔥 核心修复：强制主视频可见
-      mainVideo.style.display = "block";
-      mainVideo.style.opacity = "1"; 
-      mainVideo.style.zIndex = 2;
-      
-      mainVideo.muted = true;
-      mainVideo.currentTime = 0;
-      mainVideo.play();
-      showControls();
-      sessionStorage.setItem("showreelShown", "true");
-    });
-  }
-
-  // 点击卡片手动播放逻辑
-  if (openShowreelBtn) {
-    openShowreelBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      const currentShown = sessionStorage.getItem("showreelShown") === "true";
-      overlay.classList.remove("hidden");
-      
-      // 🔥 核心修复：手动打开时也强制主视频可见
-      loadingVideo.style.display = "none";
-      mainVideo.style.display = "block";
-      mainVideo.style.opacity = "1";
-      mainVideo.style.zIndex = 2;
-      
-      mainVideo.muted = !currentShown ? true : false;
-      mainVideo.currentTime = 0;
-      mainVideo.play();
-      showControls();
-    });
-  }
-
-  // 控制按钮逻辑（保持原样）
-  playPauseBtn?.addEventListener("click", (e) => {
-    e.stopPropagation();
-    mainVideo.paused ? mainVideo.play() : mainVideo.pause();
-    updatePlayPauseIcon();
   });
 
-  soundBtn?.addEventListener("click", (e) => {
-    e.stopPropagation();
-    mainVideo.muted = !mainVideo.muted;
-    updateSoundIcon();
-  });
+  frame.addEventListener('focusout', () => showControlsBriefly());
 
-  videoContainer.addEventListener("click", (e) => {
-    if (e.target.closest(".video-controls")) return;
-    mainVideo.paused ? mainVideo.play() : mainVideo.pause();
-    updatePlayPauseIcon();
-  });
+  let previouslyFocused;
 
-  const stopShowreel = () => {
-    overlay.classList.add("hidden");
-    mainVideo.pause();
-    sessionStorage.setItem("showreelShown", "true");
-    updatePlayPauseIcon();
+  const formatTime = (value) => {
+    const seconds = Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
+    return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
   };
 
-  closeBtn?.addEventListener("click", (e) => { e.stopPropagation(); stopShowreel(); });
-  overlay.addEventListener("click", (e) => { if (e.target === overlay) stopShowreel(); });
-
-  function updatePlayPauseIcon() {
-    if (!playPauseBtn) return;
-    playPauseBtn.src = mainVideo.paused ? "media/video_play.svg" : "media/video_pause.svg";
+  function sync() {
+    play.querySelector('img').src = activeVideo.paused ? 'media/player-play.svg?v=filled-1' : 'media/player-pause.svg?v=filled-1';
+    play.setAttribute('aria-label', activeVideo.paused ? 'Play' : 'Pause');
+    sound.querySelector('img').src = activeVideo.muted ? 'media/player-muted.svg?v=filled-1' : 'media/player-sound.svg?v=filled-1';
+    sound.setAttribute('aria-label', activeVideo.muted ? 'Unmute' : 'Mute');
+    const ready = Number.isFinite(activeVideo.duration) && activeVideo.duration > 0;
+    progress.disabled = !ready;
+    if (!dragging) {
+      progress.value = ready ? activeVideo.currentTime / activeVideo.duration * 100 : 0;
+      progress.style.setProperty('--progress', `${progress.value}%`);
+    }
+    elapsed.textContent = formatTime(activeVideo.currentTime);
+    duration.textContent = formatTime(activeVideo.duration);
+    progress.setAttribute('aria-valuetext', `${elapsed.textContent} of ${duration.textContent}`);
   }
 
-  function updateSoundIcon() {
-    if (!soundBtn) return;
-    soundBtn.src = mainVideo.muted ? "media/video_noaudio.svg" : "media/video_audio.svg";
-    if (mainVideo.muted && loadingVideo.style.display === "none") {
-      videoContainer.classList.add("force-show-sound");
-    } else {
-      videoContainer.classList.remove("force-show-sound");
+  function start(video, muted) {
+    mainVideo.pause();
+    loadingVideo.pause();
+    activeVideo = video;
+    loadingVideo.style.display = video === loadingVideo ? 'block' : 'none';
+    mainVideo.style.opacity = video === mainVideo ? '1' : '0';
+    mainVideo.style.display = 'block';
+    video.currentTime = 0;
+    video.muted = muted;
+    sync();
+    video.play().catch(sync);
+  }
+
+  function show(video, muted) {
+    previouslyFocused = document.activeElement;
+    opened = true;
+    overlay.classList.remove('hidden');
+    overlay.inert = false;
+
+    // 初始展示顶部标题 5 秒，之后自动淡出；5 秒期间不被 hover 控制条计时器覆盖
+    overlay.classList.add('showreel-title-visible');
+    clearTimeout(initialTitleTimer);
+    initialTitleTimer = setTimeout(() => {
+      overlay.classList.remove('showreel-title-visible');
+      initialTitleTimer = null;
+    }, 5000);
+
+    if (video !== loadingVideo) {
+      showControlsBriefly(2400);
+    }
+    start(video, muted);
+  }
+
+  function stop() {
+    opened = false;
+    clearTimeout(controlsTimer);
+    clearTimeout(initialTitleTimer);
+    initialTitleTimer = null;
+    overlay.classList.remove('showreel-controls-visible');
+    overlay.classList.remove('showreel-title-visible');
+    dragging = false;
+    overlay.classList.add('hidden');
+    overlay.inert = true;
+    mainVideo.pause();
+    loadingVideo.pause();
+    sessionStorage.setItem('showreelShown', 'true');
+    previouslyFocused?.focus?.({ preventScroll: true });
+  }
+
+  function togglePlayback() {
+    if (activeVideo.paused) activeVideo.play().catch(sync);
+    else activeVideo.pause();
+  }
+
+  play.addEventListener('click', togglePlayback);
+  sound.addEventListener('click', () => { activeVideo.muted = !activeVideo.muted; });
+  container.addEventListener('click', (event) => {
+    if (!event.target.closest('.video-controls, .player-control')) togglePlayback();
+  });
+  overlay.addEventListener('click', (event) => { if (event.target === overlay) stop(); });
+  document.addEventListener('keydown', (event) => { if (opened && event.key === 'Escape') stop(); });
+
+  progress.addEventListener('pointerdown', () => { dragging = true; });
+  const endDrag = () => { if (dragging) showControlsBriefly(); dragging = false; sync(); };
+  document.addEventListener('pointerup', endDrag);
+  document.addEventListener('pointercancel', endDrag);
+  progress.addEventListener('change', endDrag);
+  progress.addEventListener('input', () => {
+    if (!Number.isFinite(activeVideo.duration) || activeVideo.duration <= 0) return;
+    activeVideo.currentTime = Number(progress.value) / 100 * activeVideo.duration;
+    progress.style.setProperty('--progress', `${progress.value}%`);
+    sync();
+  });
+
+  for (const video of [mainVideo, loadingVideo]) {
+    for (const event of ['play', 'pause', 'volumechange', 'timeupdate', 'loadedmetadata', 'durationchange', 'seeked']) {
+      video.addEventListener(event, () => { if (video === activeVideo) sync(); });
     }
   }
 
-  mainVideo.addEventListener("ended", stopShowreel);
-  updatePlayPauseIcon();
-  updateSoundIcon();
-}
+  loadingVideo.loop = false;
+  loadingVideo.addEventListener('ended', () => {
+    if (!opened || activeVideo !== loadingVideo) return;
+    const muted = loadingVideo.muted;
+    start(mainVideo, muted);
+    sessionStorage.setItem('showreelShown', 'true');
+  });
 
+  loadingVideo.addEventListener('error', () => { if (opened && activeVideo === loadingVideo) start(mainVideo, loadingVideo.muted); });
+  mainVideo.addEventListener('ended', () => { if (opened && activeVideo === mainVideo) stop(); });
+
+  open?.addEventListener('click', (event) => {
+    event.preventDefault();
+    const firstVisit = sessionStorage.getItem('showreelShown') !== 'true';
+    show(firstVisit ? loadingVideo : mainVideo, firstVisit);
+    sessionStorage.setItem('showreelShown', 'true');
+  });
+
+  overlay.classList.remove('preload');
+  overlay.inert = true;
+  mainVideo.pause();
+  loadingVideo.pause();
+  sync();
+  if (!window.siteLocked && sessionStorage.getItem('showreelShown') !== 'true') show(loadingVideo, true);
+}
