@@ -6,6 +6,13 @@
     const frame = dialog.querySelector('iframe');
     const expand = dialog.querySelector('.concept-gallery__expand');
     const breadcrumbs = dialog.querySelector('.concept-gallery__breadcrumbs');
+    const loading = dialogId === 'naivevil-dialog' ? document.createElement('div') : null;
+    if (loading) {
+      loading.className = 'concept-gallery__loading';
+      loading.setAttribute('aria-label', 'Loading project');
+      loading.innerHTML = '<div class="concept-gallery__loading-dots" aria-hidden="true"><span></span><span></span><span></span></div>';
+      dialog.appendChild(loading);
+    }
     let overflow, bodyOverflow;
 
     trigger.addEventListener('click', event => {
@@ -15,6 +22,11 @@
       bodyOverflow = document.body.style.overflow;
       document.documentElement.style.overflow = 'hidden';
       document.body.style.overflow = 'hidden';
+      loading?.classList.remove('is-hidden');
+      if (frame && loading) {
+        frame.addEventListener('load', () => loading.classList.add('is-hidden'), { once: true });
+        setTimeout(() => loading.classList.add('is-hidden'), 1800);
+      }
       if (frame && !frame.getAttribute('src')) frame.src = frame.dataset.src;
       dialog.showModal();
     });
@@ -57,6 +69,7 @@
       }
       if (breadcrumbs) breadcrumbs.inert = true;
       trigger.focus({ preventScroll: true });
+      loading?.classList.remove('is-hidden');
     });
   }
 

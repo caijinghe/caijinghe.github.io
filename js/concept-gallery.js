@@ -8,6 +8,11 @@
     const steps = [...dialog.querySelectorAll('.concept-gallery__step')];
     const expandButton = dialog.querySelector('.concept-gallery__expand');
     const breadcrumbs = dialog.querySelector('.concept-gallery__breadcrumbs');
+    const loading = document.createElement('div');
+    loading.className = 'concept-gallery__loading';
+    loading.setAttribute('aria-label', 'Loading project');
+    loading.innerHTML = '<div class="concept-gallery__loading-dots" aria-hidden="true"><span></span><span></span><span></span></div>';
+    dialog.appendChild(loading);
     dialog.querySelector('.concept-gallery__back').addEventListener('click', () => dialog.close());
     const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
     let previousOverflow;
@@ -110,12 +115,20 @@
       previousBodyOverflow = document.body.style.overflow;
       document.documentElement.style.overflow = 'hidden';
       document.body.style.overflow = 'hidden';
+      loading.classList.remove('is-hidden');
       dialog.showModal();
       stopScroll();
       measure();
       stage.scrollLeft = 0;
       paint();
       stage.focus({ preventScroll: true });
+      const firstImage = dialog.querySelector('.concept-gallery__slide img');
+      const imageReady = firstImage && !firstImage.complete
+        ? new Promise(resolve => firstImage.addEventListener('load', resolve, { once: true }))
+        : Promise.resolve();
+      Promise.race([imageReady, new Promise(resolve => setTimeout(resolve, 420))]).then(() => {
+        setTimeout(() => loading.classList.add('is-hidden'), 180);
+      });
     });
     expandButton.addEventListener('click', () => {
       const index = Math.max(0, steps.findIndex(step => step.getAttribute('aria-current') === 'true'));
@@ -144,6 +157,7 @@
       document.documentElement.style.overflow = previousOverflow;
       document.body.style.overflow = previousBodyOverflow;
       trigger.focus({ preventScroll: true });
+      loading.classList.remove('is-hidden');
     });
     // Accumulate wheel input and ease toward it on animation frames.
     dialog.addEventListener('wheel', (event) => {
