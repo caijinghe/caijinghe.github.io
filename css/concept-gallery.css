@@ -1,5 +1,6 @@
 .concept-gallery {
-  position: relative;
+  position: fixed;
+  inset: 0;
   width: min(84vw, 980px);
   height: min(84dvh, 880px);
   max-width: none;
@@ -18,19 +19,22 @@
   position: absolute;
   z-index: 5;
   inset: 0;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: #fff;
   opacity: 1;
   pointer-events: auto;
-  transition: opacity 420ms ease;
+  transition: opacity 0.6s ease;
 }
 .concept-gallery__loading-video {
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: cover;
-  background: #fff;
+  width: min(65vw, 390px);
+  height: min(65vw, 390px);
+  object-fit: contain;
+  background: transparent;
+  filter: invert(1);
+  mix-blend-mode: normal;
+  pointer-events: none;
 }
 .concept-gallery__loading.is-hidden {
   opacity: 0;

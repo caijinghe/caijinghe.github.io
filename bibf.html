@@ -256,14 +256,38 @@
                 background-color: #000;
             }
 
+        }
 
+        #loading-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            opacity: 1;
+            transition: opacity 0.6s ease;
+        }
 
+        #loading-overlay video {
+            width: min(65vw, 390px);
+            height: min(65vw, 390px);
+            object-fit: contain;
+            background: transparent;
+            filter: invert(1);
+            mix-blend-mode: normal;
+            pointer-events: none;
         }
     </style>
 </head>
 
 <body>
-
+    <div id="loading-overlay" aria-label="Loading">
+        <video id="loading-video" autoplay muted loop playsinline>
+            <source src="media/index/logo_dark.mp4" type="video/mp4">
+        </video>
+    </div>
 
     <header class="project-hero">
 
@@ -362,6 +386,21 @@
 
             createDots();
             startInterval();
+        </script>
+        <script>
+            const loadingOverlay = document.getElementById('loading-overlay');
+            const loadingVideo = document.getElementById('loading-video');
+            const loadingStartedAt = Date.now();
+            loadingVideo?.play().catch(() => {});
+            window.addEventListener('load', () => {
+                const wait = Math.max(0, 800 - (Date.now() - loadingStartedAt));
+                setTimeout(() => {
+                    if (!loadingOverlay) return;
+                    loadingOverlay.style.opacity = '0';
+                    loadingOverlay.style.pointerEvents = 'none';
+                    setTimeout(() => loadingOverlay.remove(), 600);
+                }, wait);
+            });
         </script>
 </body>
 

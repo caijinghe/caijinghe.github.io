@@ -8,3 +8,7 @@ tools/
 # macOS noise
 .DS_Store
 **/.DS_Store
+
+# Scratch / local testing directory
+scratch/
+

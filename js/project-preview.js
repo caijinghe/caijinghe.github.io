@@ -10,19 +10,10 @@
     if (loading) {
       loading.className = 'concept-gallery__loading';
       loading.setAttribute('aria-label', 'Loading project');
-      loading.innerHTML = '<video class="concept-gallery__loading-video" autoplay muted playsinline aria-hidden="true"><source src="media/loading.mp4" type="video/mp4"></video>';
+      loading.innerHTML = '<video class="concept-gallery__loading-video" autoplay muted loop playsinline aria-hidden="true"><source src="media/index/logo_dark.mp4" type="video/mp4"></video>';
       dialog.appendChild(loading);
     }
     const loadingVideo = loading?.querySelector('video');
-    let frameReady = false;
-    let loadingVideoEnded = false;
-    const hideLoading = () => {
-      if (frameReady && loadingVideoEnded) loading.classList.add('is-hidden');
-    };
-    loadingVideo?.addEventListener('ended', () => {
-      loadingVideoEnded = true;
-      hideLoading();
-    });
     loadingVideo?.addEventListener('error', () => loading.classList.add('is-hidden'));
     let overflow, bodyOverflow;
 
@@ -35,11 +26,12 @@
       document.body.style.overflow = 'hidden';
       loading?.classList.remove('is-hidden');
       if (frame && loading) {
-        frameReady = false;
-        loadingVideoEnded = false;
+        const loadingStartedAt = Date.now();
         frame.addEventListener('load', () => {
-          frameReady = true;
-          hideLoading();
+          const wait = Math.max(0, 800 - (Date.now() - loadingStartedAt));
+          setTimeout(() => {
+            loading.classList.add('is-hidden');
+          }, wait);
         }, { once: true });
         loadingVideo.currentTime = 0;
         loadingVideo.play().catch(() => loading.classList.add('is-hidden'));
