@@ -11,8 +11,11 @@
     const loading = document.createElement('div');
     loading.className = 'concept-gallery__loading';
     loading.setAttribute('aria-label', 'Loading project');
-    loading.innerHTML = '<div class="concept-gallery__loading-dots" aria-hidden="true"><span></span><span></span><span></span></div>';
+    loading.innerHTML = '<video class="concept-gallery__loading-video" autoplay muted playsinline aria-hidden="true"><source src="media/loading.mp4" type="video/mp4"></video>';
     dialog.appendChild(loading);
+    const loadingVideo = loading.querySelector('video');
+    loadingVideo.addEventListener('ended', () => loading.classList.add('is-hidden'));
+    loadingVideo.addEventListener('error', () => loading.classList.add('is-hidden'));
     dialog.querySelector('.concept-gallery__back').addEventListener('click', () => dialog.close());
     const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
     let previousOverflow;
@@ -122,13 +125,8 @@
       stage.scrollLeft = 0;
       paint();
       stage.focus({ preventScroll: true });
-      const firstImage = dialog.querySelector('.concept-gallery__slide img');
-      const imageReady = firstImage && !firstImage.complete
-        ? new Promise(resolve => firstImage.addEventListener('load', resolve, { once: true }))
-        : Promise.resolve();
-      Promise.race([imageReady, new Promise(resolve => setTimeout(resolve, 420))]).then(() => {
-        setTimeout(() => loading.classList.add('is-hidden'), 180);
-      });
+      loadingVideo.currentTime = 0;
+      loadingVideo.play().catch(() => loading.classList.add('is-hidden'));
     });
     expandButton.addEventListener('click', () => {
       const index = Math.max(0, steps.findIndex(step => step.getAttribute('aria-current') === 'true'));
