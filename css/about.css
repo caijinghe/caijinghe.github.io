@@ -307,7 +307,7 @@ body {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  font-size: clamp(1.2rem, 2.4vw, 1.65rem);
+  font-size: 1.6rem;
   margin-bottom: 0;
   z-index: 10;
   text-align: center;
@@ -317,19 +317,19 @@ body {
 
 @keyframes heroTitleIntro {
   0% {
-    top: 45%;
-    transform: translate(-50%, -50%) scale(1.5);
+    top: 48%;
+    transform: translate(-50%, -50%) scale(1.6);
   }
   15% {
-    top: 45%;
-    transform: translate(-50%, -50%) scale(1.5);
+    top: 48%;
+    transform: translate(-50%, -50%) scale(1.6);
   }
   48% {
-    top: 45%;
-    transform: translate(-50%, -50%) scale(1.5);
+    top: 48%;
+    transform: translate(-50%, -50%) scale(1.6);
   }
   100% {
-    top: clamp(75px, 12vh, 120px);
+    top: 18vh;
     transform: translate(-50%, 0) scale(1);
   }
 }
@@ -369,25 +369,18 @@ body {
 
 
 .shelf-viewport {
-  --book-height: clamp(110px, min(34vh, 26vw), 380px);
-  --scale: calc(var(--book-height) / 380px);
-  --shelf-bottom: clamp(65px, 18vh, 180px);
-
   width: 100%;
-  max-width: 100%;
+  max-width: 1200px;
   position: -webkit-sticky;
   position: sticky;
   top: 0;
   height: 100vh;
-  height: 100dvh;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   align-items: center;
   margin-left: auto;
   margin-right: auto;
-  padding: 0 clamp(16px, 4vw, 60px);
-  overflow: hidden;
   will-change: transform;
 }
 
@@ -396,11 +389,11 @@ body {
   justify-content: center;
   align-items: flex-end;
   height: auto;
-  width: auto;
-  max-width: 100%;
   position: relative;
   z-index: 2;
-  margin-bottom: var(--shelf-bottom);
+  margin-bottom: 28vh;
+  transform-origin: bottom center;
+  transform: scale(min(1, calc((100vw - 32px) / 1120)));
   animation: shelfFadeIn 1.1s cubic-bezier(0.16, 1, 0.3, 1) 1.25s backwards;
 }
 
@@ -414,11 +407,9 @@ body {
 }
 
 .book-svg {
-  height: var(--book-height);
-  width: auto;
-  max-height: none;
-  max-width: none;
-  flex-shrink: 0;
+  height: auto;
+  max-height: 380px;
+  max-width: 100%;
   align-self: flex-end;
   margin-bottom: 0;
   opacity: 1;
@@ -440,21 +431,21 @@ body {
 
 
 .item-2019 {
-  margin-left: calc(-15px * var(--scale));
-  margin-right: calc(50px * var(--scale));
+  margin-left: -15px;
+  margin-right: 50px;
 }
 
 .item-2020 {
-  margin-left: calc(-50px * var(--scale));
-  margin-right: calc(-12px * var(--scale));
+  margin-left: -50px;
+  margin-right: -12px;
 }
 
 .item-2021 {
-  margin-left: calc(8px * var(--scale));
+  margin-left: 8px;
 }
 
 .item-2022 {
-  margin-left: calc(-5px * var(--scale));
+  margin-left: -5px;
   margin-right: 0px;
 }
 
@@ -464,17 +455,16 @@ body {
 }
 
 .item-2024 {
-  margin-left: calc(-35px * var(--scale));
+  margin-left: -35px;
 }
 
 .item-2025 {
-  margin-left: calc(5px * var(--scale));
-  margin-right: calc(-35px * var(--scale));
+  margin-left: 5px;
+  margin-right: -35px;
 }
 
 .book-line {
-  width: calc(100% + clamp(40px, 8vw, 120px));
-  min-width: 100%;
+  width: 110%;
   height: 1px;
   background: #000;
   position: absolute;
@@ -490,12 +480,13 @@ Timeline Ruler
 ========================================= */
 .timeline-ruler {
   position: absolute;
-  bottom: calc(var(--shelf-bottom) - clamp(26px, 4.5vh, 44px));
+  bottom: 23vh;
   left: 50%;
-  transform: translateX(-50%);
+  transform-origin: top center;
+  transform: translateX(-50%) scale(min(1, calc((100vw - 32px) / 1120)));
   display: flex;
   align-items: flex-start;
-  gap: calc(9.5px * var(--scale));
+  gap: 9.5px;
   z-index: 0;
   pointer-events: none;
   user-select: none;
@@ -514,7 +505,7 @@ Timeline Ruler
 }
 
 .tick {
-  width: max(1.5px, calc(2px * var(--scale)));
+  width: 2px;
   background: hsla(0, 0%, 0%, 0.18);
   position: relative;
   border-radius: 999px;
@@ -526,22 +517,22 @@ Timeline Ruler
 }
 
 .tick.minor {
-  height: max(4px, calc(7px * var(--scale)));
+  height: 7px;
 }
 
 .tick.major {
-  height: max(7px, calc(12px * var(--scale)));
-  width: max(2px, calc(3px * var(--scale)));
+  height: 12px;
+  width: 3px;
   background: hsla(0, 0%, 0%, 0.28);
 }
 
 .year-label {
   position: absolute;
-  top: calc(18px * var(--scale) + 4px);
+  top: 25px;
   left: 50%;
   transform: translateX(-50%) translateZ(0);
   -webkit-transform: translateX(-50%) translateZ(0);
-  font-size: clamp(0.7rem, calc(0.95rem * var(--scale)), 1rem);
+  font-size: 1rem;
   font-weight: 300;
   white-space: nowrap;
   color: #000000;
@@ -587,7 +578,7 @@ Timeline Ruler
 
 .tick.major.active-tick .year-label,
 .tick.major.highlighted .year-label {
-  top: calc(13px * var(--scale) + 3px);
+  top: 18px; /* 18px * 1.4 = 25.2px，保持年份数字水平基准线完全对齐 */
   opacity: 1 !important;
   font-weight: 500;
 }
@@ -615,12 +606,12 @@ Timeline Ruler
 
 .year-info {
   position: absolute;
-  top: clamp(90px, 13vh, 145px);
+  top: 30%;
   left: 50%;
   transform: translateX(-50%);
   flex-direction: column;
-  align-items: flex-start;
-  gap: clamp(8px, 1.8vh, 16px);
+  align-items: center;
+  gap: 16px;
   z-index: 5;
   padding: 0;
   opacity: 0;
@@ -628,8 +619,8 @@ Timeline Ruler
   transition: opacity 0.3s ease;
   display: flex;
   will-change: opacity;
-  max-width: min(94vw, 980px);
-  width: 100%;
+  max-width: 1000px;
+  width: 90%;
 }
 
 
@@ -643,16 +634,15 @@ Timeline Ruler
 .info-images {
   width: 100%;
   display: flex;
-  justify-content: flex-start;
-  gap: clamp(8px, 1.5vw, 16px);
+  justify-content: left;
+  gap: 16px;
   flex-wrap: wrap;
 }
 
 .info-images img {
-  height: clamp(70px, 13vh, 135px);
+  height: 150px;
   width: auto;
-  max-width: 100%;
-  border-radius: 8px;
+  border-radius: 10px;
   border: none;
   object-fit: contain;
   opacity: 0;
@@ -685,8 +675,8 @@ Timeline Ruler
 .info-text {
   width: 100%;
   text-align: left;
-  margin-top: clamp(0.3rem, 0.8vh, 0.8rem);
-  font-size: clamp(0.82rem, 1.05vw, 0.98rem);
+  margin-top: 1rem;
+  font-size: 1rem;
   line-height: 1.5;
   color: #111;
   opacity: 0;
@@ -700,71 +690,70 @@ Timeline Ruler
   transform: translateY(0);
 }
 
-/* 各年份信息自适应布局：使用相对左边距，保证在不同视口下绝不溢出容器 */
-.layout-2019 .info-images,
-.layout-2019 .info-text {
-  margin-left: clamp(20px, 15%, 220px);
+.layout-2019 {
+  left: 65%;
 }
 
-.layout-2020 .info-images,
-.layout-2020 .info-text {
-  margin-left: clamp(30px, 25%, 300px);
+.layout-2020 {
+  left: 80%;
 }
 
-.layout-2021 .info-images,
-.layout-2021 .info-text {
-  margin-left: clamp(40px, 32%, 360px);
+.layout-2021 {
+  left: 87%;
 }
 
-.layout-2024 .info-images,
-.layout-2024 .info-text {
-  margin-left: clamp(10px, 8%, 100px);
+.layout-2024 {
+  left: 60%;
 }
 
-.layout-2025 .info-images,
-.layout-2025 .info-text {
-  margin-left: clamp(5px, 4%, 60px);
+.layout-2025 {
+  left: 62%;
 }
 
-/* 针对 2022 年的图像与文字排版自适应 */
+/* 针对 2022 年的图像间距微调 */
+
 .layout-2022 .info-images img:first-child {
-  margin-left: clamp(10px, 2.5vw, 30px);
+  margin-left: 30px;
+  /* 根据你喜欢的间距调整 */
 }
 
 .layout-2022 .info-images img:nth-child(2) {
-  margin-right: clamp(15px, 8vw, 120px);
+  margin-right: 260px;
+  /* 根据你喜欢的间距调整 */
 }
 
 .layout-2022 .info-text-split {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: clamp(15px, 4vw, 60px);
+  gap: 180px;
   margin-top: 0px;
   width: 100%;
-  max-width: 100%;
-  margin-left: 0;
+  max-width: 1000px;
+  margin-left: 30px;
   margin-right: auto;
 }
 
-/* 针对 2023 年的图像与文字排版自适应 */
+/* 针对 2023 年的图像间距微调 */
 .layout-2023 .info-images img:first-child {
-  margin-left: clamp(15px, 4vw, 60px);
+  margin-left: 100px;
+  /* 根据你喜欢的间距调整 */
 }
 
 .layout-2023 .info-images img:nth-child(2) {
-  margin-right: clamp(15px, 6vw, 90px);
+  margin-right: 165px;
+  /* 根据你喜欢的间距调整 */
 }
 
 .layout-2023 .info-text-split {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: clamp(15px, 4vw, 50px);
+  gap: 60px;
   margin-top: 0px;
-  width: 100%;
-  max-width: 100%;
-  margin-left: 0;
+  width: 120%;
+  max-width: 1200px;
+  margin-left: 100px;
   margin-right: auto;
 }
 
