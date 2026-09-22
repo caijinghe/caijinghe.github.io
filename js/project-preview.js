@@ -6,15 +6,6 @@
     const frame = dialog.querySelector('iframe');
     const expand = dialog.querySelector('.concept-gallery__expand');
     const breadcrumbs = dialog.querySelector('.concept-gallery__breadcrumbs');
-    const loading = dialogId === 'naivevil-dialog' ? document.createElement('div') : null;
-    if (loading) {
-      loading.className = 'concept-gallery__loading';
-      loading.setAttribute('aria-label', 'Loading project');
-      loading.innerHTML = '<video class="concept-gallery__loading-video" autoplay muted loop playsinline aria-hidden="true"><source src="media/index/logo_dark.mp4" type="video/mp4"></video>';
-      dialog.appendChild(loading);
-    }
-    const loadingVideo = loading?.querySelector('video');
-    loadingVideo?.addEventListener('error', () => loading.classList.add('is-hidden'));
     let overflow, bodyOverflow;
 
     trigger.addEventListener('click', event => {
@@ -24,18 +15,6 @@
       bodyOverflow = document.body.style.overflow;
       document.documentElement.style.overflow = 'hidden';
       document.body.style.overflow = 'hidden';
-      loading?.classList.remove('is-hidden');
-      if (frame && loading) {
-        const loadingStartedAt = Date.now();
-        frame.addEventListener('load', () => {
-          const wait = Math.max(0, 800 - (Date.now() - loadingStartedAt));
-          setTimeout(() => {
-            loading.classList.add('is-hidden');
-          }, wait);
-        }, { once: true });
-        loadingVideo.currentTime = 0;
-        loadingVideo.play().catch(() => loading.classList.add('is-hidden'));
-      }
       if (frame && !frame.getAttribute('src')) frame.src = frame.dataset.src;
       dialog.showModal();
     });
@@ -78,7 +57,6 @@
       }
       if (breadcrumbs) breadcrumbs.inert = true;
       trigger.focus({ preventScroll: true });
-      loading?.classList.remove('is-hidden');
     });
   }
 

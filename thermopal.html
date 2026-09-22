@@ -316,15 +316,25 @@
         const loadingVideo = document.getElementById('loading-video');
         const loadingStartedAt = Date.now();
         loadingVideo?.play().catch(() => {});
-        window.addEventListener('load', () => {
+
+        let overlayRemoved = false;
+        function removeOverlay() {
+            if (overlayRemoved || !loadingOverlay) return;
+            overlayRemoved = true;
             const wait = Math.max(0, 800 - (Date.now() - loadingStartedAt));
             setTimeout(() => {
-                if (!loadingOverlay) return;
                 loadingOverlay.style.opacity = '0';
                 loadingOverlay.style.pointerEvents = 'none';
                 setTimeout(() => loadingOverlay.remove(), 600);
             }, wait);
-        });
+        }
+
+        if (document.readyState === 'complete') {
+            removeOverlay();
+        } else {
+            window.addEventListener('load', removeOverlay, { once: true });
+            setTimeout(removeOverlay, 2500);
+        }
 
         const nestFlow = document.querySelector('.nest-states-flow');
         if (nestFlow && 'IntersectionObserver' in window) {
