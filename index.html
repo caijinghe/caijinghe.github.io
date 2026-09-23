@@ -12,7 +12,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="css/index.css?v=20260922-1" />
+    <link rel="stylesheet" href="css/index.css?v=20260923-08" />
+    <link rel="stylesheet" href="css/index.css?v=20260923-09" />
     <link rel="stylesheet" href="css/header.css" />
     <!-- 开站密码开关：当前已停用。之后如需重新启用告诉我“打开开站密码”即可 -->
     <script>window.siteLocked = false;</script>
@@ -29,11 +30,26 @@
         }
     </style>
     <link rel="stylesheet" href="css/concept-gallery.css?v=20260922-39" />
+    <link rel="stylesheet" href="css/preloader.css?v=20260922-5" />
     <script src="js/concept-gallery.js?v=20260922-23" defer></script>
     <script src="js/project-preview.js?v=20260922-5" defer></script>
+    <script src="js/info-popover.js?v=20260923-10" defer></script>
 </head>
 
 <body>
+
+    <!-- 开屏加载动画（蘑菇奔跑 + 0%~100% 计数器） -->
+    <div id="site-preloader" aria-label="Loading site">
+        <div class="preloader-box">
+            <video class="preloader-logo" autoplay muted loop playsinline preload="auto" aria-hidden="true">
+                <source src="media/index/logo.mp4" type="video/mp4" />
+            </video>
+            <div class="preloader-progress">
+                <span id="preloader-percent">0%</span>
+            </div>
+        </div>
+    </div>
+    <script src="js/preloader.js?v=20260922-4"></script>
 
     <!-- 开站密码遮罩（已注释停用）：
     <div id="password-overlay" role="dialog" aria-label="Enter password">
@@ -393,7 +409,7 @@
     <script src="vendor/gsap/gsap.min.js"></script>
     <script src="https://unpkg.com/lenis@1.0.45/dist/lenis.min.js"></script>
     <script src="https://unpkg.com/@rive-app/canvas@2.31.6"></script>
-    <script src="js/index.js?v=20260921-2"></script>
+    <script src="js/index.js?v=20260922-3"></script>
     <script>
         new rive.Rive({
             src: 'media/nestify/bird-blink.riv',

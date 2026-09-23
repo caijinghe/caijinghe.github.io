@@ -45,7 +45,7 @@ a {
     transform: none;
     width: 100%;
     padding: 16px 16px 12px;
-    z-index: 1000;
+    z-index: 10050;
     
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -62,6 +62,8 @@ a {
 
 .site-header a {
     pointer-events: auto;
+    position: relative;
+    z-index: 10060;
     transition: opacity 0.3s ease;
 }
 
@@ -733,4 +735,238 @@ a {
     color: #929292;
     font-weight: 400;
     white-space: nowrap;
+}
+
+/* =========================================
+   Info Hover Popover (Experience & Education)
+   ========================================= */
+.info-hover-backdrop {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #25252538;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 9990;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none !important;
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              visibility 0.25s;
+}
+
+.info-hover-backdrop.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.info-hover-popover {
+  position: fixed;
+  top: 48px;
+  left: auto;
+  right: var(--page-gutter, 8px);
+  width: 560px;
+  max-width: calc(100vw - 2 * var(--page-gutter, 8px));
+  background: #ffffff;
+  color: #111111;
+  border-radius: 12px;
+  box-shadow: none;
+  border: none;
+  z-index: 10000;
+  padding: 22px 24px 20px;
+  padding: 20px 24px 18px;
+  box-sizing: border-box;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-18px) scale(.985);
+  transform-origin: top right;
+  transition: opacity 0.3s ease,
+              transform 0.3s ease,
+              visibility 0.3s;
+}
+
+.info-hover-popover.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: none;
+}
+
+/* Header inside popover */
+.popover-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  align-items: center;
+  gap: 16px;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+  padding-bottom: 14px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid #ebebeb;
+}
+
+.popover-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.popover-greeting-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.popover-greeting {
+  font-family: 'Sora', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #111111;
+  letter-spacing: -0.01em;
+  transition: color 0.15s ease;
+}
+
+.popover-greeting-link:hover .popover-greeting {
+  color: #555555;
+}
+
+.popover-header-right {
+  font-size: 0.76rem;
+  font-weight: 300;
+  color: #767676;
+  line-height: 1.4;
+  text-align: right;
+  max-width: 270px;
+  display: flex;
+  align-items: center;
+}
+
+.popover-scholar-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background-color: #ededed;
+  color: #767676;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  padding: 3px 8px;
+  border-radius: 5px;
+  font-size: 0.76rem;
+  font-weight: 400;
+  line-height: 1.1;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 0.2s ease, transform 0.15s ease, color 0.2s ease;
+}
+
+.popover-scholar-pill:hover {
+  background-color: #e2e2e2;
+  color: #111111;
+  transform: translateY(-1px);
+}
+
+.popover-scholar-pill svg {
+  display: inline-block;
+  width: 6.5px;
+  height: 6.5px;
+  flex-shrink: 0;
+  stroke: currentColor;
+  stroke-width: 1.3;
+  opacity: 0.65;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.popover-scholar-pill:hover svg {
+  transform: translate(0.5px, -0.5px);
+  opacity: 1;
+}
+
+/* Invisible hover bridge extending 16px upward towards header */
+.info-hover-popover::before {
+  content: '';
+  position: absolute;
+  top: -16px;
+  left: 0;
+  width: 100%;
+  height: 16px;
+  background: transparent;
+  pointer-events: auto;
+}
+
+.info-hover-popover .exp-group {
+  margin-bottom: 14px;
+}
+
+.info-hover-popover .exp-group:last-child {
+  margin-bottom: 0;
+}
+
+.info-hover-popover .exp-group-label {
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: #949494;
+  letter-spacing: 0.03em;
+  margin-bottom: 5px;
+  font-family: 'Inter', sans-serif;
+}
+
+.info-hover-popover .exp-list {
+  border-top: 1px solid #ebebeb;
+}
+
+.info-hover-popover .exp-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 5.5px 0;
+  border-bottom: 1px solid #ebebeb;
+  gap: 12px;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.info-hover-popover .exp-title {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: nowrap;
+  gap: 5px;
+  min-width: 0;
+  flex: 1;
+  white-space: nowrap;
+}
+
+.info-hover-popover .exp-org {
+  font-weight: 350;
+  color: #111111;
+  white-space: nowrap;
+}
+
+.info-hover-popover .exp-role {
+  font-weight: 200;
+  color: #767676;
+  white-space: nowrap;
+}
+
+.info-hover-popover .exp-year {
+  font-weight: 200;
+  font-family: 'Sora', sans-serif;
+  font-feature-settings: "tnum";
+  font-size: 0.8rem;
+  color: #888888;
+  white-space: nowrap;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .info-hover-popover,
+  .info-hover-backdrop {
+    display: none !important;
+  }
 }
