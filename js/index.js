@@ -232,4 +232,21 @@ function initShowreelOverlay() {
   mainVideo.pause();
   loadingVideo.pause();
   sync();
+
+  const triggerAutoShowreel = () => {
+    if (!window.siteLocked && sessionStorage.getItem('showreelShown') !== 'true') {
+      show(loadingVideo, true);
+    }
+  };
+
+  const preloaderEl = document.getElementById('site-preloader');
+  const isPreloaderActive = preloaderEl && !preloaderEl.classList.contains('is-loaded') && getComputedStyle(preloaderEl).display !== 'none';
+
+  if (isPreloaderActive) {
+    document.addEventListener('site:preloaded', () => {
+      setTimeout(triggerAutoShowreel, 320);
+    }, { once: true });
+  } else {
+    triggerAutoShowreel();
+  }
 }

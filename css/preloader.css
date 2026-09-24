@@ -39,27 +39,24 @@ html.preloader-skipped #site-preloader {
     margin: 0 auto;
     width: 90%;
     max-width: 400px;
-    transform: translateY(-96px); /* Elevates the mushroom + text combo to natural optical eye-level */
+    transform: translateY(-24px); /* Optically centers the entire mushroom + text combo in the viewport */
 }
 
-.preloader-box video.preloader-logo {
-    width: min(78vw, 350px);
-    height: min(78vw, 350px);
-    max-width: 350px;
-    max-height: 350px;
-    object-fit: contain;
+.preloader-box .preloader-logo-pic,
+.preloader-box .preloader-logo {
     display: block;
+    width: 88px;
+    height: 92px;
+    object-fit: contain;
     margin: 0 auto;
-    transform: none;
-    filter: brightness(1.18) contrast(1.08);
-    mix-blend-mode: multiply; /* Ensures video background stays transparent and does not block text */
     pointer-events: none;
+    background: transparent;
 }
 
 .preloader-progress {
     position: relative;
     z-index: 100;
-    margin-top: calc(min(78vw, 350px) * -0.408 + 26px);
+    margin-top: 14px;
     display: flex;
     flex-direction: column;
     align-items: center;
