@@ -12,13 +12,44 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="css/index.css?v=20260923-08" />
-    <link rel="stylesheet" href="css/index.css?v=20260923-09" />
-    <link rel="stylesheet" href="css/header.css" />
-    <!-- 开站密码开关：当前已停用。之后如需重新启用告诉我“打开开站密码”即可 -->
-    <script>window.siteLocked = false;</script>
+    <script>
+        try {
+            if (sessionStorage.getItem('site-preloader-seen') === '1') {
+                document.documentElement.classList.add('preloader-skipped');
+            }
+        } catch (_) {}
+    </script>
 
     <style>
+        /* 关键内联样式：确保首帧即约束尺寸，防止任何 FOUC 巨大视频跳动或白屏闪烁 */
+        html.preloader-skipped #site-preloader {
+            display: none !important;
+        }
+        #site-preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999999;
+        }
+        .preloader-box {
+            transform: translateY(-96px);
+        }
+        .preloader-box video.preloader-logo {
+            width: min(78vw, 350px);
+            height: min(78vw, 350px);
+            max-width: 350px;
+            max-height: 350px;
+            object-fit: contain;
+        }
+        .preloader-progress {
+            margin-top: calc(min(78vw, 350px) * -0.408 + 26px);
+        }
         /* 简单的淡入预设 */
         .work-item {
             opacity: 0;
@@ -29,8 +60,13 @@
             opacity: 1;
         }
     </style>
+
+    <link rel="stylesheet" href="css/preloader.css?v=20260924-6" />
+    <link rel="stylesheet" href="css/index.css?v=20260924-1" />
+    <!-- 开站密码开关：当前已停用。之后如需重新启用告诉我“打开开站密码”即可 -->
+    <script>window.siteLocked = false;</script>
+
     <link rel="stylesheet" href="css/concept-gallery.css?v=20260922-39" />
-    <link rel="stylesheet" href="css/preloader.css?v=20260922-5" />
     <script src="js/concept-gallery.js?v=20260922-23" defer></script>
     <script src="js/project-preview.js?v=20260922-5" defer></script>
     <script src="js/info-popover.js?v=20260923-10" defer></script>
@@ -41,7 +77,7 @@
     <!-- 开屏加载动画（蘑菇奔跑 + 0%~100% 计数器） -->
     <div id="site-preloader" aria-label="Loading site">
         <div class="preloader-box">
-            <video class="preloader-logo" autoplay muted loop playsinline preload="auto" aria-hidden="true">
+            <video class="preloader-logo" autoplay muted loop playsinline preload="auto" aria-hidden="true" width="350" height="350" style="width:min(78vw, 350px);height:min(78vw, 350px);max-width:350px;max-height:350px;object-fit:contain;">
                 <source src="media/index/logo.mp4" type="video/mp4" />
             </video>
             <div class="preloader-progress">
@@ -49,7 +85,7 @@
             </div>
         </div>
     </div>
-    <script src="js/preloader.js?v=20260922-4"></script>
+    <script src="js/preloader.js?v=20260924-1"></script>
 
     <!-- 开站密码遮罩（已注释停用）：
     <div id="password-overlay" role="dialog" aria-label="Enter password">
@@ -100,7 +136,7 @@
 
                     <a href="samsung.html" id="open-samsung" class="work-item" aria-haspopup="dialog">
                         <div class="work-image-wrapper">
-                            <img src="media/index/samsung.png" alt="Samsung" />
+                            <img src="media/index/samsung.png" alt="Samsung" loading="lazy" decoding="async" />
                         </div>
                         <div class="work-tags-container">
                             <span class="tag-name">Samsung<span class="tag-year">2025</span></span>
@@ -110,7 +146,7 @@
 
                     <div class="work-item no-click">
                         <div class="work-image-wrapper">
-                            <img src="media/index/linko.png" alt="Linko — Indigo Design Award" />
+                            <img src="media/index/linko.png" alt="Linko — Indigo Design Award" loading="lazy" decoding="async" />
                         </div>
                         <div class="work-tags-container">
                             <span class="tag-business">Learning Community, Design System</span>
@@ -131,7 +167,7 @@
 
                     <a href="lepal.html?v=20260920-3" id="open-lepal" class="work-item" aria-haspopup="dialog">
                         <div class="work-image-wrapper">
-                            <img src="media/index/lepal.png" alt="LePal" />
+                            <img src="media/index/lepal.png" alt="LePal" loading="lazy" decoding="async" />
                         </div>
                         <div class="work-tags-container">
                             <span class="tag-name">Lepal.ai<span class="tag-year">2024</span></span>
@@ -141,7 +177,7 @@
 
                     <a href="bibf.html" id="open-bibf" class="work-item" aria-haspopup="dialog">
                         <div class="work-image-wrapper">
-                            <img src="media/index/BIBF.png" alt="BIBF" />
+                            <img src="media/index/BIBF.png" alt="BIBF" loading="lazy" decoding="async" />
                         </div>
                         <div class="work-tags-container">
                             <span class="tag-name">BIBF<span class="tag-year">2020</span></span>
@@ -151,7 +187,7 @@
 
                     <a href="naivevil.html?v=20260920-8" id="open-naivevil" class="work-item" aria-haspopup="dialog">
                         <div class="work-image-wrapper">
-                            <img src="media/index/naive.png" alt="Naivevil" />
+                            <img src="media/index/naive.png" alt="Naivevil" loading="lazy" decoding="async" />
                         </div>
                         <div class="work-tags-container">
                             <span class="tag-name">Naivevil<span class="tag-year">2019</span></span>
@@ -170,8 +206,8 @@
 
                     <a href="microsoft.html" id="open-microsoft" class="work-item" aria-haspopup="dialog">
                         <div class="work-image-wrapper">
-                            <img src="media/index/mfst.png" alt="Microsoft" />
-                            <video class="hover-video" src="media/index/mfst2.mp4" muted loop playsinline></video>
+                            <img src="media/index/mfst.png" alt="Microsoft" loading="lazy" decoding="async" />
+                            <video class="hover-video" src="media/index/mfst2.mp4" muted loop playsinline preload="none"></video>
                         </div>
                         <div class="work-tags-container">
                             <span class="tag-name">Microsoft<span class="tag-year">2025</span></span>
@@ -181,7 +217,7 @@
 
                     <a href="thermopal.html" id="open-thermopal" class="work-item thermopal-card" aria-label="ThermoPal — Design System" aria-haspopup="dialog">
                         <div class="work-image-wrapper">
-                            <img src="media/index/thermopal.png?v=20260921-6" alt="ThermoPal" />
+                            <img src="media/index/thermopal.png?v=20260921-6" alt="ThermoPal" loading="lazy" decoding="async" />
                         </div>
                         <div class="work-tags-container">
                             <span class="tag-name">ThermoPal<span class="tag-year">2025</span></span>
@@ -191,7 +227,7 @@
 
                     <div class="work-item no-click">
                         <div class="work-image-wrapper">
-                            <img src="media/index/pink.svg" alt="Pink Panthers — Menstrual Health, Service Design" />
+                            <img src="media/index/pink.svg" alt="Pink Panthers — Menstrual Health, Service Design" loading="lazy" decoding="async" />
                         </div>
                         <div class="work-tags-container">
                             <span class="tag-business">Menstrual Health, Service Design</span>
@@ -231,10 +267,10 @@
             </div>
             <div class="showreel-card">
                 <div class="video-container">
-                    <video id="loadingVideo" autoplay muted playsinline class="loading-video">
+                    <video id="loadingVideo" muted playsinline preload="none" class="loading-video">
                         <source src="media/loading.mp4" type="video/mp4" />
                     </video>
-                    <video id="showreelVideo" autoplay playsinline muted class="main-video">
+                    <video id="showreelVideo" playsinline muted preload="none" class="main-video">
                         <source src="media/showreel.mp4" type="video/mp4" />
                     </video>
                     <div class="video-controls">

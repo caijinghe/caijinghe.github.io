@@ -38,10 +38,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 4. 执行所有初始化
     initShowreelOverlay();
-    initCursorAndOverlayHints?.();
-    initProjectFilter?.();
-    initLogoTicker?.();    
-    initIconHoverSwap?.();  
+    if (typeof initCursorAndOverlayHints === 'function') initCursorAndOverlayHints();
+    if (typeof initProjectFilter === 'function') initProjectFilter();
+    if (typeof initLogoTicker === 'function') initLogoTicker();
+    if (typeof initIconHoverSwap === 'function') initIconHoverSwap();
 });
 
 /* -------------------------------------------------------------------------- */
@@ -178,7 +178,15 @@ function initShowreelOverlay() {
   play.addEventListener('click', togglePlayback);
   sound.addEventListener('click', () => { activeVideo.muted = !activeVideo.muted; });
   container.addEventListener('click', (event) => {
-    if (!event.target.closest('.video-controls, .player-control')) togglePlayback();
+    if (event.target.closest('.video-controls, .player-control')) return;
+    if (activeVideo.muted) {
+      activeVideo.muted = false;
+      sync();
+      showControlsBriefly();
+      if (activeVideo.paused) activeVideo.play().catch(sync);
+    } else {
+      togglePlayback();
+    }
   });
   overlay.addEventListener('click', (event) => { if (event.target === overlay) stop(); });
   document.addEventListener('keydown', (event) => { if (opened && event.key === 'Escape') stop(); });
@@ -224,5 +232,4 @@ function initShowreelOverlay() {
   mainVideo.pause();
   loadingVideo.pause();
   sync();
-  if (!window.siteLocked && sessionStorage.getItem('showreelShown') !== 'true') show(loadingVideo, true);
 }

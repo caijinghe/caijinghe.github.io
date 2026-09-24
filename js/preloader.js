@@ -12,6 +12,11 @@
     if (sessionStorage.getItem('site-preloader-seen') === '1') {
       preloader.classList.add('is-loaded');
       preloader.style.display = 'none';
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => initIdlePrefetch(true), { once: true });
+      } else {
+        initIdlePrefetch(true);
+      }
       return;
     }
   } catch (_) {}
@@ -64,12 +69,10 @@
     }, 180);
   }
 
-  // Kick off project prefetching immediately during the 0%-100% animation
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initIdlePrefetch, { once: true });
-  } else {
-    initIdlePrefetch();
-  }
+  // Kick off project prefetching after preloader finishes or on idle to avoid competing for bandwidth
+  document.addEventListener('site:preloaded', () => {
+    initIdlePrefetch(false);
+  }, { once: true });
 
   function tick(now) {
     if (hasFinished) return;
@@ -112,7 +115,7 @@
   /**
    * Background prefetching of project dialog pages to eliminate preview delay
    */
-  function initIdlePrefetch() {
+  function initIdlePrefetch(immediate = false) {
     const dialogFrames = document.querySelectorAll('dialog.project-preview iframe[data-src]');
     if (!dialogFrames.length) return;
 
@@ -133,10 +136,11 @@
       });
     };
 
+    const delay = immediate ? 1500 : 2500;
     if ('requestIdleCallback' in window) {
-      window.requestIdleCallback(prefetchAll, { timeout: 2500 });
+      window.requestIdleCallback(prefetchAll, { timeout: 4000 });
     } else {
-      setTimeout(prefetchAll, 1200);
+      setTimeout(prefetchAll, delay);
     }
 
     const triggerCards = [

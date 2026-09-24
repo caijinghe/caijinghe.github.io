@@ -2,11 +2,20 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("✅ DOM loaded");
 
   /** -------------------------------
-   * Sticky 图像切换
+   * Sticky 图像切换 (Section 1 -> photo1 Detect, Section 2 -> photo2 Dance)
    -------------------------------- */
   const img1 = document.getElementById("photo1");
   const img2 = document.getElementById("photo2");
   const panels = document.querySelectorAll(".about-panel");
+  const panel2 = document.getElementById("panel2");
+
+  function updateStickyPhotos() {
+    if (!img1 || !img2 || !panel2) return;
+    const rect2 = panel2.getBoundingClientRect();
+    const isPanel2Active = rect2.top <= window.innerHeight * 0.5;
+    img1.style.opacity = isPanel2Active ? '0' : '1';
+    img2.style.opacity = isPanel2Active ? '1' : '0';
+  }
 
   if (img1 && img2 && panels.length > 0) {
     img1.style.opacity = 1;
@@ -51,8 +60,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   generateTimeline();
-
-
 
   /** -------------------------------
    * 滚动下拉驱动年份切换 & 细刻度滑尺波纹
@@ -200,11 +207,28 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  const heroTitle = document.querySelector('.shelf-section h1');
+
+  function checkScrollState() {
+    const isScrolled = window.scrollY > 30 || targetProgress > 0.01;
+    if (isScrolled) {
+      if (!document.documentElement.classList.contains('is-scrolled')) {
+        document.documentElement.classList.add('is-scrolled');
+      }
+      if (heroTitle) {
+        heroTitle.style.display = 'none';
+        heroTitle.style.animation = 'none';
+      }
+    }
+  }
+
   function onScroll() {
     targetProgress = calculateTargetProgress();
+    checkScrollState();
     if (!rafId) {
       rafId = requestAnimationFrame(tick);
     }
+    updateStickyPhotos();
   }
 
   // 监听滚动与尺寸变化
@@ -220,11 +244,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-
-
   // 初始加载：在页面最顶端时完整展示整个书架
   targetProgress = calculateTargetProgress();
   dampedProgress = targetProgress;
+  checkScrollState();
   if (dampedProgress <= 0.025) {
     showFullShelf();
   } else {
@@ -233,6 +256,7 @@ document.addEventListener("DOMContentLoaded", () => {
     showYearInfo(years[currentYearIndex]);
     updateTickIndicators(timelineProgress);
   }
+  updateStickyPhotos();
 
   /** -------------------------------
    * ticker 滚动动画
@@ -301,18 +325,19 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const cursor = document.getElementById('custom-cursor');
+  if (cursor) {
+    document.addEventListener('mousemove', (e) => {
+      cursor.style.left = `${e.clientX}px`;
+      cursor.style.top = `${e.clientY}px`;
+    });
 
-  document.addEventListener('mousemove', (e) => {
-    cursor.style.left = `${e.clientX}px`;
-    cursor.style.top = `${e.clientY}px`;
-  });
-
-  document.addEventListener('mouseenter', () => {
-    cursor.style.opacity = 1;
-  });
-  document.addEventListener('mouseleave', () => {
-    cursor.style.opacity = 0;
-  });
+    document.addEventListener('mouseenter', () => {
+      cursor.style.opacity = 1;
+    });
+    document.addEventListener('mouseleave', () => {
+      cursor.style.opacity = 0;
+    });
+  }
 
   const hoverTargets = document.querySelectorAll(
     'a, button, [role="button"], [onclick], .cube-button, .logo, .tab, .more-wrapper, .filter-wrapper, .showreel-controls, .year-label, .work-item'

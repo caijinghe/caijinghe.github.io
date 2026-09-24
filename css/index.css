@@ -764,9 +764,9 @@ a {
 .info-hover-popover {
   position: fixed;
   top: 48px;
-  left: auto;
   right: var(--page-gutter, 8px);
-  width: 560px;
+  left: auto;
+  width: 580px;
   max-width: calc(100vw - 2 * var(--page-gutter, 8px));
   background: #ffffff;
   color: #111111;
@@ -774,35 +774,31 @@ a {
   box-shadow: none;
   border: none;
   z-index: 10000;
-  padding: 22px 24px 20px;
   padding: 20px 24px 18px;
   box-sizing: border-box;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transform: translateY(-18px) scale(.985);
+  transform: translateX(36px);
   transform-origin: top right;
-  transition: opacity 0.3s ease,
-              transform 0.3s ease,
-              visibility 0.3s;
+  transition: opacity 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.26s cubic-bezier(0.16, 1, 0.3, 1),
+              visibility 0.24s;
 }
 
 .info-hover-popover.is-open {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
-  transform: none;
+  transform: translateX(0);
 }
 
 /* Header inside popover */
 .popover-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
   align-items: center;
   gap: 16px;
-  padding-bottom: 15px;
-  margin-bottom: 15px;
   padding-bottom: 14px;
   margin-bottom: 14px;
 }
@@ -833,12 +829,6 @@ a {
 }
 
 .popover-header-right {
-  font-size: 0.76rem;
-  font-weight: 300;
-  color: #767676;
-  line-height: 1.4;
-  text-align: right;
-  max-width: 270px;
   display: flex;
   align-items: center;
 }
@@ -849,9 +839,6 @@ a {
   gap: 5px;
   background-color: #ededed;
   color: #767676;
-  padding: 2px 7px;
-  border-radius: 4px;
-  font-size: 0.72rem;
   padding: 3px 8px;
   border-radius: 5px;
   font-size: 0.76rem;
