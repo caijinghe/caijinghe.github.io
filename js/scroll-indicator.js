@@ -103,15 +103,9 @@
         return;
       }
 
-      const docEl = document.documentElement;
-      const body = document.body;
-      const scrollHeight = Math.max(
-        docEl.scrollHeight,
-        body.scrollHeight,
-        docEl.offsetHeight,
-        body.offsetHeight
-      );
-      const clientHeight = window.innerHeight || docEl.clientHeight;
+      const scrollRoot = document.scrollingElement || document.documentElement;
+      const scrollHeight = scrollRoot.scrollHeight;
+      const clientHeight = scrollRoot.clientHeight;
       const maxScroll = scrollHeight - clientHeight;
 
       if (maxScroll <= 20) {
@@ -126,7 +120,7 @@
       currentThumbHeight = Math.max(36, Math.min(availableHeight * 0.85, rawThumbHeight));
       currentMaxTravel = Math.max(1, availableHeight - currentThumbHeight);
 
-      const scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop || 0;
+      const scrollTop = scrollRoot.scrollTop;
       const fraction = Math.max(0, Math.min(1, scrollTop / maxScroll));
       currentThumbY = fraction * currentMaxTravel;
 
@@ -148,9 +142,9 @@
 
     // Scroll directly by fraction
     function scrollToFraction(fraction, immediate = false) {
-      const docEl = document.documentElement;
-      const scrollHeight = Math.max(docEl.scrollHeight, document.body.scrollHeight);
-      const maxScroll = scrollHeight - window.innerHeight;
+      const scrollRoot = document.scrollingElement || document.documentElement;
+      const scrollHeight = scrollRoot.scrollHeight;
+      const maxScroll = scrollHeight - scrollRoot.clientHeight;
       const targetScroll = Math.max(0, Math.min(maxScroll, fraction * maxScroll));
 
       if (window.lenis && typeof window.lenis.scrollTo === 'function') {
@@ -179,16 +173,16 @@
       }
 
       dragStartPointerY = e.clientY;
-      const docEl = document.documentElement;
-      dragStartScrollTop = window.pageYOffset || docEl.scrollTop || document.body.scrollTop || 0;
+      const scrollRoot = document.scrollingElement || document.documentElement;
+      dragStartScrollTop = scrollRoot.scrollTop;
     });
 
     indicator.addEventListener('pointermove', (e) => {
       if (!isDragging) return;
       const deltaY = e.clientY - dragStartPointerY;
-      const docEl = document.documentElement;
-      const scrollHeight = Math.max(docEl.scrollHeight, document.body.scrollHeight);
-      const maxScroll = scrollHeight - window.innerHeight;
+      const scrollRoot = document.scrollingElement || document.documentElement;
+      const scrollHeight = scrollRoot.scrollHeight;
+      const maxScroll = scrollHeight - scrollRoot.clientHeight;
       const scrollPerPixel = maxScroll / currentMaxTravel;
       const targetScroll = dragStartScrollTop + deltaY * scrollPerPixel;
       const fraction = Math.max(0, Math.min(1, targetScroll / maxScroll));
