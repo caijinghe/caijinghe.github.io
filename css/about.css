@@ -138,6 +138,7 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  margin-top: 15vh;
   margin-bottom: 15vh;
 }
 
@@ -957,6 +958,10 @@ Timeline Ruler
   #panel1 {
     padding-top: 50vh;
     padding-right: 20px;
+  }
+
+  #panel2 {
+    margin-top: 56px;
   }
 
   .sticky-left {
