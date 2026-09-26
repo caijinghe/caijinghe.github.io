@@ -91,6 +91,17 @@ body {
   cursor: default;
 }
 
+/* Desktop and compact desktop: the sticky artwork must stay visible. */
+@media (min-width: 601px) {
+  .sticky-left {
+    display: flex !important;
+  }
+
+  #photo1 {
+    opacity: 1;
+  }
+}
+
 
 /* 右侧文字区域 */
 .scroll-right {
@@ -133,13 +144,13 @@ body {
 }
 
 #panel2 {
-  height: auto !important;
-   max-width: none;
+  min-height: 100vh;
+  max-width: none;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  margin-top: 15vh;
-  margin-bottom: 15vh;
+  justify-content: center;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 .about-panel h1 {
@@ -901,7 +912,9 @@ Timeline Ruler
   }
 }
 
-@media (max-width: 1200px) {
+/* Keep the sticky artwork visible in desktop and compact desktop windows.
+   Switch to the single-column text layout only on phone-sized screens. */
+@media (max-width: 600px) {
 
   .section-container {
     display: flex;
@@ -961,7 +974,10 @@ Timeline Ruler
   }
 
   #panel2 {
+    min-height: auto;
+    justify-content: flex-start;
     margin-top: 56px;
+    margin-bottom: 64px;
   }
 
   .sticky-left {
