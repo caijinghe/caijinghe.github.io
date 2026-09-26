@@ -263,12 +263,12 @@
 
             .showcase-transition.showcase-transition.is-active {
                 width: fit-content;
-                height: 32px;
-                padding: 0 14px;
+                height: var(--case-pill-height);
+                padding: 0 var(--case-pill-padding-x);
             }
 
             .showcase-transition.showcase-transition.is-active .showcase-transition__label {
-                font-size: 16px;
+                font-size: var(--case-pill-font-size);
             }
 
         }
@@ -292,7 +292,7 @@
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 16px;
             align-items: start;
-            padding: 18px 0 56px;
+            padding: var(--case-divider-to-title, 18px) 0 56px;
         }
 
         .project-background h2 {
@@ -394,7 +394,7 @@
         .project-challenge__divider {
             width: 100%;
             height: 1px;
-            background: #303030;
+            background: var(--case-divider-color, #303030);
         }
 
         .project-challenge__intro {
@@ -562,10 +562,38 @@
             padding-bottom: 0;
         }
 
+        /*
+         * REUSABLE CASE-STUDY SECTION RHYTHM
+         * Copy this block with the divider/pill rules to keep project pages consistent.
+         *
+         * Media/image -> divider:       36px
+         * Divider -> Showcase pill:    160px
+         * Pill -> following content:    20px
+         * Divider -> section title:     18px
+         * Previous content -> Impact:   80px
+         * Final page bottom space:      15vw
+         * Desktop pill: 42px high, 22px horizontal padding, 22px type
+         * Small-window pill: 32px high, 14px horizontal padding, 16px type
+         */
+        :root {
+            --case-gutter: 15%;
+            --case-divider-color: #303030;
+            --case-media-to-divider: 36px;
+            --case-divider-to-pill: 160px;
+            --case-pill-to-content: 20px;
+            --case-divider-to-title: 18px;
+            --case-pill-height: 42px;
+            --case-pill-padding-x: 22px;
+            --case-pill-font-size: 22px;
+            --case-pill-color: #ff6dd8;
+            --case-impact-pill-top: 80px;
+            --case-page-bottom-space: 15vw;
+        }
+
         .showcase-transition {
             width: 100%;
             height: 1px;
-            margin: 0 auto 20px;
+            margin: 0 auto var(--case-pill-to-content);
             overflow: hidden;
             background: transparent;
             border-radius: 999px;
@@ -575,8 +603,8 @@
         .showcase-divider {
             width: 70%;
             height: 1px;
-            margin: 36px 15% 160px;
-            background: #303030;
+            margin: var(--case-media-to-divider) var(--case-gutter) var(--case-divider-to-pill);
+            background: var(--case-divider-color);
         }
 
         .showcase-transition__label {
@@ -585,7 +613,7 @@
             height: 100%;
             place-items: center;
             color: #000;
-            font-size: 22px;
+            font-size: var(--case-pill-font-size);
             font-weight: 500;
             line-height: 1;
             opacity: 0;
@@ -594,9 +622,9 @@
 
         .showcase-transition.is-active {
             width: fit-content;
-            height: 42px;
-            background: #ff6dd8;
-            padding: 0 22px;
+            height: var(--case-pill-height);
+            padding: 0 var(--case-pill-padding-x);
+            background: var(--case-pill-color);
         }
 
         .showcase-transition.is-active .showcase-transition__label {
@@ -605,7 +633,7 @@
         }
 
         .impact-transition {
-            margin: 80px auto 20px;
+            margin: var(--case-impact-pill-top) auto var(--case-pill-to-content);
         }
 
         .impact-transition.is-active {
@@ -620,8 +648,36 @@
 
         .project-end-spacer {
             width: 100%;
-            min-height: 15vw;
+            min-height: var(--case-page-bottom-space);
             flex-shrink: 0;
+        }
+
+        .project-challenge.project-takeaway {
+            padding-top: var(--case-media-to-divider);
+            padding-bottom: 0;
+        }
+
+        .project-takeaway .project-challenge__intro {
+            padding-bottom: 0;
+        }
+
+        .project-takeaway__copy p {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 300;
+            line-height: 1.4;
+        }
+
+        .project-takeaway__copy p + p {
+            margin-top: 24px;
+        }
+
+        @media (max-width: 1100px) {
+            :root {
+                --case-pill-height: 32px;
+                --case-pill-padding-x: 14px;
+                --case-pill-font-size: 16px;
+            }
         }
 
         .showcase-design-system {
@@ -1743,6 +1799,17 @@
         <div class="showcase-transition impact-transition is-active" aria-label="Impact section"><span class="showcase-transition__label">Impact</span></div>
         <section class="block showcase-design-system impact-overview" aria-label="Lepal impact overview">
             <img src="media/lepal/impact.png" loading="lazy" decoding="async" alt="Lepal impact overview" />
+        </section>
+
+        <section class="project-challenge project-takeaway" aria-labelledby="project-takeaway-title">
+            <div class="project-challenge__divider" aria-hidden="true"></div>
+            <div class="project-challenge__intro">
+                <h2 id="project-takeaway-title">Takeaway.</h2>
+                <div class="project-challenge__copy project-takeaway__copy">
+                    <p>LePal was my first experience turning years of HCI research in digital mental health into a product used by real people. It made me realize that an intervention can be clinically grounded and still fail if people don’t understand its value or feel motivated to return.</p>
+                    <p>That changed how I think about rigor and creativity. Research tells me what should work; design gives people a reason to engage with it. For me, the strongest products need both: evidence to ground the experience, and imagination to make that experience worth coming back to.</p>
+                </div>
+            </div>
         </section>
         <div class="project-end-spacer" aria-hidden="true"></div>
     </main>
