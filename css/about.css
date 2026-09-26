@@ -204,6 +204,81 @@ body {
   font-weight: 600;
 }
 
+/* =========================================
+   Experience & Education Blocks (Panel 1)
+   Restored from the original About-page design.
+   ========================================= */
+.experience-block {
+  width: 100%;
+  margin-top: 32px;
+}
+
+.exp-group {
+  margin-bottom: 40px;
+}
+
+.exp-group:last-child {
+  margin-bottom: 0;
+}
+
+.exp-group-label {
+  margin-bottom: 8px;
+  color: #949494;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+}
+
+.exp-list {
+  border-top: 1px solid #ebebeb;
+}
+
+.exp-row {
+  display: flex;
+  width: 100%;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8.5px 0;
+  border-bottom: 1px solid #ebebeb;
+  box-sizing: border-box;
+  font-size: 0.98rem;
+  line-height: 1.45;
+}
+
+.exp-title {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 6px;
+}
+
+.exp-org {
+  color: #111;
+  font-weight: 300;
+  white-space: nowrap;
+}
+
+.exp-role {
+  color: #767676;
+  font-weight: 200;
+  white-space: normal;
+}
+
+.exp-year {
+  flex-shrink: 0;
+  color: #888;
+  font-family: 'Sora', sans-serif;
+  font-size: 0.95rem;
+  font-feature-settings: "tnum";
+  font-weight: 200;
+  text-align: right;
+  white-space: nowrap;
+}
+
 .award-block {
   margin-top: 30px;
   margin-bottom: 8vh;
@@ -934,5 +1009,24 @@ Timeline Ruler
   line-height: 1.4;
   margin-bottom: 20px;
 }
+
+  .exp-group {
+    margin-bottom: 20px;
+  }
+
+  .exp-group-label {
+    margin-bottom: 6px;
+  }
+
+  .exp-row {
+    gap: 10px;
+    padding: 8px 0;
+    font-size: 0.95rem;
+  }
+
+  .exp-title {
+    flex-wrap: wrap;
+    white-space: normal;
+  }
 
 }
