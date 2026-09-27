@@ -1009,13 +1009,34 @@
     <main class="stack" id="samsung-stack">
 <section class="block cover case-cover microsoft-cover" data-meteors>
 
-            <img src="media/MFST/new-cover.png?v=20260927-1" loading="eager" alt="Microsoft Copilot AI Design Toolkit cover" />
-            <h1 class="case-cover__title case-cover__title--dark-on-light">AI Design Toolkit: Embedding Design Review into Microsoft Copilot Workflows</h1>
+            <img src="media/MFST/new-cover.png?v=20260927-2" loading="eager" alt="Microsoft Copilot AI Design Toolkit cover" />
+            <h1 class="case-cover__title case-cover__title--dark-on-light">Building a Continuous Design Review<br />Workflow for Microsoft Copilot</h1>
         </section>
 
+        <section class="project-overview project-overview--light" aria-labelledby="project-overview-title">
+            <h1 id="project-overview-title">AI Design Toolkit,<br />Design Automation.</h1>
 
+            <div class="project-overview__content">
+                <div class="project-overview__meta">
+                    <span>Product Design, 2025</span>
+                    <span>10 Weeks</span>
+                    <span>UX, Research, Prototyping</span>
+                </div>
+                <p>Working with Microsoft Copilot teams, we designed an AI Design Toolkit that turned abstract AI design principles into actionable evaluation criteria. As part of the project's lead team, I focused on UX and research, shaping the evaluation framework and workflow prototype.</p>
+                <p>Instead of asking designers to remember every principle, we explored a system that could continuously evaluate work artifacts and provide traceable feedback across team discussions, interface design, and code.</p>
 
+                <p class="project-overview__label">My deliverables</p>
+                <ol>
+                    <li>Led interviews with 11 Copilot designers and engineers, uncovering why existing guidelines failed to shape everyday decisions.</li>
+                    <li>Turned research insights into 8 actionable design principles with clear criteria and real examples.</li>
+                    <li>Prototyped a continuous review tool evaluating Slack discussions, screen activity, and code throughout the design workflow.</li>
+                    <li>Designed a traceable feedback system with scores, alerts, and violation history to support self-correction.</li>
+                </ol>
 
+                <p class="project-overview__label">Team</p>
+                <p>20-person SCADpro team<br />Microsoft Copilot design &amp; engineering</p>
+            </div>
+        </section>
 
         <section class="block"><img src="media/MFST/overview.png" alt="Intro shot" /></section>
         <section class="block"><img src="media/MFST/challenge.png" alt="Intro shot" /></section>
@@ -1359,7 +1380,20 @@
         });
 
         if (window.parent !== window && new URLSearchParams(location.search).has('preview')) {
+            const previewCanvasWidth = 1100;
+            document.body.classList.add('is-preview');
             document.body.style.overflow = "auto";
+
+            function scalePreviewToFrame() {
+                const previewScale = Math.min(1, window.innerWidth / previewCanvasWidth);
+                document.body.style.width = `${window.innerWidth / previewScale}px`;
+                document.body.style.minHeight = `${window.innerHeight / previewScale}px`;
+                document.body.style.zoom = previewScale;
+            }
+
+            scalePreviewToFrame();
+            window.addEventListener('resize', scalePreviewToFrame);
+
             document.addEventListener('keydown', event => {
                 if (event.key === 'Escape') {
                     parent.postMessage({ type: 'microsoft-close' }, location.origin);
