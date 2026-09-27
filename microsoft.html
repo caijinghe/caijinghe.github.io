@@ -14,6 +14,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/workheader2.css" />
     <link rel="stylesheet" href="css/scroll-indicator.css?v=20260920-1" />
+    <link rel="stylesheet" href="css/case-study-system.css?v=20260926-10" />
     <script src="js/scroll-indicator.js?v=20260920-1" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="js/mfst.js?v=20260921-2" defer></script>
@@ -174,6 +175,21 @@
             /* object-position: center top; */
             /* 从下半部分对齐裁剪 */
             display: block;
+        }
+
+        /* Keep the Microsoft cover title consistent with the LePal case study. */
+        .block.cover.case-cover > img {
+            height: auto;
+            object-fit: contain;
+        }
+
+        .microsoft-cover .case-cover__title {
+            top: 11.5%;
+            width: min(1050px, calc(100% - 24px));
+            max-width: none;
+            color: #0b0b0b;
+            font-size: clamp(20px, 3.8vw, 50px);
+            text-wrap: balance;
         }
 
 
@@ -991,9 +1007,10 @@
 
 
     <main class="stack" id="samsung-stack">
-<section class="block cover" data-meteors>
+<section class="block cover case-cover microsoft-cover" data-meteors>
 
-            <img src="media/MFST/cover.jpg" loading="eager" alt="Samsung Cover" />
+            <img src="media/MFST/new-cover.png?v=20260927-1" loading="eager" alt="Microsoft Copilot AI Design Toolkit cover" />
+            <h1 class="case-cover__title case-cover__title--dark-on-light">AI Design Toolkit: Embedding Design Review into Microsoft Copilot Workflows</h1>
         </section>
 
 
