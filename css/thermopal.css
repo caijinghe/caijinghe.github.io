@@ -1,6 +1,6 @@
 /* ==========================================================================
    ThermoPal Project Detail Styles
-   Faithfully replicated from source design with Inter typography
+   Faithfully replicated from source design with Google Sans Flex typography
    ========================================================================== */
 
 :root {
@@ -55,7 +55,7 @@ body {
   margin: 0;
   background: #ffffff;
   color: var(--color-text);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -119,35 +119,26 @@ body.is-preview .intro-grid {
 }
 
 .thermostat-cover {
-  width: 100%;
-  overflow: hidden;
   background: #fff;
-}
-
-.thermostat-cover img {
-  display: block;
-  width: 100%;
-  height: auto;
-  max-width: none;
-}
-
-.thermopal-role-image {
-  width: 100%;
-  overflow: hidden;
-  background: #fff;
-}
-
-.thermopal-role-image img {
-  display: block;
-  width: 100%;
-  height: auto;
-  max-width: none;
 }
 
 .thermopal img {
   display: block;
   max-width: 100%;
   height: auto;
+}
+
+.project-overview__team span:not(:last-child)::after {
+  content: ", ";
+}
+
+@media (max-width: 1100px) {
+  .project-overview__team span {
+    display: block;
+  }
+  .project-overview__team span:not(:last-child)::after {
+    content: none;
+  }
 }
 
 /* ==========================================================================
@@ -164,7 +155,7 @@ body.is-preview .intro-grid {
 }
 
 .intro-col-1 h1 {
-  font-family: 'Avenir Next', 'Avenir', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Avenir Next', 'Avenir', 'Google Sans Flex', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 24px;
   font-weight: 800;
   letter-spacing: -0.2px;
@@ -487,7 +478,7 @@ body.is-preview .intro-grid {
   display: inline-block;
   background-color: #ACD92F;
   color: #000000;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 20px;
   font-weight: 600;
   line-height: 1;
@@ -498,7 +489,7 @@ body.is-preview .intro-grid {
 }
 
 .showcase-brand {
-  font-family: 'Avenir Next', 'Avenir', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Avenir Next', 'Avenir', 'Google Sans Flex', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 20px;
   font-weight: 800;
   line-height: 1.2;
@@ -535,7 +526,7 @@ body.is-preview .intro-grid {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(16px, 2.5vw, 32px);
+  gap: clamp(24px, 3.5vw, 48px);
   max-width: 1100px;
   margin: 0 auto;
   text-align: center;
@@ -543,23 +534,23 @@ body.is-preview .intro-grid {
 
 .statement-flower {
   display: inline-block;
-  width: clamp(28px, 3.2vw, 44px);
-  height: clamp(28px, 3.2vw, 44px);
+  width: clamp(36px, 6vw, 70px);
+  height: clamp(36px, 6vw, 70px);
   flex-shrink: 0;
   color: #ACD92F;
   transform-origin: center center;
   opacity: 0;
   filter: blur(8px);
   transform: scale(0.6) rotate(-15deg);
-  transition: opacity 0.75s ease, filter 0.8s ease, transform 0.8s cubic-bezier(.2,.8,.2,1);
+  transition: opacity 0.45s ease, filter 0.45s ease, transform 0.45s cubic-bezier(.2,.8,.2,1);
 }
 
 .statement-quote-wrap.is-visible .statement-flower {
   opacity: 1;
   filter: blur(0);
   transform: scale(1) rotate(0deg);
-  transition-delay: 0.72s;
-  animation: statement-flower-spin 12s linear 1.55s infinite;
+  transition-delay: 0s;
+  animation: statement-flower-spin 12s linear 0.5s infinite;
 }
 
 @keyframes statement-flower-spin {
@@ -568,7 +559,7 @@ body.is-preview .intro-grid {
 }
 
 .statement-quote {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: clamp(26px, 3.4vw, 44px);
   font-weight: 700;
   line-height: 1.25;
@@ -592,12 +583,12 @@ body.is-preview .intro-grid {
   filter: blur(0);
 }
 
-.statement-quote.is-visible .statement-word:nth-of-type(1) { transition-delay: 0.05s; }
-.statement-quote.is-visible .statement-word:nth-of-type(2) { transition-delay: 0.13s; }
-.statement-quote.is-visible .statement-word:nth-of-type(3) { transition-delay: 0.21s; }
-.statement-quote.is-visible .statement-word:nth-of-type(4) { transition-delay: 0.32s; }
-.statement-quote.is-visible .statement-word:nth-of-type(5) { transition-delay: 0.40s; }
-.statement-quote.is-visible .statement-word:nth-of-type(6) { transition-delay: 0.48s; }
+.statement-quote.is-visible .statement-word:nth-of-type(1) { transition-delay: 0.65s; }
+.statement-quote.is-visible .statement-word:nth-of-type(2) { transition-delay: 0.73s; }
+.statement-quote.is-visible .statement-word:nth-of-type(3) { transition-delay: 0.81s; }
+.statement-quote.is-visible .statement-word:nth-of-type(4) { transition-delay: 0.92s; }
+.statement-quote.is-visible .statement-word:nth-of-type(5) { transition-delay: 1s; }
+.statement-quote.is-visible .statement-word:nth-of-type(6) { transition-delay: 1.08s; }
 
 .statement-word--orange { color: #ff7a2f; }
 .statement-word--blue { color: #1688e8; }
@@ -663,7 +654,7 @@ body.is-preview .intro-grid {
 
 /* Feature 统一上标编号 (Feature #1, #2, #3, #4, #5) */
 .feature-eyebrow {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 16px;
   font-weight: 300;
   line-height: 1.2;
@@ -674,7 +665,7 @@ body.is-preview .intro-grid {
 
 /* Feature 统一主标题 (38px / 600 / line-height: 39px / letter-spacing: -0.25px) */
 .feature-title {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 38px;
   font-weight: 600;
   line-height: 39px;
@@ -685,7 +676,7 @@ body.is-preview .intro-grid {
 
 /* Feature 统一描述正文 (20px / 600 / line-height: 24px / letter-spacing: -0.13px) */
 .feature-desc {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 20px;
   font-weight: 600;
   line-height: 24px;
@@ -714,7 +705,7 @@ body.is-preview .intro-grid {
 
 /* 子板块标题与描述 (Friendly Companionship & Collective Impact) */
 .subfeature-title {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 24px;
   font-weight: 600;
   line-height: 28px;
@@ -724,7 +715,7 @@ body.is-preview .intro-grid {
 }
 
 .subfeature-desc {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 18px;
   font-weight: 300;
   line-height: 24px;
@@ -749,7 +740,7 @@ body.is-preview .intro-grid {
 }
 
 .nest-title {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 38px;
   font-weight: 600;
   line-height: 39px;
@@ -856,7 +847,7 @@ body.is-preview .intro-grid {
 }
 
 .nest-callout-text {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 18px;
   font-weight: 600;
   line-height: 1.45;
@@ -1217,4 +1208,3 @@ video:focus-visible {
     padding: 40px 16px 20px;
   }
 }
-

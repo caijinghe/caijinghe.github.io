@@ -7,9 +7,10 @@
     <link rel="icon" href="media/logo.svg" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/workheader2.css">
-    <link rel="stylesheet" href="css/thermopal.css?v=20260921-28">
+    <link rel="stylesheet" href="css/case-study-system.css?v=20260926-10">
+    <link rel="stylesheet" href="css/thermopal.css?v=20260927-46">
     <link rel="stylesheet" href="css/scroll-indicator.css?v=20260920-1">
     <script src="js/scroll-indicator.js?v=20260920-1" defer></script>
     <script>
@@ -40,13 +41,26 @@
 
     <main class="thermopal">
         <!-- ThermoPal cover -->
-        <section class="thermostat-cover" aria-label="ThermoPal cover">
-            <img src="media/thermopal/thermostat-cover.png?v=20260921-6" alt="ThermoPal project cover" width="4680" height="3740" loading="eager" decoding="async">
+        <section class="thermostat-cover case-cover" aria-label="ThermoPal cover">
+            <img src="media/thermopal/thermostat-cover.png?v=20260921-6" alt="ThermoPal project cover" width="4680" height="3904" loading="eager" decoding="async">
+            <h1 class="case-cover__title case-cover__title--dark-on-light">Rethinking Thermal Comfort<br>in Shared Workspaces</h1>
         </section>
 
-        <!-- Role overview -->
-        <section class="thermopal-role-image" aria-label="ThermoPal role overview">
-            <img src="media/thermopal/role.png?v=20260921-4" alt="ThermoPal role overview" width="3510" height="965" loading="eager" decoding="async">
+        <!-- Project overview -->
+        <section class="project-overview project-overview--light" aria-labelledby="project-overview-title">
+            <h1 id="project-overview-title">Smart Thermostat,<br>Cross-Device Experience.</h1>
+
+            <div class="project-overview__content">
+                <div class="project-overview__meta">
+                    <span>UI/UX Design, 2024</span>
+                    <span>14-Day Design Challenge</span>
+                </div>
+                <p>ThermoPal explores how shared workspaces can balance individual temperature preferences with collective energy efficiency. We designed a cross-device experience across a physical thermostat and mobile app, combining personalized controls, smart automation, and shared energy-saving goals.</p>
+                <p>I focused on feature design and the cross-device UI system, creating a consistent visual language while adapting interactions to two different device contexts.</p>
+
+                <p class="project-overview__label">Team</p>
+                <p class="project-overview__team"><span>Jinghe Cai</span><span>Maryam Eyvazi</span><span>Wenjun Gong</span><span>Luqia Xu</span></p>
+            </div>
         </section>
 
         <!-- Section 2: Hero Showcase Demo (Phone Video + Screen Mockup) -->
@@ -131,10 +145,10 @@
             </div>
             <div class="statement-quote-wrap">
                 <svg class="statement-flower" viewBox="0 0 44 44" fill="currentColor" aria-hidden="true">
-                    <rect x="19.25" y="2" width="5.5" height="40" rx="0.5" />
-                    <rect x="19.25" y="2" width="5.5" height="40" rx="0.5" transform="rotate(45 22 22)" />
-                    <rect x="19.25" y="2" width="5.5" height="40" rx="0.5" transform="rotate(90 22 22)" />
-                    <rect x="19.25" y="2" width="5.5" height="40" rx="0.5" transform="rotate(135 22 22)" />
+                    <rect x="20" y="2" width="4" height="40" rx="0.5" />
+                    <rect x="20" y="2" width="4" height="40" rx="0.5" transform="rotate(45 22 22)" />
+                    <rect x="20" y="2" width="4" height="40" rx="0.5" transform="rotate(90 22 22)" />
+                    <rect x="20" y="2" width="4" height="40" rx="0.5" transform="rotate(135 22 22)" />
                 </svg>
                 <h2 class="statement-quote" aria-label="Where Thermal Comfort Meets Playful Engagement">
                     <span class="statement-word statement-word--orange">Where</span>
@@ -145,10 +159,10 @@
                     <span class="statement-word">Engagement</span>
                 </h2>
                 <svg class="statement-flower" viewBox="0 0 44 44" fill="currentColor" aria-hidden="true">
-                    <rect x="19.25" y="2" width="5.5" height="40" rx="0.5" />
-                    <rect x="19.25" y="2" width="5.5" height="40" rx="0.5" transform="rotate(45 22 22)" />
-                    <rect x="19.25" y="2" width="5.5" height="40" rx="0.5" transform="rotate(90 22 22)" />
-                    <rect x="19.25" y="2" width="5.5" height="40" rx="0.5" transform="rotate(135 22 22)" />
+                    <rect x="20" y="2" width="4" height="40" rx="0.5" />
+                    <rect x="20" y="2" width="4" height="40" rx="0.5" transform="rotate(45 22 22)" />
+                    <rect x="20" y="2" width="4" height="40" rx="0.5" transform="rotate(90 22 22)" />
+                    <rect x="20" y="2" width="4" height="40" rx="0.5" transform="rotate(135 22 22)" />
                 </svg>
             </div>
         </section>
@@ -297,6 +311,34 @@
     </footer>
 
     <script>
+        const isPreview = window.parent !== window && new URLSearchParams(location.search).has('preview');
+
+        if (isPreview) {
+            const previewCanvasWidth = 1100;
+            document.body.classList.add('is-preview');
+
+            function scalePreviewToFrame() {
+                const previewScale = Math.min(1, window.innerWidth / previewCanvasWidth);
+                document.body.style.width = `${window.innerWidth / previewScale}px`;
+                document.body.style.minHeight = `${window.innerHeight / previewScale}px`;
+                document.body.style.zoom = previewScale;
+            }
+
+            scalePreviewToFrame();
+            window.addEventListener('resize', scalePreviewToFrame);
+
+            document.addEventListener('keydown', event => {
+                if (event.key === 'Escape') {
+                    parent.postMessage({ type: 'project-preview-close' }, location.origin);
+                }
+            });
+
+            document.querySelectorAll('a').forEach(link => {
+                if (link.hostname !== location.hostname) link.target = '_blank';
+                else link.target = '_top';
+            });
+        }
+
         const statementQuote = document.querySelector('.statement-quote');
         if (statementQuote && 'IntersectionObserver' in window) {
             const statementObserver = new IntersectionObserver((entries, observer) => {
