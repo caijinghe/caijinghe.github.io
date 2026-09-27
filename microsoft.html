@@ -499,6 +499,10 @@
             z-index: 2;
         }
 
+        .confidential-section[hidden] {
+            display: none;
+        }
+
         .confidential-card {
             width: 70%;
             max-width: none;
@@ -537,12 +541,12 @@
         .animated-lock .lock-shackle {
             transform-box: view-box;
             transform-origin: 21px 22px;
+            shape-rendering: geometricPrecision;
         }
 
         /* Unlocked: open on the left at y = -5px */
         .animated-lock.is-unlocked .lock-shackle {
             transform: translateY(-5px) scaleX(-1);
-            transition: transform 0.4s ease-out;
         }
 
         /* Locked: 2-stage lock animation: slide horizontal first at -5px (no height change), THEN snap down into body! */
@@ -556,8 +560,12 @@
                 /* Left side, elevated at -5px */
                 transform: translateY(-5px) scaleX(-1);
             }
+            54.99% {
+                /* Keep the vector crisp instead of interpolating through scaleX(0). */
+                transform: translateY(-5px) scaleX(-1);
+            }
             55% {
-                /* Swung across to the right, HEIGHT UNCHANGED at -5px! */
+                /* Switch sides in one frame, then snap down into the body. */
                 transform: translateY(-5px) scaleX(1);
             }
             75% {
@@ -1038,16 +1046,19 @@
             </div>
         </section>
 
+        <!--
         <section class="block"><img src="media/MFST/overview.png" alt="Intro shot" /></section>
         <section class="block"><img src="media/MFST/challenge.png" alt="Intro shot" /></section>
+        -->
 
 
         <section class="block showcase-teaser">
             <img src="media/MFST/showcase1.png" alt="Intro shot" />
-            <div class="linear-fade"></div>
+            <!-- <div class="linear-fade"></div> -->
         </section>
 
-        <section class="confidential-section">
+        <!-- Retained for future use; hidden while the shortened case study ends at showcase1. -->
+        <section class="confidential-section" hidden>
             <div class="confidential-card">
                 <div class="confidential-lock-badge" id="confidential-lock-badge" title="Confidential lock">
                     <svg class="animated-lock is-unlocked" id="microsoft-lock-svg" viewBox="0 0 60 64" fill="none" aria-label="Confidential lock">
