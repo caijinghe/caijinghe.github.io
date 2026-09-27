@@ -656,21 +656,22 @@
         }
 
         .feature-showcase {
-            padding: 120px 10% 150px;
+            padding: 120px 15% 150px;
         }
 
         .feature-showcase__grid {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: flex-start;
-            gap: 64px;
-            max-width: 1040px;
+            gap: clamp(32px, 4vw, 56px);
+            width: 100%;
+            max-width: 900px;
             margin: 0 auto;
         }
 
         .feature-showcase .feature-showcase__image {
             display: block;
-            width: min(22vw, 320px);
+            width: min(18vw, 300px);
             height: auto;
             object-fit: contain;
         }

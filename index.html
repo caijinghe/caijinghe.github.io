@@ -10,7 +10,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
 
     <script>
         try {
@@ -69,7 +69,7 @@
     <!-- 开站密码开关：当前已停用。之后如需重新启用告诉我“打开开站密码”即可 -->
     <script>window.siteLocked = false;</script>
 
-    <link rel="stylesheet" href="css/concept-gallery.css?v=20260922-39" />
+    <link rel="stylesheet" href="css/concept-gallery.css?v=20260924-5" />
     <script src="js/concept-gallery.js?v=20260922-23" defer></script>
     <script src="js/project-preview.js?v=20260922-5" defer></script>
     <script src="js/info-popover.js?v=20260923-10" defer></script>
@@ -440,7 +440,7 @@
                 <span aria-current="page">ThermoPal</span>
             </nav>
         </header>
-        <iframe class="project-preview__frame" title="ThermoPal project" data-src="thermopal.html?v=20260926-65&amp;preview=1"></iframe>
+        <iframe class="project-preview__frame" title="ThermoPal project" data-src="thermopal.html?v=20260927-67&amp;preview=1"></iframe>
     </dialog>
 
     <div id="custom-cursor"></div>
@@ -450,14 +450,22 @@
     <script src="https://unpkg.com/lenis@1.0.45/dist/lenis.min.js"></script>
     <script src="https://unpkg.com/@rive-app/canvas@2.31.6"></script>
     <script src="js/index.js?v=20260922-3"></script>
+    <script src="js/nestify-bird-data.js?v=20260924-1"></script>
     <script>
-        new rive.Rive({
-            src: 'media/nestify/bird-blink.riv',
-            canvas: document.getElementById('nestify-card-bird'),
-            autoplay: true,
-            fit: rive.Fit.Contain,
-            alignment: rive.Alignment.Center
-        });
+        (() => {
+            const encodedBird = window.NESTIFY_BIRD_RIVE_BASE64;
+            const birdCanvas = document.getElementById('nestify-card-bird');
+            if (!encodedBird || !birdCanvas || !window.rive) return;
+
+            const birdBytes = Uint8Array.from(atob(encodedBird), character => character.charCodeAt(0));
+            new rive.Rive({
+                buffer: birdBytes.buffer,
+                canvas: birdCanvas,
+                autoplay: true,
+                fit: rive.Fit.Contain,
+                alignment: rive.Alignment.Center
+            });
+        })();
     </script>
     <!-- 开站密码验证逻辑（已注释停用。之后如需重新启用告诉我“打开开站密码”即可）：
     <script>

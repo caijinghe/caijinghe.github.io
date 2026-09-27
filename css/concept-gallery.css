@@ -302,3 +302,7 @@
 .project-preview--dark .concept-gallery__breadcrumbs > span[aria-current="page"] {
   color: #fff;
 }
+#lepal-dialog .concept-gallery__breadcrumbs > span[aria-current="page"] {
+  font-size: 14px;
+  font-weight: 400;
+}

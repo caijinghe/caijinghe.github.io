@@ -10,7 +10,7 @@
     <script src="js/password.js"></script>
 
     <link rel="icon" href="media/logo.svg" type="image/svg+xml" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,100..900&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/workheader2.css" />
     <link rel="stylesheet" href="css/scroll-indicator.css?v=20260920-1" />
@@ -45,7 +45,7 @@
             padding: 0;
             background: #ffffff;
             color: #FCFBF4;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Google Sans Flex', sans-serif;
         }
 
         body {
@@ -473,7 +473,8 @@
         /* Confidential Card */
         .confidential-section {
             width: 100%;
-            padding: 10px 24px 140px 24px;
+            padding: 0 24px 50vh;
+            padding-bottom: 50dvh;
             display: flex;
             justify-content: center;
             background-color: #ffffff;
@@ -483,11 +484,12 @@
         }
 
         .confidential-card {
-            width: 100%;
-            max-width: 680px;
+            width: 70%;
+            max-width: none;
+            transform: translateY(50%);
             background: #f7f7f8;
-            border-radius: 24px;
-            padding: 48px 48px;
+            border-radius: clamp(24px, 2vw, 38px);
+            padding: clamp(48px, 4vw, 76px);
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
@@ -499,7 +501,7 @@
             display: inline-flex;
             align-items: center;
             justify-content: flex-start;
-            margin-bottom: 24px;
+            margin-bottom: clamp(24px, 2vw, 38px);
             cursor: pointer;
             user-select: none;
             background: transparent;
@@ -509,8 +511,8 @@
         }
 
         .animated-lock {
-            width: 48px;
-            height: 52px;
+            width: clamp(48px, 4vw, 76px);
+            height: auto;
             overflow: visible;
             display: block;
         }
@@ -633,8 +635,8 @@
         }
 
         .confidential-title {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            font-size: 19px;
+            font-family: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: clamp(19px, 1.6vw, 30px);
             font-weight: 500;
             color: #111827;
             margin: 0 0 8px 0;
@@ -644,8 +646,8 @@
         }
 
         .confidential-desc {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            font-size: 16px;
+            font-family: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: clamp(16px, 1.35vw, 25px);
             font-weight: 400;
             color: #9ca3af;
             margin: 0;
@@ -668,9 +670,13 @@
                 height: 200px;
             }
             .confidential-section {
-                padding: 0 20px 100px 20px;
+                padding-top: 0;
+                padding-right: 20px;
+                padding-left: 20px;
+                padding-bottom: 50dvh;
             }
             .confidential-card {
+                width: 100%;
                 padding: 32px 28px;
                 border-radius: 20px;
             }
@@ -723,7 +729,7 @@
             align-items: center;
             justify-content: center;
             font-size: 0.85rem;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Google Sans Flex', sans-serif;
             font-weight: 300;
             color: #000000;
             backface-visibility: hidden;
