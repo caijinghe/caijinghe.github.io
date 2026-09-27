@@ -1,0 +1,474 @@
+/*
+ * CASE STUDY SYSTEM
+ * Reusable portfolio-page rules distilled from the LePal project.
+ *
+ * Usage:
+ *   <link rel="stylesheet" href="css/case-study-system.css">
+ *   <main class="case-page">...</main>
+ *
+ * Keep project-specific colors and artwork in each project stylesheet.
+ * Keep shared typography, spacing, dividers, pills and responsive behavior here.
+ */
+
+:root {
+  /* Page geometry */
+  --case-gutter: 15%;
+  --case-content-width: 70%;
+  --case-copy-max-width: 545px;
+  --case-column-gap: 16px;
+
+  /* Color */
+  --case-page-bg: #000;
+  --case-text: #fff;
+  --case-muted: #777;
+  --case-divider: #303030;
+  --case-accent: #ff6dd8;
+
+  /* Typography — Google Sans Flex */
+  --case-font: "Google Sans Flex", sans-serif;
+  --case-hero-size: clamp(40px, 3.8vw, 50px);
+  --case-section-title-size: 26px;
+  --case-body-size: 16px;
+  --case-label-size: 13px;
+  --case-body-line-height: 1.4;
+
+  /* Section rhythm */
+  --case-section-padding-y: 80px;
+  --case-divider-to-title: 18px;
+  --case-media-to-divider: 36px;
+  --case-divider-to-pill: 160px;
+  --case-pill-to-content: 20px;
+  --case-paragraph-gap: 24px;
+  --case-page-bottom-space: 15vw;
+
+  /* Showcase / Impact pills */
+  --case-pill-height: 42px;
+  --case-pill-padding-x: 22px;
+  --case-pill-font-size: 22px;
+  --case-impact-pill-top: 80px;
+
+  /* Media groups */
+  --case-media-group-padding-top: 120px;
+  --case-media-group-padding-bottom: 150px;
+  --case-media-gap: 64px;
+  --case-phone-radius: 2vw;
+}
+
+/* ---------- Page foundation ---------- */
+
+.case-page {
+  width: 100%;
+  margin: 0;
+  background: var(--case-page-bg);
+  color: var(--case-text);
+  font-family: var(--case-font);
+}
+
+.case-stack {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+}
+
+.case-content {
+  width: 100%;
+  padding-inline: var(--case-gutter);
+}
+
+/* ---------- Cover title ---------- */
+
+.case-cover {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.case-cover > img,
+.case-cover > video {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.case-cover__title {
+  position: absolute;
+  z-index: 3;
+  top: 22%;
+  left: 50%;
+  width: max-content;
+  max-width: calc(100% - 32px);
+  margin: 0;
+  color: inherit;
+  font: 500 var(--case-hero-size)/1.2 var(--case-font);
+  letter-spacing: 0;
+  text-align: center;
+  transform: translateX(-50%);
+  cursor: text;
+  pointer-events: auto;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* Match the perceived weight of light text when the title is dark on a light cover. */
+.case-cover__title--dark-on-light {
+  font-weight: 600;
+}
+
+/* ---------- Project overview ---------- */
+
+.project-overview {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  width: 100%;
+  padding: 40px 15% 80px;
+  background: var(--case-overview-bg, #000);
+  color: var(--case-overview-text, #fff);
+  font-family: var(--case-font);
+  font-synthesis: none;
+}
+
+.project-overview--light {
+  --case-overview-bg: #fff;
+  --case-overview-text: #000;
+  padding-bottom: 300px;
+}
+
+.project-overview.project-overview--light h1 {
+  font-weight: 500;
+}
+
+.project-overview--light .project-overview__content {
+  font-weight: 400;
+}
+
+.project-overview--light .project-overview__meta,
+.project-overview--light .project-overview__label {
+  font-weight: 300;
+}
+
+.project-overview h1 {
+  max-width: 460px;
+  margin: 0;
+  font-size: clamp(27px, 2.4vw, 33px);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.project-overview__content {
+  width: min(100%, 545px);
+  justify-self: end;
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 1.45;
+}
+
+.project-overview__content p {
+  margin: 0 0 18px;
+}
+
+.project-overview__meta,
+.project-overview__label {
+  font-size: 12px;
+  font-weight: 200;
+  line-height: 1.35;
+}
+
+.project-overview__meta {
+  display: flex;
+  justify-content: flex-start;
+  gap: 24px;
+  align-items: end;
+  margin-bottom: 8px !important;
+}
+
+.project-overview__label {
+  margin-top: 38px !important;
+  margin-bottom: 8px !important;
+}
+
+.project-overview ol {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.project-overview__collaborators {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  justify-content: start;
+  gap: 48px;
+}
+
+.project-overview__collaborators p {
+  margin: 0;
+}
+
+.project-overview__muted {
+  color: #777;
+}
+
+@media (max-width: 1100px) {
+  .project-overview__collaborators {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}
+
+/* ---------- Standard two-column section ---------- */
+
+.case-section {
+  width: 100%;
+  padding: var(--case-section-padding-y) var(--case-gutter);
+}
+
+.case-section__divider {
+  width: 100%;
+  height: 1px;
+  background: var(--case-divider);
+}
+
+.case-section__header {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--case-column-gap);
+  align-items: start;
+  padding-top: var(--case-divider-to-title);
+}
+
+.case-section__title {
+  margin: 0;
+  font-size: var(--case-section-title-size);
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.case-section__copy {
+  width: min(100%, var(--case-copy-max-width));
+  justify-self: end;
+}
+
+.case-section__copy p {
+  margin: 0;
+  font-size: var(--case-body-size);
+  font-weight: 300;
+  line-height: var(--case-body-line-height);
+}
+
+.case-section__copy p + p {
+  margin-top: var(--case-paragraph-gap);
+}
+
+.case-section__label {
+  margin: 0;
+  color: var(--case-accent);
+  font-size: var(--case-label-size);
+  font-weight: 300;
+  line-height: 1.35;
+}
+
+/* ---------- Divider + centered section pill ----------
+ * Media to divider: 36px
+ * Divider to pill: 160px
+ * Pill to first content: 20px
+ */
+
+.case-showcase-divider {
+  width: var(--case-content-width);
+  height: 1px;
+  margin: var(--case-media-to-divider) var(--case-gutter) var(--case-divider-to-pill);
+  background: var(--case-divider);
+}
+
+.case-pill {
+  display: grid;
+  width: fit-content;
+  height: var(--case-pill-height);
+  margin: 0 auto var(--case-pill-to-content);
+  padding-inline: var(--case-pill-padding-x);
+  place-items: center;
+  border-radius: 999px;
+  background: var(--case-accent);
+  color: #000;
+  font-size: var(--case-pill-font-size);
+  font-weight: 500;
+  line-height: 1;
+}
+
+.case-pill--impact {
+  margin-top: var(--case-impact-pill-top);
+}
+
+/* ---------- Full-width project media ---------- */
+
+.case-media {
+  width: 100%;
+  padding-inline: var(--case-gutter);
+}
+
+.case-media img,
+.case-media video {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* ---------- Two- and three-item phone comparisons ---------- */
+
+.case-media-group {
+  padding: var(--case-media-group-padding-top) var(--case-gutter)
+    var(--case-media-group-padding-bottom);
+}
+
+.case-media-group__grid {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: var(--case-media-gap);
+}
+
+.case-media-group__grid--spread {
+  justify-content: space-between;
+}
+
+.case-media-group__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.case-media-group__tag {
+  display: block;
+  width: 125px;
+  height: auto;
+  margin-bottom: 24px;
+  object-fit: contain;
+}
+
+.case-phone {
+  display: block;
+  width: min(25vw, 280px);
+  aspect-ratio: 9 / 19.4;
+  overflow: hidden;
+  border-radius: var(--case-phone-radius);
+  background: #000;
+}
+
+.case-phone > video,
+.case-phone > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ---------- Carousel dots ---------- */
+
+.case-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-top: 25px;
+}
+
+.case-dot {
+  display: grid;
+  width: 16px;
+  height: 32px;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  background: transparent;
+}
+
+.case-dot::before {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+  content: "";
+}
+
+.case-dot.is-active::before,
+.case-dot[aria-current="true"]::before {
+  background: #fff;
+  transform: scale(1.65);
+}
+
+/* Always place this after the final section, never before it. */
+.case-page-end {
+  width: 100%;
+  min-height: var(--case-page-bottom-space);
+  flex-shrink: 0;
+}
+
+/* ---------- Responsive rules ---------- */
+
+@media (max-width: 1100px) {
+  :root {
+    --case-pill-height: 32px;
+    --case-pill-padding-x: 14px;
+    --case-pill-font-size: 16px;
+  }
+
+  .case-media-group__grid {
+    gap: clamp(48px, 8vw, 96px);
+  }
+
+  .case-phone {
+    width: min(20vw, 220px);
+  }
+
+  .case-media-group__tag {
+    width: 100px;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --case-section-padding-y: 64px;
+  }
+
+  .case-cover__title {
+    width: calc(100% - 48px);
+    max-width: none;
+    font-size: clamp(20px, 4.5vw, 28px);
+    line-height: 1.15;
+  }
+
+  .project-overview {
+    grid-template-columns: 1fr;
+    gap: 56px;
+    padding: 32px 15% 64px;
+  }
+
+  .project-overview--light {
+    padding-bottom: 224px;
+  }
+
+  .project-overview__content {
+    width: 100%;
+    justify-self: stretch;
+  }
+
+  .project-overview__collaborators {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .project-overview__desktop-break {
+    display: none;
+  }
+
+  .case-section__header {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .case-section__copy {
+    width: 100%;
+    justify-self: stretch;
+  }
+}

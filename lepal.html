@@ -11,6 +11,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet" />
 
     <link rel="stylesheet" href="css/scroll-indicator.css?v=20260920-6" />
+    <!-- Shared case-study specification. Other project pages can reuse the same .case-* components. -->
+    <link rel="stylesheet" href="css/case-study-system.css?v=20260926-10" />
 
     <script src="js/lepal.js?v=20260924-5" defer></script>
     <script src="js/scroll-indicator.js?v=20260926-2" defer></script>
@@ -109,11 +111,6 @@
             position: relative;
         }
 
-        /* 全屏封面 & 大图 */
-        .block.cover {
-            overflow: hidden;
-        }
-
         .block:not(.cover) {
             content-visibility: auto;
             contain-intrinsic-size: 800px;
@@ -126,26 +123,8 @@
         }
 
 
-        .block.cover img,
-        .block.cover video,
-        .block img,
-        .block video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-
-        .block.cover {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .block.cover img {
-            position: relative;
-            z-index: 2;
-            /* 图片在上 */
+        .block:not(.cover) img,
+        .block:not(.cover) video {
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -160,107 +139,12 @@
             /* 不挡鼠标交互 */
         }
 
-        .hero-title {
-            position: absolute;
-            z-index: 3;
-            top: 22%;
-            left: 50%;
-            width: max-content;
-            max-width: calc(100% - 32px);
-            margin: 0;
-            color: #fff;
-            font-family: "Google Sans Flex", sans-serif;
-            font-size: clamp(40px, 3.8vw, 50px);
-            font-weight: 500;
-            line-height: 1.2;
-            letter-spacing: 0;
-            text-align: center;
-            transform: translateX(-50%);
-            cursor: text;
-            pointer-events: auto;
-            user-select: text;
-            -webkit-user-select: text;
-        }
-
-        .project-overview {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 16px;
-            width: 100%;
-            padding: 40px 15% 80px;
-            background: #000;
-            color: #fff;
-            font-family: "Google Sans Flex", sans-serif;
-            font-synthesis: none;
-        }
-
-        .project-overview h1 {
-            max-width: 460px;
-            margin: 0;
-            font-size: clamp(27px, 2.4vw, 33px);
-            font-weight: 400;
-            line-height: 1.15;
-            letter-spacing: -0.01em;
-        }
-
-        .project-overview__content {
-            width: min(100%, 545px);
-            justify-self: end;
-            font-size: 16px;
-            font-weight: 300;
-            line-height: 1.45;
-        }
-
-        .project-overview__content p {
-            margin: 0 0 18px;
-        }
-
-        .project-overview__meta,
-        .project-overview__label {
-            font-size: 12px;
-            font-weight: 200;
-            line-height: 1.35;
-        }
-
-        .project-overview__meta {
-            display: flex;
-            justify-content: flex-start;
-            gap: 24px;
-            align-items: end;
-            margin-bottom: 8px !important;
-        }
-
-        .project-overview__label {
-            margin-top: 38px !important;
-            margin-bottom: 8px !important;
-        }
-
-        .project-overview ol {
-            margin: 0;
-            padding-left: 18px;
-        }
-
-        .project-overview__collaborators {
-            display: grid;
-            grid-template-columns: max-content max-content;
-            justify-content: start;
-            gap: 48px;
-        }
-
-        .project-overview__collaborators p {
-            margin: 0;
-        }
-
-        .project-overview__muted {
-            color: #777;
+        .block.cover > img {
+            position: relative;
+            z-index: 2;
         }
 
         @media (max-width: 1100px) {
-            .project-overview__collaborators {
-                grid-template-columns: 1fr;
-                gap: 4px;
-            }
-
             .showcase-transition.showcase-transition.is-active {
                 width: fit-content;
                 height: var(--case-pill-height);
@@ -951,33 +835,6 @@
         }
 
         @media (max-width: 768px) {
-            .hero-title {
-                width: calc(100% - 48px);
-                max-width: none;
-                font-size: clamp(20px, 4.5vw, 28px);
-                line-height: 1.15;
-            }
-
-            .project-overview {
-                grid-template-columns: 1fr;
-                gap: 56px;
-                padding: 32px 15% 64px;
-            }
-
-            .project-overview__content {
-                width: 100%;
-                justify-self: stretch;
-            }
-
-            .project-overview__collaborators {
-                grid-template-columns: 1fr;
-                gap: 4px;
-            }
-
-            .project-overview__desktop-break {
-                display: none;
-            }
-
             .project-background {
                 padding: 160px 15% 0;
             }
@@ -1549,11 +1406,11 @@
 
     <main class="stack" id="lepal-stack">
         <!-- Cover -->
-        <section class="block cover" data-meteors>
+        <section class="block cover case-cover" data-meteors>
             <!-- 图片在上层 -->
             <img src="media/lepal/new-cover.png?v=20260924-3" loading="eager" alt="LePal Cover" />
 
-            <h1 class="hero-title">A Narrative-Driven Redesign of a Gen Z<br />Mental Wellness Experience</h1>
+            <h1 class="case-cover__title">A Narrative-Driven Redesign of a Gen Z<br />Mental Wellness Experience</h1>
 
         </section>
 
