@@ -15,6 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/workheader2.css" />
     <link rel="stylesheet" href="css/scroll-indicator.css?v=20260920-1" />
+    <link rel="stylesheet" href="css/case-study-system.css?v=20260926-10" />
 
     <script src="js/scroll-indicator.js?v=20260920-1" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -180,6 +181,39 @@
             display: block;
         }
 
+
+        /* Use the shared case-study title layout at every window size. */
+        .block.cover.case-cover > img {
+            height: auto;
+            object-fit: contain;
+        }
+
+        .samsung-cover .case-cover__title {
+            top: 11.5%;
+            width: min(1050px, calc(100% - 24px));
+            max-width: none;
+            font-size: clamp(14px, 3.4vw, 50px);
+            line-height: 1.2;
+            text-wrap: balance;
+            color: #a18bbe;
+            background: linear-gradient(90deg, #168fff 0%, #ff8078 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .samsung-overview h1 {
+            font-size: clamp(14px, 2.3vw, 33px);
+        }
+
+        .samsung-overview .project-overview__content {
+            font-size: clamp(12px, 1.12vw, 16px);
+        }
+
+        .samsung-overview .project-overview__meta,
+        .samsung-overview .project-overview__label {
+            font-size: clamp(9px, 0.84vw, 12px);
+        }
 
         /* 中等视频段 */
         .block.video-focus {
@@ -833,24 +867,45 @@
     <main class="stack" id="samsung-stack">
 <!-- Cover -->
         <!-- Cover -->
-        <section class="block cover" data-meteors>
+        <section class="block cover case-cover samsung-cover" data-meteors>
             <!-- 视频在底层 -->
             <video class="bg-video" autoplay muted loop playsinline>
                 <source src="media/samsung/samsung.mp4" type="video/mp4" />
             </video>
 
             <!-- 图片在上层 -->
-            <img src="media/samsung/cover.png" loading="eager" alt="Samsung Cover" />
+            <img src="media/samsung/new-cover.png" loading="eager" alt="Samsung Cover" />
+            <h1 class="case-cover__title">Designing Personalized Experiences<br />for the Future of Galaxy</h1>
         </section>
 
 
 
 
 
-        <!-- 普通大图 -->
-        <section class="block"><img src="media/samsung/overview.png" alt="Intro shot" /></section>
-        <section class="block"><img src="media/samsung/essential.png" alt="Intro shot" /></section>
-        <section class="block"><img src="media/samsung/challenge.png" alt="Intro shot" /></section>
+        <section class="project-overview samsung-overview" aria-labelledby="project-overview-title">
+            <h1 id="project-overview-title">Mobile Personalization,<br />Future Experiences.</h1>
+
+            <div class="project-overview__content">
+                <div class="project-overview__meta">
+                    <span>Design Strategy, 2025</span>
+                    <span>10 Weeks</span>
+                    <span>Research · UX · Prototyping</span>
+                </div>
+                <p>Working with Tom Hardy, former Corporate Design Advisor to Samsung Electronics, we explored how personalization could shape future Galaxy experiences. Through research across 8 countries and Gen Z interviews, we translated user perceptions, aesthetics, and behaviors into actionable design directions.</p>
+                <p>I focused on research and design strategy, conducting the adjective study and quantitative analysis, then translating those insights into personalization concepts for future Galaxy experiences.</p>
+
+                <p class="project-overview__label">My deliverables</p>
+                <ol>
+                    <li>Conducted a global adjective study across 8 countries, analyzing 700+ users' perceptions, aesthetics, and behaviors.</li>
+                    <li>Translated research findings into design directions for Gen Z, connecting user expectations with future Galaxy experiences.</li>
+                    <li>Prototyped 5 AI-driven personalization concepts for the Galaxy cover screen.</li>
+                    <li>Developed future-device applications, with 2 core concepts later commercialized in the Galaxy Z Flip series.</li>
+                </ol>
+
+                <p class="project-overview__label">Collaborators</p>
+                <p>16-person SCADpro team<br />Samsung PX, CX &amp; BX design teams</p>
+            </div>
+        </section>
 
         <section class="block showcase-teaser">
             <div class="teaser-crop">
