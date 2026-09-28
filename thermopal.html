@@ -19,6 +19,7 @@
         }
     </script>
     <link rel="stylesheet" href="css/project-loader.css?v=20260928-3" />
+    <script src="js/project-asset-loader.js?v=20260928-1" defer></script>
 </head>
 <body>
     <div id="loading-overlay" aria-label="Loading">
@@ -373,12 +374,14 @@
             }, wait);
         }
 
-        if (document.readyState === 'complete') {
+        async function removeOverlayWhenReady() {
+            if (document.readyState !== 'complete') {
+                await new Promise(resolve => window.addEventListener('load', resolve, { once: true }));
+            }
+            await window.projectAssetsReady;
             removeOverlay();
-        } else {
-            window.addEventListener('load', removeOverlay, { once: true });
-            setTimeout(removeOverlay, 2500);
         }
+        removeOverlayWhenReady();
 
         const nestFlow = document.querySelector('.nest-states-flow');
         if (nestFlow && 'IntersectionObserver' in window) {

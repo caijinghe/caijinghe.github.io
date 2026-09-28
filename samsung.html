@@ -918,6 +918,7 @@
         }
     </style>
     <link rel="stylesheet" href="css/project-loader.css?v=20260928-3" />
+    <script src="js/project-asset-loader.js?v=20260928-1" defer></script>
 </head>
 
 <body>
@@ -1323,7 +1324,8 @@
         }
         initAnimatedLock();
 
-        window.addEventListener("load", () => {
+        window.addEventListener("load", async () => {
+            await window.projectAssetsReady;
             const elapsed = Date.now() - loadStart;
             setTimeout(removeOverlay, Math.max(0, 800 - elapsed));
         });
