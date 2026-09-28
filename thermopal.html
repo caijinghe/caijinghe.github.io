@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/workheader2.css">
-    <link rel="stylesheet" href="css/case-study-system.css?v=20260926-10">
+    <link rel="stylesheet" href="css/case-study-system.css?v=20260928-11">
     <link rel="stylesheet" href="css/thermopal.css?v=20260927-46">
     <link rel="stylesheet" href="css/scroll-indicator.css?v=20260920-1">
     <script src="js/scroll-indicator.js?v=20260920-1" defer></script>
@@ -18,6 +18,7 @@
             document.documentElement.classList.add('is-preview');
         }
     </script>
+    <link rel="stylesheet" href="css/project-loader.css?v=20260928-3" />
 </head>
 <body>
     <div id="loading-overlay" aria-label="Loading">
@@ -319,6 +320,7 @@
 
             function scalePreviewToFrame() {
                 const previewScale = Math.min(1, window.innerWidth / previewCanvasWidth);
+                document.documentElement.style.setProperty('--project-preview-scale', previewScale);
                 document.body.style.width = `${window.innerWidth / previewScale}px`;
                 document.body.style.minHeight = `${window.innerHeight / previewScale}px`;
                 document.body.style.zoom = previewScale;

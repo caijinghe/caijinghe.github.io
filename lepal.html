@@ -12,7 +12,7 @@
 
     <link rel="stylesheet" href="css/scroll-indicator.css?v=20260920-6" />
     <!-- Shared case-study specification. Other project pages can reuse the same .case-* components. -->
-    <link rel="stylesheet" href="css/case-study-system.css?v=20260926-10" />
+    <link rel="stylesheet" href="css/case-study-system.css?v=20260928-11" />
 
     <script src="js/lepal.js?v=20260924-5" defer></script>
     <script src="js/scroll-indicator.js?v=20260926-2" defer></script>
@@ -63,8 +63,6 @@
         }
 
         #loading-overlay video {
-            width: min(65vw, 390px);
-            height: min(65vw, 390px);
             object-fit: contain;
             border: none;
             border-radius: 0;
@@ -1150,6 +1148,10 @@
         }
 
         @media (max-width: 768px) {
+            body.is-preview .project-end-spacer {
+                min-height: calc(var(--case-page-bottom-space) / var(--project-preview-scale, 1));
+            }
+
             .carousel-nav {
                 width: 36px;
                 height: 36px;
@@ -1391,6 +1393,7 @@
 
         }
     </style>
+    <link rel="stylesheet" href="css/project-loader.css?v=20260928-3" />
 </head>
 
 <body>
@@ -1407,7 +1410,7 @@
 
     <main class="stack" id="lepal-stack">
         <!-- Cover -->
-        <section class="block cover case-cover" data-meteors>
+        <section class="block cover case-cover lepal-cover" data-meteors>
             <!-- 图片在上层 -->
             <img src="media/lepal/new-cover.png?v=20260924-3" loading="eager" alt="LePal Cover" />
 
@@ -1709,6 +1712,7 @@
 
             function scalePreviewToFrame() {
                 const previewScale = Math.min(1, window.innerWidth / previewCanvasWidth);
+                document.documentElement.style.setProperty('--project-preview-scale', previewScale);
                 document.body.style.width = `${window.innerWidth / previewScale}px`;
                 document.body.style.minHeight = `${window.innerHeight / previewScale}px`;
                 document.body.style.zoom = previewScale;

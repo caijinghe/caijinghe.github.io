@@ -14,7 +14,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/workheader2.css" />
     <link rel="stylesheet" href="css/scroll-indicator.css?v=20260920-1" />
-    <link rel="stylesheet" href="css/case-study-system.css?v=20260926-10" />
+    <link rel="stylesheet" href="css/case-study-system.css?v=20260928-11" />
     <script src="js/scroll-indicator.js?v=20260920-1" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="js/mfst.js?v=20260921-2" defer></script>
@@ -76,15 +76,13 @@
         }
 
         #loading-overlay video {
-            width: min(65vw, 390px);
-            height: min(65vw, 390px);
             object-fit: contain;
             border: none;
             border-radius: 0;
             box-shadow: none;
             background: transparent;
-            mix-blend-mode: multiply;
-            filter: contrast(1.05) brightness(1.02);
+            mix-blend-mode: normal;
+            filter: invert(1);
             pointer-events: none;
         }
 
@@ -707,6 +705,31 @@
             .confidential-desc {
                 font-size: 15px;
             }
+
+            /* Keep the confidential card at Samsung's readable phone size
+               when the Microsoft preview canvas is scaled down. */
+            html.is-preview .confidential-section {
+                margin-top: calc(-2px / var(--project-preview-scale, 1));
+                padding-right: calc(20px / var(--project-preview-scale, 1));
+                padding-bottom: calc(50dvh / var(--project-preview-scale, 1));
+                padding-left: calc(20px / var(--project-preview-scale, 1));
+            }
+            html.is-preview .confidential-card {
+                padding: calc(32px / var(--project-preview-scale, 1)) calc(28px / var(--project-preview-scale, 1));
+                border-radius: calc(20px / var(--project-preview-scale, 1));
+            }
+            html.is-preview .confidential-lock-badge {
+                margin-bottom: calc(24px / var(--project-preview-scale, 1));
+            }
+            html.is-preview .animated-lock {
+                width: calc(48px / var(--project-preview-scale, 1));
+            }
+            html.is-preview .confidential-title {
+                font-size: calc(18px / var(--project-preview-scale, 1));
+            }
+            html.is-preview .confidential-desc {
+                font-size: calc(15px / var(--project-preview-scale, 1));
+            }
         }
 
         /* Footer */
@@ -968,13 +991,14 @@
 
         }
     </style>
+    <link rel="stylesheet" href="css/project-loader.css?v=20260928-3" />
 </head>
 
 <body>
     <!-- Loading Overlay -->
     <div id="loading-overlay">
         <video id="loading-video" autoplay muted loop playsinline>
-            <source src="media/index/logo.mp4" type="video/mp4" />
+            <source src="media/index/logo_dark.mp4" type="video/mp4" />
         </video>
     </div>
 
@@ -1392,6 +1416,7 @@
 
             function scalePreviewToFrame() {
                 const previewScale = Math.min(1, window.innerWidth / previewCanvasWidth);
+                document.documentElement.style.setProperty('--project-preview-scale', previewScale);
                 document.body.style.width = `${window.innerWidth / previewScale}px`;
                 document.body.style.minHeight = `${window.innerHeight / previewScale}px`;
                 document.body.style.zoom = previewScale;

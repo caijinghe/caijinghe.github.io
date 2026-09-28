@@ -1,0 +1,40 @@
+/* The shared clip has generous padding: a 390px canvas gives a ~70px logo. */
+html #loading-overlay,
+html .concept-gallery__loading {
+  overflow: hidden;
+}
+
+/* Cancel the case-study canvas zoom so the loader keeps its on-screen size. */
+html #loading-overlay {
+  zoom: calc(1 / var(--project-preview-scale, 1));
+}
+
+html #loading-overlay video,
+html .concept-gallery__loading-video {
+  width: 390px;
+  height: 390px;
+  max-width: none;
+  max-height: none;
+  flex: none;
+  object-fit: contain;
+}
+
+@media (max-width: 768px) {
+  /* Match every mobile case-study hero to Samsung's title treatment. */
+  html .case-cover .case-cover__title {
+    top: 11.5%;
+    width: min(1050px, calc(100% - 24px));
+    max-width: none;
+    font-size: calc(14px / var(--project-preview-scale, 1));
+    font-weight: 500;
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+
+  /* These covers place their brand marks higher in the artwork. Keep each
+     title's original relative position while sharing Samsung's type size. */
+  html .lepal-cover .case-cover__title,
+  html .thermostat-cover .case-cover__title {
+    top: 22%;
+  }
+}

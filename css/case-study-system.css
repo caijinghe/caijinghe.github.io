@@ -444,6 +444,36 @@
     padding: 32px 15% 64px;
   }
 
+  .project-overview h1 {
+    width: 100%;
+    max-width: none;
+    font-size: 16px;
+  }
+
+  .project-overview.samsung-overview h1 {
+    font-size: 14px;
+  }
+
+  .project-overview__content {
+    font-size: 11px;
+  }
+
+  .project-overview__meta,
+  .project-overview__label {
+    font-size: 9px;
+  }
+
+  .project-overview__meta {
+    flex-wrap: nowrap;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .project-overview__meta > span {
+    flex: none;
+    white-space: nowrap;
+  }
+
   .project-overview--light {
     padding-bottom: 224px;
   }
@@ -470,5 +500,34 @@
   .case-section__copy {
     width: 100%;
     justify-self: stretch;
+  }
+
+  /* Some project previews preserve a 1100px design canvas with page zoom.
+     Counter that zoom for type only, matching Samsung's readable phone sizes. */
+  :is(html, body).is-preview .project-overview h1 {
+    font-size: calc(16px / var(--project-preview-scale, 1));
+  }
+
+  :is(html, body).is-preview .project-overview.samsung-overview h1 {
+    font-size: calc(14px / var(--project-preview-scale, 1));
+  }
+
+  :is(html, body).is-preview .project-overview__content,
+  :is(html, body).is-preview .case-section__copy p {
+    font-size: calc(11px / var(--project-preview-scale, 1));
+  }
+
+  :is(html, body).is-preview .project-overview__meta,
+  :is(html, body).is-preview .project-overview__label,
+  :is(html, body).is-preview .case-section__label {
+    font-size: calc(9px / var(--project-preview-scale, 1));
+  }
+
+  :is(html, body).is-preview .case-section__title {
+    font-size: calc(16px / var(--project-preview-scale, 1));
+  }
+
+  :is(html, body).is-preview .project-overview__meta {
+    gap: calc(12px / var(--project-preview-scale, 1));
   }
 }
