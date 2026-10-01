@@ -23,8 +23,22 @@
   --bg-card-sage: #CCDF80;
 }
 
-/* Preview artwork layout. Live text uses project-typography.css. */
-html.is-preview .showcase-badge { padding: clamp(7px, 0.7vw, 10px) clamp(15px, 1.5vw, 22px); }
+/* Continuous type scaling for the preview: preserve the same visual ratio at different window sizes. */
+html.is-preview .intro-col-1 h1 { font-size: clamp(20px, 1.8vw, 28px); }
+html.is-preview .meta-title,
+html.is-preview .meta-subtitle,
+html.is-preview .intro-col-2 .meta-heading,
+html.is-preview .intro-col-2 li { font-size: clamp(11px, 0.85vw, 13px); }
+html.is-preview .showcase-badge { font-size: clamp(15px, 1.3vw, 20px); padding: clamp(7px, 0.7vw, 10px) clamp(15px, 1.5vw, 22px); }
+html.is-preview .showcase-brand { font-size: clamp(16px, 1.4vw, 20px); }
+html.is-preview .feature-eyebrow { font-size: clamp(13px, 1.1vw, 16px); }
+html.is-preview .feature-title,
+html.is-preview .nest-title { font-size: clamp(30px, 2.65vw, 38px); line-height: 1.03; }
+html.is-preview .feature-desc { font-size: clamp(16px, 1.4vw, 20px); line-height: 1.2; }
+html.is-preview .subfeature-title { font-size: clamp(19px, 1.67vw, 24px); line-height: 1.17; }
+html.is-preview .subfeature-desc { font-size: clamp(15px, 1.25vw, 18px); line-height: 1.33; }
+html.is-preview .nest-state-label { font-size: clamp(15px, 1.32vw, 19px); }
+html.is-preview .nest-callout-text { font-size: clamp(15px, 1.25vw, 18px); }
 html.is-preview .nest-state-label { transform: translateY(-35px); }
 html.is-preview .nest-logo-icon { width: clamp(40px, 4.8vw, 69px); height: clamp(40px, 4.8vw, 69px); }
 
@@ -37,12 +51,14 @@ html {
   scroll-behavior: smooth;
 }
 
-body {
+body.project-design-system {
   margin: 0;
   background: #ffffff;
   color: var(--color-text);
-
-
+  font-family: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 html.is-preview .site-header,
@@ -140,7 +156,12 @@ body.is-preview .intro-grid {
 }
 
 .intro-col-1 h1 {
+  font-family: 'Avenir Next', 'Avenir', 'Google Sans Flex', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
   margin: 0 0 20px;
+  line-height: 1.2;
 }
 
 .intro-col-1 h1 .brand-accent {
@@ -152,13 +173,18 @@ body.is-preview .intro-grid {
 }
 
 .meta-title {
+  font-size: 13px;
+  font-weight: 500;
   color: #000;
   margin: 0 0 2px;
 }
 
 .meta-subtitle {
+  font-size: 13px;
+  font-weight: 400;
   color: #666;
   margin: 0;
+  line-height: 1.4;
 }
 
 .intro-col-2 .meta-block {
@@ -166,6 +192,8 @@ body.is-preview .intro-grid {
 }
 
 .intro-col-2 .meta-heading {
+  font-size: 13px;
+  font-weight: 600;
   color: #000;
   margin: 0 0 4px;
 }
@@ -177,11 +205,19 @@ body.is-preview .intro-grid {
 }
 
 .intro-col-2 li {
+  font-size: 13px;
+  line-height: 1.5;
   color: var(--color-dim);
 }
 
 .intro-col-3 .project-summary {
+  font-size: 14px;
+  line-height: 1.65;
   color: #000;
+}
+
+.intro-col-3 .project-summary strong {
+  font-weight: 600;
 }
 
 /* ==========================================================================
@@ -276,6 +312,10 @@ body.is-preview .intro-grid {
   max-width: 1200px;
   width: 100%;
   margin: 0;
+  font-size: clamp(26px, 3.4vw, 48px);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.5px;
   color: #ffffff;
 }
 
@@ -313,11 +353,16 @@ body.is-preview .intro-grid {
 }
 
 .section-label {
+  font-size: 19px;
+  font-weight: 500;
+  letter-spacing: -0.2px;
   margin: 0 0 8px;
   color: #000;
 }
 
 .section-subtitle {
+  font-size: 14px;
+  font-weight: 400;
   color: #666;
   margin: 0;
 }
@@ -350,6 +395,9 @@ body.is-preview .intro-grid {
 }
 
 .stat-number {
+  font-size: 38px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
   min-width: 175px;
   flex-shrink: 0;
 }
@@ -367,20 +415,25 @@ body.is-preview .intro-grid {
 }
 
 .stat-desc {
+  font-size: 18px;
+  line-height: 1.55;
   color: #000;
   margin: 0;
 }
 
 .stat-desc .highlight-orange {
   color: var(--color-orange);
+  font-weight: 600;
 }
 
 .stat-desc .highlight-blue {
   color: var(--color-blue);
+  font-weight: 600;
 }
 
 .stat-desc .highlight-purple {
   color: var(--color-purple);
+  font-weight: 600;
 }
 
 /* ==========================================================================
@@ -403,8 +456,14 @@ body.is-preview .intro-grid {
 }
 
 .hmw-item {
+  font-size: 18px;
+  line-height: 1.6;
   color: #000;
   margin: 0;
+}
+
+.hmw-item strong {
+  font-weight: 700;
 }
 
 /* ==========================================================================
@@ -420,12 +479,22 @@ body.is-preview .intro-grid {
   display: inline-block;
   background-color: #ACD92F;
   color: #000000;
+  font-family: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1;
   padding: 10px 22px;
   border-radius: 999px;
   margin: 0 auto;
+  letter-spacing: -0.2px;
 }
 
 .showcase-brand {
+  font-family: 'Avenir Next', 'Avenir', 'Google Sans Flex', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.2px;
   color: #000000;
   margin: 22px 0 54px;
 }
@@ -491,6 +560,11 @@ body.is-preview .intro-grid {
 }
 
 .statement-quote {
+  font-family: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: clamp(26px, 3.4vw, 44px);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.4px;
   color: #ACD92F;
   text-align: center;
   margin: 0;
@@ -581,18 +655,33 @@ body.is-preview .intro-grid {
 
 /* Feature 统一上标编号 (Feature #1, #2, #3, #4, #5) */
 .feature-eyebrow {
+  font-family: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 1.2;
+  letter-spacing: -0.15px;
   color: #000000;
   margin: 0 0 12px 0;
 }
 
-/* Typography is defined by data-case-type in project-typography.css. */
+/* Feature 统一主标题 (38px / 600 / line-height: 39px / letter-spacing: -0.25px) */
 .feature-title {
+  font-family: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 38px;
+  font-weight: 600;
+  line-height: 39px;
+  letter-spacing: -0.25px;
   margin: 0 0 42px 0;
   color: #000000;
 }
 
-/* Typography is defined by data-case-type in project-typography.css. */
+/* Feature 统一描述正文 (20px / 600 / line-height: 24px / letter-spacing: -0.13px) */
 .feature-desc {
+  font-family: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: -0.13px;
   color: #000000;
   margin: 0;
   max-width: 520px;
@@ -617,11 +706,21 @@ body.is-preview .intro-grid {
 
 /* 子板块标题与描述 (Friendly Companionship & Collective Impact) */
 .subfeature-title {
+  font-family: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 28px;
+  letter-spacing: -0.16px;
   margin: 0 0 42px 0;
   color: #000000;
 }
 
 .subfeature-desc {
+  font-family: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 18px;
+  font-weight: 300;
+  line-height: 24px;
+  letter-spacing: -0.1px;
   margin: 0;
   max-width: 500px;
   color: #767676;
@@ -642,6 +741,11 @@ body.is-preview .intro-grid {
 }
 
 .nest-title {
+  font-family: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 38px;
+  font-weight: 600;
+  line-height: 39px;
+  letter-spacing: -0.25px;
   margin: 0 0 120px 0;
   color: #000000;
 }
@@ -679,7 +783,10 @@ body.is-preview .intro-grid {
 .nest-state-label {
   position: relative;
   z-index: 1;
+  font-size: 19px;
+  font-weight: 300;
   font-style: italic;
+  letter-spacing: -0.2px;
   color: #000;
   margin: 0;
 }
@@ -741,6 +848,11 @@ body.is-preview .intro-grid {
 }
 
 .nest-callout-text {
+  font-family: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.45;
+  letter-spacing: -0.25px;
   color: #000000;
   margin: 0;
   max-width: 980px;
@@ -797,6 +909,8 @@ body.is-preview .intro-grid {
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
   align-items: end;
+  font-size: 15px;
+  font-weight: 300;
   mix-blend-mode: difference;
   color: #ffffff;
 }
@@ -867,6 +981,30 @@ video:focus-visible {
 }
 
 @media (max-width: 1024px) {
+  html.is-preview .feature-eyebrow {
+    font-size: 14px;
+  }
+
+  html.is-preview .feature-title,
+  html.is-preview .nest-title {
+    font-size: 33px;
+    line-height: 35px;
+  }
+
+  html.is-preview .feature-desc {
+    font-size: 17px;
+    line-height: 21px;
+  }
+
+  html.is-preview .subfeature-title {
+    font-size: 20px;
+    line-height: 24px;
+  }
+
+  html.is-preview .subfeature-desc {
+    font-size: 16px;
+    line-height: 21px;
+  }
 
   html.is-preview .hero-showcase {
     grid-template-columns: 1fr 1fr;
@@ -923,7 +1061,10 @@ video:focus-visible {
   }
 
   html.is-preview .nest-state-label {
+    font-size: clamp(13px, 1.3vw, 17px);
+    font-weight: 300;
     font-style: italic;
+    letter-spacing: -0.2px;
     color: #000;
     text-align: center;
     white-space: nowrap;
@@ -982,7 +1123,10 @@ video:focus-visible {
   }
 
   html.is-preview .nest-state-label {
+    font-size: 19px;
+    font-weight: 300;
     font-style: italic;
+    letter-spacing: -0.2px;
     color: #000;
     text-align: center;
     white-space: nowrap;
@@ -1008,6 +1152,9 @@ video:focus-visible {
   }
   .hero-banner-overlay {
     padding: 60px 24px 32px;
+  }
+  .hero-banner-overlay h2 {
+    font-size: 24px;
   }
   .background-section,
   .hmw-section {
