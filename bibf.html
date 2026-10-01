@@ -8,7 +8,6 @@
     <link rel="icon" href="media/logo.svg" type="image/svg+xml" />
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,100..900&display=swap" rel="stylesheet" />
 
-
     <link rel="stylesheet" href="css/index.css" />
 
     <script>
@@ -16,9 +15,6 @@
             document.documentElement.classList.add('is-preview');
         }
     </script>
-
-
-
 
     <style>
         * {
@@ -30,7 +26,6 @@
             margin: 0;
             padding: 0;
             height: 100vh;
-            font-family: 'Google Sans Flex', sans-serif;
             background-color: #fff;
             color: #111;
         }
@@ -48,7 +43,6 @@
             overflow-y: auto;
         }
 
-
         .content {
             flex: 1;
             display: flex;
@@ -56,8 +50,6 @@
             align-items: stretch;
             overflow: hidden;
         }
-
-
 
         .left-panel {
             flex: 1;
@@ -68,9 +60,6 @@
 
         }
 
-
-
-
         .info-award-wrapper {
             display: flex;
             flex-direction: row;
@@ -80,19 +69,12 @@
             /* ❌ 不需要 margin-top 或 margin-bottom */
         }
 
-
-
         .project-info h1 {
-            font-size: 3rem;
-            font-weight: 300;
             margin-top: 10rem;
         }
 
         .project-info p {
-            font-size: 1rem;
-            font-weight: 200;
             margin-top: 30px;
-            line-height: 1.6;
         }
 
         .award {
@@ -140,10 +122,6 @@
             display: block;
         }
 
-
-
-
-
         .dots {
             display: flex;
             justify-content: center;
@@ -164,7 +142,6 @@
         .dot.active {
             background-color: #000;
         }
-
 
     @media (max-width: 1000px) {
             html {
@@ -197,26 +174,17 @@
             }
 
             .project-info h1 {
-                font-size: 1.8rem;
-                font-weight: 300;
                 margin-top: 0;
             }
 
             .project-info p {
-                font-size: 0.8rem;
-                font-weight: 200;
                 margin-top: 1rem;
-                line-height: 1.5;
             }
 
             .award {
                 width: 80px;
                 margin-top: 10px;
             }
-
-
-
-
 
             .right-panel {
 
@@ -234,7 +202,6 @@
                 height: auto;
                 width: auto;
             }
-
 
             .dots {
                 display: flex;
@@ -277,19 +244,21 @@
             mix-blend-mode: normal;
             pointer-events: none;
         }
-    </style>
+</style>
     <link rel="stylesheet" href="css/project-loader.css?v=20260928-3" />
     <script src="js/project-asset-loader.js?v=20260928-1" defer></script>
+    <link rel="stylesheet" href="css/case-study-system.css?v=20261001-6" />
+    <link rel="stylesheet" href="css/project-typography.css?v=20261001-4" />
 </head>
 
-<body>
+<body class="project-design-system">
     <div id="loading-overlay" aria-label="Loading">
         <video id="loading-video" autoplay muted loop playsinline>
             <source src="media/index/logo_dark.mp4" type="video/mp4">
         </video>
     </div>
 
-    <header class="project-hero">
+    <header class="project-hero" data-case-type="ui">
 
         <div class="site-header">
             <div class="header-col-1">
@@ -316,7 +285,7 @@
                 <div class="info-award-wrapper">
                     <div class="project-info">
                         <img src="media/bibf/bibf.png" alt="Award" class="award" />
-                        <p>Beijing International Book Fair<br /> <br />Key Visual Design<br />Sep 2020, Client Work</p>
+                        <p data-case-type="body">Beijing International Book Fair<br /> <br />Key Visual Design<br />Sep 2020, Client Work</p>
                     </div>
 
                 </div>

@@ -20,7 +20,6 @@
             margin: 0;
             padding: 0;
             height: 100vh;
-            font-family: 'Google Sans Flex', sans-serif;
             background-color: #ffffff;
             color: #000000;
         }
@@ -32,7 +31,6 @@
             height: 100vh;
         }
 
-
         .content {
             flex: 1;
             display: flex;
@@ -40,8 +38,6 @@
             align-items: stretch;
             overflow: hidden;
         }
-
-
 
         .left-panel {
             flex: 1;
@@ -70,45 +66,19 @@
             /* ❌ 不需要 margin-top 或 margin-bottom */
         }
 
-
-        .project-info h1 {
-            font-size: 3rem;
-            font-weight: 300;
-            /* margin-top: 10rem; */
-        }
-
-        .project-info h2 {
-            font-size: 0.9rem;
-            font-weight: 200;
-            line-height: 1.5;
-        }
-
         .project-info p {
-            font-size: 1rem;
-            font-weight: 200;
             margin-top: 30px;
-            line-height: 1.6;
         }
 
         .award {
             width: 25vh;
         }
 
-        .project-title {
-            font-size: 3rem;
-            font-weight: 300;
-        }
-
-
         .project-text {
-            font-size: 14px;
             display: inline-block;
-            line-height: 1.6;
         }
 
         .paper-button {
-            font-family: inherit;
-            font-size: 13px;
             padding: 4px 10px;
             margin-top: 10px;
 
@@ -124,7 +94,6 @@
             background: #7e7e7e;
             color: #ffffff;
         }
-
 
         .right-panel {
             flex: 2;
@@ -163,8 +132,6 @@
             height: 36px;
         }
 
-
-
         @media (max-width: 1300px) {
             html {
                 height: auto !important;
@@ -187,7 +154,6 @@
                 padding: 10vw 8vw 0 8vw;
             }
 
-
             .info-award-wrapper {
                 flex-direction: row;
                 align-items: flex-start;
@@ -197,24 +163,17 @@
             }
 
             .project-info h1 {
-                font-size: 1.8rem;
-                font-weight: 300;
                 margin-top: 0;
             }
 
             .project-info p {
-                font-size: 0.8rem;
-                font-weight: 200;
                 margin-top: 1rem;
-                line-height: 1.5;
             }
 
             .award {
                 margin-top: 6rem;
                 width: 200px;
             }
-
-
 
             .right-panel {
                 padding: 4vw 8vw 15vw 8vw;
@@ -230,10 +189,6 @@
                 /* ✅ 防止变形并填满空间 */
                 border-radius: 8px;
             }
-
-
-
-
 
             .logo-button {
                 top: 8vw;
@@ -259,21 +214,16 @@
                 flex-wrap: wrap;
             }
 
-
-
             .logo-button img {
                 width: 30px;
                 height: 30px;
             }
-
-
 
             footer {
                 padding: 20px 8vw;
             }
 
             footer span {
-                font-size: 0.75rem;
                 color: #666;
             }
 
@@ -282,19 +232,16 @@
                 height: 30px;
                 border: 0.8px solid #ffffff;
             }
-
-            .more-text .face {
-                font-size: 0.75rem;
-                font-weight: 200;
-            }
         }
-    </style>
+</style>
+    <link rel="stylesheet" href="css/case-study-system.css?v=20261001-6" />
+    <link rel="stylesheet" href="css/project-typography.css?v=20261001-4" />
 </head>
 
-<body>
+<body class="project-design-system">
 
     <!-- Header -->
-    <header class="site-header">
+    <header class="site-header" data-case-type="ui">
         <div class="header-col-1">
             <a href="index.html" class="my-name">Jinghe Cai</a>
         </div>
@@ -319,16 +266,16 @@
             <div class="info-award-wrapper">
                 <div class="project-info">
                     <!-- <img src="media/wander/chiplay.svg" alt="Award" class="award" /> -->
-                    <p>
+                    <p data-case-type="body">
 
                         <img src="media/wander/chiplay.svg" alt="Award" class="award" />
 
-                    <h1>Wander</h1>
+                    <h1 data-case-type="overview">Wander</h1>
 
-                    <p>Gamified Sleep Experience<br />
+                    <p data-case-type="body">Gamified Sleep Experience<br />
                         Oct 2021, Research Work</p>
 
-                    <h2>
+                    <h2 data-case-type="body">
                         Nighttime phone use is a major cause of sleep disorders. We introduce lightweight interventions
                         across the sleep cycle to gently modify this behavior. At its core is a breath-controlled audio
                         game that reframes the smartphone as a sleep aid. By gamifying breathing exercises, it turns the
@@ -337,7 +284,7 @@
 
                     <a href="https://drive.google.com/file/u/0/d/1wOOOeP6lsSFb5pxlyFuNeut2zyGPdYnq/view"
                         target="_blank">
-                        <button class="paper-button">Paper Download</button>
+                        <button class="paper-button" data-case-type="ui">Paper Download</button>
                     </a><br /><br />
 
 

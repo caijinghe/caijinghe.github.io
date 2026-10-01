@@ -9,8 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/workheader2.css">
-    <link rel="stylesheet" href="css/case-study-system.css?v=20260928-11">
-    <link rel="stylesheet" href="css/thermopal.css?v=20260927-46">
+    <link rel="stylesheet" href="css/case-study-system.css?v=20261001-6">
+    <link rel="stylesheet" href="css/thermopal.css?v=20261001-2">
     <link rel="stylesheet" href="css/scroll-indicator.css?v=20260920-1">
     <script src="js/scroll-indicator.js?v=20260920-1" defer></script>
     <script>
@@ -18,16 +18,19 @@
             document.documentElement.classList.add('is-preview');
         }
     </script>
-    <link rel="stylesheet" href="css/project-loader.css?v=20260928-3" />
+    <link rel="stylesheet" href="css/project-loader.css?v=20261001-1" />
     <script src="js/project-asset-loader.js?v=20260928-1" defer></script>
+    <link rel="stylesheet" href="css/project-typography.css?v=20261001-4" />
+    <script src="js/case-preview-scale.js?v=20261001-1" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet" />
 </head>
-<body>
+<body class="project-design-system">
     <div id="loading-overlay" aria-label="Loading">
         <video id="loading-video" autoplay muted loop playsinline>
             <source src="media/index/logo_dark.mp4" type="video/mp4">
         </video>
     </div>
-    <header class="site-header">
+    <header class="site-header" data-case-type="ui">
         <div class="header-col-1">
             <a href="index.html" class="my-name">Jinghe Cai</a>
         </div>
@@ -45,23 +48,23 @@
         <!-- ThermoPal cover -->
         <section class="thermostat-cover case-cover" aria-label="ThermoPal cover">
             <img src="media/thermopal/thermostat-cover.png?v=20260921-6" alt="ThermoPal project cover" width="4680" height="3904" loading="eager" decoding="async">
-            <h1 class="case-cover__title case-cover__title--dark-on-light">Rethinking Thermal Comfort<br>in Shared Workspaces</h1>
+            <h1 class="case-cover__title case-cover__title--dark-on-light" data-case-type="cover">Rethinking Thermal Comfort<br>in Shared Workspaces</h1>
         </section>
 
         <!-- Project overview -->
         <section class="project-overview project-overview--light" aria-labelledby="project-overview-title">
-            <h1 id="project-overview-title">Smart Thermostat,<br>Cross-Device Experience.</h1>
+            <h1 id="project-overview-title" data-case-type="overview">Smart Thermostat,<br>Cross-Device Experience.</h1>
 
             <div class="project-overview__content">
-                <div class="project-overview__meta">
+                <div class="project-overview__meta" data-case-type="label">
                     <span>UI/UX Design, 2025</span>
                     <span>14-Day Design Challenge</span>
                 </div>
-                <p>ThermoPal explores how shared workspaces can balance individual temperature preferences with collective energy efficiency. We designed a cross-device experience across a physical thermostat and mobile app, combining personalized controls, smart automation, and shared energy-saving goals.</p>
-                <p>I focused on feature design and the cross-device UI system, creating a consistent visual language while adapting interactions to two different device contexts.</p>
+                <p data-case-type="body">ThermoPal explores how shared workspaces can balance individual temperature preferences with collective energy efficiency. We designed a cross-device experience across a physical thermostat and mobile app, combining personalized controls, smart automation, and shared energy-saving goals.</p>
+                <p data-case-type="body">I focused on feature design and the cross-device UI system, creating a consistent visual language while adapting interactions to two different device contexts.</p>
 
-                <p class="project-overview__label">Team</p>
-                <p class="project-overview__team"><span>Jinghe Cai</span><span>Maryam Eyvazi</span><span>Wenjun Gong</span><span>Luqia Xu</span></p>
+                <p class="project-overview__label" data-case-type="label">Team</p>
+                <p class="project-overview__team" data-case-type="body"><span>Jinghe Cai</span><span>Maryam Eyvazi</span><span>Wenjun Gong</span><span>Luqia Xu</span></p>
             </div>
         </section>
 
@@ -81,7 +84,7 @@
         <section class="hero-banner-wrap">
             <img class="hero-banner-img" src="media/thermopal/image-f10b6b8f-6aa3-448e-b5c4-d1e1b8957ec5.jpg" alt="ThermoPal shared workspace" width="2880" height="1620" loading="lazy" decoding="async">
             <div class="hero-banner-overlay">
-                <h2>Bridging the Comfort Gap: Reimagining workspace thermal management for shared efficiency.</h2>
+                <h2 data-case-type="display">Bridging the Comfort Gap: Reimagining workspace thermal management for shared efficiency.</h2>
             </div>
         </section>
 
@@ -131,8 +134,8 @@
                 <h2 class="section-label">HMW</h2>
             </div>
             <div class="hmw-content">
-                <p class="hmw-item"><strong>#1</strong> How might we harmonize diverse individual preferences within shared office spaces to mitigate thermal friction?</p>
-                <p class="hmw-item"><strong>#2</strong> How might we transform energy-saving into an engaging, cheerful, and shared team journey?</p>
+                <p class="hmw-item">#1 How might we harmonize diverse individual preferences within shared office spaces to mitigate thermal friction?</p>
+                <p class="hmw-item">#2 How might we transform energy-saving into an engaging, cheerful, and shared team journey?</p>
             </div>
         </section>
 
@@ -143,7 +146,7 @@
             <!-- <div class="showcase-badge">Showcase</div> -->
             <div class="showcase-brand-lockup">
                 <img class="showcase-brand-logo" src="media/thermopal/logo.png?v=20260921-1" alt="ThermoPal logo" width="122" height="122" loading="lazy" decoding="async">
-                <h3 class="showcase-brand">Therm<span class="brand-accent">&oacute;</span>Pal</h3>
+                <h3 class="showcase-brand" data-case-type="badge">Therm<span class="brand-accent">&oacute;</span>Pal</h3>
             </div>
             <div class="statement-quote-wrap">
                 <svg class="statement-flower" viewBox="0 0 44 44" fill="currentColor" aria-hidden="true">
@@ -152,7 +155,7 @@
                     <rect x="20" y="2" width="4" height="40" rx="0.5" transform="rotate(90 22 22)" />
                     <rect x="20" y="2" width="4" height="40" rx="0.5" transform="rotate(135 22 22)" />
                 </svg>
-                <h2 class="statement-quote" aria-label="Where Thermal Comfort Meets Playful Engagement">
+                <h2 class="statement-quote" aria-label="Where Thermal Comfort Meets Playful Engagement" data-case-type="display">
                     <span class="statement-word statement-word--orange">Where</span>
                     <span class="statement-word">Thermal</span>
                     <span class="statement-word statement-word--blue">Comfort</span><br>
@@ -175,18 +178,18 @@
                 <img src="media/thermopal/image-837a3ce6-c6b5-4a6f-915c-a6d36582fd99.png" alt="Personalized Comfort Setup" width="1000" height="936" loading="lazy" decoding="async">
             </div>
             <div class="feature-copy-card">
-                <p class="feature-eyebrow">Feature #1</p>
-                <h2 class="feature-title title-feature-1">Personalized Comfort Setup</h2>
-                <p class="feature-desc">Easily set your preferred temperature for each season and keep your comfort just the way you like it.</p>
+                <p class="feature-eyebrow" data-case-type="label">Feature #1</p>
+                <h2 class="feature-title title-feature-1" data-case-type="section">Personalized Comfort Setup</h2>
+                <p class="feature-desc" data-case-type="body">Easily set your preferred temperature for each season and keep your comfort just the way you like it.</p>
             </div>
         </section>
 
         <!-- Section 8: Feature #2 -->
         <section class="feature-row reverse">
             <div class="feature-copy-card">
-                <p class="feature-eyebrow">Feature #2</p>
-                <h2 class="feature-title title-feature-2">Smart Auto-Balance</h2>
-                <p class="feature-desc">The system automatically calculates and applies the average preferred temperature for group bookings.</p>
+                <p class="feature-eyebrow" data-case-type="label">Feature #2</p>
+                <h2 class="feature-title title-feature-2" data-case-type="section">Smart Auto-Balance</h2>
+                <p class="feature-desc" data-case-type="body">The system automatically calculates and applies the average preferred temperature for group bookings.</p>
             </div>
             <div class="feature-media-card bg-feature-2">
                 <img src="media/thermopal/image-3749fc26-a776-4617-a007-007d5a70ee84.png" alt="Smart Auto-Balance" width="1106" height="854" loading="lazy" decoding="async">
@@ -199,18 +202,18 @@
                 <img src="media/thermopal/image-a68ff7bf-53ea-4bf7-b16e-7f14b5ef71cc.png?v=20260921-3" alt="Room Match Indicator" width="2412" height="2277" loading="lazy" decoding="async">
             </div>
             <div class="feature-copy-card">
-                <p class="feature-eyebrow">Feature #3</p>
-                <h2 class="feature-title title-feature-3">Room Match Indicator</h2>
-                <p class="feature-desc">Before booking, ThermoPal shows whether the conference room matches the user’s desired temperature, using clear color cues.</p>
+                <p class="feature-eyebrow" data-case-type="label">Feature #3</p>
+                <h2 class="feature-title title-feature-3" data-case-type="section">Room Match Indicator</h2>
+                <p class="feature-desc" data-case-type="body">Before booking, ThermoPal shows whether the conference room matches the user’s desired temperature, using clear color cues.</p>
             </div>
         </section>
 
         <!-- Section 10: Feature #4 (Grand Full Width Hero Card) -->
         <section class="feature-row bg-feature-4-full">
             <div class="feature-copy-card">
-                <p class="feature-eyebrow">Feature #4</p>
-                <h2 class="feature-title title-feature-4">Eco Gamification</h2>
-                <p class="feature-desc">ThermoPal rewards energy-saving habits through playful competition. Users can also customize their own virtual pets.</p>
+                <p class="feature-eyebrow" data-case-type="label">Feature #4</p>
+                <h2 class="feature-title title-feature-4" data-case-type="section">Eco Gamification</h2>
+                <p class="feature-desc" data-case-type="body">ThermoPal rewards energy-saving habits through playful competition. Users can also customize their own virtual pets.</p>
             </div>
             <div class="feature-media-card">
                 <img src="media/thermopal/image-521fb822-82d6-4d33-bb43-24dbfb1fb212.png" alt="Eco Gamification" width="994" height="1028" loading="lazy" decoding="async">
@@ -223,16 +226,16 @@
                 <img src="media/thermopal/image-e0ac0cc7-e298-4e15-af96-75dd8edfc715.png" alt="Friendly Companionship" width="1050" height="850" loading="lazy" decoding="async">
             </div>
             <div class="feature-copy-card">
-                <h2 class="subfeature-title">Friendly Companionship</h2>
-                <p class="subfeature-desc">Turning rigid controls into an ongoing relationship. Caring for a digital pet builds an emotional bond, bringing joy and support to everyday thermostat interactions.</p>
+                <h2 class="subfeature-title" data-case-type="section">Friendly Companionship</h2>
+                <p class="subfeature-desc" data-case-type="body">Turning rigid controls into an ongoing relationship. Caring for a digital pet builds an emotional bond, bringing joy and support to everyday thermostat interactions.</p>
             </div>
         </section>
 
         <!-- Section 12: Subfeature 4B: Connect through collective impact -->
         <section class="feature-row reverse">
             <div class="feature-copy-card">
-                <h2 class="subfeature-title">Connect through collective impact</h2>
-                <p class="subfeature-desc">Beyond simple rankings, this space highlights our journey as a team, bringing the office closer through cheerful interactions and eco-conscious habits.</p>
+                <h2 class="subfeature-title" data-case-type="section">Connect through collective impact</h2>
+                <p class="subfeature-desc" data-case-type="body">Beyond simple rankings, this space highlights our journey as a team, bringing the office closer through cheerful interactions and eco-conscious habits.</p>
             </div>
             <div class="feature-media-card bg-feature-collective">
                 <img src="media/thermopal/image-ae5d1f96-6c2a-4051-a2a4-a33e707db989.png" alt="Connect through collective impact" width="998" height="974" loading="lazy" decoding="async">
@@ -245,40 +248,40 @@
                 <img src="media/thermopal/image-afa90c10-1aa2-4087-b62a-2f40b2aa7c80.png" alt="Reward System" width="934" height="826" loading="lazy" decoding="async">
             </div>
             <div class="feature-copy-card">
-                <p class="feature-eyebrow">Feature #5</p>
-                <h2 class="feature-title title-feature-5">Reward System</h2>
-                <p class="feature-desc">Mindful energy habits lead to cheerful recognition and fun rewards for everyone, turning sustainability into a shared, joyful adventure.</p>
+                <p class="feature-eyebrow" data-case-type="label">Feature #5</p>
+                <h2 class="feature-title title-feature-5" data-case-type="section">Reward System</h2>
+                <p class="feature-desc" data-case-type="body">Mindful energy habits lead to cheerful recognition and fun rewards for everyone, turning sustainability into a shared, joyful adventure.</p>
             </div>
         </section>
 
         <!-- Section 14: Home & Menu -->
         <section class="nest-section">
-            <h2 class="nest-title">Thermostat Home &amp; Menu</h2>
+            <h2 class="nest-title" data-case-type="section">Thermostat Home &amp; Menu</h2>
             <div class="nest-states-flow">
                 <div class="nest-state-node">
                     <img class="nest-state-img" src="media/thermopal/image-7d4e2179-e3f5-4f32-96cc-5ac6f276a41e.png?v=20260921-5" alt="Far Sight" width="738" height="740" loading="lazy" decoding="async">
-                    <p class="nest-state-label">Far Sight</p>
+                    <p class="nest-state-label" data-case-type="label">Far Sight</p>
                 </div>
                 <img class="nest-arrow" src="media/thermopal/image-3faca923-9629-4514-a088-e72dc995259e.png" alt="" width="43" height="11" loading="lazy" decoding="async">
                 <div class="nest-state-node">
                     <img class="nest-state-img" src="media/thermopal/image-a68360df-a06d-4b91-9583-b7807c725e51.png?v=20260921-5" alt="Closer" width="738" height="740" loading="lazy" decoding="async">
-                    <p class="nest-state-label">Closer</p>
+                    <p class="nest-state-label" data-case-type="label">Closer</p>
                 </div>
                 <img class="nest-arrow" src="media/thermopal/image-3faca923-9629-4514-a088-e72dc995259e.png" alt="" width="43" height="11" loading="lazy" decoding="async">
                 <div class="nest-state-node">
                     <img class="nest-state-img" src="media/thermopal/image-c2bf89ee-e9c0-47ff-b2b8-ddb4dbcdadfd.png?v=20260921-5" alt="Changing" width="738" height="740" loading="lazy" decoding="async">
-                    <p class="nest-state-label">Changing</p>
+                    <p class="nest-state-label" data-case-type="label">Changing</p>
                 </div>
                 <img class="nest-arrow" src="media/thermopal/image-3faca923-9629-4514-a088-e72dc995259e.png" alt="" width="43" height="11" loading="lazy" decoding="async">
                 <div class="nest-state-node">
                     <img class="nest-state-img" src="media/thermopal/image-ff2c27cc-eb5d-4afc-b2f1-df9d7555cfc0.png?v=20260921-6" alt="Heating" width="738" height="740" loading="lazy" decoding="async">
-                    <p class="nest-state-label">Heating</p>
+                    <p class="nest-state-label" data-case-type="label">Heating</p>
                 </div>
             </div>
 
             <div class="nest-description-callout">
                 <img class="nest-logo-icon" src="media/thermopal/image-16af6365-5f50-4632-87e2-c6a84cda1bb3.png" alt="Nest Thermostat icon" width="69" height="69" loading="lazy" decoding="async">
-                <p class="nest-callout-text">The ThermoPal serves as the shared touchpoint in the workspace, offering simple temperature controls and clear team-level feedback. Subtle animations and eco prompts encourage positive behavior, turning the device into a friendly presence that supports comfort and harmony across the office.</p>
+                <p class="nest-callout-text" data-case-type="body">The ThermoPal serves as the shared touchpoint in the workspace, offering simple temperature controls and clear team-level feedback. Subtle animations and eco prompts encourage positive behavior, turning the device into a friendly presence that supports comfort and harmony across the office.</p>
             </div>
 
             <div class="nest-menu-graphic">
@@ -303,7 +306,7 @@
         </section>
     </main>
 
-    <footer class="site-footer" id="info">
+    <footer class="site-footer" id="info" data-case-type="caption">
         <div class="footer-left">
             <a href="mailto:jinghe-cai@outlook.com">Contact</a>
         </div>
@@ -316,19 +319,8 @@
         const isPreview = window.parent !== window && new URLSearchParams(location.search).has('preview');
 
         if (isPreview) {
-            const previewCanvasWidth = 1100;
             document.body.classList.add('is-preview');
 
-            function scalePreviewToFrame() {
-                const previewScale = Math.min(1, window.innerWidth / previewCanvasWidth);
-                document.documentElement.style.setProperty('--project-preview-scale', previewScale);
-                document.body.style.width = `${window.innerWidth / previewScale}px`;
-                document.body.style.minHeight = `${window.innerHeight / previewScale}px`;
-                document.body.style.zoom = previewScale;
-            }
-
-            scalePreviewToFrame();
-            window.addEventListener('resize', scalePreviewToFrame);
 
             document.addEventListener('keydown', event => {
                 if (event.key === 'Escape') {

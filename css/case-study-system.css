@@ -111,7 +111,7 @@
 
 /* Match the perceived weight of light text when the title is dark on a light cover. */
 .case-cover__title--dark-on-light {
-  font-weight: 600;
+  font-weight: 500;
 }
 
 /* ---------- Project overview ---------- */
@@ -132,19 +132,6 @@
   --case-overview-bg: #fff;
   --case-overview-text: #000;
   padding-bottom: 300px;
-}
-
-.project-overview.project-overview--light h1 {
-  font-weight: 500;
-}
-
-.project-overview--light .project-overview__content {
-  font-weight: 400;
-}
-
-.project-overview--light .project-overview__meta,
-.project-overview--light .project-overview__label {
-  font-weight: 300;
 }
 
 .project-overview h1 {
@@ -439,7 +426,7 @@
   }
 
   .project-overview {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 56px;
     padding: 32px 15% 64px;
   }
@@ -448,10 +435,6 @@
     width: 100%;
     max-width: none;
     font-size: 16px;
-  }
-
-  .project-overview.samsung-overview h1 {
-    font-size: 14px;
   }
 
   .project-overview__content {
@@ -506,10 +489,6 @@
      Counter that zoom for type only, matching Samsung's readable phone sizes. */
   :is(html, body).is-preview .project-overview h1 {
     font-size: calc(16px / var(--project-preview-scale, 1));
-  }
-
-  :is(html, body).is-preview .project-overview.samsung-overview h1 {
-    font-size: calc(14px / var(--project-preview-scale, 1));
   }
 
   :is(html, body).is-preview .project-overview__content,

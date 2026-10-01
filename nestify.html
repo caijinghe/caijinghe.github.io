@@ -16,7 +16,6 @@
             height: 100%;
             background: #ffffff;
             color: #111111;
-            font-family: 'Google Sans Flex', sans-serif;
             overflow: hidden;
         }
         .coming-soon-container {
@@ -30,12 +29,7 @@
             padding: 32px 24px;
             user-select: none;
         }
-        .coming-soon-title {
-            font-size: clamp(16px, 2vw, 19px);
-            font-weight: 300;
-            line-height: 1.4;
-        }
-        .coming-soon-dots { display: inline-flex; margin-left: 2px; letter-spacing: 0.08em; }
+        .coming-soon-dots { display: inline-flex; margin-left: 2px; }
         .coming-soon-dots span { animation: dotWave 1.4s infinite ease-in-out; opacity: 0.18; }
         .coming-soon-dots span:nth-child(2) { animation-delay: 0.22s; }
         .coming-soon-dots span:nth-child(3) { animation-delay: 0.44s; }
@@ -44,10 +38,12 @@
             35% { opacity: 1; transform: translateY(-2px); }
             70% { opacity: 0.25; transform: translateY(0); }
         }
-    </style>
+</style>
+    <link rel="stylesheet" href="css/case-study-system.css?v=20261001-6" />
+    <link rel="stylesheet" href="css/project-typography.css?v=20261001-4" />
 </head>
-<body>
-    <header class="site-header">
+<body class="project-design-system">
+    <header class="site-header" data-case-type="ui">
         <div class="header-col-1"><a href="index.html" class="my-name">Jinghe Cai</a></div>
         <nav class="header-col-2"><a href="index.html#work">Work</a></nav>
         <div class="header-col-3">
@@ -56,7 +52,7 @@
         </div>
     </header>
     <main class="coming-soon-container">
-        <h1 class="coming-soon-title">Coming soon<span class="coming-soon-dots" aria-label="..."><span>.</span><span>.</span><span>.</span></span></h1>
+        <h1 class="coming-soon-title" data-case-type="question">Coming soon<span class="coming-soon-dots" aria-label="..."><span>.</span><span>.</span><span>.</span></span></h1>
     </main>
 </body>
 </html>

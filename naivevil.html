@@ -11,7 +11,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,100..900&display=swap"
         rel="stylesheet">
 
-    
     <link rel="stylesheet" href="css/index.css?v=20260920-16" />
     <link rel="stylesheet" href="css/scroll-indicator.css?v=20260920-1" />
     <script src="js/scroll-indicator.js?v=20260920-1" defer></script>
@@ -20,14 +19,11 @@
             document.documentElement.classList.add('is-preview');
         }
     </script>
-  
-
 
     <style>
         body {
             margin: 0;
             padding: 0;
-            font-family: Google Sans Flex, sans-serif;
             /* background-color: #FFFCF2; */
             background-color: #ffffff;
             color: #111;
@@ -113,16 +109,9 @@
             flex-shrink: 0;
         }
 
-
         .back-button img {
             width: 36px;
             height: 36px;
-        }
-
-        .project-title {
-            /* font-family: 'Sora', sans-serif; */
-            font-size: 3rem;
-            font-weight: 300;
         }
 
         .project-meta {
@@ -135,22 +124,14 @@
         }
 
         .project-meta__description {
-            font-family: 'Google Sans Flex', sans-serif;
-            font-size: clamp(12px, 1.3vw, 14px);
-            line-height: 1.5;
             color: #222;
             margin: 0;
-            font-weight: 400;
             text-align: center;
         }
 
         .project-meta__details {
-            font-family: 'Google Sans Flex', sans-serif;
-            font-size: clamp(11px, 1.1vw, 12px);
-            line-height: 1.5;
             color: #999;
             margin: 3px 0 0;
-            font-weight: 400;
             text-align: center;
         }
 
@@ -173,12 +154,12 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             padding: 0;
-            
+
             /* ✅ 修改开始：使用 gap 来制作分割线 */
             background-color: #d8d8d8; /* 这里定义线条的颜色 */
             gap: 1px;               /* 这里定义线条的粗细 */
             border: 1px solid #d8d8d8; /* 这里定义最外圈的边框 */
-            
+
             /* ❌ 删除旧的边框写法 */
             /* border-top: 1px solid #ccc; */
             /* border-left: 1px solid #ccc; */
@@ -186,7 +167,7 @@
 
 .grid-item {
             aspect-ratio: 1 / 1;
-            
+
             /* ❌ 删除旧的边框写法 */
             /* border-right: 1px solid #ccc; */
             /* border-bottom: 1px solid #ccc; */
@@ -195,16 +176,15 @@
             align-items: center;
             justify-content: center;
             padding: 4vw;
-            
+
             /* ✅ 修改开始：遮盖底色 */
             /* 卡片背景统一为纯白 */
             /* 这样才能盖住 container 的灰色背景，只漏出 gap 的缝隙作为线条 */
             background-color: #ffffff; 
-            
+
             box-sizing: border-box;
             cursor: default;
         }
-        
 
         .grid-item img {
             max-width: 100%;
@@ -241,30 +221,23 @@
             display: flex;
         }
 
-
         footer {
             margin-top: auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 2rem 4vw;
-            font-size: 0.8rem;
             /* border-top: 1px solid #ccc; */
         }
 
         footer span {
             color: #909090;
-            font-weight: 400;
         }
-
 
         .more-wrapper {
             display: inline-block;
             text-decoration: none;
         }
-
-
-
 
         .more-text {
             position: relative;
@@ -279,8 +252,6 @@
             cursor: default;
         }
 
-
-
         .more-text .face {
             position: absolute;
             width: 100%;
@@ -288,13 +259,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.85rem;
-            font-family: 'Google Sans Flex', sans-serif;
-            font-weight: 300;
 
             color: #000;
-
-            line-height: 1;
             /* ✅ 去掉额外空隙 */
             padding: 0;
             /* ✅ 显式移除 padding */
@@ -317,9 +283,7 @@
 
         .more-wrapper:hover .more-text .top {
             transform: rotateX(0deg);
-            font-weight: 500;
         }
-
 
         @media (max-width: 768px) {
             .grid-container {
@@ -346,10 +310,6 @@
                 gap: rem;
             }
 
-
-
-    
-
             .header-bottom {
                 display: flex;
                 flex-direction: row;
@@ -361,17 +321,9 @@
                 margin-top: 30vh;
             }
 
-
-
             .back-button img {
                 width: 30px;
                 height: 30px;
-            }
-
-            .project-title {
-                /* font-family: 'Sora', sans-serif; */
-                font-size: 1.8rem;
-                font-weight: 300;
             }
 
             .project-meta {
@@ -393,7 +345,6 @@
                 margin: 0 auto;
             }
 
-
             .grid-container {
                 grid-template-columns: 1fr;
             }
@@ -403,49 +354,30 @@
                 padding: 8vw;
             }
 
-
             footer {
                 margin-top: auto;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
                 padding: 20px 8vw;
-                font-size: 0.8rem;
                 /* border-top: 1px solid #ccc; */
             }
 
-
             footer span {
-                font-size: 0.75rem;
                 color: #909090;
 
             }
-
 
             .more-wrapper {
                 display: inline-block;
                 text-decoration: none;
             }
 
-
-
-
             .more-text {
                 width: 110px;
                 height: 30px;
                 border: 0.8px solid #000000;
             }
-
-
-
-            .more-text .face {
-                font-size: 0.75rem;
-                font-weight: 200;
-            }
-
-
-
-
 
         }
 
@@ -468,25 +400,27 @@
             mix-blend-mode: normal;
             pointer-events: none;
         }
-    </style>
+</style>
     <link rel="stylesheet" href="css/project-loader.css?v=20260928-3" />
     <script src="js/project-asset-loader.js?v=20260928-1" defer></script>
+    <link rel="stylesheet" href="css/case-study-system.css?v=20261001-6" />
+    <link rel="stylesheet" href="css/project-typography.css?v=20261001-4" />
 </head>
 
-<body>
+<body class="project-design-system">
     <div id="loading-overlay" aria-label="Loading">
         <video id="loading-video" autoplay muted loop playsinline>
             <source src="media/index/logo_dark.mp4" type="video/mp4">
         </video>
     </div>
-<header class="project-hero">
+<header class="project-hero" data-case-type="ui">
     
     <div class="header-bottom">
         <div class="title-group">
             <img src="media/naivevil/naive_name.svg" alt="天真有邪" class="chinese-title" />
             <div class="project-meta">
-                <p class="project-meta__description">Chinese Ink Painting</p>
-                <p class="project-meta__details">Jul 2019, Individual Work</p>
+                <p class="project-meta__description" data-case-type="body">Chinese Ink Painting</p>
+                <p class="project-meta__details" data-case-type="label">Jul 2019, Individual Work</p>
             </div>
         </div>
     </div>
@@ -512,7 +446,7 @@
         <img id="lightbox-img" src="" alt="Zoomed artwork">
     </div>
 
-    <footer>
+    <footer data-case-type="caption">
         <span>© 2025 Jinghe Cai. All rights reserved.</span>
         <!-- <a href="work.html" class="more-wrapper">
             <span class="more-text">

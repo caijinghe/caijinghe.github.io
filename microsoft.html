@@ -11,10 +11,9 @@
 
     <link rel="icon" href="media/logo.svg" type="image/svg+xml" />
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,100..900&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/workheader2.css" />
     <link rel="stylesheet" href="css/scroll-indicator.css?v=20260920-1" />
-    <link rel="stylesheet" href="css/case-study-system.css?v=20260928-11" />
+    <link rel="stylesheet" href="css/case-study-system.css?v=20261001-6" />
     <script src="js/scroll-indicator.js?v=20260920-1" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="js/mfst.js?v=20260921-2" defer></script>
@@ -46,7 +45,6 @@
             padding: 0;
             background: #ffffff;
             color: #FCFBF4;
-            font-family: 'Google Sans Flex', sans-serif;
         }
 
         body {
@@ -106,10 +104,6 @@
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-
-
-
-
         /* 主容器 */
         .stack {
             width: 100%;
@@ -142,7 +136,6 @@
             object-fit: cover;
             display: block;
         }
-
 
         .block.cover {
             position: relative;
@@ -186,10 +179,8 @@
             width: min(1050px, calc(100% - 24px));
             max-width: none;
             color: #0b0b0b;
-            font-size: clamp(20px, 3.8vw, 50px);
             text-wrap: balance;
         }
-
 
         /* 中等视频段 */
         .block.video-focus {
@@ -249,8 +240,6 @@
             justify-content: center;
             width: 40px;
             height: 40px;
-            font-size: 2rem;
-            line-height: 1;
             /* 保证上下居中 */
             color: #ffffff;
             background: rgba(0, 0, 0, 0.9);
@@ -271,8 +260,6 @@
             padding-bottom: 7px;
             /* 微调，避免 › 看起来偏左 */
         }
-
-
 
         .carousel-frame video {
 
@@ -310,9 +297,6 @@
             padding: 0;
         }
 
-
-
-
         /* Carousel */
         .poster-carousel {
             display: flex;
@@ -322,8 +306,6 @@
             margin: 0px auto;
             background-color: #FFF5F9;
         }
-
-
 
         .poster-carousel .carousel-frame {
             position: relative;
@@ -380,7 +362,6 @@
             background: #FE0070;
         }
 
-
         .poster-carousel.green-bg {
             background-color: #F7FFFC;
             /* 或者你想要的任何颜色 */
@@ -403,9 +384,6 @@
             border: 1px solid #24C88B;
             /* 举例，亮绿色 */
         }
-
-
-
 
         .poster-carousel.blue-bg {
             background-color: #F1F8FF;
@@ -430,8 +408,6 @@
             /* 举例，亮绿色 */
         }
 
-
-
         .poster-carousel.yellow-bg {
             background-color: #fff;
         }
@@ -453,12 +429,6 @@
             border: 1px solid #666;
             /* 举例，亮绿色 */
         }
-
-
-
-
-
-
 
         /* Showcase Teaser with Bottom Linear Fade */
         .showcase-teaser {
@@ -545,7 +515,7 @@
 
         /* Locked: 2-stage lock animation: slide horizontal first at -5px (no height change), THEN snap down into body! */
         .animated-lock.is-locked .lock-shackle {
-            transform: translateY(3.5px) scaleX(1);
+            transform: translateY(4px) scaleX(1);
             animation: shackleLockSequence 0.65s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
 
@@ -568,7 +538,7 @@
             }
             100% {
                 /* Settles snugly in locked position */
-                transform: translateY(3.5px) scaleX(1);
+                transform: translateY(4px) scaleX(1);
             }
         }
 
@@ -653,28 +623,18 @@
         }
 
         .confidential-title {
-            font-family: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, sans-serif;
-            font-size: clamp(19px, 1.6vw, 30px);
-            font-weight: 500;
             color: #111827;
             margin: 0 0 8px 0;
-            line-height: 1.35;
-            letter-spacing: -0.01em;
-            -webkit-font-smoothing: antialiased;
+
         }
 
         .confidential-desc {
-            font-family: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, sans-serif;
-            font-size: clamp(16px, 1.35vw, 25px);
-            font-weight: 400;
             color: #9ca3af;
             margin: 0;
-            line-height: 1.5;
         }
 
         .confidential-desc a {
             color: #4b5563;
-            font-weight: 400;
             text-decoration: none;
             transition: color 0.2s ease;
         }
@@ -698,13 +658,6 @@
                 padding: 32px 28px;
                 border-radius: 20px;
             }
-            .confidential-title {
-                font-size: 18px;
-                font-weight: 500;
-            }
-            .confidential-desc {
-                font-size: 15px;
-            }
 
             /* Keep the confidential card at Samsung's readable phone size
                when the Microsoft preview canvas is scaled down. */
@@ -724,12 +677,6 @@
             html.is-preview .animated-lock {
                 width: calc(48px / var(--project-preview-scale, 1));
             }
-            html.is-preview .confidential-title {
-                font-size: calc(18px / var(--project-preview-scale, 1));
-            }
-            html.is-preview .confidential-desc {
-                font-size: calc(15px / var(--project-preview-scale, 1));
-            }
         }
 
         /* Footer */
@@ -738,13 +685,11 @@
             justify-content: space-between;
             align-items: center;
             padding: 1rem 4vw;
-            font-size: 0.8rem;
             border-top: 0.8px solid #666;
         }
 
         footer span {
             color: #666;
-            font-weight: 300;
         }
 
         .more-wrapper {
@@ -771,9 +716,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.85rem;
-            font-family: 'Google Sans Flex', sans-serif;
-            font-weight: 300;
             color: #000000;
             backface-visibility: hidden;
             transform-style: preserve-3d;
@@ -792,14 +734,11 @@
 
         .more-wrapper:hover .more-text .top {
             transform: rotateX(0deg);
-            font-weight: 500;
         }
 
         .divider {
             display: none;
         }
-
-
 
         @media (max-width: 768px) {
             .grid-container {
@@ -826,8 +765,6 @@
                 gap: 1rem;
             }
 
-
-
             .back-button {
                 width: 45px;
                 height: 45px;
@@ -850,24 +787,13 @@
                 flex-wrap: wrap;
             }
 
-
-
             .back-button img {
                 width: 30px;
                 height: 30px;
             }
 
-            .project-title {
-                /* font-family: 'Sora', sans-serif; */
-                font-size: 1.8rem;
-                font-weight: 300;
-            }
-
             .project-meta {
                 padding-top: 30px;
-                font-size: 0.7rem;
-                font-weight: 200;
-                line-height: 1.5;
                 color: #000000;
             }
 
@@ -879,7 +805,6 @@
             .chinese-title {
                 height: 140px;
             }
-
 
             .grid-container {
                 grid-template-columns: 1fr;
@@ -920,13 +845,10 @@
                 flex-wrap: wrap;
             }
 
-
-
             .logo-button img {
                 width: 30px;
                 height: 30px;
             }
-
 
             footer {
                 margin-top: auto;
@@ -934,37 +856,23 @@
                 justify-content: space-between;
                 align-items: center;
                 padding: 20px 8vw;
-                font-size: 0.8rem;
                 /* border-top: 1px solid #ccc; */
             }
 
-
             footer span {
-                font-size: 0.75rem;
                 color: #000000;
 
             }
-
 
             .more-wrapper {
                 display: inline-block;
                 text-decoration: none;
             }
 
-
-
-
             .more-text {
                 width: 110px;
                 height: 30px;
                 border: 0.8px solid #ffffff;
-            }
-
-
-
-            .more-text .face {
-                font-size: 0.75rem;
-                font-weight: 200;
             }
 
             .poster-carousel .carousel-frame {
@@ -977,25 +885,23 @@
                 display: none;
             }
 
-
             .carousel-frame video {
-
 
                 border-radius: 10px;
 
-
             }
 
-
-
-
         }
-    </style>
-    <link rel="stylesheet" href="css/project-loader.css?v=20260928-3" />
+</style>
+    <link rel="stylesheet" href="css/project-loader.css?v=20261001-1" />
     <script src="js/project-asset-loader.js?v=20260928-1" defer></script>
+    <link rel="stylesheet" href="css/project-typography.css?v=20261001-4" />
+    <script src="js/case-preview-scale.js?v=20261001-1" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/confidential-lock.css?v=20261001-1" />
 </head>
 
-<body>
+<body class="project-design-system">
     <!-- Loading Overlay -->
     <div id="loading-overlay">
         <video id="loading-video" autoplay muted loop playsinline>
@@ -1008,17 +914,17 @@
         <div class="password-box">
             <img src="media/logo.svg" alt="Logo" class="logo" />
             <div class="input-container">
-                <input type="password" id="password-input" placeholder="•••" autocomplete="off" />
-                <button id="password-submit" type="button">
+                <input type="password" id="password-input" placeholder="•••" autocomplete="off"  data-case-type="ui"/>
+                <button id="password-submit" type="button" data-case-type="ui">
                     <img src="media/go.svg" alt="Go" />
                 </button>
             </div>
-            <p id="password-error" class="error-message" style="visibility: hidden;">Incorrect password. Please try again.</p>
+            <p id="password-error" class="error-message" style="visibility: hidden;" data-case-type="body">Incorrect password. Please try again.</p>
         </div>
         <div id="custom-cursor"></div>
     </div>
 
-        <header class="site-header">
+        <header class="site-header" data-case-type="ui">
         <div class="header-col-1">
             <a href="index.html" class="my-name">Jinghe Cai</a>
         </div>
@@ -1039,31 +945,31 @@
 <section class="block cover case-cover microsoft-cover" data-meteors>
 
             <img src="media/MFST/new-cover.png?v=20260927-2" loading="eager" alt="Microsoft Copilot AI Design Toolkit cover" />
-            <h1 class="case-cover__title case-cover__title--dark-on-light">Building a Continuous Design Review<br />Workflow for Microsoft Copilot</h1>
+            <h1 class="case-cover__title case-cover__title--dark-on-light" data-case-type="cover">Building a Continuous Design Review<br />Workflow for Microsoft Copilot</h1>
         </section>
 
         <section class="project-overview project-overview--light" aria-labelledby="project-overview-title">
-            <h1 id="project-overview-title">AI Design Toolkit,<br />Design Automation.</h1>
+            <h1 id="project-overview-title" data-case-type="overview">AI Design Toolkit,<br />Design Automation.</h1>
 
             <div class="project-overview__content">
-                <div class="project-overview__meta">
+                <div class="project-overview__meta" data-case-type="label">
                     <span>Product Design, 2025</span>
                     <span>10 Weeks</span>
                     <span>UX, Research, Prototyping</span>
                 </div>
-                <p>Working with Microsoft Copilot teams, we designed an AI Design Toolkit that turned abstract AI design principles into actionable evaluation criteria. As part of the project's lead team, I focused on UX and research, shaping the evaluation framework and workflow prototype.</p>
-                <p>Instead of asking designers to remember every principle, we explored a system that could continuously evaluate work artifacts and provide traceable feedback across team discussions, interface design, and code.</p>
+                <p data-case-type="body">Working with Microsoft Copilot teams, we designed an AI Design Toolkit that turned abstract AI design principles into actionable evaluation criteria. As part of the project's lead team, I focused on UX and research, shaping the evaluation framework and workflow prototype.</p>
+                <p data-case-type="body">Instead of asking designers to remember every principle, we explored a system that could continuously evaluate work artifacts and provide traceable feedback across team discussions, interface design, and code.</p>
 
-                <p class="project-overview__label">My deliverables</p>
+                <p class="project-overview__label" data-case-type="label">My deliverables</p>
                 <ol>
-                    <li>Led interviews with 11 Copilot designers and engineers, uncovering why existing guidelines failed to shape everyday decisions.</li>
-                    <li>Turned research insights into 8 actionable design principles with clear criteria and real examples.</li>
-                    <li>Prototyped a continuous review tool evaluating Slack discussions, screen activity, and code throughout the design workflow.</li>
-                    <li>Designed a traceable feedback system with scores, alerts, and violation history to support self-correction.</li>
+                    <li data-case-type="body">Led interviews with 11 Copilot designers and engineers, uncovering why existing guidelines failed to shape everyday decisions.</li>
+                    <li data-case-type="body">Turned research insights into 8 actionable design principles with clear criteria and real examples.</li>
+                    <li data-case-type="body">Prototyped a continuous review tool evaluating Slack discussions, screen activity, and code throughout the design workflow.</li>
+                    <li data-case-type="body">Designed a traceable feedback system with scores, alerts, and violation history to support self-correction.</li>
                 </ol>
 
-                <p class="project-overview__label">Team</p>
-                <p>20-person SCADpro team<br />Microsoft Copilot design &amp; engineering</p>
+                <p class="project-overview__label" data-case-type="label">Team</p>
+                <p data-case-type="body">20-person SCADpro team<br />Microsoft Copilot design &amp; engineering</p>
             </div>
         </section>
 
@@ -1091,8 +997,7 @@
                             </clipPath>
                         </defs>
                         <!-- Shackle (Black) -->
-                        <path class="lock-shackle" d="M 21 34 V 19 A 9 9 0 0 1 39 19 V 30"
-                              stroke="#111827" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" />
+                        <path class="lock-shackle" d="M18.25 34V19A11.75 11.75 0 0 1 41.75 19V30A2.75 2.75 0 0 1 36.25 30V19A6.25 6.25 0 0 0 23.75 19V34A2.75 2.75 0 0 1 18.25 34Z" fill="#111827" />
                         <!-- Body (Black) -->
                         <g class="lock-body">
                             <rect x="10" y="27" width="40" height="28" rx="7" fill="#111827" />
@@ -1112,8 +1017,8 @@
                         </g>
                     </svg>
                 </div>
-                <h2 class="confidential-title">This work is confidential.</h2>
-                <p class="confidential-desc">Please <a href="mailto:jinghe-cai@outlook.com">email me</a> if you'd like to chat!</p>
+                <h2 class="confidential-title" data-case-type="section">This work is confidential.</h2>
+                <p class="confidential-desc" data-case-type="body">Please <a href="mailto:jinghe-cai@outlook.com">email me</a> if you'd like to chat!</p>
             </div>
         </section>
 
@@ -1412,20 +1317,9 @@
         });
 
         if (window.parent !== window && new URLSearchParams(location.search).has('preview')) {
-            const previewCanvasWidth = 1100;
             document.body.classList.add('is-preview');
             document.body.style.overflow = "auto";
 
-            function scalePreviewToFrame() {
-                const previewScale = Math.min(1, window.innerWidth / previewCanvasWidth);
-                document.documentElement.style.setProperty('--project-preview-scale', previewScale);
-                document.body.style.width = `${window.innerWidth / previewScale}px`;
-                document.body.style.minHeight = `${window.innerHeight / previewScale}px`;
-                document.body.style.zoom = previewScale;
-            }
-
-            scalePreviewToFrame();
-            window.addEventListener('resize', scalePreviewToFrame);
 
             document.addEventListener('keydown', event => {
                 if (event.key === 'Escape') {

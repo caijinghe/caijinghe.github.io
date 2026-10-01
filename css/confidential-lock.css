@@ -1,0 +1,13 @@
+/* Keep the animated vector out of the scaled page canvas. Its rendered width
+   is snapped to CSS pixels; the shackle uses a filled outline, not a thin stroke. */
+body.project-design-system .confidential-lock-badge .animated-lock {
+  zoom: calc(1 / var(--project-preview-scale, 1));
+  width: clamp(48px, 4vw, 76px);
+  width: round(nearest, clamp(48px, 4vw, 76px), 1px);
+  height: auto;
+  overflow: visible;
+}
+
+body.project-design-system .animated-lock .lock-shackle {
+  shape-rendering: geometricPrecision;
+}

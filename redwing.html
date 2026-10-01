@@ -10,7 +10,6 @@
 
     <link rel="stylesheet" href="css/index.css" />
 
-
     <style>
         * {
             box-sizing: border-box;
@@ -21,7 +20,6 @@
             margin: 0;
             padding: 0;
             height: 100vh;
-            font-family: 'Google Sans Flex', sans-serif;
             background: #fff;
             color: #111;
         }
@@ -43,9 +41,6 @@
             overflow: hidden;
         }
 
-
-
-
         .left-panel {
             flex: 1;
             padding: 4vw 0 15vw 6vw;
@@ -64,20 +59,8 @@
             /* ✅ 关键：让这个 block 自动顶到底部 */
         }
 
-
-
-
-        .project-info h1 {
-            font-size: 3rem;
-            font-weight: 300;
-
-        }
-
         .project-info p {
-            font-size: 1rem;
-            font-weight: 200;
             margin-top: 30px;
-            line-height: 1.6;
             /* margin-bottom: 8vh; */
         }
 
@@ -151,8 +134,6 @@
             background-color: #000;
         }
 
-      
-
         @media (max-width: 1000px) {
             html {
                 height: auto !important;
@@ -184,26 +165,17 @@
             }
 
             .project-info h1 {
-                font-size: 1.8rem;
-                font-weight: 300;
                 margin-top: 0;
             }
 
             .project-info p {
-                font-size: 0.8rem;
-                font-weight: 200;
                 margin-top: 1rem;
-                line-height: 1.5;
             }
 
             .award {
                 width: 80px;
                 margin-top: 10px;
             }
-
-
-
-
 
             .right-panel {
                 padding: 8vw;
@@ -219,7 +191,6 @@
                 height: auto;
                 width: auto;
             }
-
 
             .dots {
                 display: flex;
@@ -262,19 +233,21 @@
             mix-blend-mode: normal;
             pointer-events: none;
         }
-    </style>
+</style>
     <link rel="stylesheet" href="css/project-loader.css?v=20260928-3" />
     <script src="js/project-asset-loader.js?v=20260928-1" defer></script>
+    <link rel="stylesheet" href="css/case-study-system.css?v=20261001-6" />
+    <link rel="stylesheet" href="css/project-typography.css?v=20261001-4" />
 </head>
 
-<body>
+<body class="project-design-system">
     <div id="loading-overlay" aria-label="Loading">
         <video id="loading-video" autoplay muted loop playsinline>
             <source src="media/index/logo_dark.mp4" type="video/mp4">
         </video>
     </div>
 
-    <header class="site-header">
+    <header class="site-header" data-case-type="ui">
         <div class="header-col-1">
             <a href="index.html" class="my-name">Jinghe Cai</a>
         </div>
@@ -295,8 +268,8 @@
 
             <div class="info-award-wrapper">
                 <div class="project-info">
-                    <h1>Red Wing</h1>
-                    <p>Narrative Illustration Series<br />Mar 2020, Individual Work</p>
+                    <h1 data-case-type="overview">Red Wing</h1>
+                    <p data-case-type="body">Narrative Illustration Series<br />Mar 2020, Individual Work</p>
                 </div>
                 <img src="media/redwing/aniwow.svg" alt="Award" class="award" />
             </div>

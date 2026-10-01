@@ -12,7 +12,7 @@
 
     <link rel="stylesheet" href="css/scroll-indicator.css?v=20260920-6" />
     <!-- Shared case-study specification. Other project pages can reuse the same .case-* components. -->
-    <link rel="stylesheet" href="css/case-study-system.css?v=20260928-11" />
+    <link rel="stylesheet" href="css/case-study-system.css?v=20261001-6" />
 
     <script src="js/lepal.js?v=20260924-5" defer></script>
     <script src="js/scroll-indicator.js?v=20260926-2" defer></script>
@@ -27,7 +27,6 @@
 
         gtag('config', 'G-Q1VYN4W02W');
     </script>
-
 
     <style>
         * {
@@ -414,7 +413,7 @@
             line-height: 1.35;
         }
 
-        .project-challenge__strategy strong {
+        .project-challenge__strategy-title {
             display: block;
             margin-top: 10px;
             font-size: 22px;
@@ -1393,11 +1392,13 @@
 
         }
     </style>
-    <link rel="stylesheet" href="css/project-loader.css?v=20260928-3" />
+    <link rel="stylesheet" href="css/project-loader.css?v=20261001-1" />
     <script src="js/project-asset-loader.js?v=20260928-1" defer></script>
+    <link rel="stylesheet" href="css/project-typography.css?v=20261001-4" />
+    <script src="js/case-preview-scale.js?v=20261001-1" defer></script>
 </head>
 
-<body>
+<body class="project-design-system">
     <!-- Loading Overlay -->
     <div id="loading-overlay">
         <video id="loading-video" autoplay muted loop playsinline>
@@ -1415,34 +1416,34 @@
             <!-- 图片在上层 -->
             <img src="media/lepal/new-cover.png?v=20260924-3" loading="eager" alt="LePal Cover" />
 
-            <h1 class="case-cover__title">A Narrative-Driven Redesign of a Gen Z<br />Mental Wellness Experience</h1>
+            <h1 class="case-cover__title" data-case-type="cover">A Narrative-Driven Redesign of a Gen Z<br />Mental Wellness Experience</h1>
 
         </section>
 
         <section class="project-overview" aria-labelledby="project-overview-title">
-            <h1 id="project-overview-title">AI Wellness Companion,<br />Digital Production.</h1>
+            <h1 id="project-overview-title" data-case-type="overview">AI Wellness Companion,<br />Digital Production.</h1>
 
             <div class="project-overview__content">
-                <div class="project-overview__meta">
+                <div class="project-overview__meta" data-case-type="label">
                     <span>Product Design, 2024</span>
                     <span>5 Months</span>
                     <span>Mobile UX, Visual, Brand</span>
                 </div>
-                <p>During my work with Lepal.ai, I led a narrative-driven redesign of the UX and brand for a Gen Z mental wellness app, restructuring the information architecture, onboarding, and visual identity so the experience feels native to how this generation actually thinks and feels.</p>
-                <p>The redesign launched in November 2024, increasing Day-3 retention from 31% to 87% and growing weekly active users past 1,000.</p>
+                <p data-case-type="body">During my work with Lepal.ai, I led a narrative-driven redesign of the UX and brand for a Gen Z mental wellness app, restructuring the information architecture, onboarding, and visual identity so the experience feels native to how this generation actually thinks and feels.</p>
+                <p data-case-type="body">The redesign launched in November 2024, increasing Day-3 retention from 31% to 87% and growing weekly active users past 1,000.</p>
 
-                <p class="project-overview__label">My deliverables</p>
+                <p class="project-overview__label" data-case-type="label">My deliverables</p>
                 <ol>
-                    <li>Defined a new brand tone from user research, anchoring the redesign.</li>
-                    <li>Restructured the Information Architecture from a flat 2D layout into a 3D spatial model.</li>
-                    <li>Elevated the visual identity system, redefining color, motion, and typography for a Gen Z-native experience.</li>
-                    <li>Owned end-to-end design for 5 core features, validated through A/B testing and cross-functional collaboration.</li>
+                    <li data-case-type="body">Defined a new brand tone from user research, anchoring the redesign.</li>
+                    <li data-case-type="body">Restructured the Information Architecture from a flat 2D layout into a 3D spatial model.</li>
+                    <li data-case-type="body">Elevated the visual identity system, redefining color, motion, and typography for a Gen Z-native experience.</li>
+                    <li data-case-type="body">Owned end-to-end design for 5 core features, validated through A/B testing and cross-functional collaboration.</li>
                 </ol>
 
-                <p class="project-overview__label">Collaborators</p>
+                <p class="project-overview__label" data-case-type="label">Collaborators</p>
                 <div class="project-overview__collaborators">
-                    <p>Jinghe Cai <span class="project-overview__muted">(Product Design)</span><br />Runqi Zhou <span class="project-overview__muted">(UI/UX Design)</span></p>
-                    <p>Huiyang Chen <span class="project-overview__muted">(UI/UX Design)</span><br />Lepal.ai engineer &amp; research team</p>
+                    <p data-case-type="body">Jinghe Cai <span class="project-overview__muted">(Product Design)</span><br />Runqi Zhou <span class="project-overview__muted">(UI/UX Design)</span></p>
+                    <p data-case-type="body">Huiyang Chen <span class="project-overview__muted">(UI/UX Design)</span><br />Lepal.ai engineer &amp; research team</p>
                 </div>
             </div>
         </section>
@@ -1450,10 +1451,10 @@
         <section class="project-background" aria-labelledby="project-background-title">
             <div class="project-background__divider" aria-hidden="true"></div>
             <div class="project-background__intro">
-                <h2 id="project-background-title">Background.</h2>
+                <h2 id="project-background-title" data-case-type="section">Background.</h2>
                 <div class="project-background__copy">
-                    <p>Lepal.ai is built on Cognitive Behavioral Therapy (CBT), the idea that changing how we think can change how we feel and behave. Traditional CBT relies on talk therapy and daily exercises, both of which require consistency to work.</p>
-                    <p>Lepal.ai turns this process into lightweight, gamified, bite-sized interactions, making it easier for Gen Z to stay consistent. But users weren’t sticking around.</p>
+                    <p data-case-type="body">Lepal.ai is built on Cognitive Behavioral Therapy (CBT), the idea that changing how we think can change how we feel and behave. Traditional CBT relies on talk therapy and daily exercises, both of which require consistency to work.</p>
+                    <p data-case-type="body">Lepal.ai turns this process into lightweight, gamified, bite-sized interactions, making it easier for Gen Z to stay consistent. But users weren’t sticking around.</p>
                 </div>
             </div>
             <img class="project-background__image" src="media/lepal/new-background.png" width="2247" height="824" loading="lazy" decoding="async" alt="Lepal.ai background research and early product context" />
@@ -1462,12 +1463,12 @@
         <section class="project-challenge project-challenge--simple" aria-labelledby="project-challenge-title">
             <div class="project-challenge__divider" aria-hidden="true"></div>
             <div class="project-challenge__intro">
-                <h2 id="project-challenge-title">Challenge.</h2>
+                <h2 id="project-challenge-title" data-case-type="section">Challenge.</h2>
                 <div class="project-challenge__copy">
-                    <p class="project-challenge__question">How might we help new users quickly feel LePal’s value and keep coming back?</p>
-                    <p class="project-challenge__body">The original Day 3 Magic Moment focused on solving users’ emotional problems, an outcome that takes time. I reframed it around a more immediate signal of value: making users feel heard and cared for.</p>
-                    <p class="project-challenge__strategy">Strategy 01<strong>Building a clearer information architecture</strong></p>
-                    <p class="project-challenge__detail">The existing structure made it difficult for users to understand what each feature did, how they connected, and where to start.</p>
+                    <p class="project-challenge__question" data-case-type="question">How might we help new users quickly feel LePal’s value and keep coming back?</p>
+                    <p class="project-challenge__body" data-case-type="body">The original Day 3 Magic Moment focused on solving users’ emotional problems, an outcome that takes time. I reframed it around a more immediate signal of value: making users feel heard and cared for.</p>
+                    <p class="project-challenge__strategy" data-case-type="label">Strategy 01<span class="project-challenge__strategy-title" data-case-type="section">Building a clearer information architecture</span></p>
+                    <p class="project-challenge__detail" data-case-type="body">The existing structure made it difficult for users to understand what each feature did, how they connected, and where to start.</p>
                 </div>
             </div>
 
@@ -1480,8 +1481,8 @@
                 </div>
             </div>
             <section class="project-principles" aria-labelledby="project-principles-title">
-                <h2 id="project-principles-title">Design principles.</h2>
-                <p>With early success redefined, I translated it into three design principles: make the experience clear, meaningful, and rewarding to return to.</p>
+                <h2 id="project-principles-title" data-case-type="section">Design principles.</h2>
+                <p data-case-type="body">With early success redefined, I translated it into three design principles: make the experience clear, meaningful, and rewarding to return to.</p>
             </section>
 
             <img class="thinking-framework" src="media/lepal/thinking-framework.svg" width="2248" height="504" loading="lazy" decoding="async" alt="Three strategies for defining success, creating clarity, building meaning, and driving return" />
@@ -1555,14 +1556,14 @@
         </section>
 
         <div class="showcase-divider" aria-hidden="true"></div>
-        <div class="showcase-transition is-active" aria-label="Showcase section"><span class="showcase-transition__label">Showcase</span></div>
+        <div class="showcase-transition is-active" aria-label="Showcase section"><span class="showcase-transition__label" data-case-type="badge">Showcase</span></div>
 
         <section class="block showcase-design-system" aria-label="Lepal design system showcase">
             <img src="media/lepal/new-showcase-design-system.png" loading="lazy" decoding="async" alt="Lepal design system" />
         </section>
 
         <div class="center showcase-private-corner">
-            <h1 id="animated-text">“A Private Corner for Your Emotions”</h1>
+            <h1 id="animated-text" data-case-type="display">“A Private Corner for Your Emotions”</h1>
         </div>
 
         <section class="block showcase-design-system" aria-label="Lepal information architecture">
@@ -1639,8 +1640,8 @@
 
         <section class="block poster-carousel" aria-label="Visual design carousel">
             <div class="carousel-frame">
-                <button class="carousel-nav carousel-nav--prev" type="button" aria-label="Previous slide"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
-                <button class="carousel-nav carousel-nav--next" type="button" aria-label="Next slide"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+                <button class="carousel-nav carousel-nav--prev" type="button" aria-label="Previous slide" data-case-type="ui"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+                <button class="carousel-nav carousel-nav--next" type="button" aria-label="Next slide" data-case-type="ui"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
                 <div class="carousel-track">
                     <img class="active" src="media/lepal/poster1.png" loading="lazy" decoding="async" alt="Lepal visual design 1" />
                     <img src="media/lepal/poster2.png" loading="lazy" decoding="async" alt="Lepal visual design 2" />
@@ -1655,11 +1656,11 @@
                 </div>
             </div>
             <div class="carousel-dots" aria-label="Choose carousel page">
-                <button class="dot active" type="button" data-index="0" aria-label="Slide 1"></button><button class="dot" type="button" data-index="1" aria-label="Slide 2"></button><button class="dot" type="button" data-index="2" aria-label="Slide 3"></button><button class="dot" type="button" data-index="3" aria-label="Slide 4"></button><button class="dot" type="button" data-index="4" aria-label="Slide 5"></button><button class="dot" type="button" data-index="5" aria-label="Slide 6"></button><button class="dot" type="button" data-index="6" aria-label="Slide 7"></button><button class="dot" type="button" data-index="7" aria-label="Slide 8"></button><button class="dot" type="button" data-index="8" aria-label="Slide 9"></button><button class="dot" type="button" data-index="9" aria-label="Slide 10"></button>
+                <button class="dot active" type="button" data-index="0" aria-label="Slide 1" data-case-type="ui"></button><button class="dot" type="button" data-index="1" aria-label="Slide 2" data-case-type="ui"></button><button class="dot" type="button" data-index="2" aria-label="Slide 3" data-case-type="ui"></button><button class="dot" type="button" data-index="3" aria-label="Slide 4" data-case-type="ui"></button><button class="dot" type="button" data-index="4" aria-label="Slide 5" data-case-type="ui"></button><button class="dot" type="button" data-index="5" aria-label="Slide 6" data-case-type="ui"></button><button class="dot" type="button" data-index="6" aria-label="Slide 7" data-case-type="ui"></button><button class="dot" type="button" data-index="7" aria-label="Slide 8" data-case-type="ui"></button><button class="dot" type="button" data-index="8" aria-label="Slide 9" data-case-type="ui"></button><button class="dot" type="button" data-index="9" aria-label="Slide 10" data-case-type="ui"></button>
             </div>
         </section>
 
-        <div class="showcase-transition impact-transition is-active" aria-label="Impact section"><span class="showcase-transition__label">Impact</span></div>
+        <div class="showcase-transition impact-transition is-active" aria-label="Impact section"><span class="showcase-transition__label" data-case-type="badge">Impact</span></div>
         <section class="block showcase-design-system impact-overview" aria-label="Lepal impact overview">
             <img src="media/lepal/impact.png" loading="lazy" decoding="async" alt="Lepal impact overview" />
         </section>
@@ -1667,10 +1668,10 @@
         <section class="project-challenge project-takeaway" aria-labelledby="project-takeaway-title">
             <div class="project-challenge__divider" aria-hidden="true"></div>
             <div class="project-challenge__intro">
-                <h2 id="project-takeaway-title">Takeaway.</h2>
+                <h2 id="project-takeaway-title" data-case-type="section">Takeaway.</h2>
                 <div class="project-challenge__copy project-takeaway__copy">
-                    <p>LePal was my first experience turning years of HCI research in digital mental health into a product used by real people. It made me realize that an intervention can be clinically grounded and still fail if people don’t understand its value or feel motivated to return.</p>
-                    <p>That changed how I think about rigor and creativity. Research tells me what should work; design gives people a reason to engage with it. For me, the strongest products need both: evidence to ground the experience, and imagination to make that experience worth coming back to.</p>
+                    <p data-case-type="body">LePal was my first experience turning years of HCI research in digital mental health into a product used by real people. It made me realize that an intervention can be clinically grounded and still fail if people don’t understand its value or feel motivated to return.</p>
+                    <p data-case-type="body">That changed how I think about rigor and creativity. Research tells me what should work; design gives people a reason to engage with it. For me, the strongest products need both: evidence to ground the experience, and imagination to make that experience worth coming back to.</p>
                 </div>
             </div>
         </section>
@@ -1709,19 +1710,8 @@
         });
 
         if (isPreview) {
-            const previewCanvasWidth = 1100;
             document.body.classList.add('is-preview');
 
-            function scalePreviewToFrame() {
-                const previewScale = Math.min(1, window.innerWidth / previewCanvasWidth);
-                document.documentElement.style.setProperty('--project-preview-scale', previewScale);
-                document.body.style.width = `${window.innerWidth / previewScale}px`;
-                document.body.style.minHeight = `${window.innerHeight / previewScale}px`;
-                document.body.style.zoom = previewScale;
-            }
-
-            scalePreviewToFrame();
-            window.addEventListener('resize', scalePreviewToFrame);
 
             document.addEventListener('keydown', event => {
                 if (event.key === 'Escape') {
