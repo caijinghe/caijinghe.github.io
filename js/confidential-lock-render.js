@@ -21,20 +21,25 @@
     let x = -1;
     let y = -5;
     path.setAttribute('data-settled', '');
+    path.setAttribute('stroke', path.getAttribute('fill'));
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke-width', '6.25');
+    path.setAttribute('stroke-linecap', 'round');
+    path.setAttribute('stroke-linejoin', 'round');
 
     function draw() {
-      // At the minimum 48px icon size, the resting U has 5px sides
-      // and whole-pixel inner/outer edges instead of 4.4px fractional sides.
+      // Project the U's centerline, keeping its thickness constant even edge-on.
+      // Scaling a filled outline also shrank its sides below one screen pixel.
       const px = value => +(21 + (value - 21) * x).toFixed(4);
       const py = value => +(value + y).toFixed(4);
-      const arc = (radius, sweep, endX, endY) =>
-        `A${+(radius * Math.abs(x)).toFixed(4)} ${radius} 0 0 ${x < 0 ? 1 - sweep : sweep} ${px(endX)} ${py(endY)}`;
+      const point = (a, b) => `${px(a)} ${py(b)}`;
+      const radius = 9.375;
+      const handle = radius * 0.5522847498;
       path.setAttribute('d',
-        `M${px(17.5)} ${py(34)}V${py(18.5)}` +
-        arc(12.5, 1, 42.5, 18.5) + `V${py(30)}` +
-        arc(3.125, 1, 36.25, 30) + `V${py(18.5)}` +
-        arc(6.25, 0, 23.75, 18.5) + `V${py(34)}` +
-        arc(3.125, 1, 17.5, 34) + 'Z');
+        `M${point(20.625, 34)}V${py(18.5)}` +
+        `C${point(20.625, 18.5 - handle)} ${point(30 - handle, 9.125)} ${point(30, 9.125)}` +
+        `C${point(30 + handle, 9.125)} ${point(39.375, 18.5 - handle)} ${point(39.375, 18.5)}` +
+        `V${py(30)}`);
       pose.removeAttribute('transform');
     }
 
