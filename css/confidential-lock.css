@@ -12,8 +12,8 @@ body.project-design-system .animated-lock .lock-shackle {
   shape-rendering: geometricPrecision;
 }
 
-/* Once motion finishes, the wrapper uses native SVG coordinates. Release the
-   CSS animation layer so a stationary shackle is repainted as a vector. */
+/* Native SVG coordinates handle both movement and resting poses. Disable CSS
+   transforms throughout to avoid a rasterized animation layer. */
 body.project-design-system .animated-lock .lock-shackle[data-settled] {
   animation: none;
   transition: none;
