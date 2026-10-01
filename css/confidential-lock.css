@@ -1,3 +1,10 @@
+/* Position the card without transforming its entire contents into a layer. */
+body.project-design-system .confidential-card {
+  position: relative;
+  transform: none;
+  top: var(--confidential-card-offset, 0px);
+}
+
 /* Keep the animated vector out of the scaled page canvas. Its rendered width
    is snapped to CSS pixels; the shackle uses a filled outline, not a thin stroke. */
 body.project-design-system .confidential-lock-badge .animated-lock {
@@ -12,10 +19,10 @@ body.project-design-system .animated-lock .lock-shackle {
   shape-rendering: geometricPrecision;
 }
 
-/* Native SVG coordinates handle both movement and resting poses. Disable CSS
-   transforms throughout to avoid a rasterized animation layer. */
+/* The script draws the path directly, without CSS or SVG transforms. */
 body.project-design-system .animated-lock .lock-shackle[data-settled] {
   animation: none;
   transition: none;
   transform: none;
+  will-change: auto;
 }
