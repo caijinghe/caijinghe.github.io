@@ -306,3 +306,9 @@
   font-size: 14px;
   font-weight: 400;
 }
+
+/* Keep Nestify navigation readable over its dark cover. */
+#nestify-dialog.project-preview--dark .concept-gallery__back,
+#nestify-dialog.project-preview--dark .concept-gallery__breadcrumbs > span[aria-hidden] {
+  color: #fff;
+}
