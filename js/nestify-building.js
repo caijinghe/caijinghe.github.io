@@ -7,6 +7,16 @@
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let frame, start;
   let revealed = false;
+  let revealStart = null;
+  const whites = [...svg.querySelectorAll('.nestify-eye-reveal > ellipse')];
+  const dots = [...pupils.querySelectorAll('circle')].map(circle => {
+    const ellipse = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+    for (const attribute of circle.attributes) {
+      if (attribute.name !== 'r') ellipse.setAttribute(attribute.name, attribute.value);
+    }
+    circle.replaceWith(ellipse);
+    return ellipse;
+  });
   let dizzyStart = null;
   const button = svg.closest('.nestify-building__button');
   // Hold each glance before gently moving to the next one.
@@ -40,8 +50,25 @@
         dizzyStart = null;
       }
     }
-    pupils.setAttribute('transform', `translate(${x} ${y})`);
-    eyes.setAttribute('transform', `translate(0 33) scale(1 ${1 - blink * 0.96}) translate(0 -33)`);
+    // Draw final vector coordinates rather than scaling a cached eye layer.
+    const reveal = reducedMotion.matches || revealStart === null ? 1 : Math.min(1, (now - revealStart) / 480);
+    const first = reveal < 0.65;
+    const progress = smooth(first ? reveal / 0.65 : (reveal - 0.65) / 0.35);
+    const size = reveal === 1 ? 1 : first ? 0.15 + progress : 1.15 - 0.15 * progress;
+    const lift = reveal === 1 ? 0 : first ? 5 - 6 * progress : -1 + progress;
+    const openness = 1 - blink * 0.96;
+    whites.forEach((eye, i) => {
+      const center = i === 0 ? 57 : 70;
+      eye.setAttribute('cx', 63.5 + (center - 63.5) * size);
+      eye.setAttribute('cy', 33 + lift * openness);
+      eye.setAttribute('rx', 5.2 * size);
+      eye.setAttribute('ry', 6 * size * openness);
+      const dot = dots[i];
+      dot.setAttribute('cx', 63.5 + (center + x - 63.5) * size);
+      dot.setAttribute('cy', 33 + (lift + y * size) * openness);
+      dot.setAttribute('rx', 2.6 * size);
+      dot.setAttribute('ry', 2.6 * size * openness);
+    });
   }
   function tick(now) {
     if (start === undefined) start = now;
@@ -64,6 +91,7 @@
   const observer = new IntersectionObserver(entries => {
     if (!entries.some(entry => entry.isIntersecting)) return;
     revealed = true;
+    revealStart = performance.now();
     svg.classList.add('is-revealed');
     updateMotion();
     observer.disconnect();
