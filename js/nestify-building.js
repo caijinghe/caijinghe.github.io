@@ -6,6 +6,7 @@
   if (!eyes || !pupils) return;
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let frame, start;
+  let revealed = false;
   let dizzyStart = null;
   const button = svg.closest('.nestify-building__button');
   // Hold each glance before gently moving to the next one.
@@ -52,7 +53,7 @@
     start = undefined;
     dizzyStart = null;
     draw(0);
-    if (!reducedMotion.matches && !document.hidden) frame = requestAnimationFrame(tick);
+    if (revealed && !reducedMotion.matches && !document.hidden) frame = requestAnimationFrame(tick);
   }
   button?.addEventListener('click', () => {
     if (reducedMotion.matches) return;
@@ -60,5 +61,13 @@
   });
   reducedMotion.addEventListener('change', updateMotion);
   document.addEventListener('visibilitychange', updateMotion);
+  const observer = new IntersectionObserver(entries => {
+    if (!entries.some(entry => entry.isIntersecting)) return;
+    revealed = true;
+    svg.classList.add('is-revealed');
+    updateMotion();
+    observer.disconnect();
+  }, { threshold: 0.6 });
+  observer.observe(svg);
   updateMotion();
 })();

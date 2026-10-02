@@ -113,6 +113,10 @@
         .nestify-building__icon { display: block; zoom: calc(1 / var(--project-preview-scale, 1)); width: auto; height: calc(clamp(48px, 4vw, 76px) * 64 / 60); height: calc(round(nearest, clamp(48px, 4vw, 76px), 1px) * 64 / 60); overflow: visible; }
         .nestify-building__button { display: block; padding: 0; border: 0; background: transparent; color: inherit; cursor: pointer; border-radius: 12px; }
         .nestify-building__button:focus-visible { outline: 2px solid #94a3b8; outline-offset: 5px; }
+        .nestify-hole-eyes { opacity: 0; }
+        .nestify-building__icon.is-revealed .nestify-hole-eyes { opacity: 1; }
+        .nestify-building__icon.is-revealed .nestify-eye-reveal { animation: nestify-eyes-pop 480ms cubic-bezier(.2,.8,.3,1.2) both; transform-box: fill-box; transform-origin: center; }
+        @keyframes nestify-eyes-pop { 0% { transform: translateY(5px) scale(.15); } 65% { transform: translateY(-1px) scale(1.15); } 100% { transform: translateY(0) scale(1); } }
         .coming-soon-dots span { opacity: 1; }
         .coming-soon-dots span:nth-child(2) { animation: coming-soon-second 1.8s step-end infinite; }
         .coming-soon-dots span:nth-child(3) { animation: coming-soon-third 1.8s step-end infinite; }
@@ -120,6 +124,7 @@
         @keyframes coming-soon-third { 0%, 100% { opacity: 0; } 66.666667% { opacity: 1; } }
         @media (prefers-reduced-motion: reduce) {
             .coming-soon-dots span:nth-child(n) { animation: none; opacity: 1; }
+            .nestify-building__icon.is-revealed .nestify-eye-reveal { animation: none; }
         }
         @media (max-width: 768px) {
             .confidential-section { padding: 0 20px 50dvh; }
@@ -132,7 +137,7 @@
     <link rel="stylesheet" href="css/confidential-lock.css?v=20261001-4" />
     <script src="js/case-preview-scale.js?v=20261001-1" defer></script>
     <script src="js/scroll-indicator.js?v=20260926-2" defer></script>
-    <script src="js/nestify-building.js?v=20261001-dizzy-4" defer></script>
+    <script src="js/nestify-building.js?v=20261001-reveal-5" defer></script>
 </head>
 <body class="project-design-system">
     <header class="site-header" data-case-type="ui">
@@ -181,14 +186,14 @@
                     <!-- The opening ends above the feet, with no stroke across its bottom. -->
                     <path d="M40 54C40 35 43 22 50 13C53 11 56 10 59 10C79 10 86 28 86 56L86 54Z" fill="#111827" />
                     <path d="M15.5 58H29Q31 58 31 56C31 31 38 10 59 10C79 10 86 28 86 56Q86 58 88 58H103M31 58L40 54" stroke="#111827" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
-                    <g class="nestify-hole-eyes">
+                    <g class="nestify-hole-eyes"><g class="nestify-eye-reveal">
                         <ellipse cx="57" cy="33" rx="5.2" ry="6" fill="#fff" />
                         <ellipse cx="70" cy="33" rx="5.2" ry="6" fill="#fff" />
                         <g class="nestify-hole-pupils">
-                            <circle cx="57" cy="33" r="2" fill="#111827" />
-                            <circle cx="70" cy="33" r="2" fill="#111827" />
+                            <circle cx="57" cy="33" r="2.6" fill="#111827" />
+                            <circle cx="70" cy="33" r="2.6" fill="#111827" />
                         </g>
-                    </g>
+                    </g></g>
                 </svg>
                 </button>
                 </div>
