@@ -9,38 +9,130 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/workheader2.css">
+    <link rel="stylesheet" href="css/scroll-indicator.css?v=20261001-7" />
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body {
-            width: 100%;
-            height: 100%;
-            background: #ffffff;
-            color: #111111;
-            overflow: hidden;
-        }
-        .coming-soon-container {
-            width: 100%;
-            height: 100%;
-            min-height: 100vh;
-            display: flex;
+        * { box-sizing: border-box; }
+        html, body { margin: 0; width: 100%; background: #25201c; color: #fff; }
+        body { overflow-x: hidden; overflow-y: auto; }
+        .nestify-cover .case-cover__title { top: 12%; }
+        .project-overview.nestify-overview { padding-bottom: 80px; }
+        .nestify-overview .project-overview__meta { flex-wrap: wrap; row-gap: 6px; }
+        .nestify-overview .nestify-live-link { margin: 38px 0 0; }
+        .nestify-live-link a {
+            display: inline-flex;
             align-items: center;
+            gap: 8px;
+            padding: 9px 14px;
+            border: 1px solid #000;
+            border-radius: 999px;
+            background: transparent;
+            color: #000;
+            font-size: .82em;
+            font-weight: 400;
+            line-height: 1.1;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease;
+        }
+        .nestify-live-link a::after {
+            content: "";
+            display: inline-block;
+            width: .72em;
+            height: .72em;
+            flex: 0 0 .72em;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='4.5 4.5 11 11'%3E%3Cpath d='M5.5 14.5 14.5 5.5M5.5 5.5h9v9' fill='none' stroke='black' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center / contain;
+            background-color: currentColor;
+            -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='4.5 4.5 11 11'%3E%3Cpath d='M5.5 14.5 14.5 5.5M5.5 5.5h9v9' fill='none' stroke='black' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center / contain;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='4.5 4.5 11 11'%3E%3Cpath d='M5.5 14.5 14.5 5.5M5.5 5.5h9v9' fill='none' stroke='black' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center / contain;
+        }
+        .nestify-live-link a:hover { background: #000; border-color: #000; color: #fff; }
+        @media (prefers-reduced-motion: reduce) { .nestify-live-link a { transition: none; } }
+        .nestify-live-link a:focus-visible { outline: 2px solid currentColor; outline-offset: 5px; }
+        .confidential-section {
+            width: 100%;
+            padding: 0 24px 50vh;
+            padding-bottom: 50dvh;
+            display: flex;
             justify-content: center;
-            text-align: center;
-            padding: 32px 24px;
+            background-color: #ffffff;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 2;
+        }
+
+        .confidential-card {
+            width: 70%;
+            max-width: none;
+            transform: translateY(50%);
+            background: #f7f7f8;
+            border-radius: clamp(24px, 2vw, 38px);
+            padding: clamp(48px, 4vw, 76px);
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: left;
+        }
+
+        .confidential-lock-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin-bottom: clamp(24px, 2vw, 38px);
+            cursor: pointer;
             user-select: none;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            padding: 0;
         }
-        .coming-soon-dots { display: inline-flex; margin-left: 2px; }
-        .coming-soon-dots span { animation: dotWave 1.4s infinite ease-in-out; opacity: 0.18; }
-        .coming-soon-dots span:nth-child(2) { animation-delay: 0.22s; }
-        .coming-soon-dots span:nth-child(3) { animation-delay: 0.44s; }
-        @keyframes dotWave {
-            0%, 100% { opacity: 0.18; transform: translateY(0); }
-            35% { opacity: 1; transform: translateY(-2px); }
-            70% { opacity: 0.25; transform: translateY(0); }
+
+        .confidential-title {
+            color: #111827;
+            margin: 0 0 8px 0;
+
         }
-</style>
+
+        .confidential-desc {
+            color: #9ca3af;
+            margin: 0;
+        }
+
+        .confidential-desc a {
+            color: #4b5563;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .confidential-desc a:hover {
+            color: #111827;
+        }
+        /* Match the Confidential lock's 64-unit canvas height, preserving the doorway's proportions. */
+        .nestify-building__icon { display: block; zoom: calc(1 / var(--project-preview-scale, 1)); width: auto; height: calc(clamp(48px, 4vw, 76px) * 64 / 60); height: calc(round(nearest, clamp(48px, 4vw, 76px), 1px) * 64 / 60); overflow: visible; }
+        .nestify-building__button { display: block; padding: 0; border: 0; background: transparent; color: inherit; cursor: pointer; border-radius: 12px; }
+        .nestify-building__button:focus-visible { outline: 2px solid #94a3b8; outline-offset: 5px; }
+        .coming-soon-dots span { opacity: 1; }
+        .coming-soon-dots span:nth-child(2) { animation: coming-soon-second 1.8s step-end infinite; }
+        .coming-soon-dots span:nth-child(3) { animation: coming-soon-third 1.8s step-end infinite; }
+        @keyframes coming-soon-second { 0%, 100% { opacity: 0; } 33.333333% { opacity: 1; } }
+        @keyframes coming-soon-third { 0%, 100% { opacity: 0; } 66.666667% { opacity: 1; } }
+        @media (prefers-reduced-motion: reduce) {
+            .coming-soon-dots span:nth-child(n) { animation: none; opacity: 1; }
+        }
+        @media (max-width: 768px) {
+            .confidential-section { padding: 0 20px 50dvh; }
+            .confidential-card { width: 100%; padding: 32px 28px; border-radius: 20px; }
+        }
+        body.is-preview .site-header { display: none; }
+    </style>
     <link rel="stylesheet" href="css/case-study-system.css?v=20261001-6" />
     <link rel="stylesheet" href="css/project-typography.css?v=20261001-4" />
+    <link rel="stylesheet" href="css/confidential-lock.css?v=20261001-4" />
+    <script src="js/case-preview-scale.js?v=20261001-1" defer></script>
+    <script src="js/scroll-indicator.js?v=20260926-2" defer></script>
+    <script src="js/nestify-building.js?v=20261001-dizzy-4" defer></script>
 </head>
 <body class="project-design-system">
     <header class="site-header" data-case-type="ui">
@@ -51,8 +143,66 @@
             <a href="https://drive.google.com/file/d/1IsOUI2ZcsX_7XXkCw_bYc1aIiybE1FQT/view?usp=sharing" target="_blank">Résumé</a>
         </div>
     </header>
-    <main class="coming-soon-container">
-        <h1 class="coming-soon-title" data-case-type="question">Coming soon<span class="coming-soon-dots" aria-label="..."><span>.</span><span>.</span><span>.</span></span></h1>
+    <main class="case-page case-stack">
+        <section class="case-cover nestify-cover" aria-labelledby="nestify-hero-title">
+            <img src="media/nestify/cover.png?v=20261001-1" width="4698" height="3944" loading="eager" fetchpriority="high" alt="Nestify family dashboard on a wall display and phone in a warm living room" />
+            <h1 class="case-cover__title" id="nestify-hero-title" data-case-type="cover">Designing a Voice-First, Multimodal AI<br />for Family Life</h1>
+        </section>
+        <section class="project-overview project-overview--light nestify-overview" aria-labelledby="nestify-overview-title">
+            <h1 id="nestify-overview-title" data-case-type="overview">Family Copilot.<br />Proactive Intelligence.</h1>
+            <div class="project-overview__content">
+                <div class="project-overview__meta" data-case-type="label">
+                    <span>Product Design, 2026</span>
+                    <span>6+ Months</span>
+                    <span>End-to-End</span>
+                </div>
+                <p data-case-type="body">Nestify is a proactive family copilot that understands family context, anticipates what needs attention, and provides support across voice, mobile, and ambient devices. I owned end-to-end product experiences from 0 to 1, shaping how families capture information, manage daily life, and interact with AI through voice and screen.</p>
+                <p data-case-type="body">I defined cross-app voice interactions, dynamic feedback states, and multimodal AI onboarding. The product achieved an 83% onboarding completion rate, secured 1,000+ pre-orders, and supported the company in raising seed funding.</p>
+                <p class="project-overview__label" data-case-type="label">My deliverables</p>
+                <ol>
+                    <li data-case-type="body">Designed end-to-end experiences across mobile and ambient hardware.</li>
+                    <li data-case-type="body">Defined voice and multimodal interactions across shared and personal devices.</li>
+                    <li data-case-type="body">Built a code-based design system with 40+ Flutter components.</li>
+                    <li data-case-type="body">Designed the company website and fundraising materials from concept to launch.</li>
+                    <li data-case-type="body">Built an <strong>AI-native design environment</strong> by developing a real-time UI inspector and an internal Slack-to-prototype assistant.</li>
+                </ol>
+                <p class="project-overview__label" data-case-type="label">Collaborators</p>
+                <div class="project-overview__collaborators">
+                    <p data-case-type="body">4-person Product Design team<br />Engineering &amp; Hardware teams<br />Founding team</p>
+                </div>
+                <p class="nestify-live-link" data-case-type="body"><a href="https://www.nestifyapp.org/" target="_blank" rel="noopener noreferrer">Live Website</a></p>
+            </div>
+        </section>
+        <section class="confidential-section" aria-labelledby="nestify-building-title">
+            <div class="confidential-card">
+                <div class="confidential-lock-badge">
+                <button class="nestify-building__button" type="button" aria-label="Make the little eyes dizzy">
+                <svg class="nestify-building__icon" viewBox="12 0 94 64" fill="none" aria-hidden="true">
+                    <!-- The opening ends above the feet, with no stroke across its bottom. -->
+                    <path d="M40 54C40 35 43 22 50 13C53 11 56 10 59 10C79 10 86 28 86 56L86 54Z" fill="#111827" />
+                    <path d="M15.5 58H29Q31 58 31 56C31 31 38 10 59 10C79 10 86 28 86 56Q86 58 88 58H103M31 58L40 54" stroke="#111827" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+                    <g class="nestify-hole-eyes">
+                        <ellipse cx="57" cy="33" rx="5.2" ry="6" fill="#fff" />
+                        <ellipse cx="70" cy="33" rx="5.2" ry="6" fill="#fff" />
+                        <g class="nestify-hole-pupils">
+                            <circle cx="57" cy="33" r="2" fill="#111827" />
+                            <circle cx="70" cy="33" r="2" fill="#111827" />
+                        </g>
+                    </g>
+                </svg>
+                </button>
+                </div>
+                <h2 class="confidential-title" id="nestify-building-title" data-case-type="section" aria-label="Coming soon...">Coming soon<span class="coming-soon-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span></h2>
+                <p class="confidential-desc" data-case-type="body">Please <a href="mailto:jinghe-cai@outlook.com">email me</a> if you'd like to chat!</p>
+            </div>
+        </section>
     </main>
+    <script>
+        if (window.parent !== window && new URLSearchParams(location.search).has('preview')) {
+            document.addEventListener('keydown', event => {
+                if (event.key === 'Escape') parent.postMessage({ type: 'nestify-close' }, location.origin);
+            });
+        }
+    </script>
 </body>
 </html>

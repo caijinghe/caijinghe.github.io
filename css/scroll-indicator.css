@@ -28,6 +28,12 @@ body::-webkit-scrollbar {
   transition: opacity 300ms ease;
 }
 
+/* Keep viewport controls at their real size inside a scaled project canvas.
+   This also keeps pointer coordinates and thumb travel in the same units. */
+body.is-preview .page-scroll-indicator {
+  zoom: calc(1 / var(--project-preview-scale, 1));
+}
+
 /* Only visible when scrolling, hovering, or dragging */
 .page-scroll-indicator.is-visible.is-active,
 .page-scroll-indicator.is-visible:hover,

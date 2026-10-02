@@ -64,5 +64,6 @@
   setupPreviewDialog('lepal-dialog', 'open-lepal', 'lepal-close');
   setupPreviewDialog('samsung-dialog', 'open-samsung', 'samsung-close');
   setupPreviewDialog('microsoft-dialog', 'open-microsoft', 'microsoft-close');
+  setupPreviewDialog('nestify-dialog', 'open-nestify', 'nestify-close');
   setupPreviewDialog('thermopal-dialog', 'open-thermopal', 'thermopal-close');
 })();
