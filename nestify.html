@@ -131,15 +131,41 @@
             .confidential-card { width: 100%; padding: 32px 28px; border-radius: 20px; }
         }
         body.is-preview .site-header { display: none; }
+        #loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        #loading-overlay video {
+            object-fit: contain;
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
+            background: transparent;
+            mix-blend-mode: normal;
+            filter: invert(1);
+            pointer-events: none;
+        }
     </style>
     <link rel="stylesheet" href="css/case-study-system.css?v=20261001-6" />
     <link rel="stylesheet" href="css/project-typography.css?v=20261001-4" />
     <link rel="stylesheet" href="css/confidential-lock.css?v=20261001-4" />
+    <link rel="stylesheet" href="css/project-loader.css?v=20261001-1" />
+    <script src="js/project-asset-loader.js?v=20260928-1" defer></script>
     <script src="js/case-preview-scale.js?v=20261001-1" defer></script>
     <script src="js/scroll-indicator.js?v=20260926-2" defer></script>
     <script src="js/nestify-building.js?v=20261001-reveal-5" defer></script>
 </head>
 <body class="project-design-system">
+    <div id="loading-overlay">
+        <video id="loading-video" autoplay muted loop playsinline>
+            <source src="media/index/logo_dark.mp4" type="video/mp4" />
+        </video>
+    </div>
     <header class="site-header" data-case-type="ui">
         <div class="header-col-1"><a href="index.html" class="my-name">Jinghe Cai</a></div>
         <nav class="header-col-2"><a href="index.html#work">Work</a></nav>
@@ -203,6 +229,24 @@
         </section>
     </main>
     <script>
+        const overlay = document.getElementById('loading-overlay');
+        const loadingVideo = document.getElementById('loading-video');
+        const loadStart = Date.now();
+        loadingVideo.play().catch(() => {});
+
+        window.addEventListener('load', async () => {
+            await window.projectAssetsReady;
+            setTimeout(() => {
+                overlay.style.transition = 'opacity 0.6s ease';
+                overlay.style.opacity = '0';
+                overlay.style.pointerEvents = 'none';
+                setTimeout(() => {
+                    loadingVideo.pause();
+                    overlay.remove();
+                }, 600);
+            }, Math.max(0, 800 - (Date.now() - loadStart)));
+        });
+
         if (window.parent !== window && new URLSearchParams(location.search).has('preview')) {
             document.addEventListener('keydown', event => {
                 if (event.key === 'Escape') parent.postMessage({ type: 'nestify-close' }, location.origin);
