@@ -152,10 +152,12 @@
     <link rel="stylesheet" href="css/project-typography.css?v=20261001-4" />
     <link rel="stylesheet" href="css/confidential-lock.css?v=20261001-4" />
     <link rel="stylesheet" href="css/project-loader.css?v=20261001-1" />
+    <link rel="stylesheet" href="css/nestify-hero.css?v=20261004-57" />
     <script src="js/project-asset-loader.js?v=20260928-1" defer></script>
     <script src="js/case-preview-scale.js?v=20261001-1" defer></script>
     <script src="js/scroll-indicator.js?v=20260926-2" defer></script>
     <script src="js/nestify-building.js?v=20261002-vector-1" defer></script>
+    <script src="js/nestify-hero.js?v=20261004-2" defer></script>
 </head>
 <body class="project-design-system">
     <div id="loading-overlay">
@@ -173,8 +175,23 @@
     </header>
     <main class="case-page case-stack">
         <section class="case-cover nestify-cover" aria-labelledby="nestify-hero-title">
-            <img src="media/nestify/cover.png?v=20261001-1" width="4698" height="3944" loading="eager" fetchpriority="high" alt="Nestify family dashboard on a wall display and phone in a warm living room" />
-            <h1 class="case-cover__title" id="nestify-hero-title" data-case-type="cover">Designing a Voice-First, Multimodal AI<br />for Family Life</h1>
+            <div class="nestify-cover__brand" aria-label="Nestify">
+                <img class="nestify-cover__logo" src="media/nestify/hero/logo.svg" alt="Nestify" />
+            </div>
+            <h1 class="case-cover__title" id="nestify-hero-title" data-case-type="cover">Designing a <span class="nestify-cover__accent nestify-cover__accent--voice">Voice-First,</span> <span class="nestify-cover__accent nestify-cover__accent--ai">Multimodal AI</span><br />for Family Life</h1>
+            <div class="nestify-cover__device" aria-label="Nestify device showing six product screens">
+                <div class="nestify-cover__screens">
+                    <img class="nestify-cover__screen is-active" src="media/nestify/hero/home.png" width="3840" height="2160" alt="Nestify home dashboard" aria-hidden="false" fetchpriority="high" decoding="async" />
+                    <img class="nestify-cover__screen" src="media/nestify/hero/calendar.png" width="3840" height="2160" alt="Nestify family calendar" aria-hidden="true" decoding="async" />
+                    <img class="nestify-cover__screen" src="media/nestify/hero/task.png" width="3840" height="2160" alt="Nestify family tasks" aria-hidden="true" decoding="async" />
+                    <img class="nestify-cover__screen" src="media/nestify/hero/lists.png" width="3840" height="2160" alt="Nestify shared lists" aria-hidden="true" decoding="async" />
+                    <img class="nestify-cover__screen" src="media/nestify/hero/meals.png" width="3840" height="2160" alt="Nestify meal planner" aria-hidden="true" decoding="async" />
+                    <img class="nestify-cover__screen" src="media/nestify/hero/recipe.png" width="3840" height="2160" alt="Nestify recipes" aria-hidden="true" decoding="async" />
+                </div>
+                <div class="nestify-cover__frame-crop" aria-hidden="true"><img class="nestify-cover__frame" src="media/nestify/hero/frame.png" width="3158" height="2240" alt="" decoding="async" /></div>
+                <svg class="nestify-cover__bezel-clip" width="0" height="0" aria-hidden="true" focusable="false"><defs><clipPath id="nestify-glass-bezel" clipPathUnits="objectBoundingBox"><path clip-rule="evenodd" d="M .09 .156 H .91 Q .925 .156 .925 .175 V .825 Q .925 .844 .91 .844 H .09 Q .075 .844 .075 .825 V .175 Q .075 .156 .09 .156 Z M .1088 .2121 H .8919 V .7898 H .1088 Z" /></clipPath></defs></svg>
+                <div class="nestify-cover__glass-bezel" aria-hidden="true"></div>
+            </div>
         </section>
         <section class="project-overview project-overview--light nestify-overview" aria-labelledby="nestify-overview-title">
             <h1 id="nestify-overview-title" data-case-type="overview">Family Copilot.<br />Proactive Intelligence.</h1>
@@ -205,10 +222,10 @@
             <div class="confidential-card">
                 <div class="confidential-lock-badge">
                 <button class="nestify-building__button" type="button" aria-label="Make the little eyes dizzy">
-                <svg class="nestify-building__icon" viewBox="12 0 94 64" fill="none" aria-hidden="true">
+                <svg class="nestify-building__icon" viewBox="29.5 0 58 64" fill="none" aria-hidden="true">
                     <!-- The opening ends above the feet, with no stroke across its bottom. -->
-                    <path d="M40 54C40 35 43 22 50 13C53 11 56 10 59 10C79 10 86 28 86 56L86 54Z" fill="#111827" />
-                    <path d="M15.5 58H29Q31 58 31 56C31 31 38 10 59 10C79 10 86 28 86 56Q86 58 88 58H103M31 58L40 54" stroke="#111827" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M40 52C40 35 43 21 50 12C53 9 56 8 59 8C77 8 86 21 86 54H44Q42 54 40 55Z" fill="#111827" />
+                    <path d="M31 58C31 28 40 8 59 8C77 8 86 21 86 58M31 58L40 54" stroke="#111827" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
                     <g class="nestify-hole-eyes"><g class="nestify-eye-reveal">
                         <ellipse cx="57" cy="33" rx="5.2" ry="6" fill="#fff" />
                         <ellipse cx="70" cy="33" rx="5.2" ry="6" fill="#fff" />

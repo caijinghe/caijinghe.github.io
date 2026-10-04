@@ -8,37 +8,6 @@
     const breadcrumbs = dialog.querySelector('.concept-gallery__breadcrumbs');
     let overflow, bodyOverflow;
 
-    // Nestify starts with a dark cover, then switches to white content.
-    if (dialogId === 'nestify-dialog' && frame) {
-      let pendingThemeUpdate = false;
-      const updateTheme = () => {
-        pendingThemeUpdate = false;
-        const doc = frame.contentDocument;
-        if (!doc?.body) return;
-        const frameBounds = frame.getBoundingClientRect();
-        const buttonBounds = expand.getBoundingClientRect();
-        const x = buttonBounds.left + buttonBounds.width / 2 - frameBounds.left;
-        const y = buttonBounds.top + buttonBounds.height / 2 - frameBounds.top;
-        const element = doc.elementFromPoint(x, y);
-        dialog.classList.toggle('project-preview--dark', !!element?.closest('.nestify-cover'));
-      };
-      const scheduleThemeUpdate = () => {
-        if (pendingThemeUpdate) return;
-        pendingThemeUpdate = true;
-        requestAnimationFrame(updateTheme);
-      };
-      frame.addEventListener('load', () => {
-        frame.contentWindow.addEventListener('scroll', scheduleThemeUpdate, { passive: true });
-        frame.contentWindow.addEventListener('resize', scheduleThemeUpdate);
-        // Recheck when the white loading overlay disappears.
-        new MutationObserver(scheduleThemeUpdate).observe(frame.contentDocument.body, { childList: true });
-        scheduleThemeUpdate();
-      });
-      new ResizeObserver(scheduleThemeUpdate).observe(frame);
-      dialog.addEventListener('transitionend', scheduleThemeUpdate);
-      trigger.addEventListener('click', scheduleThemeUpdate);
-    }
-
     trigger.addEventListener('click', event => {
       if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       event.preventDefault();

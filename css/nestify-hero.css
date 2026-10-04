@@ -1,0 +1,177 @@
+.nestify-cover {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    min-height: clamp(780px, 82vw, 1120px);
+    padding: clamp(74px, 7vw, 112px) 24px 52px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    color: #202124;
+    background: linear-gradient(180deg, #e3eff7 0%, #eaf2f7 32%, #f7fafc 68%, #fff 90%);
+}
+
+.nestify-cover::before {
+    content: "";
+    position: absolute;
+    inset: -8% 34% 12% -16%;
+    z-index: -1;
+    pointer-events: none;
+    background: url("../media/nestify/hero/top-left-light.png") left top / cover no-repeat;
+    -webkit-mask-image: linear-gradient(to right, #000 0%, #000 20%, transparent 70%), linear-gradient(to bottom, #000 0%, #000 32%, transparent 72%);
+    mask-image: linear-gradient(to right, #000 0%, #000 20%, transparent 70%), linear-gradient(to bottom, #000 0%, #000 32%, transparent 72%);
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
+    transform-origin: 20% 10%;
+    opacity: .64;
+    transform: scale(1.08);
+    animation: nestify-shadow-travel 12s ease-in-out -6s infinite alternate, nestify-shadow-breeze 3s ease-in-out -.53s infinite, nestify-daylight-shift 6s ease-in-out infinite alternate;
+}
+
+@keyframes nestify-shadow-travel { from { translate: -8% -4%; } to { translate: 9% 7%; } }
+@keyframes nestify-shadow-breeze { 0%, 100% { rotate: -3.5deg; } 35% { rotate: 4deg; } 70% { rotate: -1.2deg; } }
+@keyframes nestify-daylight-shift { from { opacity: .64; } to { opacity: .5; } }
+
+.nestify-cover__brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 0 32px;
+}
+
+.nestify-cover__logo { display: block; width: clamp(67px, 5.2vw, 75px); height: auto; margin: -7px 0; }
+
+html .nestify-cover .case-cover__title {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: min(1050px, calc(100% - 24px));
+    max-width: none;
+    margin: 0;
+    color: #202124;
+    font-size: var(--case-hero-size);
+    font-weight: 500;
+    line-height: 1.2;
+    text-wrap: balance;
+    transform: none;
+}
+
+.nestify-cover__accent {
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.nestify-cover__accent--voice {
+    background-image: linear-gradient(90deg, #289bfa 0%, #9187ed 52%, #dc78bb 100%);
+}
+
+.nestify-cover__accent--ai {
+    background-image: linear-gradient(90deg, #dc78bb 0%, #f09a7d 55%, #e8b84d 100%);
+}
+
+.nestify-cover__device {
+    position: relative;
+    isolation: isolate;
+    width: min(880px, 82%);
+    aspect-ratio: 1489 / 1135.416;
+    flex: 0 0 auto;
+    margin: clamp(24px, 3vw, 44px) auto 0;
+}
+
+.nestify-cover__device::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    left: 7%;
+    right: 7%;
+    top: 86.7%;
+    height: 1.2%;
+    border-radius: 50%;
+    background: rgba(25, 35, 40, .55);
+    filter: blur(4px);
+    pointer-events: none;
+}
+
+.nestify-cover__screens,
+.nestify-cover__frame-crop,
+.nestify-cover__frame {
+    position: absolute;
+    inset: 0;
+}
+
+.nestify-cover__frame-crop {
+    z-index: 1;
+    clip-path: inset(13.6% 5.7% 13% 5.7% round 2.5%);
+}
+
+.nestify-cover__screens::before {
+    content: '';
+    position: absolute;
+    left: 10.87978509%;
+    top: 21.21212121%;
+    width: 78.30758899%;
+    height: 57.76515152%;
+    background: #f5f3ee;
+}
+
+.nestify-cover__screen {
+    position: absolute;
+    left: 11.32978509%;
+    top: 21.21212121%;
+    width: 77.40758899%;
+    height: 57.76515152%;
+    object-fit: fill;
+    border-radius: clamp(2px, .3vw, 4px);
+    opacity: 0;
+    transition: opacity 450ms ease;
+}
+
+.nestify-cover__screen.is-active { opacity: 1; }
+
+.nestify-cover__frame {
+    z-index: 1;
+    display: block;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    filter: saturate(.48) hue-rotate(165deg) brightness(1.14);
+    clip-path: polygon(evenodd, 0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%, 10.87978509% 21.21212121%, 10.87978509% 78.97727273%, 89.18737408% 78.97727273%, 89.18737408% 21.21212121%, 10.87978509% 21.21212121%);
+}
+
+.nestify-cover__glass-bezel {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    clip-path: url(#nestify-glass-bezel);
+    background:
+        radial-gradient(ellipse 75% 38% at 42% 15%, rgba(255, 255, 255, .5), transparent 75%),
+        linear-gradient(125deg, rgba(255, 255, 255, .34) 0%, rgba(222, 237, 243, .22) 36%, rgba(173, 202, 214, .32) 73%, rgba(251, 255, 255, .34) 100%);
+}
+
+
+@media (max-width: 768px) {
+    .nestify-cover {
+        min-height: 700px;
+        padding: 82px 16px 52px;
+    }
+    .nestify-cover__brand { margin-bottom: 36px; }
+    .nestify-cover__logo { width: 66px; }
+    html .nestify-cover .case-cover__title {
+        top: auto;
+        width: min(1050px, calc(100% - 24px));
+        font-size: var(--case-hero-size);
+        line-height: 1.2;
+    }
+    .nestify-cover__device {
+        width: min(100%, 560px);
+        margin-top: 26px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .nestify-cover__screen { transition: none; }
+    .nestify-cover::before { animation: none; translate: none; rotate: none; opacity: .64; }
+}
