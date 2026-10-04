@@ -151,6 +151,10 @@ html .nestify-cover .case-cover__title {
         linear-gradient(125deg, rgba(255, 255, 255, .34) 0%, rgba(222, 237, 243, .22) 36%, rgba(173, 202, 214, .32) 73%, rgba(251, 255, 255, .34) 100%);
 }
 
+@media (min-width: 1000px) {
+    body.is-preview .nestify-cover__device { width: min(1100px, 94%); }
+}
+
 
 @media (max-width: 768px) {
     .nestify-cover {
