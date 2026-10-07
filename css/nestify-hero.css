@@ -40,11 +40,11 @@
     margin: 0 0 32px;
 }
 
-.nestify-cover__logo { display: block; width: clamp(67px, 5.2vw, 75px); height: auto; margin: -7px 0; }
+.nestify-cover__logo { display: block; width: clamp(95px, 8vw, 105px); height: auto; margin: -7px 0; }
 
 html .nestify-cover .case-cover__title {
     position: relative;
-    top: auto;
+    top: 36px;
     left: auto;
     width: min(1050px, calc(100% - 24px));
     max-width: none;
@@ -124,11 +124,7 @@ html .nestify-cover .case-cover__title {
     height: 57.76515152%;
     object-fit: fill;
     border-radius: clamp(2px, .3vw, 4px);
-    opacity: 0;
-    transition: opacity 450ms ease;
 }
-
-.nestify-cover__screen.is-active { opacity: 1; }
 
 .nestify-cover__frame {
     z-index: 1;
@@ -162,9 +158,9 @@ html .nestify-cover .case-cover__title {
         padding: 82px 16px 52px;
     }
     .nestify-cover__brand { margin-bottom: 36px; }
-    .nestify-cover__logo { width: 66px; }
+    .nestify-cover__logo { width: 95px; }
     html .nestify-cover .case-cover__title {
-        top: auto;
+        top: 20px;
         width: min(1050px, calc(100% - 24px));
         font-size: var(--case-hero-size);
         line-height: 1.2;
@@ -176,6 +172,49 @@ html .nestify-cover .case-cover__title {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .nestify-cover__screen { transition: none; }
     .nestify-cover::before { animation: none; translate: none; rotate: none; opacity: .64; }
+}
+
+/* Temporary single-image Hero. The previous Hero markup remains in nestify.html. */
+.nestify-static-hero { background: #e9f2f6; }
+.nestify-static-hero > img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+.nestify-static-hero__content {
+    position: absolute;
+    z-index: 2;
+    top: clamp(82px, 7vw, 110px);
+    left: 24px;
+    right: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+.nestify-static-hero .nestify-cover__brand { margin-bottom: 32px; }
+.nestify-static-hero .nestify-cover__logo { width: clamp(95px, 8vw, 105px); }
+html .nestify-static-hero .case-cover__title {
+    position: static;
+    width: min(1050px, 100%);
+    max-width: 100%;
+    margin: 0;
+    color: #202124;
+    font-size: var(--case-hero-size);
+    font-weight: 500;
+    line-height: 1.2;
+    text-wrap: balance;
+    transform: none;
+}
+@media (max-width: 768px) {
+    .nestify-static-hero > img {
+        height: 100vh;
+        object-fit: cover;
+        object-position: center top;
+    }
+    .nestify-static-hero__content { top: 70px; left: 16px; right: 16px; }
+    .nestify-static-hero .nestify-cover__brand { margin-bottom: 18px; }
+    .nestify-static-hero .nestify-cover__logo { width: 88px; }
+    html .nestify-static-hero .case-cover__title { font-size: clamp(26px, 6.5vw, 36px); }
 }

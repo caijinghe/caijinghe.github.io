@@ -18,6 +18,7 @@
     return ellipse;
   });
   let dizzyStart = null;
+  let autoDizzyAt = null;
   const button = svg.closest('.nestify-building__button');
   // Hold each glance before gently moving to the next one.
   const glances = [[0, 0, 0], [0.6, 0, 0], [1, 1.5, 0.3], [2, 1.5, 0.3],
@@ -72,6 +73,10 @@
   }
   function tick(now) {
     if (start === undefined) start = now;
+    if (autoDizzyAt !== null && now >= autoDizzyAt) {
+      dizzyStart = now;
+      autoDizzyAt = null;
+    }
     draw(((now - start) % 6400) / 1000, now);
     frame = requestAnimationFrame(tick);
   }
@@ -79,11 +84,13 @@
     cancelAnimationFrame(frame);
     start = undefined;
     dizzyStart = null;
+    if (reducedMotion.matches) autoDizzyAt = null;
     draw(0);
     if (revealed && !reducedMotion.matches && !document.hidden) frame = requestAnimationFrame(tick);
   }
   button?.addEventListener('click', () => {
     if (reducedMotion.matches) return;
+    autoDizzyAt = null;
     dizzyStart = performance.now();
   });
   reducedMotion.addEventListener('change', updateMotion);
@@ -94,6 +101,7 @@
     revealStart = performance.now();
     svg.classList.add('is-revealed');
     updateMotion();
+    if (!reducedMotion.matches) autoDizzyAt = performance.now() + 480;
     observer.disconnect();
   }, { threshold: 0.6 });
   observer.observe(svg);

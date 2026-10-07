@@ -152,12 +152,11 @@
     <link rel="stylesheet" href="css/project-typography.css?v=20261001-4" />
     <link rel="stylesheet" href="css/confidential-lock.css?v=20261001-4" />
     <link rel="stylesheet" href="css/project-loader.css?v=20261001-1" />
-    <link rel="stylesheet" href="css/nestify-hero.css?v=20261004-60" />
+    <link rel="stylesheet" href="css/nestify-hero.css?v=20261007-single-image-3" />
     <script src="js/project-asset-loader.js?v=20260928-1" defer></script>
     <script src="js/case-preview-scale.js?v=20261001-1" defer></script>
     <script src="js/scroll-indicator.js?v=20260926-2" defer></script>
-    <script src="js/nestify-building.js?v=20261002-vector-1" defer></script>
-    <script src="js/nestify-hero.js?v=20261004-2" defer></script>
+    <script src="js/nestify-building.js?v=20261007-scroll-dizzy-1" defer></script>
 </head>
 <body class="project-design-system">
     <div id="loading-overlay">
@@ -174,23 +173,29 @@
         </div>
     </header>
     <main class="case-page case-stack">
+        <!-- Previous interactive Hero preserved for future screens.
         <section class="case-cover nestify-cover" aria-labelledby="nestify-hero-title">
             <div class="nestify-cover__brand" aria-label="Nestify">
-                <img class="nestify-cover__logo" src="media/nestify/hero/logo.svg" alt="Nestify" />
+                <img class="nestify-cover__logo" src="media/nestify/hero/logo.svg?v=20261007-4" alt="Nestify" />
             </div>
             <h1 class="case-cover__title" id="nestify-hero-title" data-case-type="cover">Designing a <span class="nestify-cover__accent nestify-cover__accent--voice">Voice-First,</span> <span class="nestify-cover__accent nestify-cover__accent--ai">Multimodal AI</span><br />for Family Life</h1>
-            <div class="nestify-cover__device" aria-label="Nestify device showing six product screens">
+            <div class="nestify-cover__device" aria-label="Nestify device showing the Home / Today screen">
                 <div class="nestify-cover__screens">
-                    <img class="nestify-cover__screen is-active" src="media/nestify/hero/home.png" width="3840" height="2160" alt="Nestify home dashboard" aria-hidden="false" fetchpriority="high" decoding="async" />
-                    <img class="nestify-cover__screen" src="media/nestify/hero/calendar.png" width="3840" height="2160" alt="Nestify family calendar" aria-hidden="true" decoding="async" />
-                    <img class="nestify-cover__screen" src="media/nestify/hero/task.png" width="3840" height="2160" alt="Nestify family tasks" aria-hidden="true" decoding="async" />
-                    <img class="nestify-cover__screen" src="media/nestify/hero/lists.png" width="3840" height="2160" alt="Nestify shared lists" aria-hidden="true" decoding="async" />
-                    <img class="nestify-cover__screen" src="media/nestify/hero/meals.png" width="3840" height="2160" alt="Nestify meal planner" aria-hidden="true" decoding="async" />
-                    <img class="nestify-cover__screen" src="media/nestify/hero/recipe.png" width="3840" height="2160" alt="Nestify recipes" aria-hidden="true" decoding="async" />
+                    <img class="nestify-cover__screen" src="media/nestify/hero/home.png" width="3840" height="2160" alt="Nestify Home / Today dashboard" fetchpriority="high" decoding="async" />
                 </div>
                 <div class="nestify-cover__frame-crop" aria-hidden="true"><img class="nestify-cover__frame" src="media/nestify/hero/frame.png" width="3158" height="2240" alt="" decoding="async" /></div>
                 <svg class="nestify-cover__bezel-clip" width="0" height="0" aria-hidden="true" focusable="false"><defs><clipPath id="nestify-glass-bezel" clipPathUnits="objectBoundingBox"><path clip-rule="evenodd" d="M .09 .156 H .91 Q .925 .156 .925 .175 V .825 Q .925 .844 .91 .844 H .09 Q .075 .844 .075 .825 V .175 Q .075 .156 .09 .156 Z M .1088 .2121 H .8919 V .7898 H .1088 Z" /></clipPath></defs></svg>
                 <div class="nestify-cover__glass-bezel" aria-hidden="true"></div>
+            </div>
+        </section>
+        -->
+        <section class="case-cover nestify-static-hero" aria-labelledby="nestify-static-hero-title">
+            <img src="media/nestify/hero/hero-one.png?v=20261007-3" width="3720" height="4096" alt="Nestify devices in a family living room" fetchpriority="high" decoding="async" />
+            <div class="nestify-static-hero__content">
+                <div class="nestify-cover__brand">
+                    <img class="nestify-cover__logo" src="media/nestify/hero/logo.svg?v=20261007-4" alt="Nestify" />
+                </div>
+                <h1 class="case-cover__title" id="nestify-static-hero-title" data-case-type="cover">Designing a <span class="nestify-cover__accent nestify-cover__accent--voice">Voice-First,</span> <span class="nestify-cover__accent nestify-cover__accent--ai">Multimodal AI</span><br />for Family Life</h1>
             </div>
         </section>
         <section class="project-overview project-overview--light nestify-overview" aria-labelledby="nestify-overview-title">
