@@ -1,0 +1,69 @@
+/* ============================================================
+   THE FOUR SHAPES.
+
+   One shape per dimension, used in two places: as the mask the hero
+   deck's video is revealed through, and as the silhouette of every
+   tile in the intro's grid. That is the whole point — the little
+   pictures and the big reveals are the same four marks, so the page
+   has a shape language instead of a bag of geometry.
+
+     hexagon  Family information hub   cells slotting together
+     clover   Family relationships     four leaves, one centre
+     star     Kids' development        the reward star the hub
+                                       already gives out for chores
+     heart    Parent mental health     the softest one, for the
+                                       screen that is about you
+
+   🔴 THE RULE, read off labs.google: NOTHING HAS A SHARP CORNER.
+   Their mask library (labs.google/assets/images/masks/) is Circle,
+   Square, Flower, Clover, Star, Hexagon — and even the star and the
+   hexagon are heavily radiused; their "Square" is a rect with rx 60
+   of 280, which is a squircle, not a square. Round everything is the
+   entire Google feel here. Break that and these stop matching.
+
+   🔴 THE BOX IS 192×108 — THE VIEWPORT.S ASPECT, not the shape.s own.
+   This is labs-clone.s construction (maskURL() in its app.js) and it is
+   the whole reason its transition never degenerates. mask-size with one
+   value sets the WIDTH and lets the height follow the image ratio, so a
+   SQUARE mask on a 16:10 screen has to grow very wide before it covers,
+   and by then its top and bottom are far off-screen: what is left on
+   screen is the shape.s middle band, flat top and flat bottom — a
+   rectangle with shaped sides. Drawn into a 16:9 box instead, the mark
+   reaches every edge at about the same moment and stays a mark.
+
+   🔴 Each mark is INSCRIBED in the box — scaled so its height is exactly
+   108, the box height. labs-clone gives its hexagon R=66 in a box whose
+   half-height is 54, i.e. it deliberately overruns and lets the viewBox
+   cut it flat. That is fine for a pointy-top hexagon losing its two tips;
+   on a clover it shears the top and bottom lobes off square and the mark
+   is a flat-topped slab before it is anywhere near the screen edges.
+   Nothing may be clipped by its own box.
+
+   ⚠️ HEXAGON, CLOVER AND STAR ARE GOOGLE.S OWN GEOMETRY, verbatim. Pulled
+   from labs.google/assets/images/masks/{Hexagon,Clover,Star}.svg and
+   re-boxed into 192×108 as above (their own viewBoxes were 277×301,
+   403×404, 401×401) because their corner radii are drawn per-vertex with
+   explicit cubics, and any redraw of mine was a worse approximation of
+   the thing we were trying to look like. Same standing as the IKEA film
+   and Google Sans elsewhere in this project: fine for a comp, has to be
+   replaced or cleared before this is public.
+
+   🔴 THE HEART IS OURS. Their library has no heart — it is Circle,
+   Square, Flower, Clover, Star, Hexagon and nothing else — so this one
+   is drawn to sit in the family: their 281-square box, and the bottom
+   cusp rounded with a fat stroke-linejoin so its softness matches the
+   radii on the three real ones. It is the one mark here that cannot be
+   checked against a reference, so if the set ever stops feeling
+   coherent, this is the one that drifted.
+   ============================================================ */
+
+:root {
+  --shape-hexagon:
+    url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27192%27%20height%3D%27108%27%20viewBox%3D%270%200%20192%20108%27%20fill%3D%27%23000%27%3E%3Cg%20transform%3D%27translate%2896%2054%29%20scale%280.3588%29%20translate%28-138.5%20-150.5%29%27%3E%3Cpath%20d%3D%22M108.103%208.24078C126.954%20-2.64276%20150.179%20-2.64276%20169.03%208.24078L246.169%2052.7773C265.02%2063.6609%20276.633%2083.7745%20276.633%20105.542V194.615C276.633%20216.382%20265.02%20236.495%20246.169%20247.379L169.03%20291.915C150.179%20302.799%20126.954%20302.799%20108.103%20291.915L30.9635%20247.379C12.1126%20236.495%200.5%20216.382%200.5%20194.615V105.542C0.5%2083.7745%2012.1126%2063.6609%2030.9635%2052.7773L108.103%208.24078Z%22%20%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+  --shape-clover:
+    url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27192%27%20height%3D%27108%27%20viewBox%3D%270%200%20192%20108%27%20fill%3D%27%23000%27%3E%3Cg%20transform%3D%27translate%2896%2054%29%20scale%280.2673%29%20translate%28-201.5%20-202%29%27%3E%3Cpath%20d%3D%22M402.25%2064.2731C402.25%2028.776%20373.617%204.76239e-06%20338.296%200H265.205C229.884%200%20201.251%2028.776%20201.251%2064.2731C201.251%2028.776%20172.617%206.02022e-06%20137.295%206.02022e-06H64.2046C28.8834%206.02022e-06%200.25%2028.776%200.25%2064.2731V137.728C0.25%20173.127%2028.7251%20201.842%2063.9114%20202C28.7251%20202.16%200.250023%20230.873%200.250018%20266.273L0.250008%20339.727C0.25%20375.225%2028.8834%20404%2064.2046%20404H137.295C172.617%20404%20201.251%20375.225%20201.251%20339.727C201.251%20375.225%20229.884%20404%20265.205%20404H338.296C373.617%20404%20402.25%20375.225%20402.25%20339.727V266.273C402.25%20230.875%20373.777%20202.16%20338.59%20202C373.777%20201.84%20402.25%20173.126%20402.25%20137.728V64.2731Z%22%20%2F%3E%20%3Cpath%20d%3D%22M402.25%2064.2731C402.25%2028.776%20373.617%204.76239e-06%20338.296%200H265.205C229.884%200%20201.251%2028.776%20201.251%2064.2731C201.251%2028.776%20172.617%206.02022e-06%20137.295%206.02022e-06H64.2046C28.8834%206.02022e-06%200.25%2028.776%200.25%2064.2731V137.728C0.25%20173.127%2028.7251%20201.842%2063.9114%20202C28.7251%20202.16%200.250023%20230.873%200.250018%20266.273L0.250008%20339.727C0.25%20375.225%2028.8834%20404%2064.2046%20404H137.295C172.617%20404%20201.251%20375.225%20201.251%20339.727C201.251%20375.225%20229.884%20404%20265.205%20404H338.296C373.617%20404%20402.25%20375.225%20402.25%20339.727V266.273C402.25%20230.875%20373.777%20202.16%20338.59%20202C373.777%20201.84%20402.25%20173.126%20402.25%20137.728V64.2731Z%22%20%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+  --shape-star:
+    url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27192%27%20height%3D%27108%27%20viewBox%3D%270%200%20192%20108%27%20fill%3D%27%23000%27%3E%3Cg%20transform%3D%27translate%2896%2054%29%20scale%280.2693%29%20translate%28-200.5%20-200.5%29%27%3E%3Cpath%20d%3D%22M184.218%204.26754C194.176%20-1.31835%20206.324%20-1.31835%20216.282%204.26754L240.677%2017.9521C245.454%2020.6316%20250.826%2022.0711%20256.302%2022.139L284.272%2022.4854C295.688%2022.6268%20306.208%2028.7005%20312.039%2038.517L326.324%2062.5657C329.121%2067.2747%20333.053%2071.2075%20337.762%2074.0045L361.811%2088.2891C371.628%2094.1199%20377.701%20104.64%20377.843%20116.057L378.189%20144.026C378.257%20149.502%20379.697%20154.875%20382.376%20159.651L396.061%20184.047C401.646%20194.004%20401.646%20206.152%20396.061%20216.11L382.376%20240.505C379.697%20245.282%20378.257%20250.654%20378.189%20256.131L377.843%20284.1C377.701%20295.516%20371.628%20306.036%20361.811%20311.867L337.762%20326.152C333.053%20328.949%20329.121%20332.882%20326.324%20337.591L312.039%20361.639C306.208%20371.456%20295.688%20377.529%20284.272%20377.671L256.302%20378.017C250.826%20378.085%20245.454%20379.525%20240.677%20382.204L216.282%20395.889C206.324%20401.475%20194.176%20401.475%20184.218%20395.889L159.823%20382.204C155.046%20379.525%20149.674%20378.085%20144.198%20378.017L116.228%20377.671C104.812%20377.529%2094.2918%20371.456%2088.461%20361.639L74.1764%20337.591C71.3794%20332.882%2067.4466%20328.949%2062.7376%20326.152L38.6888%20311.867C28.8724%20306.036%2022.7987%20295.516%2022.6573%20284.1L22.3109%20256.131C22.243%20250.654%2020.8035%20245.282%2018.124%20240.505L4.43942%20216.11C-1.14647%20206.152%20-1.14647%20194.004%204.43941%20184.047L18.124%20159.651C20.8035%20154.875%2022.243%20149.502%2022.3109%20144.026L22.6573%20116.057C22.7987%20104.64%2028.8724%2094.1199%2038.6888%2088.2891L62.7376%2074.0045C67.4466%2071.2075%2071.3793%2067.2747%2074.1764%2062.5657L88.461%2038.517C94.2918%2028.7005%20104.812%2022.6268%20116.228%2022.4854L144.198%2022.139C149.674%2022.0711%20155.046%2020.6316%20159.823%2017.9521L184.218%204.26754Z%22%20%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+  --shape-heart:
+    url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27192%27%20height%3D%27108%27%20viewBox%3D%270%200%20192%20108%27%20fill%3D%27%23000%27%3E%3Cg%20transform%3D%27translate%2896%2054%29%20scale%280.3843%29%20translate%28-140.5%20-140.5%29%27%3E%3Cpath%20d%3D%27M140.5%20250C90%20208%2020%20154%2020%2096C20%2056%2050%2026%2088%2026C110%2026%20130%2038%20140.5%2057C151%2038%20171%2026%20193%2026C231%2026%20261%2056%20261%2096C261%20154%20191%20208%20140.5%20250Z%27%20stroke%3D%27%23000%27%20stroke-width%3D%2730%27%20stroke-linejoin%3D%27round%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+}

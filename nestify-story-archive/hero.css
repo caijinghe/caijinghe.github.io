@@ -1,0 +1,1258 @@
+/* ============================================================
+   HERO — geometric mask transition, ported from labs-clone
+   Changed vs. the original: the deck is driven by VERTICAL page
+   scroll (sticky stage inside a tall track) instead of prev/next
+   buttons, so a normal downward scroll walks the slides and then
+   releases the page to the section below.
+   ============================================================ */
+
+.hero {
+  /* ---------- how much scroll one slide costs ----------
+     🔴 300svh, not 100. At one viewport per slide the deck was four
+     viewports end to end, and a single trackpad flick on macOS carries
+     1000–2000px of momentum — more than a whole slide, often two, and the
+     tail runs straight out of the section. That is the "一滑就滑走了".
+
+     Measured off zipline.com, which is the reference and does not have
+     the problem: their pinned block is a 10800px pin-spacer at a 900px
+     viewport — twelve viewports — across four slides. Three viewports per
+     slide, exactly. The resistance is bought with SCROLL DISTANCE, not by
+     hijacking the wheel: the same flick now covers less than half a slide
+     and the snap pulls it back to the anchor.
+
+     (They also run Lenis, which damps the momentum tail. That is a second,
+     separate lever — this one is free.) */
+  /* 🔴 300 → 225svh（2026-09-02，用户「滑动太久了…要保持它的清爽」）。
+
+     这一段的距离**不承载逐拍揭示**：影片播完 barLoop 会自己 glide 到下一张
+     （见 `finished && running` 那一支），距离主要是容器。所以减它不压缩任何
+     「一拍一拍出现」的节奏，只是少滚。
+
+     🔴 防「一滑到底」的活现在由 scroll-snap 干（snap.js 在每张幻灯放了锚点），
+     不再由距离干 —— 这两件事上一轮才解耦，是这次敢减距离的前提。
+     anchorY() 与吸附点都是从 track 高度现算的，改这一个数它们自己跟着走。 */
+  /* 🔴 225 → 150svh（2026-09-05，用户：「this section, each need to scroll a lot
+     before an animation happens」，配的就是 deck 的截图）。
+     1440×900 实测：每张从 2.25 屏降到 1.5 屏，整段 8100 → 5400px。
+     上面那段注释本来就为这一刀留了门——「防『一滑到底』的活现在由 scroll-snap
+     干，不再由距离干，这两件事上一轮才解耦，**是这次敢减距离的前提**」。
+     anchorY() 与吸附点都从 track 高度现算，改这一个数它们自己跟着走。
+     ⚠️ 别再往 100svh 以下走：一张幻灯的滚动跨度小于一屏时，吸附点之间的间距
+     会短于一次滚轮手势，读者一拨就跨两张。 */
+  --slide-span: 150svh;
+  height: calc(var(--hero-slides, 4) * var(--slide-span));
+  position: relative;
+}
+
+/* 手机端的段落标题沿用下方 “What families feel with Nestify” 的标题格式。 */
+.hero__section-title { display: none; }
+
+.hero__stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  /* 🔴 min() — a bare 640px floor makes the stage TALLER THAN THE WINDOW on
+     any screen shorter than that, and a sticky box with overhang has to
+     give that overhang back at the end of its range. It gives it back on
+     the last slide, so slide four alone rode 20px up into the clock (which
+     is fixed to the viewport and does not move with it) while the other
+     three sat correctly. Measured at 900×620: stage 640, window 620, slide
+     four's content top 255 against 275 for the rest. The floor is only
+     there to stop the stage collapsing, so capping it at the viewport
+     keeps the intent and removes the slack. */
+  min-height: min(640px, 100svh);
+  /* the film's box, named once so the rail can hang off its right edge
+     without either of them repeating the other's geometry */
+  --film-x: max(3vw, 24px);
+  /* 🔴 50vw, not 50%. Identical on screen (this box IS the viewport width,
+     and macOS overlay scrollbars take nothing off it), but a percentage
+     changes MEANING with the axis it is used on — width in `left`, height
+     in `bottom` — and the rail needs this same number down both. As a vw
+     length it is one value everywhere. */
+  /* 🔴 …AND THE HEIGHT TERM HAS TO LEAVE A MARGIN. The film is square, so
+     --film-w is also its HEIGHT, and the second term used to be a bare
+     100svh — a clamp against overflow, since .hero__stage clips. But the
+     two terms cross at exactly 2:1, and on any window wider than that the
+     height term wins and the film comes out precisely as tall as the
+     stage: flush to the top and bottom edges, no air at all. That is not a
+     rare shape. It is a maximised browser on a 5K or an ultrawide, and it
+     is why this reads as "full-bleed on the big monitor, correct on the
+     laptop" — the laptop is 1.5:1, where 50vw still wins.
+
+     --film-y is what the height term now keeps back. It is not the whole
+     answer to the composition (when 50vw wins, the leftover is far larger
+     and that is fine — the film is simply not height-bound there); it is
+     the floor under it, so the picture always sits IN the stage rather
+     than filling it. The rail reads --film-w for its own foot, so it
+     follows this down without being told. */
+  --film-y: max(24px, 5svh);
+  --film-w: min(50vw, calc(100svh - 2 * var(--film-y)));
+  --rail-gap: 12px;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--stage-bg, var(--page-bg));
+  color: var(--ui-fg, #1a1a1a);
+  transition: background-color .6s ease, color .6s ease;
+}
+
+.hero__stack { position: absolute; inset: 0; }
+
+/* simple fade between slides — no geometric mask */
+.hero__slide {
+  position: absolute; inset: 0; z-index: 1;
+  background: var(--slide-bg, var(--page-bg));
+  color: var(--slide-fg, #1a1a1a);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.7s ease;
+}
+.hero__slide.is-active {
+  opacity: 1;
+  z-index: 2;
+}
+.hero__slide.is-out {
+  opacity: 0;
+  z-index: 1;
+}
+/* ---------- the photographic ground ----------
+   The picture rides .hero__inner, the layer that counter-rotates. So the
+   mask turns and the photograph does NOT — the shape reads as a window
+   opening onto something already there, rather than as a picture being
+   spun. That is what this otherwise-empty layer has always been for.
+
+   The scrim is on the same element, over the photo and under the copy: the
+   type on this slide is white, and a kitchen shot is mostly white fridge
+   and cream wall. Weighted to the foot, where the copy sits, so the top of
+   the picture is left alone. */
+.hero__inner {
+  /* LEFT HALF — the rounded square the film plays in. (It was briefly
+     full-bleed with the copy over it; back to the two-column composition.) */
+  flex: none;
+  width: var(--film-w);
+  aspect-ratio: 1;
+  position: relative;
+  overflow: hidden;
+  /* 🔴 mask 必须加在**做裁剪的这一层**，不是加在被裁剪的影片上。
+
+     iOS Safari 把 <video> 交给平台的媒体层渲染，那一层绕过祖先的 overflow
+     裁剪，所以 border-radius 无论写在容器还是影片上都可能被忽略。给容器加一个
+     mask 会强制它成为自己的合成根，裁剪于是发生在合成层上，媒体层再也逃不出去。
+     radial-gradient(#fff, #000) 两端都不透明——它不改变任何像素，唯一的作用
+     就是触发那条合成路径。isolation 是同一目的的第二条。 */
+  -webkit-mask-image: -webkit-radial-gradient(#fff, #000);
+  isolation: isolate;
+  /* 🔴 cover + centre, and it is STABLE here in a way it is not on the flip
+     card: this box is `aspect-ratio: 1` at every width, so the aspect never
+     travels and cover cannot re-derive the crop underneath the picture. The
+     card's box DOES travel — 1.60 to 1.00 across the turn — which is why its
+     rule is width-bound instead; see .flip__back in intro.css. The deck's
+     assets are square (1080×1080 films, and posters cut from them), so on a
+     square box "cover" is a 1:1 with nothing cropped and the two rules
+     resolve to the same scale and the same centre: the landing is one crop
+     handed over rather than two that resemble each other.
+
+     ⚠️ Both rules assume the source is SQUARE OR TALLER. A landscape one
+     would still cover here and would letterbox on the card. Change the pair
+     together. */
+  background-image: var(--slide-img, none);
+  background-size: cover;
+  background-position: center;
+  border-radius: 24px;
+  margin-left: var(--film-x);
+}
+.hero__video {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  /* 🔴 圆角写在**影片自己身上**，不能只靠 .hero__inner 的 overflow: hidden
+     （用户 2026-08-30：「hero deck 的视频圆角有时候会消失」）。
+
+     父层的 overflow 裁剪发生在**布局层**；而 <video> 在 iOS 上会被提成独立的
+     合成层，合成层是绕过父层裁剪直接交给 GPU 合成的——于是圆角时有时无，取决
+     于浏览器那一刻有没有把它提层（滚动、播放状态、内存压力都会改变这个决定）。
+     「有时候」正是这种非确定性的样子。
+
+     给它自己一个同样的圆角，那一层无论提不提都是圆的。24px 必须与
+     .hero__inner 的值一致——两处是一对，改一个要改另一个。 */
+  border-radius: 24px;
+  /* ⚠️ 这里曾经有一条 -webkit-mask-image，**加错了地方**：那个修法要求 mask
+     加在做裁剪的那一层（.hero__inner），加在被裁剪的影片上没有作用。
+     用户 2026-08-30 实测 iOS Safari 上圆角**始终**不出现。已移到上面。 */
+}
+
+
+/* RIGHT HALF — the text column. flex: 1 takes whatever the square film
+   leaves, and the copy is ranged left inside it. */
+.hero__content {
+  flex: 1;
+  min-width: 0;
+  /* 🔴 stretch, or the padding below does nothing. The slide is a flex row
+     with align-items:center, so this column is only as tall as its own
+     text and is then centred as a block — `justify-content: flex-start`
+     inside it has no free space to work with, and the padding just pushes
+     the whole centred lump down. Stretching gives the column the stage's
+     height, which is what the alignment needs to bite on. (The film keeps
+     the row's centring: it sets its own height from its aspect-ratio.) */
+  align-self: stretch;
+  position: relative; z-index: 3;
+  /* 🔴 Centred again — but the stretch above still matters. The clock used
+     to be docked above the eyebrow, so moving the copy moved the time with
+     it; it now reads off the film's top edge instead (see hero.js), which
+     leaves this column free to put the eyebrow and the headline where they
+     read best, in the middle of the frame. */
+  /* 🔴 TOP of the frame, not the middle — and the top it lines up with is
+     the FILM's, not an eyeballed inset. The column is stretched to the full
+     stage height (above), so the film's top edge is (stage − film) / 2 down
+     from it, and the same two names the film is built from give the copy its
+     offset. One geometry: retune --film-w and the headline follows the
+     picture instead of drifting off it.
+
+     (100svh, not 100%: a percentage padding resolves against the containing
+     block's WIDTH, which is the one dimension this has nothing to do with.
+     The stage is 100svh tall — its min-height floor is itself capped at
+     100svh, so the two can never disagree.) */
+  /* the max() is a FLOOR, not a taste tweak: on a wide-and-short window
+     (50vw > 100svh) the film is capped at the stage height, its top edge
+     lands at 0, and aligning to it exactly would set the headline against
+     the top of the screen.
+     🔴 88, not 32. The floor's job is to keep the headline off the top of
+     the screen, and 32 did not do it: the BAR is there. Measured at 1440
+     wide, the header's bottom edge is 66px, so every window shorter than
+     ~810 — where the film's own centring stops winning the max — put the
+     first line of the deck straight under the pills.
+     And 88 rather than a rounder 96 because the number has to stay UNDER
+     the film's offset at the reference window: at 1440×900 that offset is
+     (900 − 720) / 2 = 90, so 96 would quietly win the max there and break
+     the one thing this padding exists for — headline top on film top.
+     88 clears the bar by 22px and leaves every taller window untouched. */
+  /* 🔴 CENTRED, which reverses what the notes above argue for. "Headline
+     top on film top" is only the same thing as level-with-the-picture when
+     the copy is as tall as the picture, and it is not: measured at 1440×900
+     the headline and eyebrow come to ~178px of ink inside a 900px column,
+     so top-aligning left 632px of nothing beneath them and the whole block
+     read as having slipped up the frame. The film is genuinely centred —
+     90px clear above and below — and this makes the words agree with it.
+
+     The padding stays derived from the film rather than eyeballed; it is
+     symmetric now, so it no longer decides where the copy STARTS, only how
+     much of the column it may use. */
+  padding: max(88px, calc((100svh - var(--film-w)) / 2)) max(5vw, 48px);
+  display: flex; flex-direction: column;
+  align-items: flex-start; justify-content: center;
+  text-align: left;
+  pointer-events: none;
+}
+.hero__content > * { pointer-events: auto; }
+
+/* ---------- 文案的交接：错开的一进一出 ----------
+   🔴 2026-09-04 用户：「文字变化的那个动画有点奇怪，字会残留」。
+
+   幻灯这一层仍然是 .7s 的交叉淡入（影片需要它），所以换片时两句话会同时在场；
+   再让它们各自擦一遍，就是残留。现在整块文案自己走一进一出，且**错开**：旧的
+   .18s 淡出上移，新的等 .18s 再进来，两段没有交集。
+
+   🔴 用 keyframes，不用 transition，而且可见态是**纯声明**（.hero__slide 的
+   opacity 就是它的可见态）。第 0 张在页面加载时就带 .is-active 却不带
+   .is-copy-in，所以它**不播任何动画、加载即在**——这一条是刻意的：用
+   transition + 类切换写过两版，都会在加载时起一条永远推不动的 CSSTransition
+   （playState 一直 running、计算值钉死在起始帧，连内联样式都压不过），表现就是
+   第一句文案恒不可见。别改回 transition 驱动，也别把动画直接挂到 .is-active 上。 */
+.hero__slide.is-copy-in .hero__content {
+  animation: heroCopyIn .34s var(--ease-out-expo) .18s both;
+}
+.hero__slide.is-out .hero__content {
+  animation: heroCopyOut .18s ease both;
+}
+@keyframes heroCopyIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes heroCopyOut {
+  from { opacity: 1; transform: none; }
+  to   { opacity: 0; transform: translateY(-6px); }
+}
+
+.hero__title {
+  font-family: var(--font--primary);
+  /* 🔴 The titles carry NO authored break any more — each is one sentence
+     and the column decides where it turns. The size therefore no longer
+     has a line fit to defend: the note that used to live here worked out
+     that the longest authored line was 28 characters and warned that it
+     needed ~448px against 366px of column at 430 wide, which is exactly
+     the kind of arithmetic that stops being true the moment the copy is
+     edited. A wrapped line just takes another row.
+     Brought down from 5vw/72px — at the old size the two lines filled most
+     of the frame's width and read as shouting rather than as a caption to
+     the shape behind them, then down again to a 24px ceiling.
+
+     🔴 The ceiling is a CEILING, not a fixed size: any desktop from ~1410px
+     wide up renders exactly 38px, and below that the vw slope takes over so
+     the line still shrinks with a phone rather than sitting at 38 on a
+     390px screen. That keeps the "relative to the screen, not fixed" rule
+     the buttons follow.
+
+     🔴 The break is AUTHORED again, and that is what paid for the size. The
+     note above is kept because its warning still stands — but the copy it
+     was written against ran to 28 characters a line and let the column
+     choose the turn, so the size had to be small enough that the column
+     never chose a third one. The four titles are now written as two short
+     lines each (longest: "someone to share it.", 20 characters) with the
+     break in the markup, so the only thing the size has to clear is ONE
+     20-character line, not a paragraph looking for a fit. That is 8 fewer
+     characters to seat, and the type goes up by about a third for it.
+
+     🔴 The slope is still the load-bearing half. Measured at 1512 / 1440 /
+     1280 / 1100: usable column (stage minus film minus both gutters) runs
+     ~560 / 533 / 474 / 397px, and the longest line at 3.6vw sets to ~490 /
+     466 / 415 / 356. Every one clears with room. Re-check those four if a
+     line ever goes past 20 characters. */
+  /* 🔴 The slope is set by the COLUMN, not by taste, and the NARROW screen
+     is the one that decides it. The copy column is whatever the square film
+     leaves — 560px at 1512, 474px at 1280 — and the longest authored line
+     has to fit inside it. Measured at 3.9vw:
+
+         1512   59.0px   longest line 538 of 560   22px spare
+         1280   49.9px   longest line 455 of 474   19px spare
+
+     so 1280 is the binding case: past roughly 4.05vw that slide wraps to
+     three lines while 1512 still looks fine. The 62px ceiling only bites
+     above ~1590px.
+
+     🔴 3.9 → 3.7vw, and the binding line changed with the copy. Slide two
+     is "Understand the moments that matter." now, and it is the longest
+     of the four by some way. Measured at 1440, where the text column is
+     518px: at 3.9vw (56.2px) its natural wrap needs 530px for "moments
+     that matter." — twelve short — so it fell to THREE lines while the
+     other three slides stayed on two, which moves the eyebrow under it
+     and shows up the moment the deck cross-fades. At 3.7vw (53.3px) the
+     same line measures 503px: fifteen of headroom, ~3%, which is enough
+     to survive a different platform's rasteriser. Nothing is authored —
+     the column still decides where it turns; the size is just small
+     enough that it turns in the right place.
+
+     Re-measure if the copy gets longer again: the numbers that matter
+     are the column's width and the longest UNBREAKABLE run in a title,
+     not the character count. */
+  font-size: clamp(26px, 3.7vw, 62px);
+  line-height: 1.08;
+  font-weight: 500;
+  letter-spacing: -.03em;
+  max-width: 100%;
+  margin: 0;
+}
+/* 🔴 Not italic. The second half used to lean, on the idea that the two
+   clauses read as a call and an answer — at this size it just looks like a
+   different typeface has been dropped into the middle of a sentence. The
+   line break is doing that job already. */
+.hero__title em { font-style: normal; font-weight: inherit; }
+
+/* the word the intro hands down. It is hidden for as long as the carrier
+   is still flying it here (intro.js writes --carry-in on .hero), and there
+   is no fade on either side: at the end of the flight the carrier is on
+   exactly this word's box, so swapping one for the other is invisible,
+   while any overlap would show the word twice. */
+.hero__carry { font-style: inherit; opacity: var(--carry-in, 1); }
+/* 🔴 The padding is the DESCENDER ALLOWANCE, and it is the only thing
+   standing between "the growth you see." and a flat-bottomed g. A line box
+   ends at the font's descent, but the ink of g/y/p/j does not — at 56px it
+   was measured sitting 3px inside a 12px allowance, which is not a margin,
+   it is luck. Raised to .3em, with the negative margin taking the same
+   amount back so the block occupies exactly the space it did before: the
+   allowance is invisible to the layout and only the clip sees it.
+   (Measured with a canvas ink box, not by eye — see the note on the span
+   below for the OTHER box that was cutting the same letters.) */
+.hero__mask { display: block; overflow: hidden; padding-bottom: .3em; margin-bottom: -.22em; }
+/* ---------- the copy waits for the turn to finish ----------
+   🔴 NOT a taste decision — it is working around a real clipping failure.
+   When a masked element is rotated AND its child is counter-rotated (which
+   is exactly what this deck does: the slide spins, .hero__content spins
+   back so the words stay upright), Chrome gives the counter-rotated child
+   its own compositing layer and STOPS APPLYING THE ANCESTOR'S MASK TO IT.
+   The background obeys the clover; the text does not, and renders in full
+   across the ground outside it. That is the "rectangle showing through" —
+   it was never the shape leaking, it was the type escaping.
+
+   Reproduced down to a minimal case: same mask, same markup, one copy with
+   no rotation and one with the slide at -130° and the content at +130°.
+   The unrotated one clips to the silhouette. The rotated one does not.
+
+   So nothing readable may be on screen while the spin is running. The spin
+   is 1s (see --spin-dur), so the copy starts at 1.05s — by which point the
+   counter-rotation has landed, the layer is square with the world again,
+   and the mask is past full-bleed anyway so there is nothing left to clip.
+
+   The alternative fix is to lift .hero__content out of the masked element
+   entirely. That is the more correct structure and a bigger change; if this
+   deck ever needs copy visible DURING the turn, that is the way to do it. */
+/* 🔴 It comes in FROM THE LEFT, which is the side the film is on. The
+   reveal used to be vertical — the line rose 105% out of its own mask —
+   and that was a motion of its own, unrelated to anything else on screen.
+   The card lands on the left and the copy sits to its right, so wiping the
+   words out of that edge reads as the card putting them there rather than
+   as a second thing arriving.
+
+   A clip, not a slide: the words are already in position and the wipe
+   uncovers them, so nothing travels the width of the column. The .35em of
+   translate is only the push behind the wipe.
+
+   🔴 No transition-delay any more. The .8s was there to keep type off the
+   screen while the old spin ran; the cue now arrives with the card, and a
+   delay on top of it is exactly the pause this was meant to remove. */
+/* 🔴 The vertical insets are NEGATIVE, and that is the actual fix for the
+   clipped descenders. `inset()` resolves against this span's own border
+   box — which has no padding, so it ends exactly at the last line box, a
+   good 3px above where the g's ink does. The mask above it carries a
+   descender allowance in its padding; this clip did not, so the outer box
+   was generous and the inner one sliced the letters off anyway. Two boxes,
+   one of them silently tighter than the other.
+
+   Pushing the top and bottom edges out past the box means the wipe can
+   only ever cut HORIZONTALLY, which is all it was ever meant to do — the
+   descender allowance is left to the mask's padding, where it belongs, and
+   there is no second number to keep in step with the type. */
+.hero__mask > span {
+  display: block;
+  transition:
+    clip-path .9s var(--ease-out-expo),
+    translate .9s var(--ease-out-expo);
+}
+/* 🔴 2026-09-04：隐藏的**起始态**从这条规则里搬到 .hero--anim 下。
+
+   原本 .hero__mask > span 自己就带 clip-path: inset(… 100% …)，也就是说
+   每一句 hero 标题的静息态是**被裁成零宽**的，只有 hero.js 加上 .is-copy-in
+   才打开。hero.js 一旦没加载、报错、或被拦（CDN/CSP/旧浏览器），整段 hero
+   的文案就永远不可见，而且没有任何兜底。
+
+   仓库里已有正确写法并注明了理由——privacy.css:97「The hidden start state is
+   scoped to .pv--anim, which privacy.js adds to the section. Without JS
+   nothing is ever hidden.」hub.css:704 也写着它的基础态是「no-GSAP 与
+   reduced-motion 的兜底」。hero 是这三段里唯一的异类，这里对齐。 */
+/* 🔴 2026-09-04：**擦除关掉**。上面那段讲的是「从左边擦入」的理由，构图仍是
+   两栏、那条理由仍然成立——但它是「字会残留」的一半来源：换片时旧的那句被撤掉
+   .is-copy-in，clip-path 反向合拢，读起来像「正在被擦掉」，而新的那句同时擦开，
+   两段字在同一处反向动。整块文案的进出改由 .hero__content 一次带（见下面的
+   heroCopyIn / heroCopyOut），标题不再自己擦一遍。
+   规则留着不删：.hero__mask 的降序补偿还在用，要把擦除找回来填回这两行即可。 */
+.hero--anim .hero__mask > span {
+  clip-path: none;
+  translate: 0 0;
+}
+/* 🔴 UNDER the headline now, not over it. As a standing head it was the
+   first thing read on every slide, which made four slides open with four
+   category names; read after the line it does what a caption does — you
+   take the sentence, then you are told which part of the app it belongs
+   to. The margin flips with it: it hangs off the bottom of the title. */
+.hero__eyebrow {
+  margin: 22px 0 0;
+  font-size: clamp(12px, .95vw, 14px);
+  font-weight: 500;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  /* 🔴 The slide's own ink, held back — NOT a brand colour. This was tried
+     in --nes-blue-2 and taken back out: at 13.7px this is small text, where
+     the bar is 4.5:1, and on --nes-sand none of the three brand blues gets
+     near it — #2497f0 is 2.77:1, #14a4fd 2.41:1, #1e88e5 3.28:1. The ink at
+     the opacity below composites to #6d6c69 and measures 4.68:1, which is
+     the only one of the four that passes. A label under a headline is
+     supporting type; it wants to recede, and grey is what receding looks
+     like. */
+  color: currentColor;
+  /* 🔴 2026-09-04：它**自己不再做入场**。.62 从「揭示后的终值」变成常驻值
+     ——它一直就是这个灰（理由见上面那段对比度推导）。旧值是 opacity:0 +
+     translateY(12px) + .7s 过渡，配 .is-copy-in 揭示；那一层跟标题的擦除叠在
+     一起，就是「字会残留」。进出交给 .hero__content 整块负责。 */
+  opacity: .62;
+}
+/* 🔴 The cue is .is-copy-in, NOT .is-active. Slide one is active from page
+   load — it has to be, it is the deck's resting state — so hanging the copy
+   on that played its entrance while the reader was still three sections
+   above it, and by the time the flip delivered them here the words had been
+   sitting in place for a minute. The flip adds this class as it lands (see
+   intro.js); every other slide gets it when it becomes the active one,
+   which is the old behaviour. */
+/* the same negative top and bottom as the closed state — only the RIGHT
+   edge moves, so the clip is a horizontal wipe and nothing else */
+/* 🔴 2026-09-05：**擦除回来了**（用户：「Hero deck 的文字动画能不能稍微改一下？
+   就是没动效了，感觉应该就是直接出现」）。上面那段 09-04 关掉它的注释保留，因为
+   它记的病因是真的——但这一版换了实现方式，那个病复现不了：
+
+     旧写法是**两个状态 + transition**：静息态被裁成零宽，.is-copy-in 打开。
+     换片时旧那句被摘掉 .is-copy-in，clip-path 就**反向合拢**，读起来像「正在
+     被擦掉」，而新那句同时擦开——两段字在同一处反向动，那就是「字会残留」。
+
+     现在是**一次性 keyframes**：静息态始终是打开的（.hero--anim 那条不动，
+     也就保住了 09-04 那次修的「hero.js 挂掉时文案不会被永久裁没」），擦除只在
+     .is-copy-in 挂上时播一遍，`both` 让它停在终态。摘掉这个类不会倒放，出场
+     仍然只由 .hero__content 的 heroCopyOut 一次带走。
+
+   数值是从 06775c53a 原样取回来的，不是重新调的：inset 的 -.35em 上下出血、
+   100%→0 的右缘、-.35em 的起始位移、--ease-out-expo。只有时长从 .9s 收到 .78s
+   并压了 .18s 延迟——延迟与 heroCopyIn 对齐，两者同时起步，块淡入 .34s 结束后
+   擦除还在走，读起来是「这句话正在被写出来」而不是两层各动各的。
+
+   ⚠️ 改成 keyframes 之后，下面三处「关掉动效」的地方必须**同时**关 animation，
+   只关 transition 已经不够了：.is-copy-armed（翻卡桥接）、prefers-reduced-motion、
+   以及手机横版那段（四张同时在场，谁都不该播入场）。三处都已补。 */
+@keyframes heroLineIn {
+  from { clip-path: inset(-.35em 100% -.35em 0); translate: -.35em 0; }
+  to   { clip-path: inset(-.35em 0 -.35em 0);    translate: 0 0; }
+}
+.hero__slide.is-copy-in .hero__mask > span {
+  animation: heroLineIn .78s var(--ease-out-expo) .18s both;
+}
+/* the .62 is what makes it grey — see the note on .hero__eyebrow above */
+.hero__slide.is-copy-in .hero__eyebrow { opacity: .62; transform: none; }
+/* 🔴 Armed, not animated. While the flip's bridge is carrying these words on
+   a fixed clone, the real line is hidden and set to its FINISHED state — no
+   transition, because a timed one started here would still be running when
+   the bridge lets go and the reader would watch the same line wipe in twice.
+   intro.js drops this class at the pin, so every later slide change gets the
+   normal entrance above. */
+/* ⚠️ animation 和 transition 都要关（2026-09-05 擦除改成 keyframes 那次补的）。
+   只写 transition:none 的话，桥接的克隆刚放手，真行会自己再擦一遍——正是上面
+   这段注释要防的「同一句话擦入两次」。 */
+.hero__slide.is-copy-armed .hero__mask > span,
+.hero__slide.is-copy-armed .hero__eyebrow { transition: none; animation: none; }
+
+/* ---------- vertical rail (was a horizontal prev/next row) ---------- */
+/* Against the FILM's right edge, zipline-style: the rail is the film's
+   own scrubber, so it belongs to the picture rather than to the page.
+   (It used to sit out on the far right gutter, a whole text column away
+   from the thing it measures.)
+
+   🔴 The offset is composed from --film-x and --film-w, the same two
+   values the film itself is built from, so there is one geometry and not
+   two that have to be kept in step. Both are resolved against the same
+   box — the film's 50% is of the slide's width, the rail's is of the
+   stage's, and those are the same element's width — so the edges line up
+   exactly at every viewport.
+
+   Bottom edge to the film's bottom edge, as the reference has it. The
+   film is square (aspect-ratio 1, so its height IS --film-w) and centred
+   in a stage exactly 100svh tall, which puts its foot half the leftover
+   height up from the floor — that is the whole of the calc below, and it
+   holds at any window because both terms are real lengths. */
+.hero__rail {
+  position: absolute;
+  /* the film's own scrubber, on its inboard edge — the side facing the
+     copy */
+  left: calc(var(--film-x) + var(--film-w) + var(--rail-gap));
+  right: auto; top: auto;
+  bottom: calc((100svh - var(--film-w)) / 2);
+  transform: none;
+  z-index: 5;
+  display: flex; flex-direction: column; align-items: center; gap: 18px;
+  /* 🔴 The rail FADES IN at the seam, it does not ride in. It lives in the
+     stage, so through the intro's last viewport it was travelling up the
+     screen with everything else — a scrubber sliding up from the floor
+     before there is anything to scrub, while the flip's card is still in
+     the air. intro.js holds it at 0 for as long as the bridge is up and
+     lets go at the pin; this is the fade that then plays. */
+  transition: opacity .5s ease;
+}
+/* 🔴 NO padding. The rule above puts the rail's BOX on the film's foot, and
+   a 14px bottom padding then held the dots 14px clear of it — so the thing
+   that was aligned was the box, and the thing you can see was not. The
+   dots ARE the rail; its edges have to be theirs. (The top 14px was
+   invisible either way — the rail is bottom-anchored and grows upward, so
+   that padding only ever pushed empty space into thin air.) */
+.hero__progress {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  padding: 0;
+}
+.hero__dot {
+  position: relative;
+  width: 8px; height: 8px;
+  border: 0; padding: 0;
+  /* 🔴 color: inherit 不能省 —— 这一条是整根进度条在 iOS 上变蓝的原因。
+     .hero__dot 是 <button>，而 iOS Safari 的 UA 样式表给 button 写死了
+     系统强调色（蓝）作为 color；**UA 规则压过继承**，所以祖先
+     .hero__stage 上的 `color: var(--ui-fg)` 到不了这里。下面那两条
+     background 全是 currentColor 调出来的，于是黑色的 22%/28% 变成了
+     蓝色的 22%/28%，整条轨道连三颗点一起发蓝（用户 2026-08-30 手机实拍）。
+
+     ⚠️ headless 的 WebKit 与 Chromium **都复现不出来**：它们用的是桌面版
+     UA 样式表，button 的 color 是 buttontext（黑）。我在两个引擎上量到的
+     都是 rgb(26,26,26)，只有真机 iOS Safari 是蓝的。所以别因为"本地看着
+     没问题"把这行删掉。
+     appearance 一并归零，免得 iOS 再把原生按钮的其它外观塞进来。 */
+  color: inherit;
+  -webkit-appearance: none; appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  border-radius: 1000px;
+  /* tinted from the slide's ink, not a fixed white — but as a mix, so the
+     fill inside stays at full strength */
+  background: color-mix(in srgb, currentColor 28%, transparent);
+  overflow: hidden; cursor: pointer;
+  transition: height .3s var(--ease-out-quint), background .3s ease, transform .14s var(--ease-out-quint);
+  flex: none;
+}
+.hero__dot.is-active { height: 76px; background: color-mix(in srgb, currentColor 22%, transparent); }
+/* the fill stays with the bar to the end of the deck: nothing takes it
+   away at the seam any more (see the note at the head of the hub's
+   headline block in hub.css), so the rail simply goes up and out with
+   the section it belongs to. */
+.hero__dot i {
+  /* 🔴 Top-anchored, so it fills DOWNWARD. It was `inset: auto 0 0 0` —
+     pinned to the bottom — which grows the bar upward while the page is
+     going down: the one thing on screen whose job is to say "you are
+     moving down" was the only thing moving up. */
+  position: absolute; inset: 0 0 auto 0;
+  /* 🔴 The fraction arrives as --fill, not as a hard-coded property. hero.js
+     paints one number per frame and the RAIL'S AXIS decides what it means:
+     a height going down the desktop column, a width going across the phone
+     row (see the media query at the foot of this file). Writing `height`
+     from the script would have made the phone rail need a second painter. */
+  height: var(--fill, 0); background: currentColor; border-radius: 1000px; display: block;
+  /* 🔴 NO transition. This height is rewritten every animation frame from
+     the film's own currentTime, so a .25s tween on top of it is a second
+     animator lagging behind the first — the bar visibly stutters, and on a
+     reset it sweeps backwards down the rail instead of simply going. The
+     per-frame write IS the animation. */
+}
+
+
+/* ============================================================
+   PHONE — the two columns become two ROWS: film over copy.
+
+   🔴 The side-by-side composition does not survive a phone, and it fails
+   on the COPY side rather than the film's. The row splits the width in
+   half, so at 390 the film takes 195 and the text column is left with
+   171 — out of which .hero__content's own max(5vw, 48px) gutters take 96,
+   leaving 75px of measure. Measured: "Know your family better" set five
+   lines, one word each, in a 75px ribbon beside a 195px picture. Every
+   term in that chain is doing what it was written to do; there is just no
+   width left to divide.
+
+   Stacked, the film takes the column's full width and the copy gets the
+   same 342 the picture has, so that headline comes back to ONE line at
+   300px, at the size it was already asking for. Nothing here changes the
+   desktop numbers — this block only untangles the ROW.
+   ============================================================ */
+@media (max-width: 767px) {
+  .hero__section-title {
+    display: block;
+    padding: clamp(64px, 12svh, 104px) 1.25rem clamp(40px, 7svh, 64px);
+  }
+
+  /* one number for how far the rail sits off the stage's TOP edge — the
+     slide reserves it, the rail spends it, so neither can drift from the
+     other.
+     🔴 改名自 --rail-floor（用户 2026-08-30 要求手机上进度条移到顶部）。
+     再叫 floor 就是在撒谎，而这个名字正是「两边说的是同一件事」的凭据。 */
+  /* 🔴 轨道回到**底部**（用户 2026-08-30 先要求移到顶部、后要求恢复底部）。
+     中间还整个隐藏过一版，也撤了。留下的教训是这三件事各自独立：
+       画不画   → display
+       在哪边   → top / bottom
+       给不给留位置 → .hero__slide 的 padding（下面那条，必须跟着翻面）
+     只改其中一件就会出现「轨道在上、留白在下」这种错位。 */
+  .hero__stage { --rail-inset: max(20px, 4svh); }
+
+  /* 每张 300 → 200svh：四张合计 12 屏 → 8 屏。hero.js 的锚点是从
+     track.offsetHeight 现推的（anchorY），跟着变，不用另调。
+     推导见 intro.css 顶部那段。 */
+  .hero { --slide-span: 150svh; }   /* 同上，手机 200 → 150 */
+
+  /* film first, copy under it, the pair centred as one block. Centred and
+     not top-anchored because the titles are 1–3 lines: an anchor holds the
+     film still and lets the bottom gap swing by ~60px from slide to slide,
+     which reads as the picture jumping when the copy changes. */
+  .hero__slide {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(20px, 3.4svh, 34px);
+    /* 🔴 The rail's strip, kept out of the centring. The rail is anchored
+       to the stage floor and the block is centred in the stage, so on a
+       short window the two solve for the same pixels and the eyebrow ends
+       up sitting on the dots — measured on a 756×413 window: copy bottom
+       391 against a rail top of 385. Reserving the strip as padding takes
+       it out of the box the block is centred in, so they cannot meet.
+       (--rail-inset + the dot + clearance.)
+       🔴 轨道在底部，所以预留也在底部。这两行必须同时翻面——见上面那段。 */
+    padding-bottom: calc(var(--rail-inset) + 8px + 20px);
+  }
+
+  /* 🔴 A percentage of the COLUMN, not a --film-w rewritten in vw: 100vw
+     would also have to know about the scrollbar, which on a narrow desktop
+     window is 15px the film would hang over the edge by. aspect-ratio
+     still gives it its height.
+
+     🔴 …and capped by the HEIGHT that is left over, because this query
+     catches SHORT windows too, not only phones. A 767-wide window 600 tall
+     would take the full 719 of column width, and a square film 719 tall
+     does not fit a 600px stage — .hero__stage clips its overflow, so the
+     picture would lose its head and its feet with no way to tell from the
+     markup. The 270 is everything else the stage owes: the copy's worst
+     case (a three-line title plus the eyebrow, ~176), the gap above it
+     (34) and the rail's strip along the floor (~60, reserved as this
+     slide's padding-bottom below).
+
+     🔴 A SUBTRACTION, not a fraction of the height. Any fixed NNsvh is
+     wrong at one end or the other — 64svh clears a 413px-tall window by
+     264 when the leftovers need 262, i.e. it fits by 2px, and at 844 it
+     would be capping a film the width had already settled. Taking the
+     leftovers off the top is the same statement at every height.
+
+     On every real phone the column is the smaller of the two and the
+     height term never bites: at 390×844 it is 342 against 574. The 140px
+     floor is only there so a window short enough to drive this negative
+     yields a small film rather than an invalid width.
+
+     Ranged left rather than centred, so the film's left edge is the copy's
+     left edge in the case where the cap does bite and the two are not the
+     same width. */
+  /* Match the 1080×1080 films on phones so their full frame is visible.
+     The flowing cards can grow vertically; no fixed stage-height cap is needed. */
+  .hero__inner {
+    width: calc(100% - 2 * var(--film-x));
+    aspect-ratio: 1;
+    align-self: flex-start;
+    margin: 0 var(--film-x);
+  }
+
+  /* the copy's left edge is the FILM's left edge — same gutter, one column.
+     The desktop rule's vertical padding is derived from the film's centring
+     in the row and means nothing once they are stacked, so it goes; the gap
+     above owns the space between them now. */
+  .hero__content {
+    flex: 0 0 auto;
+    padding: 0 var(--film-x);
+    justify-content: flex-start;
+  }
+
+  /* 🔴 给标题**预留两行**，整块文案的高度才不随张数变。
+     这一段是竖排且整块居中的（见上面 .hero__slide 的注释），所以文案块
+     高度一变，影片就跟着挪半个差值 —— 用户 2026-08-30：「hero deck 视频
+     会因为文字两行或者一行而变化位置」。
+
+     实测四张的行数在 320/360/390/430/600 上恒为 [2,1,1,2]（767 上是
+     [2,1,1,1]），最多两行，从来没有三行 —— 上面那句「titles are 1–3
+     lines」是过时的说法，别照着它去预留三行。文案块高度差 31px（102 对
+     71），居中之下影片就是上下各跳约 15px。
+
+     预留两行之后：两行的那两张一分不多占，一行的那两张下面多一行空白，
+     影片则完全不动。
+     2lh = 两个行盒（Safari 16.4+ / Chrome 110+）；前一行 calc 是老引擎的
+     退路，1.08 是这里 line-height 的实测值，改行高要一起改。 */
+  .hero__title {
+    font-size: clamp(26px, 7.4vw, 40px);
+    min-height: calc(2 * 1.08em);
+    min-height: 2lh;
+    /* 🔴 600，跟页面上其它标题一致（用户 2026-08-30：「感觉有点细了，可以
+       和 family hub 那里的文字一样粗」）。
+
+       量了一遍，hero 是**唯一**的例外：
+         hero deck 标题     500   ← 就它
+         family hub 标题    600
+         One screen.        600
+         What families feel 600
+       所以这不是「把 hero 调粗」，是把跑偏的那一个收回队里。
+
+       ⚠️ 只改手机。桌面那边 hero 同样是 500、同样跟另外三个不一致，但用户
+       指名的是手机版，桌面的取舍（影片上的一句轻描述 vs 页面上的一句宣言）
+       可能是有意的，不顺手一起动。 */
+    font-weight: 600;
+  }
+
+  /* ---------- the rail lies down, at the TOP ----------
+     🔴 2026-08-30 起它在舞台的**上沿**（用户要求）。下面这段推导讲的是
+     「为什么钉在舞台边上、而不是挂在影片边上」——那条理由与上下无关，仍然
+     成立，只是把 bottom 换成了 top。实测手机上进 deck 时 header 早已滚出
+     视口（底边 -19），顶上这条不会跟它撞。
+
+     🔴 It goes to an EDGE of the stage, not under the film. On desktop it
+     hangs off the film's inboard edge, which it can do because that edge is
+     at a fixed x — `--film-x + --film-w`. Stacked, the film's inboard edge
+     is its BOTTOM, and that y is (stage − block) / 2 + film, where the
+     block's height includes the copy — i.e. it moves with the title's line
+     count, and the rail lives outside the slides (see hero.js: it is a
+     sibling of .hero__stack) so it cannot read it from the flow. Anchored
+     to the stage floor it is deterministic at every slide, and a centred
+     row of dots under the content is what a phone reads as the pager
+     anyway. */
+  /* 🔴 手机上这排圆点交给共用的底部进度条（pbar.css/js）——用户 2026-08-30
+     要求四屏共用一条、位置不变。它的可点性一并搬过去了（pbar 的 seek 参数
+     调的就是这里的 scrollToSlide），所以点着跳幻灯没有丢。
+     桌面那条竖排的 rail 一行不动。 */
+  .hero__rail { display: none; }
+  .hero__rail {
+    --rail-gap: 8px;
+    left: 0; right: 0;
+    top: auto; bottom: var(--rail-inset);
+    flex-direction: row;
+    justify-content: center;
+    gap: 12px;
+  }
+  /* 🔴 小标题排在大标题**上面**（用户 2026-08-30：「换一下顺序」）。
+     用 order 而不是改 hero.js 的模板：桌面端顺序不动，而且 DOM 里标题在前
+     对读屏和 SEO 本来就是对的，只有手机的视觉需要调个个儿。
+     margin 跟着翻面——原来是「上面留 22 跟标题拉开」，现在要「下面留 14」。 */
+  .hero__eyebrow { order: -1; margin: 0 0 14px; }
+
+  .hero__progress { flex-direction: row; gap: 10px; }
+  /* the active dot grows along the axis it is now laid out on */
+  .hero__dot.is-active { width: 76px; height: 8px; }
+  /* and its fill runs left-to-right, the direction the deck advances */
+  .hero__dot i { inset: 0 auto 0 0; width: var(--fill, 0); height: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__slide.is-anim,
+  .hero__slide.is-anim .hero__inner,
+  .hero__slide.is-anim .hero__content { animation: none; }
+  /* 🔴 2026-09-04 补齐：上面三条只杀了 slide 级的 keyframes，而这一段**最大
+     的那几个位移**当时全都还在跑：
+       · 标题 .9s 的 clip-path 擦除 + translate（本段最大的元素）
+       · .hero__eyebrow 的 translateY(12px) + .7s 淡入
+       · 翻页点 8px → 76px 的 height 增长
+     hero.js:360 读了 REDUCED，但只用于关掉自动轮播，.is-copy-in 照加。
+     这里保留 opacity（内容照样出现、也照样可读），只去掉位移与擦除。 */
+  .hero--anim .hero__mask > span { clip-path: none; translate: 0 0; }
+  /* 🔴 2026-09-05：擦除改成 keyframes 之后，上面那条静态覆盖**杀不掉它了**
+     ——运行中的 animation 优先级高于普通声明。必须显式 animation: none，否则
+     这段本来要去掉的 .78s 位移 + 擦除照跑不误。 */
+  .hero__slide.is-copy-in .hero__mask > span { animation: none; }
+
+  .hero__mask > span { transition: opacity .2s ease; }
+  .hero__eyebrow { transform: none; transition: opacity .2s ease; }
+  /* 文案的一进一出保留 opacity、去掉位移（同上一条的取舍） */
+  @keyframes heroCopyIn  { from { opacity: 0 } to { opacity: 1 } }
+  @keyframes heroCopyOut { from { opacity: 1 } to { opacity: 0 } }
+  .hero__dot { transition: background .2s ease, transform .14s var(--ease-out-quint); }
+}
+
+
+/* ============================================================
+   手机上 deck 竖过来：四幕，一幕一屏，不钉屏
+   （2026-09-05，用户对照 deepmind.google 的手机版：「那个视频的话可以一幕一幕
+   去看，就是那个 hero deck」。此前 2026-09-04 按他要求做过一版横滑卡片，这一
+   轮换掉了——理由见下。）
+
+   🔴 为什么影片适合竖排、而 hub 那种功能点适合横滑：**影片有时长**。横滑把
+   节奏交给手指，读者往往没等一支片子播完就拨走了；而这四支各是一个独立卖点，
+   是要看完的东西。一屏一幕，进屏就播，读者停多久就看多久。
+   （反过来 hub 的五拍是并列的功能点、没有先后，那种才该横滑。）
+
+   🔴 也不做回**原来那版竖排**：那一版是 sticky 舞台 + 一张幻灯买 150svh 滚动
+   距离（--slide-span），四张就是 6 屏，而且滚动位置直接驱动换张。这里不钉屏、
+   不 scrub —— 四个普通段落各一屏，谁在视口里谁播，就这么多。
+
+   🔴 上面那块 767 的竖版调校**全部继续生效**，这一块只覆盖「谁定位、谁多高」：
+     · .hero__slide 的 flex column / gap / 文案顺序      —— 原样
+     · .hero__inner 的 `min(列宽, 100svh − 270)`         —— 原样，而且这一版
+       才真正用得上它：slide 就是一屏高，影片和文案得一起装进去
+     · .hero__title / .hero__eyebrow 的字号             —— 原样（本块末尾那两条
+       是 2026-09-05 用户定过版的，别动）
+   ============================================================ */
+@media (max-width: 767px) {
+  /* 竖版 sticky 那套买的是四段滚动距离（--slide-span × 张数）；一幕一屏是四个
+     普通段落，高度由它们自己决定。 */
+  .hero { height: auto; }
+
+  .hero__stage {
+    position: static;
+    height: auto;
+    min-height: 0;
+    /* 舞台不再是取景框，overflow 交回给 slide 自己 */
+    overflow: visible;
+  }
+
+  .hero__stack { position: static; inset: auto; display: block; }
+
+  /* 🔴 一幕**不再占满一屏**（用户 2026-09-05 给了一张作品集页做参照：连续的
+     卡片流，每张只有图 + 分类 + 标题那么高，一屏能看到一张半）。
+     100svh 那一版把四幕撑到 4 屏，而每幕真正有内容的只有 340px 左右，剩下的
+     全是上下留白——读者滚过的多半是空气。现在高度由内容决定。 */
+  .hero__slide {
+    position: relative;
+    inset: auto;
+    z-index: auto;
+    min-height: 0;
+    /* 🔴 竖版用透明度表达「当前是哪一张」（默认 0，.is-active 才 1）。四幕同时
+       在页面上，那套表达要整个翻面，否则读者只看得见一屏。hero.js 仍然照常加
+       is-active / is-out（chrome、影片、进度都挂在上面），这里只抵消它们的视觉
+       部分。 */
+    opacity: 1;
+    transition: none;
+    /* rail 在手机上是 display:none，竖版给它预留的底边留白在这里是纯空白 */
+    padding-bottom: 0;
+    /* 🔴 组间 ≫ 组内（用户 2026-09-05：「每个视频感觉和它的标题不是一组的……
+       组和组之间的间隔应该最大」）。
+
+       一幕 = 小标题 + 标题 + 影片，三样是一组；四组竖着排。原来组内 gap 20–34、
+       组间 36–68，两者同一量级，读者眼里就是八个等距的东西，配不成对。
+       现在组间是相邻两幕的 padding 相加 = 64–112，组内收到 12–18（下面那条
+       gap），差出 5 倍以上，分组才是一眼可见的。 */
+    padding-block: clamp(32px, 5.5svh, 56px);
+    /* 🔴 组内：标题和它的影片贴紧。上面 767 那块的 gap 是给「一幕占满一屏」写的
+       （那时影片要靠 gap 撑开垂直居中），一幕一段之后那个理由不成立了。 */
+    gap: clamp(12px, 2svh, 18px);
+    /* 🔴 每一幕装进一张**描边卡片**（2026-09-06，用户对照 Google Labs 那种卡：
+       「hero deck 每一个卡片可不可以学习图二有个边框，但是我们的是黑色的」）。
+
+       边框画在 .hero__slide 上，不另加容器——手机上它本来就正好是「一幕」的
+       边界（小标题 + 标题 + 影片，见上面 column-reverse 那段）。
+
+       卡内留白是**白捡的**：.hero__content 有 padding: 0 var(--film-x)、
+       .hero__inner 有 margin: 0 var(--film-x)（都在 767 那块里），所以内容天然
+       离卡边 24px，不用再给 .hero__slide 加横向 padding。
+       ⚠️ 反过来说，改那两条的 --film-x 会同时改这张卡的内留白。
+
+       ⚠️ 分组的活现在归边框了。上面 padding-block 那段注释讲的是「靠相邻两幕的
+       padding 相加拉开组间距」——那是没有边框时唯一的分组手段；现在卡边自己就
+       是边界，所以 padding-block 收了一档、并把组间距移到 margin-block 上，
+       否则两张卡会贴在一起。 */
+    margin-inline: 12px;
+    margin-block: 0 clamp(28px, 7vw, 44px);
+    padding-block: clamp(22px, 3.6svh, 34px);
+    /* 真正的描边交给 ::before 入场；透明边框只负责保留原来的盒尺寸。 */
+    border: .75px solid transparent;
+    border-radius: 20px;
+    /* 🔴 标题在上、影片在下（用户 2026-09-05：「底下那个 Hero deck，我想让标题
+       在上面，然后那个视频在下面」）。上面那块 767 的 `flex-direction: column`
+       把影片排在前面，这里翻过来——和 hub 那五张白卡的读法统一：先读一句话，
+       再看那句话说的东西。
+       ⚠️ .hero__content 内部不受影响：eyebrow 的 order:-1 还在它自己的列里，
+       仍然排在标题上面。 */
+    flex-direction: column-reverse;
+  }
+  .hero__slide::before {
+    content: "";
+    position: absolute;
+    inset: -.75px;
+    z-index: 3;
+    border: .75px solid rgb(26 26 26 / 42%);
+    border-radius: inherit;
+    pointer-events: none;
+  }
+  /* JS 不可用时边框仍完整；只有 hero.js 已接管后才等待卡片进入视口。 */
+  .hero--anim .hero__slide::before {
+    clip-path: polygon(0 0, 0 0, 0 0);
+  }
+  .hero--anim .hero__slide.is-card-revealed::before {
+    animation: heroCardBorderIn .9s var(--ease-out-expo) .12s both;
+  }
+  @keyframes heroCardBorderIn {
+    /* 逐渐扩大的三角形像扫描面一样扫过卡片：左上边最先成形，右下角最后落笔。 */
+    from { clip-path: polygon(0 0, 0 0, 0 0); opacity: .35; }
+    to   { clip-path: polygon(0 0, 200% 0, 0 200%); opacity: 1; }
+  }
+  .hero__slide.is-active,
+  .hero__slide.is-out { opacity: 1; }
+  /* 文案的一进一出同理：四幕都在场，谁也不该淡入淡出 */
+  .hero__slide.is-copy-in .hero__content,
+  .hero__slide.is-out .hero__content { animation: none; }
+  /* 四张卡片从一开始就在普通文档流里可见；滚到卡片中心时 hero.js 仍会给当前卡
+     加 is-copy-in 来切换影片。这里关掉标题 span 的桌面擦入动画，避免文字先显示、
+     随后又被重新擦入一次。 */
+  .hero__slide.is-copy-in .hero__mask > span { animation: none; }
+
+  /* 与 Privacy 卡片同一套上浮回弹。每张 slide 由自己的 IntersectionObserver
+     触发，所以是随页面下滑逐张出现，而不是四张一起动。 */
+  .hero--anim .hero__slide:not(.is-card-revealed) {
+    opacity: 0;
+    transform: translateY(72px);
+  }
+  .hero--anim .hero__slide.is-card-revealed {
+    opacity: 1;
+    transform: none;
+    transition: opacity .45s ease, transform .85s cubic-bezier(.34, 1.56, .64, 1);
+  }
+
+  /* 手机卡片第一次进入视口时才揭示文案。is-card-revealed 只会添加一次，和
+     hero.js 用来切换当前影片的 is-copy-in 分开，因此来回滚动不会重播。 */
+  .hero--anim .hero__slide:not(.is-card-revealed) .hero__mask > span {
+    clip-path: inset(-.35em 100% -.35em 0);
+    translate: -.35em 0;
+  }
+  .hero--anim .hero__slide:not(.is-card-revealed) .hero__eyebrow {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  .hero--anim .hero__slide.is-card-revealed .hero__mask > span {
+    animation: heroLineIn .72s var(--ease-out-expo) both;
+  }
+  .hero--anim .hero__slide.is-card-revealed .hero__eyebrow {
+    animation: heroMobileEyebrowIn .48s var(--ease-out-expo) .1s both;
+  }
+  @keyframes heroMobileEyebrowIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: .62; transform: none; }
+  }
+
+  /* 🔴 收一档（用户 2026-09-05：「整体的那个字号跟 Google DeepMind 差不多，
+     然后字不要太大」）。参照页的卡片标题是 18px @244 宽的卡；我们的卡宽 342，
+     等比换算约 25px。原来读 --hub-copy（段落标题那一档，390 上 28px）是上一轮
+     「和 This is Nestify 一样大」的要求，那条被这次的覆盖。 */
+  .hero__title   { font-size: clamp(22px, 6.4vw, 30px); }
+  /* 🔴 margin 是**下**边距，不是上边距。手机上这行有 order: -1（上面那块），
+     它排在标题**上面**，两者之间的空气归它的 margin-bottom 管。我上一版照着
+     桌面基础规则写成了 `18px 0 0`——那条是给「小标题在标题下面」的桌面版式用
+     的，搬过来正好把 14px 的下边距清成 0，两行字于是贴在一起（用户 2026-09-05
+     截图）。
+
+     22 → 跟着字号走：这行放大到 15.6–18px 之后，原来的 14px 相对更挤了。
+     3.4vw 在 390 上是 13.3 → 取下限 18，660 上 22.4 → 取上限 22。 */
+  /* 🔴 小标题再小一档、离标题再远一点（用户：「副标题字有点大，然后行距和
+     主标题有点小」）。12.5px 是参照页那种分类行的量级；间距从 18 到 22，让它
+     读成「另起一行的标签」而不是标题的第一行。 */
+  .hero__eyebrow { font-size: clamp(11px, 3.2vw, 13px); margin: 0 0 clamp(20px, 4.4vw, 26px); }
+
+  /* 🔴 圆角收一档（用户 2026-09-05：「圆角太大了」）。24px 是给桌面那块大影片
+     定的，手机上影片只有 ~310 宽，同样的半径占掉边长的 8%，看着像颗药丸。
+     ⚠️ 两条必须一起改——.hero__inner 做裁剪，.hero__video 自己也要有同样的圆角，
+     否则 iOS 把影片提成合成层时圆角会时有时无（见上面 168 那条注释）。 */
+  .hero__inner,
+  .hero__video { border-radius: 14px; }
+}
+
+@media (max-width: 767px) and (prefers-reduced-motion: reduce) {
+  .hero--anim .hero__slide.is-card-revealed {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .hero--anim .hero__slide.is-card-revealed::before {
+    animation: none;
+    clip-path: none;
+    opacity: 1;
+  }
+  .hero--anim .hero__slide.is-card-revealed .hero__mask > span,
+  .hero--anim .hero__slide.is-card-revealed .hero__eyebrow { animation: none; }
+}
+
+/* ============================================================
+   DESKTOP — bordered cards that finish as a horizontal gallery
+
+   The tall sticky track remains the scroll spacer, so completing the
+   story never changes document height or jumps the page. Only its visual
+   state changes: one large card travels through the stage, then all four
+   settle into a smaller exhibition rail. Phone rules above stay intact.
+   ============================================================ */
+@media (min-width: 768px) {
+  /* Desktop always starts as the card gallery; keep its unused pager hidden
+     before hero.js adds hero--gallery, so it cannot flash on reload. */
+  .hero__rail { display: none; }
+  /* The exhibition is scroll-scrubbed rather than film-timed, so it only
+     needs enough vertical runway to travel across the four real cards. */
+  /* A little extra runway keeps the return trip from racing through the
+     cards. Together with hero.js's final-card hold, 80svh preserves the
+     original lateral speed and adds a small buffer in both directions
+     without intercepting the wheel or introducing a snap. */
+  .hero { --slide-span: 80svh; }
+  .hero__section-title {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 8;
+    height: 0;
+    padding: 0;
+    pointer-events: none;
+  }
+  .hero__section-title h2 {
+    position: absolute;
+    top: clamp(42px, 7svh, 70px);
+    left: 50%;
+    width: min(92vw, 920px);
+    margin: 0;
+    translate: -50% 0;
+    font-size: clamp(36px, min(4.4vw, 7svh), 64px);
+    white-space: nowrap;
+  }
+  /* The phone keeps the authored two-line break. Desktop has enough width
+     for the section opener to read as one continuous exhibition label.
+     footer.js turns each authored side of the <br> into a block-level
+     .line/.line-mask pair, so both wrappers must become inline too. */
+  .hero__section-title br { display: none; }
+  .hero__section-title .line,
+  .hero__section-title .line-mask { display: inline; }
+
+  .hero__stage {
+    --desk-card-pad: clamp(24px, 2.4vw, 38px);
+    /* The films are square. Their height therefore grows one-for-one with
+       card width, so both widths need a viewport-height cap to keep the
+       whole framed card visible on shorter desktop windows. */
+    --desk-card-w: min(72vw, 760px, calc(100svh - 260px));
+    --gallery-card-w: min(44vw, 640px, calc(100svh - 320px));
+    --gallery-gap: clamp(32px, 3.5vw, 54px);
+  }
+
+  .hero__slide {
+    box-sizing: border-box;
+    inset: 50% auto auto 50%;
+    width: var(--desk-card-w);
+    height: auto;
+    min-height: 0;
+    padding: var(--desk-card-pad);
+    border: .75px solid transparent;
+    border-radius: 26px;
+    background: transparent;
+    flex-direction: column-reverse;
+    align-items: stretch;
+    justify-content: center;
+    gap: clamp(16px, 2svh, 22px);
+    opacity: 0;
+    transform: translate(-50%, -50%) translateX(105vw);
+    transition:
+      transform .82s var(--ease-out-expo),
+      opacity .42s ease,
+      width .82s var(--ease-out-expo);
+  }
+  .hero__slide::before {
+    content: "";
+    position: absolute;
+    inset: -.75px;
+    z-index: 5;
+    border: .75px solid rgb(26 26 26 / 38%);
+    border-radius: inherit;
+    pointer-events: none;
+  }
+  .hero__slide.is-active {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+  .hero__slide.is-out {
+    opacity: 0;
+    transform: translate(-50%, -50%) translateX(-105vw);
+  }
+
+  .hero__inner {
+    width: 100%;
+    aspect-ratio: 1;
+    margin: 0;
+    border-radius: 16px;
+  }
+  .hero__video { border-radius: 16px; }
+  .hero__content {
+    flex: 0 0 auto;
+    align-self: stretch;
+    padding: 0;
+    justify-content: flex-start;
+  }
+  .hero__title {
+    font-size: clamp(20px, 2.8vw, 42px);
+    min-height: 1.08em;
+    min-height: 1lh;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  /* All four desktop film titles are one-line labels. The authored break on
+     slide one remains available to the phone rules below this media query. */
+  .hero__title br { display: none; }
+  .hero__eyebrow {
+    order: -1;
+    margin: 0 0 12px;
+  }
+
+  /* The presentation pager now follows the horizontal direction of the
+     cards instead of standing vertically beside the old two-column film. */
+  .hero__rail {
+    left: 50%;
+    right: auto;
+    top: auto;
+    bottom: max(16px, 2.8svh);
+    transform: translateX(-50%);
+    flex-direction: row;
+  }
+  .hero__progress { flex-direction: row; }
+  .hero__dot.is-active { width: 76px; height: 8px; }
+  .hero__dot i { inset: 0 auto 0 0; width: var(--fill, 0); height: auto; }
+
+  /* Completion state. The same four card nodes become a real horizontal
+     row; only the centred card keeps playing, while neighbours remain as
+     posters. --gallery-x is measured from the actual card geometry by JS,
+     avoiding viewport-specific guessed offsets. */
+  .hero.hero--gallery .hero__stack {
+    position: absolute;
+    inset: calc(50% + clamp(42px, 8svh, 74px)) auto auto 50%;
+    width: max-content;
+    height: auto;
+    display: flex;
+    align-items: center;
+    gap: var(--gallery-gap);
+    opacity: 0;
+    transform: translateX(var(--gallery-x, 0px)) translateY(-50%);
+    transition: transform .42s var(--ease-out-expo), opacity .55s ease;
+  }
+  .hero.hero--gallery.hero--gallery-ready .hero__stack { opacity: 1; }
+  .hero.hero--gallery .hero__slide,
+  .hero.hero--gallery .hero__slide.is-out {
+    position: relative;
+    inset: auto;
+    flex: 0 0 var(--gallery-card-w);
+    width: var(--gallery-card-w);
+    padding: clamp(20px, 2vw, 28px);
+    gap: 14px;
+    opacity: .62;
+    filter: brightness(.82) saturate(.68);
+    transform: scale(.84);
+    z-index: 1;
+    transition:
+      transform .72s var(--ease-out-expo),
+      opacity .5s ease,
+      filter .5s ease,
+      width .72s var(--ease-out-expo);
+  }
+  .hero.hero--gallery .hero__slide.is-active {
+    opacity: 1;
+    filter: none;
+    transform: scale(1.08);
+    z-index: 2;
+  }
+  /* Resting neighbours retain a quiet outline. As a card becomes the centre,
+     the stronger line scans diagonally from its top-left to bottom-right. */
+  .hero.hero--gallery .hero__slide::before {
+    border-color: rgb(26 26 26 / 18%);
+    clip-path: none;
+    opacity: 1;
+    animation: none;
+  }
+  .hero.hero--gallery .hero__slide.is-active::before {
+    border-color: rgb(26 26 26 / 46%);
+  }
+  .hero.hero--gallery .hero__slide.is-border-drawing::before {
+    animation: heroGalleryBorderIn .9s var(--ease-out-expo) both;
+  }
+  @keyframes heroGalleryBorderIn {
+    from { clip-path: polygon(0 0, 0 0, 0 0); opacity: .2; }
+    to   { clip-path: polygon(0 0, 200% 0, 0 200%); opacity: 1; }
+  }
+  .hero.hero--gallery .hero__slide--ghost {
+    pointer-events: none;
+    user-select: none;
+  }
+  .hero.hero--gallery .hero__slide .hero__content,
+  .hero.hero--gallery .hero__slide.is-out .hero__content {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+  .hero.hero--gallery .hero__title {
+    /* Sized against the narrower gallery card; the 16px floor still fits the
+       longest title at the 768px desktop breakpoint without clipping. */
+    font-size: clamp(16px, 2vw, 30px);
+  }
+  .hero.hero--gallery .hero__eyebrow {
+    font-size: 11px;
+    margin-bottom: 9px;
+  }
+  .hero.hero--gallery .hero__inner,
+  .hero.hero--gallery .hero__video { border-radius: 13px; }
+}
+
+@media (min-width: 768px) and (prefers-reduced-motion: reduce) {
+  .hero__slide,
+  .hero.hero--gallery .hero__stack,
+  .hero.hero--gallery .hero__slide { transition: none; }
+  .hero.hero--gallery .hero__slide.is-border-drawing::before {
+    animation: none;
+    clip-path: none;
+  }
+}

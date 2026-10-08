@@ -1,0 +1,427 @@
+/* ============================================================
+   HEADER — ported from lusion-replica (bar + full-screen menu),
+   rebranded to Nestify and adapted to native page scrolling.
+   ============================================================ */
+
+.site-header {
+  position: fixed; left: 0; top: 0; z-index: 52;
+  width: 100%;
+  /* 🔴 2026-09-04 全部还原成线上（用户「完全和线上一样吧，Header，然后
+     padding 也是」）。中途改过四处，都退了：
+       · 单一尺寸（取消大→小收缩）  → 恢复收缩，见下面 is-hd-compact
+       · padding 25px 30px          → 恢复 clamp(20,2.6vw,34) × max(5vw,32px)
+       · 字号 13px（收缩态那档）    → 恢复 16px
+       · 徽标 5.6em                 → 恢复 7.2em
+     transition 里的 font-size / padding 也一并回来——收缩既然恢复了，它们又
+     需要过渡了。 */
+  padding: clamp(20px, 2.6vw, 34px) max(5vw, 32px);
+  font-size: clamp(1rem, 1vw, 1.5rem);
+  color: var(--nes-ink);
+  transition: color .4s,
+              font-size .45s var(--ease-out),
+              padding .45s var(--ease-out),
+              transform .55s var(--ease-out);
+  pointer-events: none;
+}
+/* over the dark hero the whole bar flips to white */
+html.is-dark-bg .site-header { color: #fff; }
+
+/* ---------- scroll behaviour (zipline.com) ----------
+   Past the first screenful the bar condenses: everything inside is
+   sized in em off the header's own font-size, so one step down scales
+   the wordmark and both pills together. Keep scrolling down and it
+   leaves entirely; scroll back up and it returns still condensed,
+   only expanding again once you're actually back at the top. */
+html.is-hd-compact .site-header {
+  font-size: clamp(.8125rem, .82vw, 1.125rem);
+  padding-top: clamp(11px, 1.3vw, 17px);
+  padding-bottom: clamp(11px, 1.3vw, 17px);
+}
+html.is-hd-hidden .site-header { transform: translateY(-135%); }
+/* (`html.is-menu-open .site-header { transform: none }` lived here — the
+   bar had to come back when the sheet opened onto it. No sheet, no rule;
+   see the note at the foot of this file.) */
+
+/* 🔴 GRID, not space-between. The nav has to be centred on the VIEWPORT,
+   not on whatever is left between a wordmark and three pills — those two
+   are different widths, so space-between would park it off-centre and it
+   would drift every time a button's label changed. `1fr auto 1fr` makes
+   the middle column independent of both sides.
+   (zipline's, measured: their nav spans 531→893, centre 712, against a
+   viewport centre of 720.) */
+.hd__row {
+  position: relative; z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+.hd__right { grid-column: 3; justify-self: end; }
+
+
+
+.hd__logo { display: block; color: inherit; pointer-events: auto; transition: color .5s; }
+/* the dot on the i keeps its place — what it hands over is its COLOUR.
+   While the intro's drop is out on the page the logo wears a plain one
+   (currentColor, so it reads white on the video and ink further down);
+   it takes the blue back once the drop has left the frame. */
+.hd__logo svg circle { transition: fill .5s ease; }
+html.is-dot-lent .hd__logo svg circle { fill: currentColor; }
+.hd__logo svg { width: 7.2em; height: auto; display: block; }
+.hd__right { position: relative; display: flex; align-items: center; gap: .75em; }
+
+
+.hd__btn {
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  height: 2.8em; padding: 0 1.2em;
+  transition: transform .14s var(--ease-out-quint);   /* 按压反馈，见 styles.css 末尾 */
+  /* hollow, and the ball fills it — swapped with "Try it now" over the
+     film, which now wears the solid pill these used to have */
+  background: transparent;
+  /* 描边。2026-09-04 当天去掉过一次（改成 transparent），随后又要回来了，
+     所以这里恢复 currentColor。上面那句「hollow, and the ball fills it」说的
+     就是它：药丸是空心的，靠 .hd__fill 那颗球填进去。
+
+     ⚠️ 要再去掉的话写 `transparent`，不要写 `border: 0`——box-sizing 是
+     border-box，直接删这 1.5px 会让药丸宽高各缩 3px（实测 89.8×39.2 →
+     86.8×36.2），而 header 的 em 尺寸、.hd__fill 的 240% 覆盖半径、
+     html.is-hd-top 时的位置都是照现在这个盒子调的。 */
+  border: 1.5px solid currentColor;
+  border-radius: 6.25em;
+  /* 🔴 `em`, so the pill rides the header's own clamp and shrinks with the
+     bar when it condenses. It was briefly an absolute token shared with the
+     page's "Meet Nestify" — see the note there. The two are not a pair:
+     this is chrome, set in caps at 14px, and that is a hero CTA set in
+     sentence case at nearly 19. Sharing a type spec made both worse. */
+  font: inherit; font-family: var(--font--ui);
+  font-size: .875em; font-weight: 700;
+  /* 🔴 ALL CAPS, AND THE TRACKING IS PART OF IT — the two ship together or
+     not at all. Caps jam without the extra sidebearing, because a face's
+     built-in spacing is drawn for lowercase, where ascenders and descenders
+     do half the separating. .04em is what buys it back.
+
+     So if the transform is ever dropped again, .04em must go with it:
+     lowercase set that loose reads as a mistake rather than a decision.
+     They were removed as a pair once and restored as a pair.
+
+     The markup stays sentence case (Device, Menu, Close) — the shouting is
+     presentation, so a screen reader is not handed DEVICE to spell out. */
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  overflow: hidden; cursor: pointer;
+  pointer-events: auto;
+}
+
+/* ---------- the frame is always on ----------
+   🔴 THE PILLS ARE FRAMED ON THE FIRST SCREEN TOO, and the rule that
+   hid them is gone:
+
+       html.is-hd-top .hd__btn { border-color: transparent; }
+
+   Its argument was about the home page's opener specifically — on the
+   film the button is a WORD over a picture, not a control drawn on top
+   of it, and a stroked pill in the corner of a full-bleed film reads as
+   a sticker. That is true of the film and it was generalised to every
+   page that has a first screen, which is all of them. The device page
+   opens on a pale ground with a product floating in the middle of it;
+   there is no picture for the pill to sit on top of, so all the rule did
+   there was leave two unframed words in the corner with nothing holding
+   them — which is the exact failure the same note goes on to describe
+   for the scrolled state.
+
+   🔴 html.is-hd-top IS STILL SET by header.js and is still read by the
+   compact/hide behaviour above. Only this one declaration went; the class
+   is not dead and must not be removed from the script.
+
+   🔴 If the film ever wants its unframed corner back, the rule returns
+   scoped to the page that has a film — `html.is-hd-top body.is-intro
+   .hd__btn` or similar — rather than to every page that has a top. */
+
+/* ---------- hover: the ball opens from the middle ----------
+   The same move "Try it now" makes over the film (.intro__cta::after in
+   intro.css), brought up here so the two CTAs behave alike: a round fill
+   wider than the pill, grown from dead centre, so the ENDS arrive last and
+   it reads as liquid rather than as a bar sliding across.
+
+   Sized off the width, not a fixed em: 120% of the width as a circle
+   clears the height of any pill on the bar, at any of its sizes — the
+   bar condenses on scroll and the pills shrink with it.
+
+   🔴 scale(0), not a small scale. A tenth of a ball this size is still a
+   visible dot parked in the middle of the label.
+
+   🔴 120% is not free headroom: a centred circle of diameter 1.2w covers
+   the pill only while h ≤ 0.66w. Measured at 1440 and 850 —
+       GET THE APP  142×45  needs 75, has 85
+       DEVICE        99×45  needs 54, has 59
+       MENU          88×45  needs 50, has 53   ← the tight one
+   A shorter label or a taller pill eats that margin and leaves the
+   corners showing the pill's own colour. Re-check these two numbers if
+   either changes. */
+.hd__fill {
+  position: absolute; z-index: 0;
+  /* the pointer's entry point, and 240% to reach the far corner from it —
+     see the note on .btn-disc::after in styles.css for both numbers */
+  left: var(--disc-x, 50%); top: var(--disc-y, 50%);
+  width: 240%; aspect-ratio: 1; height: auto;
+  border-radius: 50%;
+  background: var(--hd-fill, var(--nes-ink));
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform .22s var(--ease-out);   /* 与 styles.css 的 .btn-disc 同步，见那边注释 */
+  pointer-events: none;
+}
+.hd__btn:hover .hd__fill { transform: translate(-50%, -50%) scale(1); }
+/* everything readable rides above the disc */
+.hd__cta-inner { position: relative; z-index: 1; }
+
+/* primary. Hollow like the others now, so the hierarchy is carried by the
+   ORDER and by the arrow that only this one has — not by a filled shape. */
+/* (.hd__cta — "Get the app" — lived here, with its own hover colour and
+   the stretched <a> that made the whole pill clickable. The bar carries
+   one button now: Device. The .hd__cta-inner / .hd__cta-text spans below
+   are NOT part of it — the Device button is built out of the same two,
+   which is why they are still here.) */
+.hd__cta-inner { display: flex; align-items: center; justify-content: center; gap: .625em; white-space: nowrap; }
+
+/* In mobile Chrome the Google Sans capitals sit above the visible centre.
+   Keep this optical shift off iOS, which already has its own 1px correction
+   below; applying both shifts makes the iPhone label visibly too low. */
+@media (max-width: 767px) {
+  .hd__device .hd__cta-text { transform: translateY(.08em); }
+}
+
+/* ---------- 让 DEVICE 在胶囊里真正居中（横向）----------
+   🔴 居中的是**盒子**，不是**字**。用户 2026-09-02：「header 这个 device 的
+   按钮里的字看起来不居中」。逐像素量（桌面 90×39 的胶囊，DPR4）：
+       左边距 19.00px   右边距 20.25px   → 字整体偏左 1.25px
+   在一个对称的胶囊里，两侧空白差 6.6% 是看得出来的。
+
+   拆开看是两件事，实测各占一半：
+     ① letter-spacing: .04em 会在**最后一个字母后面也加一份**，那份幽灵空白
+        进了盒子宽度，于是居中把它算了进去。去掉字距后偏移从 1.25 → 0.50px，
+        所以它贡献 0.75px。这不是审美问题，是真错误 —— 修法就是把尾部那份
+        负回去，字距本身一点没变。
+     ② 剩下的 ~0.5px 是字形自带的边距差（D 的左边距 ≠ E 的右边距），字体固有，
+        只能按比例补。intro.css 的 .intro__hero-line 为同一类原因补过 -.08em，
+        那条注释把道理讲得更细。
+
+   两条都写成 em，所以跟着 header 的 clamp 一起缩，手机那档（16px）同样成立。 */
+/* 🔴 只给桌面。手机那档实测**本来就是居中的**（-0.25px），套上这两条反而推到
+   +0.75px —— 同一个 em 值在 14px 和 16px 上落到的子像素位置不同，底层那点不平
+   衡在手机上正好舍进了。改自己没坏的东西，就是今天那个 mask 犯过的错。 */
+@media (min-width: 768px) {
+  .hd__cta-text {
+    margin-right: -.04em;   /* ① negate the trailing letter-space */
+    margin-left: .036em;    /* ② pay back the D/E side-bearing difference */
+  }
+  /* On desktop the visible ink is 1.25px nearer the right edge at 1440px.
+     Keep its vertical position, which already has equal visible insets. */
+  .hd__device .hd__cta-text { transform: translateX(-.045em); }
+}
+/* the only dark slide is now brand blue, so a blue pill would vanish —
+   invert to a white one. The hover disc is --bead-blue: the same ink the
+   drop pours into the slogan right under this button, so over the intro
+   the pill fills with the blue already on screen. */
+html.is-dark-bg .hd__cta { color: #fff; --hd-fill: #fff; }
+html.is-dark-bg .hd__cta:hover { color: var(--nes-ink); }
+
+/* secondary destination: same disc hover as the CTA — same blue, same
+   timing — on the tan pill, so the hierarchy is carried by the RESTING
+   state ("Get the app" is the dark pill, these are tan) and hovering any
+   of the three answers in one voice. */
+.hd__device {
+  color: var(--nes-ink);
+  --hd-fill: var(--nes-ink);
+  text-decoration: none;
+  /* ⚠️ transform 必须写在**这条**里。header 的按钮同时带 .hd__btn 与 .hd__device，
+     两条规则同特异性，这条排在后面会整条覆盖 .hd__btn 的 transition——
+     2026-09-04 实测：按压能触发 scale(.97)，但 transition-property 只剩
+     border-color/color，于是那 140ms 的缓动被吃掉，按下去是硬切。 */
+  transition: border-color .4s, color .2s, transform .14s var(--ease-out-quint);
+}
+.hd__device:hover { color: var(--nes-cream); }
+/* over the intro it takes --bead-blue, exactly as the CTA does: that is
+   the blue already on screen in the logo's dot */
+html.is-dark-bg .hd__device { color: #fff; --hd-fill: #fff; }
+html.is-dark-bg .hd__device:hover { color: var(--nes-ink); }
+
+/* 🔴 the label may not recolour before the disc is under it. Both change
+   at once and the disc needs .52s to arrive, so a straight .4s colour
+   tween spends most of the hover painting the new label on the OLD pill —
+   white on tan, which is close to unreadable (visible for ~400ms). So:
+   delayed and quick on the way in, immediate on the way out — the disc
+   collapses from full size, so the label is uncovered the instant the
+   cursor leaves and must be back to its resting colour by then. */
+.hd__device:hover {
+  border-color: transparent;
+  transition-delay: 0s, .18s;   /* border-color, color */
+}
+
+
+/* ============================================================
+   THE MENU IS GONE — one button in the bar, at every width.
+
+   What was here: .hd__menu-btn (the Menu/Close pill), .hd__backdrop and
+   .hd__panel (the blue full-screen sheet), .hd__link + .hd__link-inner
+   (Home / Features / Families / Privacy, each a two-copy roll on hover),
+   .hd__news (the newsletter field at the foot of the sheet), and the
+   `html.is-menu-open` states that drove all of them — including the
+   `overflow: hidden` scroll lock on <html>.
+
+   🔴 It was never a menu the whole site had. Two queries sat at the foot
+   of this file and between them they cut the bar into three:
+
+     ≥ 901px      .hd__menu-btn display:none   → Device only
+     768–900px    both                          → Device + Menu
+     ≤ 767px      .hd__device  display:none    → MENU ONLY
+
+   So a phone was the one width with no Device button in the bar, and the
+   only way to the device page was through a sheet that also carried the
+   site's only newsletter field. Removing the burger without deleting that
+   `.hd__device { display: none }` would have left a phone with an empty
+   bar, which is why the 767 query went with it rather than being edited.
+
+   🔴 The newsletter field went with the sheet and has no replacement —
+   the footer has the app-store links and the Company/Socials columns, but
+   no email capture. If one is wanted back, the footer is where it belongs
+   now; there is no longer a panel to hold it.
+
+   In-page navigation went the same way. The four anchors it carried
+   (#hero, #features, #family-feel, #privacy) are still real sections on
+   index.html — this page just no longer offers a jump list to them.
+   ============================================================ */
+
+/* ============================================================
+   手机上的胶囊瘦一圈
+   ============================================================
+   🔴 用户 2026-08-30：「顶部 device 按钮的 padding 能不能不要那么胖」。
+   实测原值 90×39，左右各 16.8px 内边距，而文字本身只有 54px——padding 占了
+   整个宽度的 37%，在 390 宽的屏上确实显胖。
+
+   改的是 em 不是 px：.hd__btn 的尺寸全部以 em 表达，跟着 header 自己的字号
+   clamp 缩放（见上面 border-radius 那段注释）。写死 px 会让它在 header 条
+   收窄时不再跟着变，那正是当初选 em 的理由。
+
+   🔴 瘦下来之后高度只剩约 32px，低于 iOS 44pt 的触控目标下限。所以用一个
+   ::before 把**可点区域**向外扩到 44px：视觉瘦，手指区不变。这两件事本来就
+   不必冲突，而在触摸屏上「点不中」比「好看」要紧。 */
+@media (max-width: 767px) {
+  /* Mobile uses the compact chrome from its first painted frame. The scroll
+     script still owns hide/reveal direction, but toggling is-hd-compact no
+     longer changes logo, button or padding size. Desktop keeps the original
+     large-to-compact choreography. */
+  .site-header,
+  html.is-hd-compact .site-header {
+    font-size: clamp(.8125rem, .82vw, 1.125rem);
+    padding-top: 16px;
+    padding-bottom: 16px;
+    padding-inline: var(--gutter);
+    transition: color .4s, transform .55s var(--ease-out);
+  }
+
+  /* 🔴 下面这两条都是给 iOS 的，2026-08-31 之前**没有加断点**，于是一路作用到
+     桌面——而用户从头到尾要求的都是手机上的改动（「让你改细的好像…之前都在
+     mobile 上了」）。桌面那颗胶囊的描边因此变了样，是我多改的。收进断点里。
+
+     ① mask：iOS 上按下去时 .hd__fill 那颗球会escape 掉祖先 overflow:hidden
+        的圆角裁剪，填充变成方块。mask 逼这一层自己成为裁剪根。
+        它同时会把按钮推上独立合成层，而一条 1.5px 的圆角描边在合成层上
+        重新栅格化，边缘就可能不一样——这正是桌面上看到的变化。
+     ② appearance 归零：iOS 的 UA 样式表直接写在 button 元素上（压过继承），
+        .hero__dot 被它把 color 改成过系统蓝。这是护栏，不是修某个已知症状。
+
+     ⚠️ 桌面 hover 用的是同一颗球。如果哪天桌面 Safari 也出现「按下/悬停时
+     填充变方块」，把 ① 那一行原样加回外面即可——但要知道代价是描边会跟着
+     变，两者是同一个合成层带来的。 */
+  .hd__btn {
+    -webkit-mask-image: -webkit-radial-gradient(#fff, #000);
+    -webkit-appearance: none; appearance: none;
+    /* 🔴 1em（= header 自己的字号），不是默认那条 .875em。
+
+       用户 2026-08-30：「header 没缩小时候 device 按钮的文字能不能和 meet
+       nestify 的大小一致」。手机上这两个数正好撞在一起：展开态 header 是
+       16px，Meet Nestify 那颗 CTA 的 .btn-label 也是 16px，所以 1em 就是
+       严丝合缝的相等（实测 16.00 : 16.00）。
+
+       ⚠️ 只给手机。桌面上 Meet Nestify 是 19.01px、header 是 16px，1em 只能
+       追到 16，差 3px；要追平就得写死一个绝对值——而文件上方那条注释记着，
+       「把这两个共用一套字号 token」正是**试过又撤掉**的做法（一个是 chrome
+       的全大写小字，一个是正常大小写的 hero CTA，共用把两边都弄糟了）。
+       手机这条只是「两个数恰好相等」，不是把它们绑成一对。
+
+       🔴 仍然写 em，不写 px：header 收缩时整条 bar 靠 em 一起缩（见上方
+       is-hd-compact）。写死 px 就是上面那条注释警告的那种破法——收缩态下
+       字号不跟着走。实测收缩态 16→13px，比例照旧。 */
+    /* 🔴 2026-09-04：1em → .8em，字重 700 → 600。**这是推翻上面那整段**。
+
+       上面记的是 2026-08-30 的要求「device 按钮的文字和 meet nestify 大小
+       一致」，于是两边都落在 16px。同日晚些用户看了手机实装：「header 一开始
+       那个 device 的字太大了……我要让 Meet Nestify 这个 CTA 比 device 更明显，
+       你现在反而反过来了。」
+
+       原来两颗都是 16px，但 DEVICE 是 **700 描边**、CTA 是 **600 实心**——同字号
+       下描边加粗反而更抢眼，主次就倒了。所以这里同时降字号和字重：视觉重量让
+       给下面那颗 CTA，而不是靠把 CTA 撑大来压过它（撑大会顶到 hero 的排版）。
+
+       上面那段关于「为什么写 em 不写 px」的理由仍然成立，一个字没动。 */
+    font-size: .8em;
+    font-weight: 600;
+    /* 胶囊尺寸按新字号重算，保持原来的 32px 高：2.0125em × 16 = 32.2，
+       现在 2.52em × 12.8 = 32.3。横向留白同理放大，宽度不缩水。 */
+    height: 2.52em;
+    padding: 0 .78em;
+  }
+  /* 🔴 手机上把标签往下推 1px —— 光学修正，量出来的，不是拍脑袋。
+
+     用户 2026-08-30：「device 按钮的 device 不在居中的位置，感觉有点偏上」。
+     真机（iOS 模拟器，逐像素量 DEVICE 的墨迹）：胶囊 32.33px、墨迹 10.00px、
+     上留白 10.00、下留白 12.33 —— **高了 2.33px**。居中应是上下各 11.17。
+
+     ⚠️ 三件事说清楚，免得下一个人当成可以随手删的魔法数：
+
+     ① 无头 WebKit 量同一个页面是 11.00 / 11.00 **完全居中**，所以本地看不出来。
+        跟「按钮在 iOS 上变蓝」一样，只有真机 UA 才复现。
+     ② 不是 <button> 的 UA 度量。我先加过 appearance:none + line-height:1，
+        真机 A/B 两种写法结果**一模一样**，那条已经撤掉。
+     ③ 孤立一颗同样 CSS 的按钮在真机上是居中的（-0.33px），只有**真实 header
+        里**这一颗偏。差别在 header 自己那条带 vw 的 font-size clamp 上：字号
+        是小数，iOS 与无头对行盒的取整不同，差出这 1px。
+
+     所以修的是「行盒取整差」，用 1px 相对位移补掉，不动任何盒模型。
+
+     🔴 只给 iOS。别的引擎在这个断点下**本来就是居中的**（无头 WebKit 实测
+     11.00 / 11.00），无差别地推 1px 等于把它们推歪。@supports
+     (-webkit-touch-callout: none) 是圈定 iOS Safari 的惯用判据。
+     残余风险只有「桌面 Safari 把窗口拉到 767px 以下」，那 1px 可以忽略。 */
+  @supports (-webkit-touch-callout: none) {
+    .hd__cta-inner { position: relative; top: 1px; }
+    .hd__device .hd__cta-text { transform: none; }
+  }
+  /* 🔴 这里曾经有一个 ::before，声称把触摸区撑到 44px。**它从来没生效过。**
+
+     .hd__btn 有 overflow: hidden（那是 .hd__fill 那颗填充球必须的），而
+     ::before 是它的后代——超出 8px…超出按钮盒子的部分被裁掉，裁掉的部分
+     连命中测试都不参与。实测：点按钮正中命中，点它上方 6px 就落到别的元素
+     上了。留着只会让下一个人以为触摸区已经够大。
+
+     所以现在按钮的触摸区就是它自己的盒子（实测 65×26），低于 44×44 的建议值。
+     不擅自改大：这个尺寸是用户 2026-08-30 指定的（「padding 不要那么胖，
+     缩小点」），把它悄悄涨回去等于推翻他的决定。
+
+     真要补，两条路，都需要用户点头：
+       ① 加一层 <span> 把 .hd__fill 包起来、由它 overflow:hidden，
+          按钮本身改成 overflow:visible，::before 就能伸出去（要改 3 个 html）
+       ② 按钮盒子加透明 padding 撑到 44px 高，视觉上的胶囊靠内层元素画 */
+}
+
+/* 🔴 2026-09-04：本文件此前也没有 reduced-motion 块，而 header 是固定的、
+   每一页每一次滚动都在场。两处位移：.hd__fill 那颗 width: 240% 的球从
+   scale(0) 扫过整个按钮；以及 header 自己收缩时 transform 与 font-size /
+   padding 一起跑 550ms。口径同 styles.css 末尾那段：砍位移、留颜色与按压。 */
+@media (prefers-reduced-motion: reduce) {
+  .hd__fill { transition: opacity .2s ease; transform: translate(-50%, -50%) scale(1); opacity: 0; }
+  .hd__btn:hover .hd__fill { opacity: 1; }
+  .site-header { transition: color .3s ease; }
+  /* 按压保留，理由见 styles.css 末尾 */
+  .hd__device { transition: border-color .3s ease, color .2s ease, transform .14s var(--ease-out-quint); }
+}

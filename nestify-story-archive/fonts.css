@@ -1,0 +1,91 @@
+@font-face {
+  font-family: 'Baloo Chettan 2';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(fonts/font-1.woff2) format('truetype');
+}
+@font-face {
+  font-family: 'Baloo Chettan 2';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(fonts/font-2.woff2) format('truetype');
+}
+@font-face {
+  font-family: 'Baloo Chettan 2';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(fonts/font-3.woff2) format('truetype');
+}
+@font-face {
+  font-family: 'Baloo Chettan 2';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(fonts/font-4.woff2) format('truetype');
+}
+@font-face {
+  font-family: 'Baloo Chettan 2';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url(fonts/font-5.woff2) format('truetype');
+}
+@font-face {
+  font-family: 'Google Sans';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url(fonts/font-6.woff2) format('truetype');
+}
+@font-face {
+  font-family: 'Google Sans';
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+  src: url(fonts/font-7.woff2) format('truetype');
+}
+@font-face {
+  font-family: 'Google Sans';
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+  src: url(fonts/font-8.woff2) format('truetype');
+}
+@font-face {
+  font-family: 'Google Sans';
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url(fonts/font-9.woff2) format('truetype');
+}
+@font-face {
+  font-family: 'Google Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(fonts/font-10.woff2) format('truetype');
+}
+@font-face {
+  font-family: 'Google Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(fonts/font-11.woff2) format('truetype');
+}
+@font-face {
+  font-family: 'Google Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(fonts/font-12.woff2) format('truetype');
+}
+@font-face {
+  font-family: 'Google Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(fonts/font-13.woff2) format('truetype');
+}

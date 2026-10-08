@@ -1,0 +1,460 @@
+/* ============================================================
+   PRIVACY — four text panels that RISE INTO PLACE and then hold.
+
+   This was an accordion (squareup.com's industry panels): one panel open,
+   the rest folded to strips, widths moving on hover. It is now a pinned,
+   scroll-scrubbed arrival, which is the behaviour measured off zipline.com's
+   three-card block — the reference asked for. What was measured there,
+   across the ~1300px the section stays pinned:
+
+       the copy block   translateY 60px → 5px,  opacity 0 → 1
+       the media strip  translateY 747  → -409  (up 1156px)
+       each frame       height 774.8px  → 504.6px   (0.65×)
+       the card heading 90px / 700 / line-height 76.5px, on a 392px card
+
+   So: the strip enters from below while the frames COMPRESS, and the words
+   fade up under it. Nothing hovers, nothing opens, nothing swaps.
+
+   🔴 NO PHOTOGRAPHY AND NO SCRIM. The panels were pictures with white type
+   and a foot of shade under it; they are type on a plain card now. That is
+   one decision with three consequences, and all three are why this file
+   changed as much as it did:
+       · the ::after gradient is gone — it existed to give white type
+         something to sit on, and there is no photograph left to sit on
+       · the ink flips. White-on-photo becomes ink-on-card, everywhere
+       · the heading can finally be the size it should be. It was 27px at
+         1440 because it had to share a 312px panel with a picture
+
+   Rebuilt from the measurements rather than lifted: the type is ours, the
+   copy is ours (nestifyapp.org), and there are four panels here, not three.
+
+   🔴 Two scrub values, not one, and privacy.js writes both:
+       --pv-p  the strip: rises from below and compresses into its frames
+       --pv-t  the copy: fades up, and finishes at ~55% of --pv-p
+   The words have to be readable before the strip finishes settling, or the
+   reader spends the whole pin waiting on a headline. Both default to 1, so
+   with no JS at all the section is simply the finished state.
+   ============================================================ */
+
+.pv {
+  position: relative;
+  /* Small breathing room after Meet's card scene, before this heading. */
+  margin-top: clamp(3rem, 7svh, 5rem);
+  background: var(--page-bg);
+  color: var(--nes-ink);
+  /* the two heights — the 0.65 ratio between them is the measured one */
+  /* 🔴 svh, like every other section on this page (hero, hub, intro all
+     use it). On a desktop vh and svh are the same number, so this changes
+     nothing there — but in iOS Safari vh is the LARGE viewport, measured as
+     if the URL bar were hidden, and svh is the visible one. Left as vh this
+     was the only block on the page sizing itself against a different
+     viewport than its neighbours, which is a seam that only ever appears on
+     one browser. */
+  --pv-short: clamp(320px, 46svh, 500px);
+  /* The panel's own inset, named once because the tag and the copy both
+     range off the same edge. Opened from 1.7vw: at three cards a panel is
+     411px wide carrying 37px type, and a 24px margin around that reads as
+     the words having been dropped in rather than set — the bigger the type
+     inside a box, the more air the box needs to hold it. */
+  --pv-pad: clamp(1.5rem, 2.6vw, 2.6rem);
+  /* one source for the heading's size: the lock is drawn off it too, and a
+     padlock that does not scale with the words beside it stops being part
+     of the line the moment the clamp moves */
+  --pv-title: var(--heading--display);
+  /* 🔴 An ordinary section, not a pinned track. It was 170svh with a sticky
+     stage, and the whole apparatus existed to hold the frames still while
+     they compressed from tall to short. That compression is gone — it was
+     the "stretching" no one wanted — and with nothing left to scrub, a pin
+     is just a section that refuses to scroll. The block arrives and stays.
+
+     The heading sits at the TOP now for the same reason: the stage was a
+     full screen with its contents centred, which floated the title into the
+     middle of an empty frame. In normal flow it is simply the first thing
+     in the section. */
+  /* 🔴 The top is now more than double the bottom, on purpose. At 8vh the
+     heading sat right under whatever the previous section left on screen,
+     so the two read as one continuous block instead of a new subject
+     starting. A section announces itself with the air above it. */
+  padding: clamp(7rem, 17svh, 13rem) 0 clamp(4.5rem, 9svh, 8rem);   /* svh — see --pv-short */
+}
+
+.pv__stage { display: block; }
+
+.pv__head {
+  padding: 0 var(--gutter) clamp(1.6rem, 3.4vw, 3rem);
+}
+/* 🔴 PLAYED ON A TIMER, TRIGGERED BY ARRIVAL — not scrubbed by scroll.
+   Every previous pass drove these off scroll POSITION, and that is why the
+   answer to "why can't I see it?" kept being "it already happened". A
+   scrubbed move is a function of where the page is, so it can be crossed in
+   40ms by one flick of a trackpad, and if you land in the middle of the
+   section it is simply over before you look. Position cannot decide how
+   long something takes; only time can.
+
+   So: an IntersectionObserver adds .is-in when the block actually comes on
+   screen, once, and the transition below plays at its own pace whatever the
+   scroll did. It does not reverse — arriving is something that happens to a
+   section once.
+
+   The hidden start state is scoped to .pv--anim, which privacy.js adds to
+   the section. Without JS nothing is ever hidden. */
+/* Word-reveal headings use footer.js; avoid a second arrival on their parent. */
+.pv--anim .pv__head:not(:has([data-reveal="words"])) {
+  opacity: 0;
+  transform: translateY(44px);
+  transition: opacity .45s ease, transform .85s cubic-bezier(.34, 1.56, .64, 1);
+}
+.pv--anim .pv__head.is-in { opacity: 1; transform: none; }
+
+/* 🔴 The undo, and it must not animate. privacy.js hangs this on the block
+   for exactly one forced reflow while it strips .is-in, so the return to
+   the un-arrived state is a snap rather than the whole arrival played
+   backwards. It only ever happens with the block off screen. */
+.pv--anim .is-reset,
+.pv--anim .is-reset * { transition: none !important; animation: none !important; }
+
+/* 🔴 THE ROW IS A LOCKUP AND NOTHING ELSE: padlock and title, centred on the
+   section as one object.
+
+   It carried a "Learn more" pill for a while, ranged hard right and held
+   there by `margin-left: auto` so it would stay right even when the row
+   wrapped — the note here used to argue at length that the link belonged to
+   the SECTION rather than to any one card. The argument is moot: the pill
+   pointed at "#", the three per-card links that briefly replaced it pointed
+   at "#" too, and all of them are gone. See the note further down for what
+   to rebuild if real destinations ever exist.
+
+   🔴 justify-content, and align-items stays. The two children have different
+   heights — a square mark and a line of 600-weight display type — so
+   centring the row's CROSS axis is what sits the lock on the title's centre
+   rather than on its top. That was already true when the row was left-ranged;
+   only the main axis changed. */
+.pv__headrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: clamp(.6rem, 1.2vw, 1.1rem);
+}
+
+/* ---------- the padlock ----------
+   🔴 THE DRAWING AND THE ANIMATION MOVED TO styles.css, because the device
+   page's privacy card draws the same lock now and a hand-tuned keyframe is
+   the last thing that should exist in two copies. Everything about HOW it
+   is built — the 180° swivel about the fixed leg, why the perspective sits
+   inside the transform, the 2.6/1.65 arithmetic, the mask — is in the note
+   there.
+
+   What stays here is the part that is this page's and not the lock's:
+
+   🔴 It latches ON THE SCROLL, not on a loop of its own. The shackle rides
+   the same arrival the words do, so by the time the section is up the
+   screen the lock has shut, once, as a consequence of the reader getting
+   here. A padlock idling shut-open-shut on a timer is a sticker; this one
+   is the section's own sentence being made.
+
+   🔴 The hidden start state lives behind .pv--anim, which privacy.js adds
+   only when it runs AND motion is allowed. So with no JS, or with reduced
+   motion, the lock is simply CLOSED — the finished state, which is the
+   correct thing to fail into for a drawing that means "your data is
+   locked". Never leave the rest state on .pv__lock-bar itself. */
+.pv__lock { --lock-size: calc(var(--pv-title) * 1.15); }
+.pv--anim .pv__lock-bar {
+  transform: translateY(-2.6px) perspective(40px) rotateY(-180deg);
+}
+.pv--anim .pv__head.is-in .pv__lock-bar {
+  animation: pv-latch 1.15s var(--ease-out) .3s forwards;
+}
+
+/* 🔴 THIS is the heading the size note was about — the section's own, not
+   the one down in a card. Measured on the reference: its section titles run
+   150px (10.4vw at 1440) against 90px for a card heading, and this was
+   sitting at 58px, which is why it read as a label rather than as the thing
+   the section is called.
+
+   🔴 The page's OWN section-title size, not a size of its own. Every other
+   heading on the page sits on a ladder — the intro's line at 136.8px, the
+   testimonials at 75px, the hero's slides at 56, the hub at 49 — and this
+   was at 92, which put it between the two loudest with nothing else at that
+   rank. A section heading should be the same size as the other section
+   heading; --heading--h2-big is what the testimonials block already reads.
+
+   The clamp only exists so it degrades on a phone: 4.45vw resolves to 64px
+   at 1440 and caps at the token, so on any desktop the two blocks match to
+   the pixel.
+
+   One line still holds with room to spare — this sentence needs 10.96 × its
+   font-size, so 822px. It used to be measured against the 1184px left beside
+   the Learn more button; with the button gone the row is the section's full
+   width and the margin is wider still, so the fit is not in question at any
+   desktop size. line-height .92 keeps the two-line case (a phone) tight. */
+.pv__title {
+  font-family: var(--font--primary);
+  font-size: var(--pv-title);
+  line-height: .92;
+  /* 🔴 600, where every other h2 on the page is 400. Asked for, and it is
+     the one heading that now has a drawn mark standing next to it — a
+     400-weight line beside a solid padlock reads as a caption to the icon
+     rather than as the two of them being one lockup. */
+  font-weight: 600;
+  letter-spacing: -.02em;
+  margin: 0;
+}
+
+/* ---------- the row ---------- */
+/* 🔴 A FIXED height, and the row only fades up. The height used to be the
+   animation — tall frames compressing into short ones, 0.65× — and that is
+   the stretch that had to go. What is left is the plainest reveal there is:
+   it comes up 28px and resolves. Nothing scales, so nothing is soft while
+   it moves; the smear at the start was a big box being re-laid-out and
+   re-rasterised on every frame of a height tween.
+
+   The gap is opened from 12px: at three cards there is room, and hairline
+   gutters made the row read as one striped slab rather than three tiles.
+
+   🔴 The row itself no longer animates. It used to fade and rise as one
+   box, which is precisely why the tiles had no arrival of their own — they
+   were cargo. Each panel carries its own ramp now (see .pv__panel). */
+.pv__row {
+  display: flex;
+  gap: clamp(12px, 1.7vw, 26px);
+  padding: 0 var(--gutter);
+  height: var(--pv-short);
+}
+
+/* 🔴 flex: 1 1 0 and nothing else. The grow value used to be the animation
+   — one panel at 3.4 and the rest at 1 — and with the accordion gone the
+   four are simply equal and stay equal. */
+.pv__panel {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  /* 🔴 The page's card corner, not a 6px one. 6px was right when the panel
+     was a photograph — a picture wants a hairline round, or it starts to
+     look like a sticker. A flat colour tile wants the corner the rest of
+     the page's cards already wear, so this reads as one family with the
+     testimonial deck instead of a second, sharper idea. */
+  border-radius: var(--section-radius--regular);
+  color: var(--nes-ink);
+  /* 🔴 One centred column, not two things pinned to opposite corners. The
+     tag was absolute at the top-left and the copy absolute at the bottom,
+     which on a 414px tile left a dead field through the middle and read as
+     two fragments sharing a box rather than one thing being said. As flow
+     children of a centred flex column they are a group, and the tile's
+     padding is the only inset any of them needs. */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: var(--pv-pad);
+  gap: clamp(.5rem, .9vw, .95rem);
+  /* 🔴 The stagger and the bounce. --pv-c0/1/2 are three separate ramps
+     (privacy.js), each opening 0.10 later than the last and each on a curve
+     that overshoots — so the tiles come up one after another, and each
+     lands a little past its mark and settles back onto it.
+
+     (1 - c) drives the travel, and because c passes 1 that value goes
+     briefly NEGATIVE: the card rises above where it belongs before dropping
+     on. That is the bounce.
+
+     🔴 NO overflow: hidden. It was here out of habit — nothing in a panel
+     overflows, the tag and the copy are both inset — and leaving it on a
+     rounded box that now carries a transform is the exact recipe that
+     blackened the testimonial cards in Safari (see .testi_card in
+     styles.css). The safest clip is the one that is not needed. */
+}
+
+/* the bounce. cubic-bezier(.34, 1.56, .64, 1) is easeOutBack — the 1.56
+   carries the tile ~10% past its mark before it settles, which is the whole
+   of the "pop". The delays are what make three tiles read as three arrivals
+   rather than one slab being nudged. */
+.pv--anim .pv__panel {
+  opacity: 0;
+  transform: translateY(72px);
+  transition: opacity .45s ease, transform .85s cubic-bezier(.34, 1.56, .64, 1);
+}
+.pv--anim .pv__row.is-in .pv__panel { opacity: 1; transform: none; }
+.pv--anim .pv__row.is-in .pv__panel:nth-child(1) { transition-delay: .06s; }
+.pv--anim .pv__row.is-in .pv__panel:nth-child(2) { transition-delay: .19s; }
+.pv--anim .pv__row.is-in .pv__panel:nth-child(3) { transition-delay: .32s; }
+
+/* 🔴 One colour per card, off the palette the testimonial deck already uses
+   — and no ink among them. Four flat tiles is the whole design now that the
+   photographs are gone, so the colour is doing the work the pictures did.
+
+   Ordered so no two neighbours are close: sky is blue-tinted, tan is a warm
+   grey, amber is yellow, cream is near-white. tan next to cream would have
+   read as one tile that had been printed twice. */
+.pv__panel.is-sky   { background: var(--nes-sky); }
+.pv__panel.is-tan   { background: var(--nes-tan); }
+.pv__panel.is-amber { background: var(--nes-amber); }
+/* 🔴 No --nes-blue here. It is the CTA's colour and it has to stay the
+   CTA's — a whole tile in it makes the page's one "press this" hue into a
+   backdrop. Dropping to three cards is what made that avoidable: four
+   needed a fourth tint, and the palette's remaining light ones (cream,
+   white) both dissolve into the ground, so the fourth had to be saturated.
+   Three fit the light tints exactly, with none left over and none forced. */
+
+/* ---------- what every panel shows, all the time ---------- */
+.pv__body { position: relative; z-index: 3; }
+
+/* The card's own line. It was briefly run up to 64px — the reference's
+   card-heading proportion — but the size note was about the SECTION title
+   above, not this, so it is back where it was and .pv__title carries the
+   scale instead. */
+.pv__claim {
+  font-family: var(--font--primary);
+  font-size: clamp(25px, 2.55vw, 42px);
+  line-height: 1.04;
+  font-weight: 500;
+  letter-spacing: -.03em;
+  margin: 0 0 clamp(.6rem, .9vw, .9rem);
+}
+
+/* ---------- there is no link on these cards ----------
+   🔴 THE SECTION ASKS FOR NOTHING, and the rules that used to are gone
+   rather than commented out. Two shapes lived here in turn: a filled pill
+   (.btn-ball + .btn-disc + .btn-arrow) ranged right of the section title,
+   and then three per-card "Learn more about X" links built after
+   .dv__val-link on the device page. Both pointed at "#", and that is why
+   neither is here: a dead link is the only element on a tile that makes a
+   promise, so the reader who takes it up gets nothing and the card is what
+   lied to them. Three of those are three times as visible as one.
+
+   🔴 IF REAL DESTINATIONS EVER EXIST, two things are already known and
+   should not be rediscovered:
+
+   1. Copy .dv__val-link's SHAPE — label, then a chevron that travels on
+      hover — but not its colour. Its --nes-blue-2 is tuned for a white
+      card (3.68:1) and dies on these tiles, where 18px type needs 4.5:
+
+                                sky    amber    tan
+        --nes-blue-2 #1e88e5   3.01     2.20   2.56
+        --nes-blue-3 #1573c9   3.97     2.91   3.38
+        --nes-ink    #1a1a1a  14.24    10.43  12.11
+
+      Amber cannot reach even the 3.0 large type gets, and no darkening of a
+      blue fixes it while still being a blue. Ink at 600 weight, marked by
+      the chevron rather than by colour, is what clears all three — the same
+      wall .pv__note hit with --nes-muted, and the same answer.
+
+   2. Do NOT floor it with margin-top: auto the way the device page does.
+      Tried, and measured: an auto margin on the last child of this centred
+      column eats all the free space, which at 1440 left 180px of empty tile
+      between the paragraph and the link. That is exactly the "dead field
+      through the middle" .pv__panel was restructured to remove. Those cards
+      are short; these are ~440px tall. The link belongs in the centred
+      group as its closing line, or --pv-short has to come down first. */
+
+/* 🔴 Ink at 72%, NOT --nes-muted. The muted token is tuned for white and
+   fails on every one of the four tiles at this size — measured against
+   #787165: sky 3.95:1, tan 3.36, amber 2.89, cream 4.39, where 12.7px type
+   needs 4.5. Mixing the section's own ink into whatever tile it lands on
+   holds everywhere: the worst case is amber at 4.98:1, and it is one value
+   rather than four. */
+.pv__note {
+  font-family: var(--font--body);
+  font-size: clamp(15px, 1.25vw, 19px);
+  line-height: 1.45;
+  margin: 0;
+  color: color-mix(in srgb, var(--nes-ink) 72%, transparent);
+}
+
+/* the category, above the line it labels */
+.pv__tag {
+  position: relative; z-index: 3;
+  font-family: var(--font--body);
+  font-size: clamp(15px, 1.25vw, 19px);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: .02em;
+  /* 🔴 No max-width. It was 11ch, and "Parental controls" is 17 characters —
+     so the longest of the four labels was the one guaranteed to break in
+     half. The card is 312px wide and the label needs ~128px at this size;
+     there was never a width problem to solve. */
+  color: color-mix(in srgb, var(--nes-ink) 72%, transparent);   /* see .pv__note */
+}
+
+@media (max-width: 900px) {
+  /* three tiles side by side stop being tiles on a phone — stack them.
+     (The pin these rules used to switch off is gone from every width now.) */
+  .pv__row { flex-direction: column; height: auto; gap: 12px; }
+  /* 🔴 NO padding-top HERE. It used to be 5.5rem, and that was room being
+     held for a .pv__tag that was absolutely positioned at the top of the
+     tile. The tag is a flow child of a centred column now (see the note on
+     .pv__panel), so the reservation is not holding anything up — it is just
+     an asymmetric box, and content centred in an asymmetric box sits low.
+     That is the whole of "文字偏下": justify-content was centring correctly
+     the entire time, inside padding that was 5.5rem deeper at the top than
+     at the foot. The line below it, .pv__body { position: static }, is from
+     the same era and is now a no-op; left in because it costs nothing and
+     says what changed. */
+  .pv__panel { flex: none; height: auto; min-height: 0; }
+  .pv__body { position: static; }
+
+  /* 🔴 手机上这句和「This is Nestify, here to light up family life.」一样大
+     （用户 2026-09-05）。--heading--display 的斜率 4.45vw 是按桌面列宽定的，
+     手机整段压在 28px 下限附近：实测 666 宽下它是 29.6px，而那句是 40px，
+     同一页两个「段落开场白」差了整整一档。
+
+     🔴 改的是 --pv-title 这个中介，不是 .pv__title 的 font-size。两个理由：
+       ① 锁图标是 `calc(var(--pv-title) * 1.15)`（见 .pv__lock），走变量它自己
+          跟着长；直接写 font-size 会把字放大、锁留在原地。
+       ② privacy.css 排在 styles.css **后面**，那边 767 的覆盖点不动这一条
+          （同特异度、后来者赢），只有变量这一层改得动。
+
+     回退值必须留着：--hub-copy 定义在 hub.css 的 900 断点里，而 device.html /
+     faq.html 不加载 hub.css，那两页读不到它。
+
+     ⚠️ 必须挂在 .pv 上——变量声明要有宿主规则块，而 .pv 正是它原来的家
+     （本文件 39 行），换个宿主就会改掉它的继承起点。 */
+  .pv { --pv-title: var(--hub-copy, var(--heading--display)); }
+  /* 🔴 行距跟着一起放。styles.css 的 767 断点里有一条「.h2-bigger, .pv__title
+     { line-height: 1.06 }」，注释写着两个选择器要同步——但它对**这一个**从来
+     没生效过：privacy.css 排在 styles.css 之后、特异度同为 0,1,0，上面那条
+     `.pv__title { line-height: .92 }` 一直赢着（实测 666 宽下量到 .92）。
+     字号 29.6 时一行装得下，看不出来；放到 40px 之后这句会折成两行，.92 的
+     负余量就把两行压到一起了——正是那条注释当初想修的东西。
+     这一条在本文件内、又在媒体块里，是唯一压得住它的位置。 */
+  .pv__title { line-height: 1.06; }
+
+  /* 🔴 标题到卡片的空气跟着字号一起放（用户 2026-09-05：「标题和下面的卡片
+     增加点距离」）。
+
+     .pv__head 的下内距是 clamp(1.6rem, 3.4vw, 3rem)，3.4vw 到 666 宽才 22.6px
+     ——手机整段压在 1.6rem = 25.6px 的下限上。字号还是 29.6px 时那 25.6 勉强
+     够，涨到 40px 之后就成了「标题贴着第一张卡」：实测墨底到卡片顶 25px，
+     不到字号的 2/3。
+
+     5vw 的斜率在这一带同样够不着下限，所以真正起作用的是 2.6rem = 41.6px
+     ——约等于一个字高，读起来是「标题带着下面这三张」而不是「压在它们上面」。
+     实测 390 / 660 两处都落在 42px。 */
+  .pv__head { padding-bottom: clamp(2.6rem, 5vw, 3.2rem); }
+}
+
+@media (max-width: 767px) {
+  /* Keep the privacy opener on the same centred axis as the testimonials
+     heading below it. The lock sits above the words so it does not push a
+     wrapped line off-centre; balance chooses a natural one- or two-line
+     break from the available width instead of hard-coding a <br>. */
+  .pv__headrow {
+    flex-direction: column;
+    gap: clamp(.75rem, 3vw, 1rem);
+  }
+
+  .pv__title {
+    width: 100%;
+    text-align: center;
+    text-wrap: balance;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* the arrival is the only motion left, so this is the whole of it */
+  /* privacy.js never adds .pv--anim on this path, so nothing is hidden and
+     nothing plays — this is only here in case the class is already on. */
+  .pv--anim .pv__head,
+  .pv--anim .pv__panel { opacity: 1; transform: none; transition: none; }
+  .pv--anim .pv__lock-bar { transform: none; animation: none; }
+}

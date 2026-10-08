@@ -1,0 +1,154 @@
+/* ============================================================
+   DRIFT — the cards that scatter around scene two's line.
+
+   After lassie.ai's floating-card screen. Sampled across its scroll range:
+
+       scroll   card scale   card translate
+       4400      0.719        (-735, …)
+       4800      0.973        (-701, …)
+       5200      1.000        (-648, -314)
+       5600      1.000        (-597, -355)
+       6000      1.000        (-562, -378)
+
+   🔴 Theirs also scales in; ours does NOT, deliberately. What reads on that
+   page is the TRAVEL — every card sliding outward as the page moves — and
+   the scale is a separate arrival flourish that is over almost immediately.
+   Ours arrives on opacity alone and spends the whole scrub translating, so
+   the only thing tied to the wheel is movement.
+
+   These live inside .intro__stage, behind scene two's sentence. They are
+   not a section of their own: the sentence they surround is the intro's,
+   and the film lands inside it.
+   ============================================================ */
+
+.intro__drift {
+  position: absolute; inset: 0;
+  z-index: 0;                 /* under the copy (1), under the film (2) */
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* 🔴 Pinned to the CENTRE of the stage, and the orbit offset carries it
+   out to the ring. Not left/top per card: drift.js drives one angle each
+   and the position falls out of cos/sin against the shared ellipse, so a
+   card cannot be given a resting place that contradicts its own arc.
+
+   --ox/--oy are that offset. No rotation: lassie's cards carry none either
+   (their matrices read r0.0 for the whole run), and on an orbit a tilt
+   fights the thing it is decorating — the ring already supplies the motion,
+   so a turn on top of it just makes each card look loose. */
+.intro__drift-card {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: var(--w, 190px);
+  height: var(--h, 190px);
+  transform:
+    translate(-50%, -50%)
+    translate(var(--ox, 0px), var(--oy, 0px));
+  border-radius: 18px;
+  /* 🔴 A tint, not a colour. The ground under these changes as the section
+     scrolls — cream at the top, the sun's blue lower down — so a fixed hex
+     is right against one and wrong against the other. Mixing the page's ink
+     into whatever is actually behind keeps them a constant step darker than
+     their background at every point in the scroll. */
+  background: color-mix(in srgb, var(--nes-ink) 9%, transparent);
+  opacity: var(--o, 0);
+  will-change: transform, opacity;
+}
+
+/* ---------- the tail of the sentence cycles ----------
+   Only the last words change — a parent → a kid → a family — because the
+   film lands in this same sentence and a whole-line swap would pull the
+   slot it sits in out from under it.
+
+   🔴 inline-grid, so all three readings occupy ONE cell. They can never
+   both take up space, which means the line's width is the widest reading's
+   at all times and the film's slot does not shift when the words change.
+   Laid out in flow they would reflow the sentence three times on the way
+   down, and the film is mid-flight into it.
+
+   🔴 The article stays OUT of the swap: the line reads "be a" and only the
+   noun turns. It is common to all three readings, so flipping it with them
+   makes a letter leave and come back identical — motion that says nothing.
+   It also leaves each reading a single word, which is what the lead's
+   word-splitter wants; when "a parent." was inside, it needed a no-break
+   space to stop the splitter cutting the reading in half. */
+.intro__swap {
+  display: inline-flex;
+  vertical-align: baseline;
+}
+/* The readings stay in the DOM as the accessible text and as what a
+   no-CSS reader gets; the drum is what is actually seen.
+   🔴 :not(.intro__type) — the typed span is a span too, and hiding every span in
+   here hid the thing it was built to show (measured: 0×0 box). */
+.intro__swap > span:not(.intro__type) { display: none; }
+
+/* ---------- the drum ----------
+   One vertical strip per LETTER POSITION, each carrying that position's
+   glyph from all three readings. Changing the reading slides every strip
+   by one row: the old glyph rolls up and out, the new one rolls in behind
+   it. Same construction as the day clock's digits (index.html, <i class="dg">).
+
+   🔴 The window is TALLER than a row, and the extra height is taken back
+   out of the layout. The lead is set at line-height 1.0 and runs to 170px,
+   so a 1em window guillotines the descender of every p and y. 1.34em shows
+   them; the negative margin means the inline box still contributes 1em to
+   the line, so the sentence's two lines do not spread apart when the drum
+   goes in. (Same trick the intro's title uses for its own descenders.)
+
+   🔴 One clip for the whole row, not one per column. The columns roll on
+   staggered delays but they are all the same height and all move on the
+   same axis, so a single overflow on the parent clips every one of them
+   correctly — and it keeps the columns free to be the strips themselves
+   rather than needing a wrapper each. */
+/* 🔴 The typed reading takes the brand blue, and it is --nes-blue-2 rather
+   than the bead's own --bead-blue. This is TYPE, not a shape: measured
+   against the ground it sits on, #14a4fd is 2.41:1 and #1e88e5 is 3.28:1,
+   and the word is display size where 3:1 is the bar.
+
+   🔴 It stays blue. It used to drain to ink as the section left, on the
+   idea that the colour was moving into the dot — but the dot is a caret
+   now and has been blue the whole time, so the drain was taking colour
+   out of the line for nothing and the last word went grey just as it was
+   being read. */
+.intro__type {
+  color: var(--nes-blue-2);
+  /* it grows and shrinks a character at a time, so it must not be able to
+     break the line while it does */
+  white-space: pre;
+}
+/* 🔴 Each letter arrives; it does not switch on. 0.14em of lift and a
+   quick out-ease, per character, staggered by the typing itself rather
+   than by a delay — the cadence is already in the clock that adds them.
+   `both` so the first frame is the pre-state: without it the glyph paints
+   once at full opacity before the animation takes hold, which is a flash
+   on every single letter. */
+.intro__type i {
+  display: inline-block;
+  font-style: normal;
+  animation: intro-type-in .2s var(--ease-out-quint) both;
+}
+.intro__type i.is-set { animation: none; }
+@keyframes intro-type-in {
+  from { opacity: 0; transform: translateY(.14em); }
+  to   { opacity: 1; transform: none; }
+}
+
+@media (max-width: 767px) {
+  .intro__drift-card { border-radius: 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro__drift-card { transition: none; }
+  /* 🔴 2026-09-04：这个块原本只盖住了**已经停用的**东西，漏掉了唯一还在跑的。
+     .intro__drift-card 由 drift.js 的 CARDS_ON = false 关着；而句子里那个换词
+     的逐字入场（上面的 .intro__type i / @keyframes intro-type-in，每字
+     opacity + translateY(.14em)）在 reduced 下照放——drift.js:285 的 REDUCED
+     分支走 frame(0.5) → wantWord → pump → paintTyped()，**不传 settled**，
+     于是 paintTyped 里 `el.className = settled ? 'is-set' : ''` 把本来该关掉
+     动画的 is-set 抹掉了（.intro__type i.is-set { animation: none } 是它的
+     正规出口）。这里直接从 CSS 断掉，不依赖那条 JS 路径传对参数。
+     ⚠️ 残留：字仍然是一个一个被 append 上去的（pump 的 setTimeout 还在跑），
+     只是不再有位移和淡入。要连出现顺序也去掉，得改 drift.js 的 REDUCED 分支。 */
+  .intro__type i { animation: none !important; }
+}

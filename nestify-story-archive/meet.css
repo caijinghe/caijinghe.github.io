@@ -1,0 +1,681 @@
+/* ============================================================
+   MEET NESTIE — 小鸟先出场，然后每往下滑一段就出一个词，
+   同时这个词的两张卡从小鸟身上飞出来、亮一下再暗回背景。
+   五个词出完全部转清晰，再往下滑是冲向镜头的飞越，交给下面的
+   Family Hub。整段站在页面的地上（--page-bg），不自带底 —— 见
+   .meet__stage 上的注释。
+
+   🔴 卡片几何、漂移参数、飞越的变换与缓动是从豆包官网 about_page
+   的 bundle 里扒出来的原值（见 meet.js 顶部）。基准画布 1440×810，
+   --meet-cover 负责铺满视口 —— 和 .hero 一样是 sticky 舞台，不是
+   transform 包裹层，所以 Lenis 和 IntersectionObserver 都还读得到
+   真实滚动位置。
+
+   🔴 段高由 meet.js 按时间轴算出来写进 --meet-h，别在这里写死：
+   改 WORD_SPAN 而忘了改高度，最后一个词就会被挤出 sticky 区间。
+   ============================================================ */
+
+.meet-intro {
+  margin-top: clamp(6rem, 14svh, 8rem);
+  padding: 0 var(--gutter);
+  background: var(--page-bg);
+  color: var(--nes-ink);
+}
+.meet-intro h2 { margin: 0; scroll-margin-top: 7rem; }
+.meet-intro__title-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.meet-intro__subtext {
+  margin: clamp(.75rem, 1.5svh, 1.25rem) 0 0;
+  font-size: clamp(16px, 2vw, 30px);
+  font-weight: 600;
+  line-height: 1.2;
+}
+.meet-intro__link {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: clamp(1.75rem, 2.3vw, 2rem);
+  aspect-ratio: 1;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  color: var(--nes-ink);
+  transition: background-color .2s ease, color .2s ease;
+}
+.meet-intro__link svg { width: 52%; height: 52%; }
+.meet-intro__link:hover { background: var(--nes-ink); color: var(--page-bg); }
+.meet-intro__link:focus-visible { outline: 2px solid currentColor; outline-offset: 5px; }
+
+.meet {
+  position: relative;
+  margin-top: clamp(5rem, 12svh, 7rem);
+  /* 🔴 z-index: 1 —— 让溢出舞台的卡片画在**后面那段之上**。
+
+     .meet__sticky 已经放开了纵向裁剪（见下面那条），卡片因此会探进下一段；
+     但 .pv 的背景是不透明的 #f4f2ea，而它排在 meet 后面、两者都是
+     z-index:auto，于是后画的把先画的盖掉——观感和被裁一模一样。用户
+     2026-09-04：「这个地方它又被截掉了，你可以把它的容器再大一点，哪怕跟
+     后面的 Privacy 有一点点接壤也无所谓。」
+
+     取 1 就够：只需要压过 auto 的 .pv。别往上加——intro 是 2、hub 提前钉住时
+     是 3，meet 一旦超过它们就会盖住转场那一幕。 */
+  z-index: 1;
+  height: var(--meet-h, 564svh);
+  --meet-cover: 1;
+}
+
+@media (min-width: 768px) {
+  .meet.is-desktop-replay { overflow-anchor: none; }
+  .meet.is-desktop-replay .meet__sticky { position: relative; }
+}
+
+.meet__sticky {
+  position: sticky;
+  top: 0;
+  /* 🔴 dvh，不是 svh —— 这一层是**看得见的舞台**，要跟着可视区走。
+
+     svh 是「工具栏展开时」的那个高度。iOS 上读者一滑工具栏就收起来，可视区
+     变高，而这块 sticky 还是原来那么高，底下就空出一条；再加上这里有
+     overflow:hidden，靠近底部的东西正好被切在 svh 那条线上。用户
+     2026-08-30：「底部好像有切割的感觉…好像是因为浏览器的 toolbar 消失了」
+     —— 诊断是对的。
+
+     ⚠️ 只有这两层（sticky + stage）改 dvh。段落总高 --meet-h 仍旧写 svh
+     （meet.js），那是**滚动长度**：用 dvh 的话工具栏一收页面总高就变，读者
+     手指底下的内容会跳。看得见的用 dvh，量距离的用 svh。 */
+  height: 100svh;
+  height: 100dvh;
+  /* 🔴 纵向放行，横向仍然裁住。
+
+     原来是 `overflow: hidden`，两个轴一起裁——而这一圈卡片的家位是照 1440×810
+     写死的、排出来比画布大（纵向 ~889 单位、横向 ~1483），舞台又正好一个视口
+     高，于是贴边那几张被切在视口线上。1512×760 实测上切 1px、下切 22px。
+     用户 2026-09-04：「恢复成原来的大小，不要把它挤在一整个 100vh 里面，
+     超出去就超出去，超到下个视口也没关系，但是不要切掉。」
+
+     不能写 `overflow-x: hidden; overflow-y: visible`：CSS 规定一轴为 hidden 时
+     另一轴的 visible 会被算成 auto，等于给舞台加一条纵向滚动条。`clip` 没有
+     这条约束，所以 x 用 clip、y 保持 visible。
+
+     横向必须留着裁：卡片左右也超出视口（实测最右到 1543），不裁就是整页横向
+     滚动条。前面那行 `overflow: hidden` 是给不认 clip 的老浏览器的兜底——那边
+     退回原来的行为，两轴都裁，不会更糟。
+
+     ⚠️ .film-relay 挂在 body 上而不是这里，正是因为这层历史上会裁（见本文件
+     下方那条注释）。现在纵向不裁了，但它仍然不该搬进来：横向还在裁。 */
+  overflow: hidden;
+  overflow-x: clip;
+  overflow-y: visible;
+}
+
+/* 🔴 站在页面的地上，不自带底。这里曾经有两层：这块 --nes-cream，
+   加上一层 .meet__bg（暖黄中心光晕 + 天蓝外圈的三段径向渐变，由
+   meet.js 驱动透明度/漂移旋转/飞越模糊）。两层一起去掉了，理由是
+   styles.css 的 one-ground 规则——整站只有一块地（--page-bg =
+   --nes-sand），只有 privacy 段是有意的深色例外；这一段自己铺一层
+   蓝黄渐变，等于在 hero 和 hub 之间插了第三块地，滑过去两道接缝。
+
+   卡片本来就是白底 + 深阴影、词是 ink→#8d867a 的渐变字，都不靠那层
+   底衬托，去掉后对比度不受影响（实测见本次改动）。 */
+.meet__stage {
+  position: relative;
+  /* 跟着 .meet__sticky 一起走，理由见那条注释 */
+  height: 100svh;
+  height: 100dvh;
+  background: var(--page-bg);
+}
+
+.meet__scene {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1440px;
+  height: 810px;
+  transform: translate(-50%, -50%) scale(var(--meet-cover));
+}
+
+.meet__cards {
+  position: relative;
+  width: 1440px;
+  height: 810px;
+  overflow: visible;
+}
+
+/* ---------- 卡片 ---------- */
+.meet__card {
+  position: absolute;
+  transform-style: preserve-3d;
+  opacity: 0;
+  /* 层级由 meet.js 每帧写进 --z（点亮的 9，其余 cfg.z 或 0）。经变量而不是
+     内联 zIndex，是为了让下面那条 :hover 规则能压过它——见那边的注释。 */
+  z-index: var(--z, 0);
+}
+
+.meet__rot {
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform .4s ease;
+}
+
+/* 🔴 静态旋转由 --rot 提供（meet.js 写），transform 归 CSS——这样 hover 才叠
+   得上去。这条 hover 规则本来就在，但一直没生效：JS 那边写的是内联 transform，
+   内联压过样式表。 */
+.meet__rot { transform: var(--rot); }
+
+/* 🔴 hover 放大：**只在桌面、且五个词演完之后**。
+
+   `(hover: hover) and (pointer: fine)` —— 用户 2026-09-04：「mobile 不要有这个
+   交互，pc 有」。触摸屏上 :hover 会在点按时误触发，而且这一段手机上本来就靠
+   吸附一格格看，卡片跳起来只会碍事。
+
+   `.is-cards-live` 由 meet.js 在五个词全部满格后加（理由见那边）：读者还在逐词
+   读的过程中，鼠标扫过就有卡片跳起来，和「一个词点亮它那两张」的节奏打架。 */
+@media (hover: hover) and (pointer: fine) {
+  .meet__rot { transition: transform .26s var(--ease-out); }
+  /* 🔴 1.16 → 1.34（2026-09-05，用户：「这些卡片放大得不够」）。 */
+  .meet.is-cards-live .meet__hover:hover { transform: var(--rot) scale(1.34); }
+  /* 🔴 放大到这个幅度就必须**同时**把卡片提到最前，否则改动看起来是坏的而不是
+     更大的：卡片在一个环上互相压着边，z-index 由 meet.js 每帧写在 .meet__card
+     上（点亮的 9，其余 cfg.z 或 0），:hover 在 .meet__rot 上够不着那个层级——
+     它只能在自己父级的层叠上下文里排序。1.16 时长出来的那一圈还落在压边范围
+     内，看不太出来；1.34 会让被压的那一侧明显缺一块。
+
+     用 :has() 打到父级。写 8 而不是 10：9 是"点亮那张"，10 是那五个词
+     （.meet__copy，绝不能被盖）。8 保证 hover 起来的卡片压过所有静止的卡片，
+     又不越过这两条已经定好的规则。
+
+     ⚠️ 这条只能待在这个 @media 里。触摸屏上 :hover 会在点按后粘住，卡片会
+     一直停在最前——那正是上面那条「mobile 不要有这个交互」要防的。 */
+  .meet.is-cards-live .meet__card:has(.meet__hover:hover) { z-index: 8; }
+}
+
+
+.meet__card .meet__face {
+  width: 100%;
+  height: 100%;
+}
+
+.meet__card img.meet__face {
+  object-fit: cover;
+  border-radius: 44px;
+  box-shadow: 0 42px 90px rgba(26, 26, 26, .22);
+}
+
+/* 🔴 用 HTML 画的卡（Nestie 那句话 / 便签 / 任务清单）内容按 3~4 倍放大画，
+   因为外层 scale3d 会把整张卡缩到 15%~55%。直接按成品尺寸写字号，
+   缩完就只剩几个像素高。 */
+.meet__ch {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 44px;
+  box-shadow: 0 42px 90px rgba(26, 26, 26, .18);
+  overflow: hidden;
+}
+
+.meet__ch--wide {
+  flex-direction: row;
+  align-items: center;
+  gap: 40px;
+  padding: 0 72px;
+  border-radius: 120px;
+}
+.meet__ch-avatar {
+  flex: none;
+  width: 132px;
+  height: 132px;
+  border-radius: 50%;
+  background: var(--nes-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.meet__ch-avatar svg { width: 80px; height: 80px; }
+.meet__ch--wide p {
+  margin: 0;
+  font-size: 62px;
+  line-height: 1.34;
+  font-weight: 500;
+  letter-spacing: -.01em;
+}
+.meet__ch--wide b { color: var(--nes-blue-3); font-weight: 600; }
+
+.meet__ch--note { padding: 52px 48px; gap: 26px; }
+.meet__ch-tag {
+  align-self: flex-start;
+  padding: 12px 26px;
+  border-radius: 999px;
+  font-size: 34px;
+  font-weight: 600;
+}
+.meet__ch-tag--blue  { background: var(--nes-sky); color: var(--nes-blue-3); }
+.meet__ch-tag--amber { background: #fdf0d0; color: #9a6a06; }
+.meet__ch--note h4 {
+  margin: 0;
+  font-size: 50px;
+  line-height: 1.24;
+  font-weight: 600;
+  letter-spacing: -.01em;
+}
+.meet__ch--note p {
+  margin: 0;
+  font-size: 38px;
+  line-height: 1.4;
+  color: var(--nes-muted);
+}
+
+.meet__ch--task { padding: 46px 36px; gap: 30px; }
+.meet__ch--task h4 { margin: 0; font-size: 44px; font-weight: 600; letter-spacing: -.01em; }
+.meet__ch-row {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  font-size: 30px;
+  white-space: nowrap;
+  color: var(--nes-muted);
+}
+.meet__ch-tick {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 4px solid var(--nes-tan);
+}
+.meet__ch-row.is-done .meet__ch-tick { background: var(--nes-blue); border-color: var(--nes-blue); }
+.meet__ch-row.is-done span { text-decoration: line-through; color: var(--nes-tan); }
+
+/* ---------- hero 末屏那支片子 → 小鸟的头（页面级接力层） ----------
+   🔴 fixed，且挂在 body 上，不在任何一个段落里——两个舞台都
+   overflow:hidden（.hero__stage / .meet__sticky），装进去就飞不出来。
+   位置/尺寸/圆角全部由 meet.js 每帧写，这里只定死"它是什么"。
+
+   🔴 圆角由 JS 写成百分比而不是 px：JS 同时在改 width/height，px 圆角在
+   缩到小鸟大小时会变成一个几乎方的小块；百分比跟着盒子走，3.3%（对齐
+   hero 的 border-radius: 24px / 720）一路补间到 50% 就是正圆。
+
+   z-index 40：要盖住 meet 的舞台（它是不透明的），又要让 .site-header
+   （52）压在它上面。 */
+.film-relay {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  z-index: 40;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, width, height, border-radius, opacity;
+}
+/* 🔴 手机上整个不画——理由全文在 meet.js 的 RELAY_OFF 那段：deck 横过来之后
+   接力的起点（「hero 末屏那个满屏的 film」）不存在了。
+
+   那边把 relay 置 null 就已经不写任何 inline style 了，这条是**兜底**：这个
+   元素的可见性全靠 JS 写的行内 width/height/opacity，谁哪天在别处又碰了它
+   （或者读者身上还留着改动前那一次写进去的 575×575），display:none 都盖得住。
+   两处是一对，改断点要一起改。 */
+@media (max-width: 767px) {
+  .film-relay { display: none; }
+}
+.film-relay__v {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ---------- Nestie 本体 ---------- */
+/* 🔴 405 = 画布正中。开场这一拍只有小鸟和它的气泡，所以它站正中（豆包
+   about 页同款构图）；五个词是它退场之后的事，两者不同框，不会打架。
+   接力那支片子也落在这个点上（meet.js 的 BIRD）。 */
+.meet__bird {
+  position: absolute;
+  left: 720px;              /* 要和 meet.js 里的 BIRD 常量一致 */
+  top: 405px;               /* 改这里必须同步改 meet.js 的 BIRD.y */
+  width: 158px;
+  height: 158px;
+  margin: -79px 0 0 -79px;
+  opacity: 0;
+}
+.meet__bird-c { width: 100%; height: 100%; display: block; }
+
+/* 每个词一只鸟，五张叠在同一个位置上交叉淡化——谁亮由 meet.js 按词的进度写。
+   🔴 contain 不是 cover：这几张不是头像，是"小鸟在做那件事"的全身图，带着
+   纸、铅笔、日历这些道具，比例也各不相同（1.000 / 1.041 / 0.994…）。cover
+   会把道具裁掉，而道具正是这五张之间唯一的区别。
+   🔴 定位盒沿用 .meet__bird 的 158 见方，所以这五张和 Rive 那只共用同一个
+   落点——换鸟不会挪位置。
+
+   🔴 --bs 是**每张自己的**放大倍数，由 meet.js 逐张写，值是量出来的（见
+   BIRD_PICS 的注释）。目标只有一个：让六张 PNG 和 Rive 那只的**头**一样大。
+
+   走过一版统一的 scale(1.25)，那是错的。当时的推理是"补 SINK 那一下 0.74
+   的收缩"，方向就不对——Rive 和 PNG 在同一个容器里，SINK 缩的是容器，两边
+   一起缩，根本不需要补。真正对不上的是**头在各自图里的占比**：
+
+     Rive 那只            头占容器 67.2%
+     六张 PNG             头占长边 62.2% ~ 65.3%
+
+   差这 5% 就够看见了：换鸟时两只同一张脸、不同大小叠着淡入淡出，读起来
+   就是一层幻影（用户 2026-08-29："它们是一样的图片，只是一个静态一个动态
+   ……把它们量的一模一样大，就不会让我看到这个幻影"）。1.25 反而把差距从
+   5% 拉到 16%，幻影更明显。
+
+   ⚠️ 换任何一张鸟图都要重量 --bs，别沿用旧值——道具画多画少会改变头的占比。 */
+.meet__bird-p {
+  position: absolute;
+  left: 0; top: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transform: scale(var(--bs, 1.07));
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---------- 小鸟的气泡 ----------
+   🔴 整句用 logo 的脸（Baloo Chettan 2）。字距 -.01em 抄 device.css 的
+   .dv__hero-name——全站标题那套 -.03em 会把 Baloo 收成一个商标。字号 27 不
+   再大：Baloo 的 cap height 占比大，同号数下比 Google Sans 明显更粗更满。
+   只有 "Nestie" 是品牌蓝（.meet__brand），其余留墨色——名字才是要被记住的
+   那个词，整句都蓝就没有重音了。蓝字白底 3.11:1，正文尺寸不合规，但这里是
+   27px Baloo 600，属 WCAG large text（≥18.66px bold），门槛 3:1，过。
+   **别照抄到小字上。**
+
+   🔴 圆角 18。走过 999（整颗胶囊，读成一枚标签）→ 30（还是偏圆）→ 18。
+
+   🔴 顶在小鸟头上、水平居中于它，translateX(-50%) 从中心往两边长，文案变长
+   仍然对称。top 242。
+
+   🔴 尾巴是**两颗圆**，不是一颗也不是尖角（对照豆包 about 页）：
+     ::before 22px 往上压进气泡 10px —— 和气泡**融成一体**，只在下沿留一段弧，
+              这就是"另一个气泡融在对话框里"的那颗；
+     ::after  11px 再往下，是脱开的那颗小的。
+   两颗都往**右**偏，且大的在小的**外侧**（中线 +42 / +29.5，用户 2026-08-28
+   定；试过大的在内侧被否）。正下方对齐会读成"一个居中的装饰点"。
+
+   🔴 位移由 meet.js 每帧写（进场的 10px 上浮 + SINK 时跟小鸟一起上飞 156），
+   这里只定死静态形态。 */
+.meet__bubble {
+  position: absolute;
+  left: 720px;
+  top: 242px;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 16px 32px;
+  border-radius: 18px;
+  background: var(--nes-white);
+  box-shadow: 0 10px 26px rgba(26, 26, 26, .07);
+  font-family: "Baloo Chettan 2", var(--font--primary);
+  font-size: 27px;
+  font-weight: 600;
+  letter-spacing: -.01em;
+  line-height: 1.25;
+  white-space: nowrap;
+  color: var(--nes-ink);
+  opacity: 0;
+  will-change: opacity, transform;
+}
+
+/* 只给名字上色；字体不写在这里，整句已经是 Baloo 了 */
+.meet__brand { color: var(--nes-blue); }
+
+.meet__bubble::before,
+.meet__bubble::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  border-radius: 50%;
+  background: var(--nes-white);
+}
+.meet__bubble::before { width: 22px; height: 22px; margin-left: 31px; bottom: -10px; }
+.meet__bubble::after  { width: 11px; height: 11px; margin-left: 24px; bottom: -26px; }
+
+/* ---------- 中间文案 ---------- */
+/* 🔴 顶对齐，因为小鸟站在这叠词的**上面**（用户 2026-08-28）。词是往下加的，
+   顶对齐让这叠的顶恒定，小鸟的落点也就恒定；反过来底对齐会让整叠随词数往上
+   顶，把小鸟一路挤走。（上一版小鸟在底下，那时用的正是底对齐，同一个理由的
+   镜像——谁在下面就锚哪一边。）
+
+   🔴 这里的排布**不能按盒子算**，按盒子算两次都会偏（用户 2026-08-28：
+   「字离鸟头那么远干嘛？偏离画面中心太多」）。两个盒子都比看得见的东西大：
+
+     · 小鸟盒 158，但落位时 meet.js 给它 scale(0.74) —— **看得见的只有 117**，
+       上下各多出 20 的空气。
+     · 词块盒 272.5，但 47px 字配 1.16 行高，首行上方与末行下方各有约 8 的
+       行距 —— **看得见的字形只有 256.5**。
+
+   所以按盒子配的「空当 40」实际看着像 61，收到 14 也还有 42。下面这组数
+   直接按**看得见的高度**配：117 + 空当 14 + 256.5 = 387.5。
+
+   🔴 但整组不是钉在几何正中，是钉在 **365**（画布高的 45%），比正中 405
+   高 40（用户 2026-08-28：「整体上移一点」）。几何居中和看着居中不是一回事
+   ——一块字压在正中会显得往下坠，视觉重心本来就该略高于几何中心，45% 是
+   排版上惯用的那一档。40 是从 405 到 365 的差，改画布高度时按比例走，别当常量。
+
+     小鸟看得见 171..288（中心 229.75，故 meet.js 的落位位移 = 229.75-405 ≈ -175）
+     空当 288..302
+     字形 302..558.5，倒推词块盒顶 = 302 - 8 = 294
+
+   改字号 / 行高 / 词数 / 落位缩放之后，这五个数全要按上面的方式重算一遍：
+   先算三段**看得见**的高度，加起来，居中到 365，再倒推盒子的位置。 */
+.meet__copy {
+  position: absolute;
+  /* 🔴 必须高过 9。meet.js 的 paintCard 给**点亮那张卡**写 z-index: 9，而
+     .meet__cards 是 position:relative 且没有 z-index —— 它不建立层叠上下文，
+     所以那个 9 是直接跟这里比的，不是被关在卡片层内部。DOM 顺序（copy 在
+     cards 之后）本来能让文字在上，但 z-index 9 一写就翻盘了。
+
+     手机上后果是可见的：点亮会把卡放大到近三倍，而窄屏上它就长在词的头上
+     —— 用户 2026-08-30：「remembers 的卡片放大会和 remembers 重叠」。桌面
+     舞台够宽，同一份代码不重叠，所以只在手机上现形。
+
+     10 而不是更大：只要压过那个 9 就够，留出余量给以后真需要盖住文字的东西。 */
+  z-index: 10;
+  left: 50%;
+  top: 294px;
+  bottom: auto;
+  width: 760px;
+  margin-left: -380px;
+  text-align: center;
+  will-change: filter, opacity, transform;
+}
+
+.meet__verbs { display: flex; flex-direction: column; align-items: center; }
+
+.meet__verb {
+  display: block;
+  opacity: 0;
+  font-size: 47px;
+  line-height: 1.16;
+  font-weight: 700;
+  letter-spacing: -.025em;
+  /* 呼应豆包那四行标题图的「白→灰」渐变，这里换成 ink→muted */
+  background: linear-gradient(96deg, var(--nes-ink) 0%, var(--nes-ink) 42%, #8d867a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+/* （这里曾有 .meet__verb i —— 每个词尾一个蓝色句点。用户 2026-08-28 要求去掉，
+   句点连同规则一起删了，不是改成透明：留着一个不上色的 <i> 只会让下一个人
+   以为它还有用。词尾现在什么都不加，和豆包那一页一致。） */
+
+/* ---------- 减弱动效 ----------
+   🔴 段高塌回一屏，JS 直接画成品状态：词都在、卡都清晰、不漂移。
+   不是「隐藏这一段」—— 内容本身是有意义的，只是不再用滚动去演它。 */
+@media (prefers-reduced-motion: reduce) {
+  .meet { height: 100svh; }
+  .meet__rot { transition: none; }
+}
+
+/* ---------- 只在这一段活着时才付合成的钱 ----------
+   🔴 will-change 原来是写死在各个规则里的，等于让合成器为 11 张卡 + 场景 +
+   文案 + 小鸟**长期**各留一层——这一页有 46 屏，读者在别处时这些层还占着
+   显存和合成预算。meet.js 的 IntersectionObserver 进出视野时挂/摘 .is-live，
+   动的时候才提升，不动就交还。 */
+.meet.is-live .meet__cards          { will-change: transform, filter; }
+.meet.is-live .meet__card           { will-change: opacity, filter, transform; }
+.meet.is-live .meet__card .meet__face { will-change: transform, opacity; }
+.meet.is-live .meet__bird           { will-change: transform, opacity, filter; }
+.meet.is-live .meet__copy           { will-change: filter, opacity, transform; }
+.meet.is-live .meet__verb           { will-change: opacity, transform; }
+
+/* On phones the cards have no perspective or blur. Flatten their nested
+   surfaces and let the browser choose card layers instead of forcing all
+   twelve full-sized cards and their images into separate backing stores. */
+@media (max-width: 767px) {
+  .meet-intro { margin-top: clamp(5rem, 12svh, 8rem); }
+  .meet-intro__subtext { font-size: clamp(16px, 4.5vw, 20px); }
+  /* A normal section: its stage determines the height, with no sticky
+     hold or surplus scroll track while the timed animation plays. */
+  .meet { height: auto; margin-top: clamp(6rem, 14svh, 8rem); }
+  .meet__sticky { position: relative; }
+  .meet__card,
+  .meet__rot { transform-style: flat; }
+  .meet.is-live .meet__cards,
+  .meet.is-live .meet__bird,
+  .meet.is-live .meet__copy { will-change: opacity, transform; }
+  .meet.is-live .meet__card,
+  .meet.is-live .meet__card .meet__face { will-change: auto; }
+}
+
+/* ============================================================
+   仅手机（≤767）：这一段在窄屏上整体太小、而且卡片圈是横躺的
+   ============================================================
+   🔴 为什么手机上一切都小：--meet-cover 在窄屏走的是 `fit` 那一支
+   （resize() 里 `Math.max(innerWidth/800, 0.42)`），390 宽的屏上只有
+   0.4875。画布里写 47px 的词，屏上就只有 22.9px；158 见方的小鸟盒，
+   过了 SINK 还要再乘 0.74，屏上只剩 57px。桌面端 fit 远大于 cover，
+   下面这些都不生效。
+
+   🔴 所以这里放大的是**画布里的数**，不是屏上的数——写 68px 是为了
+   68 × 0.4875 ≈ 33px 落到屏上。改 fit 那个 800 会一起改动画的取景，
+   不要拿它当放大手段。 */
+@media (max-width: 767px) {
+  /* 22.9 → 33.2 屏上 px。最长的 Coordinates 在画布里约 411px 宽，
+     加上 --dx 最大 72，合计 483 × 0.4875 = 235 屏上 px，390 的屏放得下。 */
+  .meet__verb { font-size: 68px; }
+
+  /* 气泡也在 1440px 画布里，390px 手机会被 --meet-cover 缩到约 48.75%。
+     桌面的 27px 到手机上只剩约 13px，因此这里只放大手机的画布字号和盒子，
+     并略微上移，避免变大的气泡盖住鸟头。屏幕上的实际字高约 20px。 */
+  .meet__bubble {
+    top: 195px;
+    padding: 20px 40px;
+    border-radius: 24px;
+    font-size: 42px;
+  }
+  .meet__bubble::before { width: 28px; height: 28px; margin-left: 36px; bottom: -13px; }
+  .meet__bubble::after  { width: 14px; height: 14px; margin-left: 28px; bottom: -31px; }
+
+  /* 57 → 83 屏上 px。改的是盒子而不是 transform：JS 每帧往
+     .meet__bird 的 style.transform 写位移和缩放，写在 CSS 里会被覆盖。
+     margin 必须跟着走一半，否则中心离开 (720,405)，和 meet.js 的 BIRD
+     常量对不上。 */
+  .meet__bird { width: 230px; height: 230px; margin: -115px 0 0 -115px; }
+
+  /* 🔴 卡片圈单独放大 1.45×（2026-09-05，用户：「卡片太小了，没有完全用到满屏
+     的感觉，让它大一点，然后出去一点」）。
+
+     放大的是**卡片这一层**，不是 --meet-cover。上面那段注释警告过「改 fit 那个
+     800 会一起改动画的取景，不要拿它当放大手段」——它说得对，而且还不止取景：
+     cover 是整个画布的缩放，抬它会把词和小鸟一起放大，那两样上面刚按屏上 px
+     调过（33 / 83），得再反向补两次。只缩放 .meet__cards 就没有这些连带：
+     词、小鸟、气泡都在它外面，一个像素不动。
+
+     1.45 同时买到了用户要的两件事——卡片本身变大，圈的半径也跟着变大，所以
+     它们往外推、开始从屏幕边上出去。390×844 实测：卡片圈的可见宽度从 702 到
+     1018px，屏幕两侧都被卡片压住了。
+
+     transform-origin 必须是中心：JS 的环形布局是围绕画布中心 (720,405) 算的
+     （meet.js 的 ringLayout / BIRD 常量），从别处缩放会让圈心离开小鸟。
+     ⚠️ 不要写成 zoom：zoom 会改变布局尺寸，ringLayout 每帧读的几何就跟着变。 */
+  .meet__cards { transform: scale(1.45); transform-origin: 720px 405px; }
+}
+
+/* ============================================================
+   自动播的进度条（仅手机）
+   ============================================================
+   🔴 只在手机上有，因为只有手机是自动播的（meet.js 的 PHONE_W 分支）。
+   桌面由手滑驱动，浏览器自己的滚动条就是进度指示，再加一条是重复。
+
+   它的作用是**告诉读者还要等多久**——自动播最怕的就是「不知道它在放、
+   也不知道什么时候完」，于是有人干等、有人过早划走。它不拦任何东西：
+   pointer-events: none，随时可以划过去。
+
+   视觉沿用 hero 那条轨道的语言（同样的胶囊、同样的 currentColor 22%），
+   这样一页之内只有一种「进度」的样子。 */
+.meet__prog {
+  display: none;
+  position: absolute;
+  left: 50%;
+  bottom: max(20px, 4svh);
+  transform: translateX(-50%);
+  width: 76px;
+  height: 8px;
+  border-radius: 1000px;
+  background: color-mix(in srgb, currentColor 22%, transparent);
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 6;
+  /* 播完之后自己淡掉——留着一条填满的进度条只是噪音 */
+  transition: opacity .45s ease;
+}
+.meet__prog > i {
+  display: block;
+  height: 100%;
+  width: var(--fill, 0%);
+  background: currentColor;
+  border-radius: 1000px;
+}
+/* 🔴 这条 76×8 的胶囊交给共用的底部进度条了（pbar.css/js）。规则留着不删：
+   meet.js 仍然在写它的宽度和透明度，那段代码是活的，只是不再显示——共用条
+   出问题时把这一行改回 block 就能立刻退回来。 */
+@media (max-width: 767px) { .meet__prog { display: none; } }
+
+/* ============================================================
+   播完就交还（仅手机）
+   ============================================================
+   🔴 二分定位的结果（用户 2026-08-30）：
+       ?off=cards  仍崩   → 卡片无罪
+       ?off=hub    不崩
+       ?off=meet   不崩
+   两段**单独关掉哪个都不崩**，所以崩溃需要它们同时在场——不是谁太重，是
+   接缝处两份资源叠在一起超了预算。
+
+   meet 的 IntersectionObserver 用 rootMargin: 150%，滚过去之后还会保持
+   live 一屏半（.is-live 给 22 个元素挂 will-change、rAF 继续跑），正好和
+   hub 的启动重叠。
+
+   content-visibility: hidden 让浏览器整棵子树跳过渲染，合成层与纹理一并
+   交还；它只是跳过渲染、不销毁 DOM，所以往回滚时撤掉这个 class 就立刻回来。
+   （同一手法在 hub 的 iframe 上用过，实测能把渲染降到 0。）
+   桌面不加：那边两段本来就重叠着演，而且显存有余量。 */
+@media (max-width: 767px) {
+  .meet.is-spent .meet__scene { content-visibility: hidden; }
+}
+
+/* ============================================================
+   🔴 手机的「点选」态（2026-09-05）—— 见 meet.js 里 TAP 那一段。
+   只在 max-width:767px 里，桌面一个像素不动（桌面的交互是 hover 放大）。 */
+@media (max-width: 767px) {
+  .meet__verb {
+    /* 它现在是可点的：给一点点击余量，但**不要**加 touch-action:none——
+       这五个词占了屏幕中段，拦掉手势读者就滑不下去了。 */
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    padding: .06em .1em;
+    margin: -.06em -.1em;
+    transition: opacity .2s ease, color .2s ease;
+  }
+  /* （这里曾是「没被选中的那几个退到 55%」的减淡。2026-09-05 加了「被点亮的
+     词变品牌蓝」之后它就多余了——蓝色已经把"现在是哪个"说清楚，再压暗其余四
+     个只是让整块变脏。而且两者会打架：减淡走 CSS、变蓝走 JS 的 inline color，
+     inline 永远赢，所以减淡在被点中的那一帧根本不生效。已删。） */
+  /* 键盘可达（role=button + tabindex 在 JS 里挂的），焦点圈别丢 */
+  .meet__verb:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; border-radius: 4px; }
+}

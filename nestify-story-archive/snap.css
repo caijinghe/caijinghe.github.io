@@ -1,0 +1,31 @@
+/* ============================================================
+   snap.css — 按拍吸附（仅手机），配 snap.js
+   ============================================================ */
+
+@media (max-width: 767px) {
+  /* 🔴 proximity，不是 mandatory —— 见 snap.js 顶部。整页 44 屏，强制吸附会把
+     想快速划过去的读者每一拍拽一下。 */
+  html { scroll-snap-type: y proximity; }
+
+  /* 🔴 锚点必须真的占一点高度。0 高的元素在部分引擎里不产生吸附位置；1px 在
+     44 屏的页面里不会影响任何布局（它还是 absolute，不进流）。 */
+  .snap-pt {
+    position: absolute;
+    left: 0;
+    width: 1px;
+    height: 1px;
+    pointer-events: none;
+    visibility: hidden;
+    /* start：让锚点的上边缘对齐视口上边缘。段落都是 sticky 舞台，视口顶边
+       就是舞台顶边，所以「对齐顶边」== 「这一拍正好演完的那一帧」。 */
+    scroll-snap-align: start;
+    /* 🔴 别让吸附把读者钉死在某一拍上出不去。normal 允许在这一点上停留，
+       但不阻止继续滚——配合 proximity 才是「有阻力」而不是「有栅栏」。 */
+    scroll-snap-stop: normal;
+  }
+
+  /* 🔴 减弱动效时整套关掉：吸附本身就是一次非用户发起的位移。 */
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-snap-type: none; }
+  }
+}

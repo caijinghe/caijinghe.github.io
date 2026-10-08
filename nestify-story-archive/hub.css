@@ -1,0 +1,3940 @@
+/* ============================================================
+   FAMILY HUB — section 05.
+
+   One device, four things it does, then it goes to the wall.
+
+   The pad is the SAME element throughout — the four scenes cross-fade
+   inside its screen while the frame never moves, so it reads as a
+   screen changing rather than as four pictures of a screen. At the end
+   it docks: it does not shrink on the scroll the way the intro's film
+   does, it steps down in one eased move, because a device being hung
+   up is an event, not a scrub.
+
+   🔴 The stage is a FLEX COLUMN, not three absolutely-positioned
+   layers. The heading, the pad and the caption all size off their own
+   content — the heading wraps to two lines on a phone, the
+   caption at 2.3vw — so stacking them by hand means picking a top
+   offset that is wrong at some width. In a column they simply cannot
+   collide, and the pad's clamp below is what gives way.
+
+   Everything inside the screen is sized in `em` off one root on
+   .hub__screen, so the whole UI scales with the viewport as a unit and
+   nothing has to be re-tuned per breakpoint.
+   ============================================================ */
+
+.hub {
+  position: relative;
+  /* 🔴 720svh, up from 620 — and the extra 100 is ALL tail. The section
+     used to end 31svh after the button appeared, so the finished picture —
+     device on the wall, line above it, pill under it — was on screen for
+     about a third of a flick and then gone. That is the one view the whole
+     scene has been building, and it was the shortest.
+
+     The phase marks in hub.js are re-anchored against the new range so
+     every beat BEFORE the dock still costs the same scroll it always did
+     (measured in svh, not in p: 115 / 105 / 93 / 84 for the four scenes,
+     74 to the thesis, 19 to the button). Only the hold at the end grows,
+     31svh → 130svh. The resistance is bought with distance, exactly the
+     way the hero deck buys it — see --slide-span in hero.css. */
+  /* 🔴 925svh, up from 720, and the extra 205 is ALL resistance before the
+     dock. Measured on the eight-beat version: the pre-dock run was 397svh
+     split five ways, which left `rewards` 48svh — half a screen, less than
+     one flick, so it went past before it was read. Every stage is at least
+     90svh now and the pre-dock run is 600.
+
+     Nothing after the dock moves: the phase marks in hub.js are re-anchored
+     against the new range so the thesis still arrives 74svh after the dock,
+     the button 19svh after that, and the finished view still holds for
+     ~130svh. The arithmetic is written out where those constants are.
+
+     Same trade the section has always made, and the one the hero deck makes
+     with --slide-span: resistance is bought with distance. */
+  /* 🔴 1050svh, up from 925, and the extra 125 is ALL for the wall. The
+     three rooms behind the docked device came off a 2800ms interval and
+     onto the scroll, which means they now cost distance instead of time —
+     and the last of them is deliberately the longest so a single flick
+     cannot cross it. Pre-dock is untouched at 600svh and so is everything
+     up to the button; ROOM_AT in hub.js has the split. */
+  /* 🔴 1235svh, up from 1050, and this 185 is damping for the two beats
+     that fly cards in. Their run had been shorter than one macOS flick
+     (108svh against ~100), so the sequence inside it — pad, then scraps,
+     then flight — could not be paced at any ratio: one gesture crossed the
+     whole thing. calendar and lists are now 240 and 230svh, everything
+     after the dock is untouched, and the arithmetic is written out at the
+     anchors in hub.js. Same trade as always: bought with distance. */
+  /* demo 本身 1235svh + 入场期。入场期长度由 meet.js 算出来发布成
+     --hub-overlap（见那边的注释），这里只做加法；回退值 330svh 是当前
+     参数下的实测值，仅用于 meet.js 还没跑的第一帧。 */
+  /* 1235 → 1458svh：三间房各加长了（见 hub.js 的 ROOM_AT，+223）。range 是
+     本值减去舞台自己那 100svh，1458 - 100 = 1358，与那边的换算对得上。 */
+  /* 🔴 2026-09-03 改版：1613 → 1813svh，多出来的 200 全是**前奏**——新顺序
+     里这一段以「房间 1 + 挂墙的模型」开场，走完前奏才脱墙飞进 app。
+     换算见 hub.js 的 PRO_SVH 与 progress() 里的重映射；那边按 px 现算，
+     所以改这个数不需要同步改那边。 */
+  /* 🔴 2026-09-03 改版：`+ var(--hub-overlap)` 与配套的负 margin-top 一起去掉了。
+     那套是「咬进 meet 末尾 1.5 屏，让 pad 从那片模糊里长出来」的入场期，而
+     hub 现在排在 meet **前面**——`--hub-overlap` 由 meet.js 发布，hub 读到的
+     只会是回退值 330svh，于是整段往上平移 3.3 屏、咬进 intro 里。
+     实测（改前）：intro 高 6075，而 hub.offsetTop = 1305。 */
+  /* 1813 → 1613svh：前奏那 200svh 随 hub.js 的 PRO_SVH → 0 一起去掉
+     （挂墙这一幕已经移到 intro 的原地转场里演）。
+     🔴 1613 → 1713svh：PRO_SVH 又从 0 调到 **1**，这 100svh 就是那一屏前奏。
+     不是把挂墙重演一遍——转场那一幕是动画，这一屏是定格，用来吃掉脱墙的
+     突兀（实测不加时 pad 在 80px 滚动内从 325px 弹到 879px）。理由全文见
+     hub.js 的 PRO_SVH。两个数必须一起改，否则前奏是从巡览里挖走的。 */
+  /* 🔴 1713 → 1472 → **1713svh**（2026-09-04 当天来回一次）。段高必须跟着
+     hub.js 的拍数走，否则每拍的像素长度会变。
+
+     算法：拍长 = range × DOCK × (w / weightSum)。删掉第 0 拍时 weightSum
+     940 → 800，range 要乘 .851 抵消（1613 × .851 = 1372，+ 前奏 100 = 1472）；
+     加回来就反向走回 1613 + 100 = 1713。
+
+     ⚠️ 改 beats 数组必须回来同步这个数，两处不同步的表现是「某几拍突然变慢」，
+     而且很难反查到是段高的问题。
+
+     🔴 1713 → 1185svh（2026-09-05，用户：「需要 scroll 的 space 太多了，短一点
+     会 feel cleaner，like from image 1 to image 2」——两张图是前奏那句和第 0 拍
+     "Everything that matters today."）。
+
+     按上面那个「正片 + 前奏」的分解来切，不是拍脑袋改总数：
+       正片 1613 → 1130svh（−30%，五拍等比缩短，权重 140/240/230/160/170 不动，
+                            所以拍与拍的相对节奏一个字没变）
+       前奏  100 →   55svh（hub.js 的 PRO_SVH 1 → 0.55，两处必须同步，见那边）
+       合计            1185svh
+
+     1440×900 实测（改前 → 改后）：
+       前奏          1.44 → 0.88 屏
+       第 0 拍       1.33 → 0.93 屏
+       第 1 拍       2.44 → 1.71 屏
+       整段         17.13 → 11.85 屏
+
+     ⚠️ 不要靠「把 DOCK / CTA_AT 往后推」来省尾巴。那两个是分数，推它们等于把
+     五拍压得更短去换尾巴，而尾巴那几屏正是停靠态换墙用的。要单独动尾巴只能
+     再减总高。 */
+  height: 1185svh;
+  /* 🔴 咬进上一段 1.5 屏，pad 才是"从那片模糊里出来"而不是"滑下来出现"。
+     算过的：meet 的飞越跑在它自己的 S 3.64→4.64，而 4.64 正是 meet 的舞台
+     解除钉住的那一刻（sectionH - stageH）。所以卡片糊完消失的同时 meet 就
+     开始滚走，而 hub 的顶还在下方整整一屏——中间那一屏是**两块空舞台交错**，
+     什么都没有。pad 无论怎么淡入都只能在这一屏之后才开始，读起来必然是
+     "滑下来才出现"。
+     🔴 -200svh，不是 -150。判据不是"重叠多少好看"，是**舞台必须在 pad 可能
+     可见之前就已经钉住**。-150 时实测：pad 在 y=22425 就到了 op 0.081，而
+     那时 hub 舞台还在 y=201——于是它一边淡入一边从 padY 417 滑到 216，
+     整整 200px 的可见位移。这就是"还是从底部滑出来"的手感来源，跟淡入怎么
+     调都没关系。
+     飞越最早可能开始的位置是 meet 的 S=FLY_A=3.64（阻尼只会让它更晚，不会
+     更早），meet 段总长 5.64 屏，所以 5.64 − 3.64 = 2.0 屏是**下界**；取 210
+     留一点余量。
+
+     🔴 配套必须 background: transparent。hub 在 DOM 里排在 meet 后面，
+     不透明的话这一屏半会把还在飞的卡片整片盖住，重叠就白搭了。视觉上零
+     差别——底下就是 .meet__stage / body，都是同一个 --page-bg（meet 的
+     渐变底 2026-08-28 已去掉，这条才成立）。 */
+  margin-top: 0;   /* 见上：入场期随 meet 一起挪走了 */
+  background: transparent;
+  color: var(--nes-ink);
+}
+
+/* 🔴 手机上短 373svh：三面墙改成时钟驱动后不再占滚动距离（见 hub.js 的
+   syncRooms —— 用户 2026-09-02「One screen 就让它自动滑过去吧」）。
+
+   1240 = 舞台 100 + pre-dock 940 + 停靠尾巴 200。hub.js 里 DOCK / THESIS_AT /
+   CTA_AT / HEAD_IN / EXIT_P 都按同一个 range 换算过（PHONE_R 那一支），所以
+   dock 仍在 940svh、thesis 仍在 dock 后 74 —— **画面节奏两边完全一样**，
+   手机只是在停靠之后少了 373svh 的空滚。 */
+@media (max-width: 767px) {
+  .hub { height: calc(1240svh + var(--hub-overlap, 0svh)); }
+}
+
+/* 🔴 整个舞台受 --meet-fly 管，不是只管 pad。hub 现在压着 meet 重叠 2.1 屏，
+   往回滚时两段同时在屏——只管 pad 的话，hub 的**其它**东西（房间底图
+   .hub__glow、上一拍残留的标题行、caption）会浮在正在回来的 meet 内容上面。
+   实测 p=0.011 往回滚那一帧：房间底图满不透明铺满屏，"The household,
+   handled together." 还挂在顶上，底下透出 meet 的词和卡片。
+   demo 全程 --meet-fly 恒为 1（meet 早滚过去了，setFly(1)），所以这条只在
+   入场/退场那两小段起作用，不会动到 demo 本身。 */
+.hub__stage {
+  opacity: 1;   /* 见 .hub__wrap 上那段长注释：--meet-fly 随 meet 挪到 hub 后面已失效 */
+  position: sticky; top: 0;
+  /* dvh —— 跟 meet 那两层同一个理由（见 meet.css .meet__sticky 的注释）：
+     svh 是「工具栏展开时」的高度，iOS 上工具栏一收可视区变高，这块不透明的
+     舞台还是原来那么高，底下就露出一条没铺到的地。用户 2026-08-30：
+     「one screen 那里背景没有满屏」。 */
+  height: 100svh;
+  height: 100dvh;
+  min-height: 640px;
+  overflow: hidden;
+  isolation: isolate;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  /* 🔴 Near-symmetric, and it has to stay that way: this padding is what
+     the DEMO composition centres in — title, device, caption — and that one
+     is composed against the window, because for most of the section there
+     is no room behind it, only the page's own ground.
+
+     It is NOT the lever for the docked view. I briefly made the foot 15svh
+     to lift the device off the new room photo's shelving, which worked and
+     tipped the demo visibly top-heavy — the two states share this box but
+     want different centres, so one padding cannot serve both. The docked
+     view has three levers of its own (--dock-y on the pad, `top` on the
+     thesis, and the button riding --pad-bot); they are where that lift
+     lives now.
+
+     🔴 3 / 8 rather than 6 / 5, and it IS the demo's lever — which is what
+     the paragraph above says it is for. What it fixes: a flex column
+     centres the WHOLE GROUP, and the group is a light line, a gap and a
+     537px frame, so centring it leaves the FRAME low. Measured at
+     1440×900: frame centre 524.5 against a window centre of 450, i.e. 75px
+     down the screen, which is exactly the "屏幕偏下" — the group was
+     centred and the mass inside it was not.
+
+     Moving 3svh from the head to the foot lifts the whole column by 3svh
+     and takes 27px of that back. The rest cannot be had here: the frame is
+     60% of the window's height and the title needs a band of its own above
+     it, so pulling the frame the whole way would put the headline under
+     the header bar. Title at ~107 with the bar's condensed edge at 66 is
+     where it stops.
+
+     🔴 5svh of the old spread is not free — the docked device rides this
+     column too, so the lift lands on the wall as well. Half of the head's
+     margin change plus all of this is what --dock-y gives back; see the
+     arithmetic there. */
+  padding: 3svh var(--gutter) 8svh;
+}
+
+/* The room the pad is hung in. It only comes up once the pad is on the
+   wall — before that the pad fills the screen and there is no room to
+   see. There are THREE of them and they cycle: this is level 0, the one
+   with no layer over it, and ::before / ::after carry the other two (see
+   the room block at the foot of this file).
+
+   🔴 这里放的是**最后出现**的那一张，所以是 hub-room-3.webp。
+
+   2026-08-31 起，文件名的 1/2/3 就是**出现顺序**：
+       hub-room-1.webp  第 1 张（餐厅）      ::before
+       hub-room-2.webp  第 2 张（卧室）      ::after
+       hub-room-3.webp  第 3 张（儿童房）    本规则，也就是底层
+   在此之前它们是按**堆叠层**编号的，跟出现顺序（ROOM_ORDER = [1,2,0]）对不上，
+   一天之内换错了三次图（先换成中间那张，再换成第一张，都不是用户要的最后一张）。
+   用户 2026-08-31 要求「按顺序重新命名，不然会搞错」，这就是那次改名。
+
+   ⚠️ 所以现在**不要**再去对照 data-room 的 0/1/2 找文件：那组数字是堆叠层
+   （0 是底、1 和 2 是盖在上面的两层），永远不会等于文件名。要改哪一张，只看
+   它第几个出现，然后改同号的文件。
+
+   三张都是 1672×941，i.e. 16:9。That is WIDER than a typical
+   desktop stage (1440×900 is 1.6), so `cover` scales it to the box HEIGHT
+   and crops the sides — which means the `26%` in background-position is
+   inert on any window wider than 16:9 and only starts doing anything on a
+   very wide one. It is left in for that case. (It was tuned for the old
+   3800×2318 photo, and the note here used to claim the photo was portrait;
+   neither of those has been true for a while.)
+
+   The radial gradient stays underneath as the ground colour: it is what
+   shows if the photo is missing or still loading, and it keeps the edges
+   warm rather than white. */
+.hub__glow {
+  position: absolute; inset: 0; z-index: 0;
+  background-image: url("assets/hub-room-3.webp?v=625"),
+    radial-gradient(72% 58% at 50% 44%,
+      var(--nes-sand) 0%,
+      color-mix(in srgb, var(--nes-tan) 55%, var(--nes-cream)) 100%);
+  background-size: cover, cover;
+  background-position: center 26%, center;   /* see above — vertical only bites past 16:9 */
+  background-repeat: no-repeat, no-repeat;
+  opacity: 0;
+  transition: opacity 1.1s var(--ease-out);
+}
+.hub.is-docked .hub__glow { opacity: 1; }
+
+/* ---------- the copy above the pad ----------
+   ONE SLOT, TWO LINES. The title holds it while the demo plays; the pad
+   docks, the title leaves and the thesis takes the same spot.
+
+   🔴 The fade lives on the two LINES, not on this box. It used to be on
+   .hub__head, which was fine while the head held only the title — but the
+   thesis now shares the slot, and an opacity on the shared parent would
+   take the incoming line out with the outgoing one.
+
+   The thesis is absolute so the slot's height is the title's at all times.
+   In flow it would add its own height above the pad and push the pad down
+   the moment it mounted, which is a layout shift for a line that is not
+   even visible yet. */
+.hub__head {
+  position: relative; z-index: 3;
+  flex: none;
+  /* 🔴 THIS IS THE WHOLE GAP TO THE FRAME, and it is bigger than it looks
+     it should be. The slot is as tall as the TITLE; the thesis is absolute
+     and hangs out of the bottom of it, so in the docked view the space that
+     reads is this margin minus that overhang — which is why it used to be
+     2svh and read as almost nothing above the app.
+
+     🔴 It costs the pad nothing to grow. The stage is a centred flex
+     column, so adding to this pushes the column's top up by half of it and
+     the pad's top down by the other half; the pad keeps its own size at
+     every width. The one thing it does move is the DOCKED device, whose
+     centre rides the pad's layout centre — see --dock-y below, which is
+     re-anchored by half of whatever changes here.
+
+     🔴 6svh, and it has been walked in from both ends. At 5svh the ink
+     sat 35px off the frame under a 64px line — the spacing of a label on
+     a thing rather than of a headline above one, and it read as stuck to
+     the app. At 9svh it was 71px and read as detached. 6svh is 44px,
+     ~0.7× the type size, which is the one that reads as a headline WITH
+     the thing under it. Both ends of that range were looked at on screen;
+     this is the middle, not a first guess.
+
+     🔴 2026-09-04：6svh → **5svh**。用户看过实装后要更近（「网页版这两个之间
+     距离近一点可以吗」）。5 正是上面走过的下限，不是新猜的数——当时判它「读作
+     贴在 app 上」，现在用户要的就是更贴。再往下（4svh 以内）没人在屏幕上看过。
+
+     ⚠️ 改这个数**必须同步改 --dock-y**，按变化量的一半。这一段是居中的 flex
+     列：margin 减 1svh，列顶下移 0.5svh、pad 顶上移 0.5svh，而停靠态那台机器的
+     中心骑在 pad 的布局中心上。所以 --dock-y 从 -10.5svh 走到 -10svh，把这半份
+     补回去——实测停靠态 pad 顶前后都是 286。
+
+     🔴 The ink, not the box: with the leading at 1.14 the box's floor and
+     the letters' floor are ~10px apart, so the margin alone overstates
+     the gap you can see. Measure from the range's client rects. */
+  margin-bottom: 5svh;
+  text-align: center;
+  pointer-events: none;
+}
+/* 🔴 .5s，不是 .8s。这条只管标题整块的**入场**（每一句之间的切换走的是
+   .hub__title-line 上的 --line-out，不受影响）。.8s 配上从 meet 交接过来的
+   那段距离，第一句要一屏多才亮满——用户 2026-08-31：「不要太慢」。 */
+.hub__title {
+  opacity: 0; transform: translateY(14px);
+  transition: opacity .5s ease, transform .5s var(--ease-out-expo);
+}
+/* 🔴 两个类都算数。is-head-lit 由 meet 的飞越进度点亮（见 hub.js），比
+   is-lit 早一整个入场期——第一句要在 hub 的第一屏就在，而不是等读者又滑了
+   三屏。is-lit 留着是因为没有 meet 段时（reduced-motion / meet.js 没跑）
+   __meetFly 是 undefined，那时仍走原路。 */
+.hub.is-lit .hub__title,
+.hub.is-head-lit .hub__title { opacity: 1; transform: none; }
+
+/* 🔴 THE PAD ARRIVES IN PLACE, it is not carried up by the stage.
+   .hub__stage is a sticky 100svh box, so before it pins the whole stage —
+   pad included — slides up from below; the pad was opacity 1 the whole
+   way, which is the "下拉出现" the reader sees (measured: .hub__wrap at
+   y 916 → 666 → 416 → 216 while the stage rose). The title never had this
+   problem because it was already gated on .is-lit. This gates the pad on
+   the same class, so the two arrive together, at rest, in the pinned
+   stage. `p` is 0 exactly when the stage pins (progress() in hub.js), and
+   HEAD_IN is 0.0094 — so "lit" and "pinned" are the same moment.
+
+   🔴 The stage sliding up is itself invisible, and that is why fading the
+   contents is enough rather than restructuring the section: .meet__stage
+   and .hub__stage are both flat --page-bg now (the meet gradient came out
+   2026-08-28), so an empty stage crossing an empty stage has no edge to
+   see. The only thing that ever read as "pulled up" was this pad.
+
+   🔴 OPACITY ONLY — no transform, deliberately. hub.js measures the pad
+   against the stage (`pad.getBoundingClientRect().bottom -
+   stage.getBoundingClientRect().top`); a transform on the wrapper would
+   feed that a shifted number for the length of the entrance. The title
+   can afford its 14px rise because nothing measures the title. */
+.hub__wrap {
+  /* 🔴 跟着 meet 的飞越进度走，不跟自己的滚动位置走。--meet-fly 由 meet.js
+     每帧播（0=卡片还清晰，1=糊到底），所以"卡片糊"和"pad 出现"是同一个数。
+     用 hub 自己的 p 是不行的：meet 的播放头带阻尼且限速，真滚起来落后原始
+     滚动近 1.2 屏——实测 pad 已经亮到 0.1 时卡片 blur 还是 0。
+     缺省 1：meet.js 没跑（reduced-motion / 报错）时 hub 必须可见。
+     没有 transition —— 它现在由滚动驱动，再叠一层过渡只会让它落后于卡片。 */
+  /* 🔴 2026-09-03 改版：恒为 1，不再跟 --meet-fly。
+     上面那段入场（「卡片糊掉飞走 → 同一种材质走回来对上焦」）成立的前提是
+     **meet 排在 hub 前面**。改版后 hub 排在 meet 前面，读者站在 hub 里时
+     meet 的飞越进度是 0，而 meet.js 每帧把 `--meet-fly: 0.000` 写在
+     documentElement 上（meet.js:103）——注释里那句「缺省 1」救不了：变量被
+     显式赋成了 0，回退值只在变量**没被设置**时才生效。
+     后果是 .hub__stage 与 .hub__wrap 的 opacity 全程为 0，整段 hub 不可见。
+     用户实测「intro 之后那儿什么也没有」，我截到的就是一整屏空白的米色。
+
+     deck / meet 哪天搬回 hub 前面，这两处改回 var(--meet-fly, 1) 即可；它们
+     与 hub.css 的 --hub-overlap、hub.js 的 hubOrigin() 是同一个机制的三半。 */
+  opacity: 1;
+  /* 🔴 原地从模糊到清晰，不是单纯淡入：它接的是上一段那批**糊掉飞走**的
+     卡片，同一种材质走回来，读起来才是"同一个世界对上了焦"而不是"另一个
+     东西亮了一下"。16px 是照着 meet 那边飞越末尾的量级给的（cardsEl 收到
+     blur 50px，但那是 1440 画布上的值，这里的 pad 只有 ~980）。
+
+     🔴 filter 会让 .hub__wrap 变成 fixed 后代的包含块 + 新的层叠上下文。
+     两者都无害：hub.css 里 `position: fixed` 0 命中，而这个盒子本来就是
+     `position: relative; z-index: 2`，早就是层叠上下文了。 */
+  /* 🔴 --hub-blur：手机 5px、桌面 16px。它和 meet 的飞越模糊**在同一帧**，
+     而那边三个满视口的模糊已经把合成器的离屏缓冲吃满了（见 meet.js 的
+     FLY_BLUR 注释——用户 2026-08-30 报的整机黑屏要重启就是这么来的）。
+     这一条是压垮那一帧的最后一块，一起降。 */
+  /* 🔴 --hub-blur 默认 0（用户 2026-08-30：入场不要模糊）。原来桌面 16px、
+     手机 5px，现在两端都不糊——hub 只随 --meet-fly 淡入。
+     留着这个变量是为了随时能加回来：给 .hub 设一个非 0 值即可。 */
+  filter: blur(calc((1 - var(--meet-fly, 1)) * var(--hub-blur, 0px)));
+}
+.hub.is-docked .hub__title { opacity: 0; transform: translateY(-10px); }
+/* and it stays gone while the thesis is still clearing out of the shared
+   slot on the way back up — see the note on thesisTl in hub.js */
+.hub.is-slot-busy .hub__title { opacity: 0; transform: translateY(-10px); }
+
+/* one line, allowed to wrap on a phone — the stage is a column, so a
+   second line costs the pad a little height and nothing else. (The two
+   clauses used to be told apart by a roman/italic turn; see the note on
+   `em` in styles.css for why nothing leans any more.) */
+/* 🔴 THE SAME LOCKUP AS .pv__title, to the property. Asked for, and the
+   two headings are the same kind of thing: a drawn mark standing next to
+   a sentence — the padlock there, the wordmark here — where a 400-weight
+   line reads as a caption to the mark rather than as one line with it.
+   Size, leading, weight and tracking are all privacy.css's; if that one
+   moves, move this with it. (--heading--display is the shared clamp, so
+   both headings agree at every width and not just at 1440.)
+
+   🔴 IT IS NOT .hub__thesis'S TYPE, and it was for one turn — matching the
+   line it shares the slot with was asked for, then reverted to this. Worth
+   knowing what the lockup costs, because the argument for the other side
+   is real and will come back: these two are the only lines on the page
+   that occupy THE SAME SPOT, the title while the demo plays and the thesis
+   once the pad docks, never both. At 1440 that swap now goes 64px/600 →
+   64.8px/500 — close enough in size to read as a wobble rather than a
+   contrast, while the weight steps a whole notch. If it ever reads wrong
+   in motion, that is what it is; the fix is one of these two rules taking
+   the other's four properties, and the choice is which relationship the
+   line belongs to more — the mark beside it, or the line that replaces
+   it. This file's answer is the mark. */
+.hub__title {
+  margin: 0;
+  font-family: var(--font--primary);
+  font-size: var(--heading--display);
+  line-height: .92;
+  font-weight: 600;
+  letter-spacing: -.02em;
+  text-wrap: balance;
+}
+
+/* ---------- the five lines share one cell ----------
+   🔴 GRID, not position:absolute. .hub__head's height is this title's, and
+   .hub__thesis is absolute against that — so a title with nothing in flow
+   collapses the slot and drops the thesis onto the pad. Every line takes
+   grid cell 1/1, so the row sizes to the TALLEST of them: the head keeps a
+   single height from the first line to the last, and a phrase that wraps to
+   two lines on a narrow screen does not shove the pad down when it arrives.
+
+   The fade is on the lines and not on .hub__title, because the title's own
+   opacity is already spoken for by .is-lit / .is-docked / .is-slot-busy —
+   putting the swap there would fight the three rules above and the outgoing
+   line would take the incoming one out with it.
+
+   🔴 THEY TAKE TURNS NOW. It was one `transition: opacity .45s` on both
+   states, which meant the line leaving and the line arriving crossed in the
+   middle: for about a fifth of a second two different sentences were on the
+   same pixels at half strength each, which reads as neither. A cross-fade
+   is right for pictures — the hub's own rooms do it — and wrong for type,
+   because type is read, and you cannot read the average of two sentences.
+
+   So the incoming line WAITS. --line-out is the whole of the exit and it is
+   also the incoming line's delay, so the second sentence starts from an
+   empty slot by construction rather than by a number that happens to be
+   large enough today.
+
+   The entrance is the deck's — .hero__mask > span in hero.css, the same
+   inset() wipe on the same expo curve, negative top and bottom so only the
+   RIGHT edge travels and the clip can never touch a descender. Reused
+   rather than reinvented because a reader meets that headline about two
+   screens before this one, and one page should change its mind in one way.
+
+   The exit is NOT the wipe reversed. It is a plain fade, and faster than
+   the wipe would be, because a wipe running backwards reads as a rewind —
+   the sentence un-writing itself — and the clip's own return journey is
+   spent behind an opacity that is already 0. Only the entrance has a
+   direction; leaving is just leaving. */
+.hub__title {
+  display: grid;
+  --line-out: .24s;
+}
+.hub__title-line {
+  grid-area: 1 / 1;
+  opacity: 0;
+  clip-path: inset(-.35em 100% -.35em 0);
+  transition:
+    opacity var(--line-out) ease,
+    clip-path .5s var(--ease-out-expo);
+}
+.hub__title-line.is-on {
+  opacity: 1;
+  clip-path: inset(-.35em 0 -.35em 0);
+  transition:
+    opacity .3s ease var(--line-out),
+    clip-path .62s var(--ease-out-expo) var(--line-out);
+}
+
+/* 🔴 The swap keeps its TURNS, it just stops moving. Reduced motion is not
+   "no change" — the sentence still has to be replaced — so the wipe goes
+   and the two fades stay sequenced, which is the part that was a
+   legibility fix rather than a flourish. */
+@media (prefers-reduced-motion: reduce) {
+  .hub__title-line { clip-path: none; transition: opacity var(--line-out) ease; }
+  .hub__title-line.is-on { clip-path: none; transition: opacity .2s ease var(--line-out); }
+}
+
+/* Typed, exactly as .hub__thesis.is-typed is: hub.js has split all five
+   lines and the GLYPHS carry both the arrival and the exit, so the lines
+   themselves must sit still and fully opaque or the two animations
+   multiply. Only set when the split actually happened, which leaves
+   everything above as the no-GSAP and reduced-motion fallback.
+
+   All five are opaque at once and that is fine — a line that has not been
+   played has every one of its characters at opacity 0, so an "empty" slot
+   is genuinely empty. */
+.hub__title.is-typed .hub__title-line {
+  opacity: 1;
+  clip-path: none;
+  transition: none;
+}
+/* the glyph boxes SplitText leaves behind, so a rise cannot be clipped by
+   the line box it rises into */
+.hub__title.is-typed .ch { display: inline-block; will-change: transform, opacity; }
+/* 🔴 手机上收掉这条 will-change。它命中的是 SplitText 拆出来的**每一个字**
+   ——实测 137 个，而 will-change 的作用就是强制合成器为元素**预先建一层**。
+   137 个字 = 137 张 GPU 纹理；连同 hub 其余的，整页合成层 224 个、按 DPR 3
+   估算约 104MB 纹理。这是 meet 播完进 hub 时页面崩溃（「A problem repeatedly
+   occurred」）剩下的最大一块。
+
+   去掉只是去掉一个**提示**：GSAP 照常动画，浏览器改为在需要时才提层。
+   桌面保留——那边显存宽裕，预先提层换来的是更稳的帧。 */
+@media (max-width: 767px) {
+  .hub__title.is-typed .ch { will-change: auto; }
+}
+
+/* ---------- the brand word is the LOGO, not the word ----------
+   🔴 Sized and seated in em, so it rides the clamp() above it: the height
+   is the cap height of this line and the -.1em drops it by the share of
+   the file that is the y's descender (viewBox 42→157, letters bottom out
+   at ~136), which is what puts the logo's baseline on the sentence's own
+   instead of leaving it floating a tenth of a line high.
+
+   The file's letters are drawn in the site's ink and its bead in the brand
+   blue, so an <img> is enough — nothing here needs to recolour it. */
+.hub__title-logo {
+  display: inline-block;
+  height: .74em;
+  width: auto;
+  vertical-align: -.1em;
+}
+
+/* ---------- the device ----------
+   🔴 The bezel is a box-shadow SPREAD, not padding or a border. Padding
+   would shrink the screen when it appears and re-lay-out every row of
+   the UI inside it mid-transition; a spread ring is painted outside the
+   box and costs the layout nothing. It also gets the outer corner right
+   for free — a shadow's outer radius is the border radius plus the
+   spread, which is exactly how a real bezel meets a screen. */
+.hub__wrap {
+  position: relative;
+  z-index: 2;
+  flex: none;
+  /* 🔴 THE PAD'S WIDTH IS DECLARED HERE, on the wrapper, and the pad takes
+     100% of it. It has to be: the pad is an in-flow child of this box, so a
+     width set on the PAD that is larger than this one does not re-centre —
+     it starts at this box's left edge and runs off the right. That is
+     exactly what the phone override used to do (92vw = 359px inside a 328px
+     wrap at 390), and it is why the device sat left of centre with its right
+     edge bled off the screen. Widen the wrapper instead and the pad is
+     centred by the stage's own flex column, at every width. */
+  --pad-w: min(980px, 84vw, 106svh);
+  width: var(--pad-w);
+  /* 🔴 A CALC, NOT `aspect-ratio: 16 / 9`, AND ONLY BECAUSE OF SAFARI. The
+     ratio is the right way to say this and Chrome resolves it exactly:
+     width 954 → height 536.625, which is what .hub__inner is scaled to
+     (1080 × 954/1920). WebKit resolves the SAME declared width to a height
+     of 540.3125 — the ratio taken against 960.56, i.e. against a width from
+     before min() clamped it. The 3.7px it invents is a strip of
+     .hub__screen's own background along the foot of the device, under the
+     app: invisible in Chrome, a pale band in Safari, and the reason this
+     read as "the screen doesn't fill its container".
+
+     Stated as a calc there is no ratio for anyone to resolve — the height
+     is the same expression the width is, so the two cannot disagree. It
+     also survives the phone override at the foot of this file, which
+     redefines --pad-w and would otherwise need a second aspect rule. */
+  height: calc(var(--pad-w) * 9 / 16);
+}
+.hub__pad {
+  position: relative; z-index: 2;
+  width: 100%;
+  height: 100%;
+  transform: translateY(var(--dock-y, 0px)) scale(var(--dock-s, 1));
+  /* 🔴 TINY, NOT REGULAR, and the number is the 3D unit's. --regular is
+     2rem: a card's corner, and on a 950px-wide screen it reads as a soft
+     rectangle rather than as hardware. The housing in nestie-unit.js draws
+     its screen corner at SCREEN_R = 2.2% of the screen's width, which is
+     21px at this pad's widest — --tiny is 20px, i.e. the same corner. That
+     matters beyond taste: the canvas cross-fades onto this box at the dock,
+     and a corner that changes during the fade is the one thing that gives
+     the swap away.
+
+     🔴 So SAY 2.2%, rather than leaving a flat 20px to be right at one
+     width and wrong everywhere else. At 980 the two agree — .022 × 980 =
+     21.6, and --tiny caps it at 20, which is the corner this has always
+     drawn. On a phone --pad-w is 359 and 2.2% is 7.9px, where the flat 20
+     was two and a half times the corner the housing draws next to it. The
+     min() is what keeps the desktop value from growing on a wider pad. */
+  border-radius: min(var(--section-radius--tiny), calc(var(--pad-w) * .022));
+  background: var(--nes-white);
+  /* --bezel-c is the FLAT FALLBACK's rim, and it is read here rather than
+     in a later override so that trimming this file cannot orphan it: the
+     rooms set it (see [data-room] at the foot) and this is the only thing
+     that reads it. 🔴 It is not the device — with WebGL up the ring is
+     never painted at all, because .hub--3d drops it and the housing is the
+     object in hub3d.js. */
+  box-shadow:
+    0 0 0 var(--bezel, 0px) var(--bezel-c, var(--nes-ink)),
+    0 28px 70px -24px color-mix(in srgb, var(--nes-ink) 34%, transparent);
+  transition:
+    transform 1.1s var(--ease-out-quint),
+    box-shadow 1.1s var(--ease-out-quint);
+}
+/* Camera was ours, not jinghe's. Demo has no bezel, so no cam. */
+.hub__cam { display: none; }
+/* 🔴 THE DOCK IS TUNED TO THE PHOTOGRAPH, and the photograph changed. The
+   room's shelving unit is taller than the credenza it replaced and it now
+   has objects standing on it — books, a mug, a clock — so the band of bare
+   wall this whole composition hangs in lost about 90px at 1440×900. At the
+   old .44/-2svh the device's bottom edge came down onto the mug and the
+   pill landed on the shelf front, which reads as a screen PROPPED on the
+   furniture rather than hung above it.
+
+   Smaller and higher, then: the pad clears the objects and the button sits
+   on the wall with them under it.
+
+   🔴 The lift lives HERE and on .hub__thesis's `top`, not on the stage's
+   padding. Padding centres the flex column, and that column is also the
+   demo composition, which is composed against the window rather than
+   against the wall — lifting it there tipped the demo top-heavy to fix the
+   dock. --dock-y is a transform: it moves the docked device and nothing
+   else, and the button follows because it rides the pad's measured rect.
+
+   These numbers are one measurement of the room photo in three places
+   (here, .hub__thesis, .hub__close). Swap the photo and re-check all
+   three against the new shelf line. */
+.hub.is-docked .hub__pad {
+  --dock-s: .37;
+  /* 🔴 -15svh, RE-ANCHORED, not re-tuned by eye. The pad's layout centre
+     is (stage centre + head height / 2) — the pad's own height cancels out
+     of that — so opening .hub__head's margin from 2svh to 5svh and setting
+     the title in the display size moved this device ~17px down the wall
+     for reasons that have nothing to do with the wall. Half of what the
+     head grew, taken back here. The photograph's tuning is unchanged.
+
+     Then the margin went on to 9svh and this took the other half of that:
+     4svh in the head, 2svh back here. It has since settled at 6svh, and
+     the stage's padding moved 3svh from its head to its foot to lift the
+     frame off the bottom of the window — so this number owes back half of
+     the margin's 3svh AND the whole of the padding's 3svh, which is why
+     it is 4.5svh less negative than it was. Verified rather than assumed:
+     the docked pad lands at y=290 at 1440×900, which is where it sat
+     before any of this moved.
+
+     🔴 It was briefly `calc(-15svh - .5vw)`, and that .5vw is worth
+     understanding even though it is gone: the title had also taken
+     .hub__thesis's 1.14 leading, which grew the head by ~15px of LINE BOX
+     on top of the margin. That half does not scale with the window, it
+     scales with the TYPE — 4.5vw through the middle of its clamp — so the
+     correction genuinely needed two units. The lockup was restored, the
+     leading went back to .92, and with it the second term.
+
+     Anything that changes the head's height owes this number half of it,
+     in whatever unit that height was measured in. */
+  /* 🔴 -10svh → -8svh（2026-09-05）。上面那句「凡是改动标题槽高度的，都欠这个
+     数一半」这次是被**字号**触发的，不是外边距：Meet Nestify 从 clamp(…,96px)
+     降到 --heading--display 之后，槽高从 95px 掉到 58.8px（1440×900 实测）——那
+     一句本来是撑起槽高的那一句，其余四句一直只有 58.8。槽矮了 36px，居中的列
+     重排，停靠态机器顶从 308 跑到 290。
+     这 18px（36 的一半）由 --dock-y 还回去，而**不能**去动 .hub__head 的
+     margin-bottom：那条同时定义着巡览四拍的「标题→机器」间距，实测这次改完
+     仍然精确停在用户上一轮定版的 41px，动它就等于替他撤回那次。
+     --dock-y 只作用于 .hub.is-docked .hub__pad，巡览态一个像素都碰不到。 */
+  --dock-y: -8svh;
+  --bezel: 15px;
+  box-shadow:
+    0 0 0 var(--bezel) var(--bezel-c, var(--nes-ink)),
+    0 46px 90px -30px color-mix(in srgb, var(--nes-ink) 55%, transparent);
+}
+
+/* the screen. One font-size here drives the entire UI below it. */
+.hub__screen {
+  position: absolute; inset: 0;
+  display: flex;
+  border-radius: inherit;
+  overflow: hidden;
+  font-family: var(--font--body);
+  font-size: clamp(10px, .97vw, 14px);
+  background: #f5f3ee;
+}
+
+/* 1920×1080 Flutter pad, scaled to the screen box */
+.hub__inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: top left;
+  background: #f5f3ee;
+}
+/* 手机上的替身：静态图铺满那块屏。桌面上它永远不显示（也永远不被赋 src，
+   所以不下载）。object-fit: cover —— 图是 16:9 抓的，.hub__screen 也是
+   16:9（.hub__wrap 的 height 是 width*9/16 算出来的），所以实际不会裁到。 */
+.hub__still {
+  position: absolute;
+  inset: 0;
+  /* 🔴 必须给显式 z-index。它在 DOM 里排在 .hub__inner 后面，按理就该画在上面，
+     但 .hub__inner 里是 **iframe**——iframe 会被提升到自己的合成层，于是压过了
+     后面的普通兄弟。实测：display:block、opacity:1、矩形完全重合，画面上却还是
+     iframe 的内容（用户 2026-09-04：「没看到 working on it 哦」）。
+     手机上一直没露出这个问题，因为那边 iframe 根本不赋 src。 */
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+  border-radius: inherit;
+}
+@media (max-width: 767px) {
+  /* iframe 在手机上根本不会被赋 src（见 hub.js 的 bootHubLazily），
+     这里只是把那个空壳藏掉，免得它参与布局。 */
+  #hub-app { display: none; }
+  .hub__still { display: block; }
+}
+
+/* 🔴 这里曾经想用 .hub__still 那张静态图盖住实时 iframe 来换屏——**没用**，
+   已删。3D 模式下 .hub__screen 整层不参与绘制：实测往里塞一个 z-index:999 的
+   纯红块，画面上一点变化都没有。停靠态的屏幕是 hub3d 画的一张**贴图**
+   （hub3d.js 的 TextureLoader，默认 assets/device/device1.webp）。
+
+   换屏的正确做法是 window.hub3d.setScreen(url)，调用点在 hub.js 的 onScroll。
+   别再往 .hub__still 上想办法。 */
+
+/* 🔴 读者不在这一段时，把 Flutter 的渲染循环整个停掉。
+
+   实测（1440×900，页面停在最顶端，hub 在 40 屏之外）：iframe 里的 CanvasKit
+   **仍以 101–121 fps 满速渲染**，画的是一块 3840×2160 的面（Retina 上
+   1920×1080 的画布 ×DPR2）。读者从进站到滚到这里要走 40 多屏，这段时间它一直
+   在烧 GPU/CPU，而画的东西一帧都不会被看到 —— 这就是「网页里跑了个 Flutter」
+   的实际代价。
+
+   🔴 三种停法只有一种真的停得住，实测：
+     visibility: hidden          → 101 fps（没用）
+     display: none（给 iframe）  → 101 fps（没用）
+     content-visibility: hidden  → **0 fps** ✅
+   而且它只是跳过渲染，不销毁文档：撤掉之后立刻回到 101 fps，Flutter 的状态
+   （当前 tab、动画进度、postMessage 通道）全都还在，不需要重新 boot。 */
+.hub.is-away .hub__inner { content-visibility: hidden; }
+
+.hub__inner iframe {
+  width: 1920px;
+  height: 1080px;
+  border: 0;
+  display: block;
+  background: #f5f3ee;
+}
+/* The dissolve a tab change now goes THROUGH — out first, then in, with the
+   token posted at the seam. See tellToken in hub.js for why this is all we
+   get from outside the iframe, and why it may not touch `transform`
+   (sizePad writes an inline scale() there and an animation would outrank
+   it, snapping the pad to 1:1 for the length of every switch).
+
+   `forwards` on the out half matters: it has to HOLD the pane dim until the
+   in half takes over, or the screen snaps back to full for the one frame
+   between the two classes. */
+.hub__inner.is-tab-out { animation: hub-tab-out .17s var(--ease-out) forwards; }
+.hub__inner.is-tab-in  { animation: hub-tab-in .34s var(--ease-out) both; }
+/* 手机上换 tab 的溶解，走的是同一组 keyframes。
+   🔴 兄弟选择器，因为 .hub__still 是 .hub__inner 的**同级**（见 index.html：
+   iframe 在 .hub__inner 里，静态图在它外面），而 hub.js 只往 .hub__inner 上
+   加类。把类改加到 .hub__screen 会让桌面的 iframe 连着外壳一起淡，所以是选择
+   器迁就 DOM，不是反过来。 */
+.hub__inner.is-tab-out ~ .hub__still { animation: hub-tab-out .17s var(--ease-out) forwards; }
+.hub__inner.is-tab-in  ~ .hub__still { animation: hub-tab-in .34s var(--ease-out) both; }
+@keyframes hub-tab-out {
+  from { opacity: 1;   filter: blur(0);    }
+  to   { opacity: .12; filter: blur(12px); }
+}
+@keyframes hub-tab-in {
+  from { opacity: .12; filter: blur(12px); }
+  to   { opacity: 1;   filter: blur(0);    }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hub__inner.is-tab-out,
+  .hub__inner.is-tab-in,
+  .hub__inner.is-tab-out ~ .hub__still,
+  .hub__inner.is-tab-in ~ .hub__still { animation: none; }
+}
+.hub__catch {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+}
+
+/* Calendar fly-in cards live ON the stage, not on the bezel. */
+.hub__flies {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  pointer-events: none;
+  perspective: 1400px;
+  perspective-origin: 50% 45%;
+  /* 🔴 THE BIRD SHOWS THROUGH. Nestie is painted by the app, inside the
+     iframe, so this layer is unavoidably in front of it — and a landed list
+     card covers the corner it perches in. The hole is cut here rather than
+     out of the card, because it belongs to a place on the SCREEN, not to
+     any one card. hub.js writes the three numbers (see BIRD) and holds the
+     radius at 0 until the cards are down, so this is a no-op — a 2px dot
+     off in the corner — for all of the flight and the whole calendar beat.
+     2px of feather, down from 3: the hole is cut tight to the bird now, so
+     any softness here is width added back to a ring that should not be
+     visible at all. */
+  -webkit-mask-image: radial-gradient(circle at var(--bird-x, -999px) var(--bird-y, -999px),
+    transparent 0 var(--bird-r, 0px), #000 calc(var(--bird-r, 0px) + 2px));
+  mask-image: radial-gradient(circle at var(--bird-x, -999px) var(--bird-y, -999px),
+    transparent 0 var(--bird-r, 0px), #000 calc(var(--bird-r, 0px) + 2px));
+}
+.hub.is-docked .hub__flies { visibility: hidden; }
+/* ---------- the pad's own Nunito, under a name only the hub uses ----------
+   🔴 THE CHIP WAS NEVER RENDERING IN NUNITO. hub.css has asked for
+   `font-family: Nunito` in six places since it was written, but the <link>
+   that fetched it came out of index.html when the page went to one face —
+   see the font note in styles.css. Nothing errored; the declaration just
+   fell through to Google Sans. Meanwhile the pad is a Flutter build that
+   BUNDLES Nunito and paints its cards in it.
+
+   So the handover was a change of TYPEFACE, and that is why matching it by
+   tuning the size never closed: at any one size the two faces agree on
+   width or on height, never both. Four rounds of measurement chasing a
+   residual that was not a size at all.
+
+   🔴 THE FILE IS THE APP'S OWN, not a Google Fonts copy of it. Same bytes
+   the pad rasterises, already in the repo and already served, so the two
+   sides cannot drift apart on a version bump.
+
+   🔴 NAMED `PadNunito`, NOT `Nunito`, and that is deliberate. Registering it
+   as "Nunito" would hand it to every other declaration on the page —
+   device.css and footer.css both ask for it too — and silently restyle two
+   sections nobody asked about. Under its own name it reaches exactly the
+   elements that name it back, which is this file's calendar layer.
+
+   ⚠️ FOUR STATIC CUTS, NOT A VARIABLE FACE. Weights between them snap to
+   the nearest, so the morph's 800 → 400 ramp is a four-step staircase
+   rather than a glide. It reads as continuous at this size and duration;
+   if it ever does not, the fix is a variable Nunito, not more cuts. */
+@font-face {
+  font-family: 'PadNunito';
+  src: url('nestify-hub-web/assets/packages/ui/assets/fonts/Nunito-Regular.ttf') format('truetype');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'PadNunito';
+  src: url('nestify-hub-web/assets/packages/ui/assets/fonts/Nunito-Medium.ttf') format('truetype');
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'PadNunito';
+  src: url('nestify-hub-web/assets/packages/ui/assets/fonts/Nunito-SemiBold.ttf') format('truetype');
+  font-weight: 600; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'PadNunito';
+  src: url('nestify-hub-web/assets/packages/ui/assets/fonts/Nunito-Bold.ttf') format('truetype');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+/* both faces of the crossing, so the morph does not change typeface
+   halfway through either */
+.hub__src .scrap,
+.hub__src .ev {
+  font-family: 'PadNunito', Nunito, var(--font--body), sans-serif;
+}
+
+/* ---------- the cards ride --fly-k ----------
+   🔴 EVERY NUMBER IN HERE WAS A FLAT PX, and they were drawn against a
+   ~950px pad. On a phone the pad is 359 and the cards did not move with it:
+   a 148×158 sticky note came out 38% of the viewport wide and 86% of the
+   PAD's height — the note was nearly as big as the device it was landing
+   on. hub.js sets --fly-k from the pad's real width, so the whole card
+   scales as one object instead of only its width being adjustable from JS.
+
+   It is a floor, not a ratio. Scaled honestly the cards would be 15% of the
+   pad as they are on desktop, which puts this type under 6px; the floor
+   trades some of that proportion back for a card you can still read. */
+/* 🔴 THE EXIT FADE MOVED UP TO THE LAYER, and it had to. Opacity used to be
+   "the one property nothing else is driving", which is what made it the one
+   that could carry the exit on a .38s transition. It is driven now: placeSet
+   writes a per-card opacity every frame for the arrival ramp (see CARD_IN),
+   and a transition on the same property turns a scrub into a chase — the
+   cards would trail the wheel by .38s and never quite reach it.
+
+   So the two are separated by ELEMENT. The card's own opacity is the scrub,
+   with nothing smoothing it; the layer's is the exit, and one fade on the
+   parent is what the whole set leaving looks like anyway. */
+.hub__flies { transition: opacity .38s var(--ease-out); }
+/* the settling beat swaps rather than dissolves — see the note in hub.js */
+.hub__flies.is-cut { transition: none; }
+
+.hub__fly-card {
+  position: absolute;
+  left: 0;
+  top: 0;
+  box-sizing: border-box;
+  border-radius: calc(12px * var(--fly-k, 1)); /* PadRadius.eventCard = NRadius.md */
+  padding: calc(12px * var(--fly-k, 1)) calc(14px * var(--fly-k, 1));
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: calc(8px * var(--fly-k, 1));
+  font-family: Nunito, var(--font--body), sans-serif;
+  transform-origin: center center;
+  will-change: transform;
+  opacity: 1;
+  box-shadow: 0 calc(10px * var(--fly-k, 1)) calc(28px * var(--fly-k, 1)) rgba(28, 25, 23, .16);
+}
+.hub__fly-card .t {
+  /* color: PadEventColor.readableOn(fill, ownerSolid) — set per card */
+  font-size: calc(15px * var(--fly-k, 1));
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: none;
+}
+.hub__fly-card .meta {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: calc(8px * var(--fly-k, 1));
+  min-height: calc(28px * var(--fly-k, 1));
+}
+.hub__fly-card .s {
+  /* color: lerp(title, fill, 0.28) — set per card */
+  font-size: calc(12px * var(--fly-k, 1));
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+.hub__fly-card .avs {
+  display: flex;
+  flex: none;
+  align-items: center;
+  direction: ltr;
+}
+.hub__fly-card .av {
+  flex: none;
+  width: calc(28px * var(--fly-k, 1));
+  height: calc(28px * var(--fly-k, 1));
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  box-shadow: 0 0 0 2px #fff;
+  margin-left: calc(-8px * var(--fly-k, 1));
+}
+.hub__fly-card .av:first-child { margin-left: 0; }
+.hub__fly-card .av-photo {
+  overflow: hidden;
+  background: #e7e5e0;
+  padding: 0;
+}
+.hub__fly-card .av-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.hub__fly-card .av svg {
+  width: calc(15px * var(--fly-k, 1));
+  height: calc(15px * var(--fly-k, 1));
+  display: block;
+}
+.hub__fly-card .av.is-more {
+  background: #fff;
+  color: #1C1917;
+  font-size: calc(11px * var(--fly-k, 1));
+  font-weight: 800;
+  letter-spacing: -.02em;
+}
+/* ---------- a list card becomes the app's own section ----------
+   🔴 EVERY NUMBER IN HERE IS A PAIR, and that is the whole rewrite. It used
+   to be one number per inset, on --fly-k, and the landing was a single
+   scale (`flyK × dest.h/item.h`) pulling our own layout up until it filled
+   the app's box. The box was right and nothing inside it was: no badge, no
+   + / ✏ / ⌃, an avatar 53% oversize at the far right instead of beside the
+   title, a header 14% too tall, rows 17% too tight, a brown title against
+   the app's near-black — a card that landed in the right place looking like
+   a different component. See SEC in hub.js for where the app's half of each
+   pair was measured.
+
+   🔴 --p AND --a ARE THE TWO ENDS OF EVERY SUM BELOW, written once here so
+   that each rule reads `parked * var(--p) + app * var(--a)` and nothing
+   else. This is the same shape the calendar's type uses — see "one type
+   size, two faces" — and it is here for the same reason: two faces of one
+   number, crossed continuously, so there is no frame on which the card is
+   neither thing.
+
+   🔴 ON --m, NOT --lift, AND THAT IS NOT A COPY-PASTE SLIP. The calendar's
+   type had to leave --m because a scrap SHRINKS onto its chip while its box
+   was holding still — type and box moved in opposite phases. A list card
+   does the opposite: it GROWS, 260 → 411 at 1600, and the growth is --m. So
+   putting the insets on --m is what puts them IN phase here. The principle
+   is the phase, not the variable.
+
+   ⚠️ THE PARKED HALVES ARE WHAT MAKE THE HEIGHT LERP EXACT. placeSet writes
+   `item.h + (dest.h - item.h) * m` as the box height while the content
+   height is the sum of these pairs — and because every pair is linear in
+   --m, that sum IS item.h·(1−m) + dest.h·m. The two agree on every frame,
+   which is why nothing clips mid-landing. Add a term that is not of this
+   form and that stops being true. */
+.hub__fly-card.is-list {
+  --p: calc(var(--fly-k, 1) * (1 - var(--m, 0)));
+  --a: calc(var(--to-k, 1) * var(--m, 0));
+  padding: 0;
+  height: auto;
+  border-radius: calc(12px * var(--p) + 16px * var(--a));
+  /* 🔴 THE SHADOW LANDS WITH THE CARD AND THEN GOES. In the air it is a
+     card — it is over the pad, it casts. Once it has become a section it is
+     INSIDE the panel, and the pad's own sections are flat; a section still
+     dropping a 32px shadow onto the panel behind it is the one thing left
+     saying "this is pasted on top". Tied to --m so it lifts exactly as the
+     card takes its place, and comes back if the reader scrolls up out of
+     the landing. (The calendar scraps need no equivalent: .scrap carries
+     their shadow and it fades out with the whole layer.) */
+  box-shadow:
+    0 calc(12px * (1 - var(--m, 0))) calc(32px * (1 - var(--m, 0)))
+    color-mix(in srgb, rgba(28, 25, 23, .16) calc((1 - var(--m, 0)) * 100%), transparent);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  /* 🔴 0, AND IT WAS THE LAST THING WRONG WITH THE BOX. .hub__fly-card sets
+     `gap: 8px * --fly-k` for the meal cards, and a list card is the same
+     flex column — so a 15.7px (app) band of nothing sat between the header
+     and the first row, the whole body rode 15.7 low, and since the card's
+     HEIGHT is written by placeSet the overflow came off the bottom: the
+     19.25 under the last row measured 3.75. Measured against the app: our
+     first row started 99.4 from the card's top where its own starts at
+     83.25. Header and body are butted, and the body's own padding is the
+     only space in here. */
+  gap: 0;
+  overflow: hidden;
+  /* 🔴 'PadNunito' FIRST, and the stack underneath it was not doing what it
+     said. `Nunito` is not loaded by this page — hub.css registers the pad's
+     own .ttf files under the name PadNunito precisely so they do NOT answer
+     to `Nunito` (see the @font-face note) — so this stack resolved to
+     whatever Nunito the reader happens to have installed, and to Google Sans
+     on every machine that has none. Measured here: the same string is 564px
+     wide in `Nunito` and 640px in PadNunito, so the two are not even the
+     same cut. The section it lands beside is rasterised from these exact
+     bytes; now so is the card. */
+  font-family: 'PadNunito', Nunito, var(--font--body), sans-serif;
+}
+/* ---------- the header, and it carries everything from the start ----------
+   🔴 NOTHING IN HERE APPEARS OR DISAPPEARS. The badge and the three icons
+   have no parked counterpart — they are the app's furniture, not a note's —
+   and the obvious thing is to fade them in on the landing. That is the
+   defect the calendar's avatars documented: a row of controls arriving in a
+   box that has been sitting still for half a second reads as a pop, because
+   it is one. They are here at the parked size instead, small, and they grow
+   with everything else. The header is a flex row, so the SPACER takes the
+   difference between 260 parked and 411 landed; no child has to reflow. */
+.hub__fly-card.is-list .hd {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: calc(39px * var(--p) + 67px * var(--a));
+  padding-left: calc(14px * var(--p) + 17px * var(--a));
+  padding-right: calc(12px * var(--p) + 5.25px * var(--a));
+  line-height: 1.15;
+}
+.hub__fly-card.is-list .hd-t {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /* 🔴 600, NOT 700. The old 700 was a guess and it showed: measured stem
+     widths on the two titles at 1920, ours 3.0–3.5px against the app's
+     2.0–2.5 — and about a third of that was the font mix-up above, the rest
+     was the weight. PadNunito has a real 600 cut, so this is a cut and not
+     an interpolation. */
+  font-size: calc(16px * var(--p) + 26.7px * var(--a));
+  font-weight: 600;
+}
+/* done/total. The pill is a 6% ink tint of the band — measured #F2DDAF on
+   #FFEFB8 and #FADEBB on #FFE7BC — and the text is the flat #79736C the app
+   uses for all four pieces of header chrome. */
+.hub__fly-card.is-list .badge {
+  flex: none;
+  display: flex;
+  align-items: center;
+  margin-left: calc(6px * var(--p) + 12.5px * var(--a));
+  height: calc(18px * var(--p) + 31.75px * var(--a));
+  padding: 0 calc(7px * var(--p) + 17px * var(--a));
+  border-radius: calc(9px * var(--p) + 16px * var(--a));
+  font-size: calc(10px * var(--p) + 19px * var(--a));
+  font-weight: 700;
+  background: var(--badge-bg, transparent);
+  color: #79736C;
+}
+.hub__fly-card.is-list .avs {
+  flex: none;
+  margin-left: calc(6px * var(--p) + 12px * var(--a));
+}
+.hub__fly-card.is-list .av {
+  width: calc(22px * var(--p) + 31.75px * var(--a));
+  height: calc(22px * var(--p) + 31.75px * var(--a));
+  /* 🔴 NO STACK AND NO WHITE RING. The base rule overlaps the faces by 8px
+     and puts a 2px white halo round each — right for a row of three on an
+     event chip, wrong here: a section header carries ONE face and the app
+     draws it with a single ring in the person's colour, 31.75 across
+     including that ring. The halo would sit outside it and make the disc
+     read a ring too big. */
+  margin-left: 0;
+  box-shadow: none;
+}
+/* the ring the pad draws round a photo avatar, in the person's own colour —
+   the same rule the calendar chip's faces get, at this header's size */
+.hub__fly-card.is-list .av-photo {
+  background: var(--av-c, #e7e5e0);
+  border: calc(1.5px * var(--p) + 3px * var(--a)) solid var(--av-c, #e7e5e0);
+  box-sizing: border-box;
+  padding: 0;
+}
+.hub__fly-card.is-list .av svg {
+  width: calc(13px * var(--p) + 20px * var(--a));
+  height: calc(13px * var(--p) + 20px * var(--a));
+}
+.hub__fly-card.is-list .sp {
+  flex: 1 1 auto;
+  min-width: calc(6px * var(--p) + 8px * var(--a));
+}
+/* 50px slots, 5.25 from the right edge — which puts the three centres at
+   30.25 / 80.25 / 130.25 from it, against 30.25 / 82.1 / 130.1 measured. */
+.hub__fly-card.is-list .ic {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: calc(19px * var(--p) + 50px * var(--a));
+  height: calc(12px * var(--p) + 21.5px * var(--a));
+  color: #79736C;
+}
+/* 🔴 26, NOT 21.5 — the SLOT is 21.5 tall, the GLYPH is not. Drawn in a 24
+   viewBox these paths only use the middle of it (the plus spans 14 of 24),
+   so at 21.5 they measured 14.75 / 17.5 / 12.75 against the app's 16.75 /
+   21.25 / 14. Scaled to 26 the three land within a px and a half. The slot
+   keeps its own height; the glyph is allowed to be bigger than it because
+   the header row is 67 tall and nothing here is clipped. */
+.hub__fly-card.is-list .ic svg {
+  width: calc(14px * var(--p) + 26px * var(--a));
+  height: calc(14px * var(--p) + 26px * var(--a));
+  display: block;
+}
+/* ---------- the body ----------
+   🔴 THE ROW IS THE CHECKBOX. 35.75 is not a line height, it is the box the
+   app draws, and the text is centred against it — which is why the row has
+   an explicit height rather than growing to its content. It also has to:
+   the height sum in the note at the top of this block only stays linear in
+   --m while every row is a fixed pair. */
+.hub__fly-card.is-list .it {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  padding: calc(8px * var(--p) + 16.75px * var(--a)) 0 calc(12px * var(--p) + 19.25px * var(--a));
+  gap: calc(8px * var(--p) + 16.5px * var(--a));
+  overflow: visible;
+}
+.hub__fly-card.is-list .row {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: calc(16px * var(--p) + 35.75px * var(--a));
+  padding-left: calc(14px * var(--p) + 20px * var(--a));
+  padding-right: calc(10px * var(--p) + 20px * var(--a));
+  gap: calc(8px * var(--p) + 7.5px * var(--a));
+  font-size: calc(13px * var(--p) + 23.9px * var(--a));
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  will-change: transform, opacity;
+}
+.hub__fly-card.is-list .row-t {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* 🔴 --box-c IS MEASURED, not `currentColor` at .7. color-mix(accent 55%,
+   body) lands on #EAC573 against #D99A15 and #FFF9E6, which is the app's
+   own checkbox to the byte. The old rule tinted the ROW's ink, so the box
+   moved every time the ink did and never matched anything. */
+.hub__fly-card.is-list .box {
+  flex: none;
+  width: calc(14px * var(--p) + 36px * var(--a));
+  height: calc(14px * var(--p) + 36px * var(--a));
+  border-radius: calc(3px * var(--p) + 10px * var(--a));
+  border: calc(1.5px * var(--p) + 3px * var(--a)) solid var(--box-c, currentColor);
+  box-sizing: border-box;
+}
+.hub__fly-card.is-list .row.is-done { text-decoration: line-through; }
+
+/* Wispr Flow toast words: Figtree SemiBold on a white capsule. */
+.hub__word {
+  position: absolute;
+  left: 0; top: 0;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  padding: 12px 22px;
+  border-radius: 999px;
+  background: #fff;
+  color: #1A1A1A;
+  font-family: Figtree, "Google Sans", var(--font--primary), sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -.02em;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 10px 24px rgba(26, 26, 26, .14);
+  will-change: transform;
+  pointer-events: none;
+}
+/* Source scraps — sticky / mail / paper / chat. Not Pad event chrome.
+   🔴 THE CLIP MOVED DOWN TO .scrap with the rest of the look. overflow
+   clips DESCENDANTS, and the scrap's drop shadow is now a descendant's —
+   left up here it would cut every sticky note's shadow off at the note's
+   own edge. On .scrap it clips what it should (the note's text, as the box
+   shrinks into a chip) and its shadow still falls outside. */
+.hub__src {
+  position: absolute;
+  left: 0; top: 0;
+  box-sizing: border-box;
+  font-family: Nunito, var(--font--body), sans-serif;
+  will-change: transform;
+  pointer-events: none;
+}
+.hub__fly-card { overflow: hidden; }
+/* ---------- a scrap becomes an event ----------
+   🔴 THE LOOK IS ON .scrap, NOT ON .hub__src. The element itself is now
+   only a box — position, size, and the clip — and the paper it is made of
+   moved one level in, so that the pad's own event chip (.ev) can lie over
+   it and the two can cross-fade. Put the background back on the element and
+   the fade cannot work: .ev would cover the fill but not the SHADOW or the
+   CORNERS, and a sticky note's square drop-shadowed edge would sit behind a
+   rounded chip for the whole landing.
+
+   The element is a flex row and .scrap stretches to it, which is what makes
+   min-height (JS writes it for sticky notes) still reach the paper, and
+   what makes the paper fill the box once JS starts writing an explicit
+   height into the morph.
+
+   --m is the landing, 0 → 1, written per card by placeSet. It is a SCROLL
+   fraction, so this whole exchange scrubs: stop mid-landing and it holds
+   half-turned; scroll back up and the event becomes a scrap again. */
+.hub__src { display: flex; }
+.hub__src > .scrap {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  opacity: calc(1 - var(--m, 0));
+}
+.hub__src > .ev {
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  /* 🔴 NO GAP. The app sets its two lines solid — title and time run into
+     one another closely enough that their ink forms a single band with no
+     blank row between, which is how the difference was found. Ours had two
+     `6px × --to-k` gaps, and those 6px were the whole of why the avatar
+     row sat 6px lower than the app's (47.0 against 41.0, measured off the
+     disc). Title tops already agreed at 9.0 vs 8.75, so the drift was all
+     below the first line. */
+  gap: 0;
+  /* 🔴 THE SAME TWO VARIABLES THE SCRAP CONVERGES ON. They were literals
+     here and named there, so trimming the target moved the scrap's landing
+     without moving the chip it was landing on — the padding is one number
+     per axis or it is two things pretending to be one. */
+  padding: calc(var(--to-pv, 14px) * var(--to-k, 1)) calc(var(--to-ph, 14.5px) * var(--to-k, 1));
+  border-radius: calc(12px * var(--to-k, 1));
+  overflow: hidden;
+  opacity: var(--m, 0);
+}
+/* PadEventCard's own type, in the app's px — see CAL_GRID in hub.js. 26 is
+   set by where the app WRAPS: "Family dinner" is one line in its 220-wide
+   chip and "Homework club" is two, which puts the title just under 190px
+   at 1920. Bigger and our copy breaks a line the app does not, and the
+   handover — where the two are stacked on the same pixels — shows it as a
+   reflow on the frame the card hands over.
+
+   🔴 THE SIZE ITSELF IS NOT SET HERE ANY MORE — see "one type size, two
+   faces" further down. 26 and 24 are the numbers that rule lands ON; this
+   block keeps only what is the chip's alone (family, weight, leading). */
+.hub__src > .ev .t {
+  line-height: 1.15;
+  overflow: hidden;
+}
+.hub__src > .ev .s {
+  line-height: 1.15;
+}
+.hub__src > .ev.is-allday {
+  flex-direction: row;
+  align-items: center;
+  padding: 0 calc(13px * var(--to-k, 1));
+  border-radius: calc(8px * var(--to-k, 1));
+}
+/* the all-day chip's title is the same weight as every other one — see
+   the note on the shared rule. It was 600 here and 700 above, and both
+   were heavier than anything the app draws. */
+.hub__src > .ev.is-allday .s { display: none; }
+/* 🔴 THE SAME 1.25px THE SCRAP GETS (ALLDAY_NUDGE in hub.js), on the other
+   face. `align-items: center` centres the LINE BOX and the app's row does
+   not sit where that puts the ink — measured 1.25px high against the app's
+   own frame on both all-day chips. Nudging only the scrap would have fixed
+   the handover and broken the crossing, so it goes on both or neither.
+   `top` rather than a margin because a flex item's margin under
+   align-items:center only moves it half as far, which is a second number
+   to keep in step for no reason. */
+.hub__src > .ev.is-allday .t { position: relative; top: calc(2.5px * var(--to-k, 1)); }
+
+/* ---------- the chip's faces ----------
+   The same markup avatarHtml writes for the list cards, at the PAD's size
+   rather than the scrap's — so --to-k and not --fly-k.
+
+   🔴 EVERY NUMBER HERE WAS MEASURED, after a first pass that guessed all
+   three off a 2× crop and got all three wrong. Read across the middle of
+   Piano recital's row at 1920:
+
+     diameter   34   (was 44 — a 23% drop at the handover, which is the
+                      "头像突然变小": our chip's faces were replaced by the
+                      app's smaller ones the moment the card faded out)
+     pitch      41   so they do NOT overlap; there is a 6px GAP. The old
+                      rule had margin-left -10, i.e. a stack.
+     ring        3   and in the PERSON's colour, not the chip's. On an icon
+                      avatar that ring is the same colour as its fill and so
+                      cannot be seen, which is why one rule covers both. */
+.hub__src > .ev .avs {
+  display: flex;
+  align-items: center;
+  /* 🔴 4, not 6. Measured off the disc rather than the row: ours centred at
+     y42.0 against the app's y41.0 once the time row above it had been
+     matched. The 6 was carried over from when the chip still had a flex
+     `gap` doing part of this job; with that at 0 it was one px too much. */
+  margin-top: calc(4px * var(--to-k, 1));
+}
+.hub__src > .ev .av {
+  flex: none;
+  width: calc(34px * var(--to-k, 1));
+  height: calc(34px * var(--to-k, 1));
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  box-shadow: none;
+  margin-left: calc(6px * var(--to-k, 1));
+  overflow: hidden;
+}
+.hub__src > .ev .av:first-child { margin-left: 0; }
+.hub__src > .ev .av-photo {
+  background: var(--av-c, #e7e5e0);
+  border: calc(3px * var(--to-k, 1)) solid var(--av-c, #e7e5e0);
+  box-sizing: border-box;
+  padding: 0;
+}
+.hub__src > .ev .av-photo img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 50%;
+}
+.hub__src > .ev .av svg {
+  /* 🔴 21.4, not 19 — the glyph, not the disc. The disc was measured (34)
+     and matched; the mark inside it was not, and at 19 it sat ~11% small in
+     a circle that was the right size. Compared at 6× against the app's own
+     paw: ours 8.0 CSS px across the toes, the app's 9.0. */
+  width: calc(21.4px * var(--to-k, 1));
+  height: calc(21.4px * var(--to-k, 1));
+  display: block;
+}
+.hub__src > .ev .av.is-more {
+  background: #fff;
+  color: #1C1917;
+  font-size: calc(13px * var(--to-k, 1));
+  font-weight: 700;
+  letter-spacing: -.02em;
+}
+
+.hub__src--sticky {
+  width: calc(148px * var(--fly-k, 1));
+  min-height: calc(158px * var(--fly-k, 1));
+}
+.hub__src--sticky > .scrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  text-align: left;
+  background: #EEDC4F;
+  color: #3F3826;
+  --scrap-pt: 22px; --scrap-pr: 16px; --scrap-pb: 18px; --scrap-pl: 16px;
+  border-radius: calc(1px * var(--fly-k, 1));
+  box-shadow:
+    0 1px 1px rgba(70, 50, 8, .10),
+    0 8px 16px rgba(50, 36, 8, .16);
+}
+.hub__src--sticky > .scrap::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: calc(9px * var(--fly-k, 1));
+  background: rgba(70, 50, 8, .05);
+}
+.hub__src--sticky .t {
+  font-family: Nunito, var(--font--body), sans-serif;
+  --scrap-t: 20px;
+  --scrap-w: 800;
+  line-height: 1.15;
+}
+.hub__src--sticky .s {
+  --scrap-s: 13px;
+  --scrap-gap: 8px;
+  --scrap-sw: 600;
+  opacity: .7;
+}
+.hub__src--paper > .scrap {
+  background: #fff;
+  color: #2F2C28;
+  border-radius: calc(2px * var(--fly-k, 1));
+  --scrap-pt: 16px; --scrap-pr: 14px; --scrap-pb: 14px; --scrap-pl: 22px;
+  box-shadow: 0 14px 24px rgba(28,25,23,.16);
+  background-image:
+    linear-gradient(90deg, transparent 18px, #E24B4B 18px, #E24B4B 19px, transparent 19px),
+    repeating-linear-gradient(
+      180deg,
+      transparent 0 27px,
+      #9EC5E8 27px 28px
+    );
+}
+.hub__src--paper .t {
+  font-family: Nunito, var(--font--body), sans-serif;
+  --scrap-t: 18px;
+  --scrap-w: 800;
+  line-height: 1.2;
+}
+.hub__src--paper .s { --scrap-s: 13px; --scrap-gap: 8px; --scrap-sw: 600; opacity: .72; }
+.hub__src--mail > .scrap {
+  background: #fff;
+  color: #1C1917;
+  border-radius: calc(10px * var(--fly-k, 1));
+  box-shadow: 0 12px 28px rgba(28,25,23,.16);
+  --scrap-pt: 12px; --scrap-pr: 14px; --scrap-pb: 14px; --scrap-pl: 14px;
+  border: 1px solid color-mix(in srgb, #CBB47B 35%, #e7e5e0);
+}
+.hub__src--mail .from {
+  --scrap-t: 11px; --eyebrow: 15px; font-weight: 700; letter-spacing: .04em;
+  text-transform: uppercase; color: #2497F0;
+}
+.hub__src--mail .t { --scrap-t: 15px; --scrap-lead: 4px; --scrap-w: 800; line-height: 1.25; }
+.hub__src--mail .s { --scrap-s: 12px; --scrap-gap: 6px; line-height: 1.35; color: #57534E; }
+.hub__src--imessage > .scrap {
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+}
+.hub__src--imessage .bubble {
+  background: #DBECFF;
+  color: #1C1917;
+  border-radius: calc(18px * var(--fly-k, 1)) calc(18px * var(--fly-k, 1)) calc(18px * var(--fly-k, 1)) calc(6px * var(--fly-k, 1));
+  --scrap-pt: 12px; --scrap-pr: 14px; --scrap-pb: 12px; --scrap-pl: 14px;
+  box-shadow: 0 10px 22px rgba(28,25,23,.14);
+}
+.hub__src--imessage .who { --scrap-t: 11px; --eyebrow: 19px; font-weight: 800; color: #2497F0; }
+.hub__src--imessage .t { --scrap-t: 15px; --scrap-lead: 4px; --scrap-w: 700; line-height: 1.3; }
+.hub__src--imessage .s { --scrap-s: 12px; --scrap-gap: 6px; opacity: .65; }
+.hub__src--app > .scrap {
+  background: #EFF8FF;
+  color: #1C1917;
+  border-radius: calc(16px * var(--fly-k, 1));
+  --scrap-pt: 12px; --scrap-pr: 14px; --scrap-pb: 12px; --scrap-pl: 14px;
+  box-shadow: 0 12px 28px rgba(28,25,23,.16);
+  border: 1px solid #DCF0FE;
+}
+.hub__src--app .app { --scrap-t: 10px; --eyebrow: 14px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: #2497F0; }
+.hub__src--app .t { --scrap-t: 16px; --scrap-lead: 4px; --scrap-w: 800; }
+.hub__src--app .s { --scrap-s: 12px; --scrap-gap: 4px; --scrap-sw: 600; color: #2497F0; }
+
+/* ---------- one type size, two faces ----------
+   🔴 THE CROSS-FADE WAS A SIZE STEP, and this is the "字体突然变小". The
+   scrap and the chip are stacked on the same pixels and traded on --m, and
+   they were sized by two unrelated numbers: the scrap's type rode --fly-k
+   (its own box, shrinking through the landing) and the chip's was FLAT at
+   26/24 × --to-k the whole way. So at every m in the crossover the reader
+   had two copies of one line at two sizes, half-opaque, on top of each
+   other — and at m=1 the survivor was a different size than the thing that
+   faded. Measured at 1440×900, title, scrap → chip:
+
+     sticky    14.8 → 12.9   −13%   (this is the one that reads as "变小")
+     app        8.6 → 12.9   +50%
+     mail       8.1 → 12.9   +60%
+     paper     12.2 → 12.9    +6%
+
+   The scrap bases differ per source (20 / 18 / 16 / 15) because a sticky
+   note and an email are not drawn at one size, so no single base could ever
+   land all four on 26 × --to-k. The size therefore has to be INTERPOLATED
+   rather than picked, and both faces have to read the same interpolation —
+   which is what this rule is.
+
+   🔴 IT APPLIES TO BOTH .scrap AND .ev. That is the whole trick: at any m
+   the two lines are the same size, so the fade has nothing left to show.
+   At m=0 it is the scrap's own base × --fly-k (the notes look as drawn, and
+   the legibility floor still holds); at m=1 it is exactly 26/24 × --to-k,
+   the app's own type, unchanged from before — only the PATH between them is
+   new. The shrink the reader sees is one continuous move.
+
+   🔴 SPECIFICITY, AND THEREFORE POSITION. `.hub__src > .ev .t` is 0,3,0 and
+   so is this; it only wins because it comes after. Keep it below every
+   .hub__src--* block — moving it up silently restores the step. The
+   per-source rules are 0,2,0 and lose either way.
+
+   ⚠️ 26 and 24 ARE THE APP'S NUMBERS and are named in the note on
+   `.hub__src > .ev .t` above, which explains where they come from (the
+   app's wrap point). Change them together. */
+/* 🔴 ONE TYPE, NOT TWO — the FACE never changes, only the size does.
+   The size used to interpolate on --m, i.e. during the landing: the words
+   changed on the way down and again at the handover, and a reader does not
+   see a curve, they see two typefaces. Asked for directly: "为啥你要用两套字".
+   Both faces have named 'PadNunito' since, from the first frame to the app,
+   and that half has not moved.
+
+   🔴 WHAT MOVES IS WHEN THE SIZE GETS THERE, AND IT IS --lift, NOT --m.
+   The scrap keeps its own drawn size while it is parked (20px extra-bold on
+   the sticky, 18 on the paper, 15 on the mail — that is the note the reader
+   was shown and it stays that note), converges across the flight, and is
+   sitting on the app's numbers BEFORE the landing opens. So --m — the box,
+   the padding, the radius, the shadow, the cross-fade — runs with the type
+   already final and standing still. The landing is a shape change and
+   nothing else.
+
+   The endpoints are unchanged from when this rode --m: at lift=0 it is the
+   scrap's own base × --fly-k (the notes look as drawn, legibility floor
+   intact), at lift=1 exactly --to-t × --to-k. Only the PATH between them,
+   and where on the run it happens, is new. See the note at the write site
+   in hub.js for why 12% was not it either.
+
+   ⚠️ --scrap-t / --scrap-s / --scrap-w ARE READ, and only while parked —
+   the (1 − lift) term is what carries them. An earlier note here said they
+   were dead; they are not, they are the whole left-hand end of the ramp. */
+.hub__src .scrap .t,
+.hub__src .ev .t {
+  font-size: calc(
+    var(--scrap-t, 15px) * var(--fly-k, 1) * (1 - var(--lift, 0))
+    + var(--to-t, 28.4px) * var(--to-k, 1) * var(--lift, 0)
+  );
+}
+.hub__src .scrap .s,
+.hub__src .ev .s {
+  font-size: calc(
+    var(--scrap-s, 12px) * var(--fly-k, 1) * (1 - var(--lift, 0))
+    + var(--to-s, 23.5px) * var(--to-k, 1) * var(--lift, 0)
+  );
+}
+
+/* ---------- …and the WEIGHT, which is the one the reader actually named ----------
+   🔴 400. THE CHIP WAS 700 (600 on the all-day row) AND THE APP DRAWS 400,
+   so the moment our layer handed over — `then: 'calendar|play'` in hub.js,
+   a whole beat AFTER the cards land — every one of the seven titles went
+   from bold to regular in a single frame. That is the "突然变细", and it is
+   a different seam from the scrap→chip one: this is chip→APP.
+
+   How 400 was arrived at, since nothing here can be read off the app: the
+   pad is a Flutter CanvasKit build, so its cards are painted into a canvas
+   and have no computed style to query. Rendered ours at 400/500/600/700
+   into the same 109px slot and compared against the app's own frame:
+
+     700  bold,   "Soccer practice" wraps to two lines
+     500  medium, still wraps
+     400  regular, ONE line — and the app's is one line
+
+   The wrap is the tell, not the eye: at 12.92px in a 93px content box the
+   string only fits unwrapped below 500, and the app fits it. The all-day
+   row agrees at 400 against the app's own "School holiday".
+
+   🔴 AND IT INTERPOLATES, for the same reason the size does. Fixing only
+   the endpoint would have moved the step rather than removed it — the
+   scraps are drawn at 800 (700 for the bubble), so scrap→chip would now be
+   800 → 400 in the crossover instead of 800 → 700. Both faces read this,
+   so the two are the same weight at every m and the whole run from sticky
+   note to app card is one continuous move.
+
+   🔴 …EXCEPT IT DOES NOT INTERPOLATE, AND THE OLD NOTE HERE WAS WRONG ABOUT
+   WHY. It claimed the face is variable 400–700 (Google Sans) and that the
+   in-between values are real interpolations. Google Sans is the PAGE's
+   face; this layer names 'PadNunito' first and gets it, and PadNunito is
+   FOUR STATIC CUTS — 400/500/600/700, the pad's own .ttf files, see the
+   @font-face block near the top of this file, whose own note says so. So
+   every value between the cuts snaps to a cut and this ramp is a
+   FOUR-STEP STAIRCASE. It cannot be made continuous from here; the only
+   real fix is a variable Nunito, and until there is one the question is
+   only where the three steps land.
+
+   🔴 WHICH IS WHY IT IS ON --wlift AND NOT --lift. --lift ends at the
+   landing, and the last step (500 → 400, the one that reads as 变细) fires
+   at the very end of whatever drives it — so on --lift it would land on the
+   frame the card stops. --wlift is --lift compressed into its first three
+   quarters (WEIGHT_SETTLE in hub.js, where the arithmetic is), which puts
+   all three steps in mid-flight under motion and leaves the last fifth of
+   the flight and the whole landing with no weight event in them.
+
+   ⚠️ THE 800 BASES RESOLVE TO 700 at wlift=0, so the first quarter of the
+   ramp is flat. Left alone deliberately: it keeps the note bold a beat
+   longer, and the flat stretch costs nothing when the ramp is a staircase
+   anyway. */
+.hub__src .scrap .t,
+.hub__src .ev .t {
+  font-weight: calc(var(--scrap-w, 700) * (1 - var(--wlift, 0)) + 400 * var(--wlift, 0));
+  /* 🔴 THE FAMILY HAS TO BE RESTATED HERE, and the reason is a trap worth
+     knowing: the per-source rules are written `.hub__src--sticky .t`, which
+     matches the CHIP's `.t` as well as the scrap's — `.ev` is a descendant
+     of the same element. Same specificity as a container-level rule and
+     later in the file, so a `font-family` on `.hub__src .ev` loses to it
+     and the chip silently keeps Nunito-that-is-not-loaded. 0,3,0 here, and
+     last, which is the same argument as the note below. */
+  font-family: 'PadNunito', Nunito, var(--font--body), sans-serif;
+}
+.hub__src .scrap .s,
+.hub__src .ev .s {
+  font-weight: calc(var(--scrap-sw, 400) * (1 - var(--wlift, 0)) + 400 * var(--wlift, 0));
+  font-family: 'PadNunito', Nunito, var(--font--body), sans-serif;
+}
+/* 🔴 THE ALL-DAY CHIP HAS NO TIME ROW (`.ev.is-allday .s` is display:none),
+   so the scrap's second line has nothing under it to converge ON — growing
+   it toward 24 × --to-k would swell a line that is about to fade into
+   nothing. It keeps its own scale and leaves with the scrap. */
+.hub__src:has(> .ev.is-allday) .scrap .s {
+  font-size: calc(
+    var(--scrap-s, 12px) * var(--fly-k, 1) * (1 - var(--lift, 0))
+    + var(--to-s, 23.5px) * var(--to-k, 1) * var(--lift, 0)
+  );
+}
+
+/* ---------- …and the same for WHERE the line sits ----------
+   🔴 MATCHING THE SIZE ONLY GOT HALF OF IT. With the two titles finally at
+   one size they were still 13–16px apart vertically and 4–6px across, so
+   the crossover read as one line sliding out from under another — the
+   double-image was quieter but it was still a double image. Measured at
+   m≈0.5, scrap title against chip title: dy 13.5 (app), 16.1 (mail), 22.3
+   (imessage), 11.5 (sticky).
+
+   Three things put it there, and all three are above the title:
+     the scrap's own padding-top   (12–22 × --fly-k against the chip's 14 × --to-k)
+     an eyebrow the chip does not have (CLUB CALENDAR / DAVID / Sarah)
+     the title's own top margin
+
+   So all three converge on --m, the same way the type does. The scrap ends
+   up laid out on the chip's box and the two lines land on one pixel; before
+   that it is drawn exactly as it always was. */
+/* 🔴 ON --lift, NOT --m — the same ramp the type rides. This was the last
+   thing still converging at the LANDING, and it is what put the two copies
+   of the line a few pixels apart for the whole crossing: the words were
+   already the chip's size and weight in flight, but they were sitting at
+   the scrap's inset, so the chip fading in underneath had them somewhere
+   else. Both on --lift and the scrap IS the chip's text box by the time it
+   arrives; the fade at the landing then has nothing left to move.
+
+   🔴 AND THIS IS THE OTHER REASON --lift IS THE WHOLE FLIGHT NOW. The inset
+   is a POSITION, so on the old 12% ramp the words did not just resize in an
+   eighth of the run, they SLID — 11–22px of travel inside a box that was
+   itself travelling, over and done before the reader had followed the card
+   halfway. Two motions at different speeds in the same object read as a
+   glitch, not as a move. Spread over the flight it is one drift. */
+.hub__src > .scrap,
+.hub__src .bubble {
+  padding:
+    calc(var(--scrap-pt, 12px) * var(--fly-k, 1) * (1 - var(--lift, 0)) + var(--to-pv, 14px) * var(--to-k, 1) * var(--lift, 0))
+    calc(var(--scrap-pr, 14px) * var(--fly-k, 1) * (1 - var(--lift, 0)) + var(--to-ph, 14.5px) * var(--to-k, 1) * var(--lift, 0))
+    calc(var(--scrap-pb, 14px) * var(--fly-k, 1) * (1 - var(--lift, 0)) + var(--to-pv, 14px) * var(--to-k, 1) * var(--lift, 0))
+    calc(var(--scrap-pl, 14px) * var(--fly-k, 1) * (1 - var(--lift, 0)) + var(--to-ph, 14.5px) * var(--to-k, 1) * var(--lift, 0));
+}
+/* the imessage scrap is a transparent wrapper — the bubble inside it is the
+   paper, so it is the bubble that has to become the chip's box */
+.hub__src--imessage > .scrap { padding: 0; }
+/* the all-day chip is a 44-tall row, not a column: `padding: 0 13px` (see
+   `.hub__src > .ev.is-allday`). Its scraps have to converge on THAT. */
+/* 🔴 …AND ITS TITLE IS SMALLER THAN A TIMED CARD'S. Measured off the app,
+   both directions, because assuming one size for both is what put the
+   all-day row 9.5% oversize: "Beach" came out 34.5px against the app's
+   31.5, while the timed cards' titles were 4% UNDER at the same 26px. The
+   26 stays where it was; the all-day row gets its own number.
+
+   How 23.7 was arrived at: the all-day row carries "School holiday", which
+   is the APP's own chip and sits in the same frame as our two — so it is a
+   ruler that needs no alignment. Scaled ours until "Beach" and "Camping"
+   matched the app's ink width to a quarter-pixel with School holiday
+   identical in both frames.
+
+   ⚠️ 26 IS ALSO A CEILING for the timed chip, not just a match. The app
+   fits "Soccer practice" on one line in a 109px card and so must we; at 27
+   our ink is 93.7px in a 93.1px content box and it wraps. Going higher
+   means taking the padding down with it. */
+/* --to-t is written by placeSet for these, not set here: the all-day chip
+   centres its one line vertically and the scrap has to land on that centre,
+   which means JS needs the number to work the free space out. One owner. */
+.hub__src:has(> .ev.is-allday) { --to-pv: 0px; --to-ph: 13px; }
+
+/* 🔴 THE EYEBROW DOES NOT CONVERGE, IT LEAVES — there is nothing in the
+   chip for "CLUB CALENDAR" to become. Collapsing `line-height` rather than
+   `height` is what empties the box: a single line's box IS its line-height,
+   so this takes the row out of the flow without the element leaving it, and
+   everything below simply moves up. On --lift it is empty exactly when the
+   chip starts fading in, so the reader never sees a squashed line and never
+   sees an eyebrow inside an event either. */
+.hub__src .scrap .app,
+.hub__src .scrap .from,
+.hub__src .scrap .who {
+  display: block;
+  overflow: hidden;
+  /* 🔴 nowrap, and it is not cosmetic. The scrap NARROWS through the
+     flight, so a two-word label reaches its wrap point partway down and
+     the row silently becomes two line-heights — which pushes the title
+     down and puts a 5–6px KINK in the very convergence this block exists
+     to make smooth. Measured on CLUB CALENDAR: dy 16.1 → 22.4 → 17.7
+     across three consecutive samples. It is a label; it was never meant
+     to wrap. */
+  white-space: nowrap;
+  text-overflow: clip;
+  line-height: calc(var(--eyebrow, 14px) * var(--fly-k, 1) * (1 - var(--lift, 0)));
+  opacity: calc(1 - var(--lift, 0));
+}
+/* the two vertical gaps inside the scrap, both on --m. As margins rather
+   than a flex `gap` because the scraps are not all flex containers — paper
+   and mail are plain blocks.
+
+   🔴 THEY ARE NOT THE SAME KIND OF NUMBER. --scrap-lead is the space under
+   the EYEBROW, and it converges on nothing: the chip's title is its first
+   child, so the lead has to be gone by the time the eyebrow is. --scrap-gap
+   is title-to-time, and the chip has one of those — `gap: 6px × --to-k`.
+
+   ⚠️ BOTH ARE DECLARED ON THE ELEMENT THEY AFFECT, not on its sibling.
+   Custom properties inherit DOWN; `--scrap-gap` set on `.t` never reaches
+   `.s`, it just silently reads the 0px fallback and the time row rides up
+   against the title. */
+.hub__src .scrap .t {
+  margin-top: calc(var(--scrap-lead, 0px) * var(--fly-k, 1) * (1 - var(--lift, 0)) + var(--allday-pad, 0px));
+}
+/* 🔴 --allday-pad IS THE ONE THING PADDING CANNOT DO. Every other card is a
+   top-aligned column on both faces, so matching the inset matches the line.
+   The all-day chip is a CENTRED row (`align-items: center`, 44 tall), and
+   the scrap it fades out of is top-aligned in a 158px note — measured 72px
+   apart at take-off, closing to 4 only at the landing, which is the whole
+   flight spent with the two copies of "Beach day" in different places.
+   Centring cannot be interpolated (`justify-content` is discrete) and the
+   free space is not a CSS-side quantity, so placeSet computes it: half of
+   (current box height − the chip's line box), faded in on --lift with
+   everything else. Timed cards never get it and read the 0px fallback. */
+/* 🔴 .ev TOO, NOT JUST .scrap. The chip's own title-to-time gap used to
+   come from `gap` on .ev, and zeroing that (see the note there) took it to
+   nothing — 2px tighter than the app, measured: our time row at y24.5
+   against the app's y26.5. A flex `gap` cannot be used to put it back
+   because it would space the avatar row by the same amount and that row
+   already lands correctly. So the gap is a margin on the time row alone,
+   and both faces read it for the same reason they read everything else
+   here: whatever the scrap is doing, the chip has to end up where the app
+   draws. */
+.hub__src .scrap .s,
+.hub__src .ev .s {
+  margin-top: calc(var(--scrap-gap, 0px) * var(--fly-k, 1) * (1 - var(--lift, 0)) + var(--to-gap, 4px) * var(--to-k, 1) * var(--lift, 0));
+}
+
+.hub__src--list-sticky {
+  background: #FFEEB8;
+  color: #87723D;
+  padding: calc(14px * var(--fly-k, 1)) calc(14px * var(--fly-k, 1)) calc(12px * var(--fly-k, 1));
+  border-radius: calc(2px * var(--fly-k, 1));
+  box-shadow: 0 10px 22px rgba(28,25,23,.16);
+}
+.hub__src--list-sticky .t {
+  font-family: Lora, var(--font--primary), serif;
+  font-size: calc(16px * var(--fly-k, 1)); font-weight: 700; margin-bottom: calc(8px * var(--fly-k, 1));
+}
+.hub__src--list-paper {
+  background: #F4F0E5;
+  color: #1C1917;
+  padding: calc(16px * var(--fly-k, 1)) calc(16px * var(--fly-k, 1)) calc(12px * var(--fly-k, 1));
+  border-radius: calc(3px * var(--fly-k, 1));
+  box-shadow: 0 12px 24px rgba(28,25,23,.15);
+  background-image: repeating-linear-gradient(
+    180deg,
+    transparent 0 22px,
+    color-mix(in srgb, #CBB47B 35%, transparent) 22px 23px
+  );
+}
+.hub__src--list-paper .t {
+  font-family: Lora, var(--font--primary), serif;
+  font-size: calc(16px * var(--fly-k, 1)); font-weight: 700; margin-bottom: calc(8px * var(--fly-k, 1));
+}
+.hub__src .it { display: flex; flex-direction: column; gap: 6px; }
+.hub__src .row { font-size: calc(13px * var(--fly-k, 1)); font-weight: 600; line-height: 1.25; }
+
+.hub__nestie {
+  position: absolute;
+  right: 2.2%;
+  bottom: 3.6%;
+  width: 8%;
+  aspect-ratio: 1;
+  z-index: 6;
+  opacity: 0;
+  pointer-events: none;
+  filter: drop-shadow(0 10px 16px rgba(28,25,23,.22));
+  transition: opacity .35s ease;
+}
+.hub__wrap.is-nestie .hub__nestie { opacity: 1; }
+.hub__nestie canvas,
+.hub__nestie img {
+  width: 100%; height: 100%;
+  display: block;
+  object-fit: contain;
+}
+
+.hub__fx {
+  position: absolute;
+  inset: -22% -28%;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0;
+}
+.hub__wrap.is-fx .hub__fx { opacity: 1; }
+
+.hub__habits {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  pointer-events: none;
+  opacity: 0;
+}
+.hub__wrap.is-habits .hub__habits { opacity: 1; }
+.hub__habit {
+  position: absolute;
+  width: 210px;
+  padding: 14px 16px 14px;
+  border-radius: 18px;
+  box-shadow: 0 16px 32px rgba(28,25,23,.16);
+  font-family: Nunito, var(--font--body), sans-serif;
+}
+.hub__habit .nm { font-size: 16px; font-weight: 800; }
+.hub__habit .lv {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; margin: 6px 0 10px;
+  font-size: 13px; font-weight: 700;
+}
+.hub__habit .star-row { letter-spacing: 1px; line-height: 1; }
+.hub__habit .bal { white-space: nowrap; }
+.hub__habit .customs { display: flex; flex-direction: column; gap: 6px; }
+.hub__habit .chip {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.45);
+  font-size: 12px; font-weight: 700; line-height: 1.2;
+}
+.hub__habit .chip .em { font-size: 18px; line-height: 1; }
+
+.hub.is-docked .hub__nestie,
+.hub.is-docked .hub__fx,
+.hub.is-docked .hub__habits { opacity: 0 !important; }
+.hub__fly-card.is-meal {
+  position: relative;
+  padding: 0;
+  overflow: hidden;
+}
+.hub__fly-card.is-meal img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.hub__fly-card.is-meal .cap {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: calc(18px * var(--fly-k, 1)) calc(10px * var(--fly-k, 1)) calc(8px * var(--fly-k, 1));
+  color: #fff;
+  font-weight: 700;
+  line-height: 1.2;
+  background: linear-gradient(180deg, transparent, rgba(28,25,23,.88));
+}
+
+/* ---------- the rail ---------- */
+.hub__rail {
+  flex: none;
+  width: 4.4em;
+  background: var(--nes-cream);
+  border-right: 1px solid color-mix(in srgb, var(--nes-tan) 55%, transparent);
+  display: flex; flex-direction: column; align-items: center;
+  gap: .35em; padding: 1.5em 0;
+}
+.hub__rail button {
+  width: 2.6em; height: 2.6em;
+  display: grid; place-items: center;
+  border: 0; padding: 0; border-radius: .85em;
+  background: transparent; color: var(--nes-muted);
+  opacity: .55; cursor: default;
+  transition: opacity .45s ease, background-color .45s ease, color .45s ease;
+}
+.hub__rail button svg { width: 1.35em; height: 1.35em; }
+.hub__rail button.is-hot {
+  opacity: 1;
+  color: var(--nes-blue);
+  background: color-mix(in srgb, var(--nes-sky) 75%, transparent);
+}
+
+/* ---------- the scenes ---------- */
+.hub__app { position: relative; flex: 1; min-width: 0; }
+.hub__scene {
+  position: absolute; inset: 0;
+  padding: 1.7em 2em 1.9em;
+  display: flex; flex-direction: column;
+  opacity: 0;
+  transition: opacity .5s ease;
+  pointer-events: none;
+}
+.hub__scene.is-active { opacity: 1; }
+
+.hub__kicker {
+  margin: 0 0 1.05em;
+  font-family: var(--font--ui);
+  font-size: .8em; font-weight: 700;
+  letter-spacing: .13em; text-transform: uppercase;
+  color: var(--nes-muted);
+  display: flex; align-items: center; justify-content: space-between; gap: 1em;
+  flex: none;
+}
+
+/* ---------- scene 1 · the week ----------
+   The bubble sits in a band of its own: the columns stop above it
+   rather than running under it, so nothing is ever covered. */
+.hub__scene[data-scene="0"] { padding-bottom: 4.4em; }
+.hub__week { display: grid; grid-template-columns: repeat(7, 1fr); gap: .5em; flex: 1; min-height: 0; }
+.hub__day {
+  background: var(--nes-sand);
+  border-radius: .8em;
+  padding: .65em .55em;
+  display: flex; flex-direction: column; gap: .38em;
+  min-width: 0;
+}
+.hub__day > b {
+  font-family: var(--font--ui);
+  font-size: .78em; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--nes-muted);
+}
+.hub__evt {
+  background: var(--nes-sky);
+  color: var(--nes-sky-up);
+  border-radius: .5em;
+  padding: .4em .5em;
+  font-size: .76em; font-weight: 600; line-height: 1.3;
+}
+/* the day you are standing in. Without it a week view is seven equal
+   columns and the eye has nowhere to start. */
+.hub__day.is-today {
+  background: var(--nes-white);
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--nes-blue) 40%, transparent);
+}
+.hub__day.is-today > b { color: var(--nes-blue); }
+/* an empty column should say so — a blank one reads as unloaded */
+.hub__free { font-size: .74em; color: var(--nes-muted); }
+
+/* the card the spoken line turns into.
+   🔴 It lives in Friday from the start and FLIES IN FROM the bubble —
+   the other way round (park it on the bubble, animate to a percentage)
+   cannot land on the column, because the target moves with the grid at
+   every width. hub.js measures the two boxes and hands over the offset,
+   so the card starts on the words that made it and ends exactly where
+   it belongs. */
+.hub__fly {
+  background: var(--nes-blue);
+  color: #fff;
+  border-radius: .5em;
+  padding: .4em .5em;
+  font-size: .76em; font-weight: 600; line-height: 1.3;
+  box-shadow: 0 10px 24px -10px color-mix(in srgb, var(--nes-blue) 75%, transparent);
+  opacity: 0;
+}
+.hub__scene.is-active .hub__fly {
+  animation: hub-fly 1.15s 1.5s var(--ease-out-quint) both;
+}
+@keyframes hub-fly {
+  0%   { opacity: 0; transform: translate(var(--fx, 0px), var(--fy, 0px)); }
+  14%  { opacity: 1; transform: translate(var(--fx, 0px), var(--fy, 0px)); }
+  100% { opacity: 1; transform: none; }
+}
+
+/* the voice line, spoken from across the room */
+.hub__voice {
+  position: absolute; left: 50%; bottom: 1.5em;
+  transform: translateX(-50%);
+  display: flex; align-items: center; gap: .7em;
+  background: var(--nes-ink); color: var(--nes-white);
+  border-radius: 999px; padding: .62em 1.15em;
+  font-size: .88em; font-weight: 500; white-space: nowrap;
+  min-height: 2.6em;
+}
+/* a level meter, not a microphone glyph: it is the one thing on the
+   screen that shows the device is listening rather than displaying */
+.hub__level { display: flex; align-items: center; gap: .17em; height: 1em; }
+.hub__level i {
+  width: .17em; height: 100%;
+  border-radius: 999px;
+  background: var(--bead-blue);
+  transform: scaleY(.3); transform-origin: center;
+}
+.hub__scene.is-active .hub__level i { animation: hub-level .9s ease-in-out infinite; }
+.hub__scene.is-active .hub__level i:nth-child(2) { animation-delay: .12s; }
+.hub__scene.is-active .hub__level i:nth-child(3) { animation-delay: .26s; }
+.hub__scene.is-active .hub__level i:nth-child(4) { animation-delay: .08s; }
+@keyframes hub-level { 50% { transform: scaleY(1); } }
+
+/* ---------- scene 2 · today's tasks ---------- */
+.hub__cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: .75em; flex: 1; min-height: 0; }
+.hub__col {
+  background: var(--nes-sand);
+  border-radius: .9em;
+  padding: .8em;
+  display: flex; flex-direction: column;
+}
+.hub__who {
+  display: flex; align-items: center; gap: .5em;
+  font-size: .88em; font-weight: 600; margin-bottom: .55em;
+}
+.hub__ava {
+  width: 1.7em; height: 1.7em; border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: .82em; font-weight: 700; color: var(--nes-ink);
+  background: var(--nes-sky);
+}
+.hub__ava.is-amber { background: var(--nes-amber); }
+.hub__ava.is-tan   { background: var(--nes-tan); }
+
+.hub__task {
+  display: flex; align-items: center; gap: .55em;
+  background: var(--nes-white);
+  border-radius: .55em;
+  padding: .5em .65em;
+  margin-top: .4em;
+  font-size: .82em; font-weight: 500; line-height: 1.25;
+}
+.hub__box {
+  position: relative; flex: none;
+  width: 1.15em; height: 1.15em;
+  border: 1.5px solid color-mix(in srgb, var(--nes-blue) 55%, transparent);
+  border-radius: .35em;
+}
+.hub__box::after {
+  content: ""; position: absolute; inset: -1.5px;
+  border-radius: .35em;
+  background: var(--nes-blue) no-repeat center / .7em .7em;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12.5 9.5 18 20 6.5'/%3E%3C/svg%3E");
+  transform: scale(0);
+}
+.hub__task.is-checked .hub__box::after { transform: scale(1); }
+.hub__scene.is-active .hub__task.is-done .hub__box::after {
+  animation: hub-tick .38s 1.15s var(--ease-out-quint) forwards;
+}
+@keyframes hub-tick { to { transform: scale(1); } }
+
+/* the tally at the foot of each column — it is what fills the card
+   below two or three chores, and it is the thing a child looks at */
+.hub__tally {
+  margin-top: auto; padding-top: .8em;
+  display: flex; align-items: center; gap: .55em;
+  font-family: var(--font--ui);
+  font-size: .74em; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--nes-muted);
+}
+.hub__bar {
+  flex: 1; height: .38em; border-radius: 999px;
+  background: color-mix(in srgb, var(--nes-tan) 70%, transparent);
+  overflow: hidden;
+}
+.hub__bar i {
+  display: block; height: 100%; width: var(--done, 0%);
+  border-radius: 999px; background: var(--nes-blue);
+  transition: width .6s var(--ease-out-quint) 1.3s;
+}
+
+/* the star the finished chore is worth, flying to the jar */
+.hub__star {
+  position: absolute; left: 13%; top: 33%;
+  color: var(--nes-amber);
+  opacity: 0;
+}
+.hub__star svg { width: 1.4em; height: 1.4em; }
+.hub__scene.is-active .hub__star { animation: hub-star 1.15s 1.45s var(--ease-out-quint) forwards; }
+@keyframes hub-star {
+  0%   { opacity: 0; transform: scale(.4); }
+  22%  { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; left: 93%; top: -1.5%; transform: scale(.7); }
+}
+.hub__jar {
+  display: inline-flex; align-items: center; gap: .35em;
+  color: var(--nes-ink);
+  font-family: var(--font--body);
+  font-size: 1.05em; font-weight: 600; letter-spacing: 0;
+  text-transform: none;
+}
+.hub__jar svg { width: 1em; height: 1em; color: var(--nes-amber); }
+
+/* ---------- scene 3 · the week's meals ---------- */
+.hub__meals { display: grid; grid-template-columns: repeat(4, 1fr); gap: .65em; flex: none; }
+.hub__meal {
+  background: var(--nes-sand);
+  border-radius: .8em;
+  padding: .7em .75em;
+}
+.hub__meal small {
+  font-family: var(--font--ui);
+  font-size: .72em; font-weight: 700; letter-spacing: .11em;
+  text-transform: uppercase; color: var(--nes-muted);
+}
+.hub__meal b { display: block; font-size: .92em; font-weight: 600; margin: .25em 0 .14em; }
+.hub__meal span { font-size: .76em; color: var(--nes-muted); }
+.hub__meal.is-picked {
+  background: var(--nes-sky);
+  box-shadow: inset 0 0 0 1.5px var(--nes-blue);
+}
+
+/* the picked night, opened out: what it is, and what it costs the list */
+.hub__cook {
+  display: grid; grid-template-columns: 1.3fr 1fr; gap: .75em;
+  flex: 1; min-height: 0; margin-top: .75em;
+}
+.hub__card {
+  background: var(--nes-sand);
+  border-radius: .9em;
+  padding: .9em 1em;
+  min-width: 0;
+}
+.hub__card { display: flex; flex-direction: column; }
+.hub__card > b {
+  display: block; margin-bottom: .5em;
+  font-family: var(--font--ui);
+  font-size: .72em; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--nes-muted);
+}
+/* pinned to the foot of a card, so a short list does not leave the box
+   looking half-loaded */
+.hub__foot {
+  margin-top: auto; padding-top: .9em;
+  display: flex; align-items: center; gap: .5em;
+  font-size: .78em; color: var(--nes-muted);
+}
+.hub__foot .hub__ava { font-size: .74em; }
+/* a quiet divider inside a list of hours */
+.hub__part {
+  margin: .9em 0 .1em;
+  font-family: var(--font--ui);
+  font-size: .68em; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--nes-muted);
+}
+.hub__dish {
+  font-family: var(--font--primary);
+  font-size: 1.7em; font-weight: 400; letter-spacing: -.02em; line-height: 1.1;
+}
+.hub__note { margin: .3em 0 0; font-size: .8em; color: var(--nes-muted); }
+.hub__steps { margin: .8em 0 0; padding: 0; list-style: none; }
+.hub__steps li {
+  position: relative;
+  padding: .2em 0 .2em 1.3em;
+  font-size: .8em; font-weight: 500;
+  counter-increment: step;
+}
+.hub__steps { counter-reset: step; }
+.hub__steps li::before {
+  content: counter(step);
+  position: absolute; left: 0; top: .28em;
+  width: 1.35em; height: 1.35em;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: var(--nes-white);
+  font-family: var(--font--ui);
+  font-size: .72em; font-weight: 700; color: var(--nes-muted);
+}
+
+.hub__list {
+  background: var(--nes-white);
+  border: 1px solid color-mix(in srgb, var(--nes-tan) 70%, transparent);
+  border-radius: .9em;
+  padding: .85em 1em;
+  min-width: 0;
+}
+.hub__list b {
+  display: block; margin-bottom: .3em;
+  font-family: var(--font--ui);
+  font-size: .72em; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--nes-muted);
+}
+.hub__list ul { margin: 0; padding: 0; }
+.hub__list li {
+  list-style: none;
+  padding: .4em 0;
+  font-size: .82em; font-weight: 500;
+  border-bottom: 1px solid color-mix(in srgb, var(--nes-tan) 45%, transparent);
+}
+.hub__list li:last-child { border-bottom: 0; }
+/* the three the recipe adds drop in one after another — they are the
+   only thing on this screen that moves, so the eye goes to them */
+.hub__list li.is-new { opacity: 0; }
+.hub__scene.is-active .hub__list li.is-new { animation: hub-drop .45s var(--ease-out-expo) forwards; }
+.hub__scene.is-active .hub__list li.is-new:nth-of-type(2) { animation-delay: 1.05s; }
+.hub__scene.is-active .hub__list li.is-new:nth-of-type(3) { animation-delay: 1.27s; }
+.hub__scene.is-active .hub__list li.is-new:nth-of-type(4) { animation-delay: 1.49s; }
+@keyframes hub-drop {
+  from { opacity: 0; transform: translateY(-.6em); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ---------- scene 4 · the morning glance ---------- */
+.hub__glance { display: grid; grid-template-columns: 1.35fr 1fr; gap: .8em; flex: 1; min-height: 0; }
+.hub__line {
+  background: var(--nes-white);
+  border-radius: .55em;
+  padding: .58em .7em;
+  margin-top: .42em;
+  font-size: .84em; font-weight: 500;
+  display: flex; align-items: center; gap: .55em;
+}
+.hub__line i {
+  width: .5em; height: .5em; border-radius: 50%;
+  background: var(--nes-blue); flex: none;
+}
+.hub__line i.is-amber { background: var(--nes-amber); }
+.hub__line i.is-sky   { background: var(--nes-sky-up); }
+.hub__temp {
+  font-family: var(--font--primary);
+  font-size: 2.8em; font-weight: 400; letter-spacing: -.02em;
+  line-height: 1.05;
+}
+.hub__out { display: flex; flex-direction: column; }
+.hub__leave {
+  margin-top: auto;
+  display: flex; align-items: baseline; gap: .5em;
+  font-family: var(--font--ui);
+  font-size: .74em; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--nes-muted);
+}
+.hub__leave b {
+  font-family: var(--font--body);
+  font-size: 1.5em; font-weight: 600; letter-spacing: 0;
+  text-transform: none; color: var(--nes-ink);
+}
+
+/* ---------- the line under the device ---------- */
+.hub__caption { display: none; }
+
+/* ---------- what is left once it is on the wall ---------- */
+.hub__close {
+  /* 8svh under the pad's painted bottom edge — see measurePad() in hub.js
+     for why that edge has to be measured rather than derived. The fallback
+     is where the old `bottom: 6svh` put it, so a page with no JS still
+     lands somewhere sane rather than at the top of the stage.
+
+     (Was 5svh, opened to 8svh so the pill stopped reading as part of the
+     device. Back to 6svh with the new room photo — the wall between the
+     device and the shelf is shorter than it was, and 8 put the pill on the
+     furniture. It is the smallest of the three numbers that had to give;
+     see the note on .hub.is-docked .hub__pad.) */
+  position: absolute; left: 0; right: 0;
+  /* 🔴 6svh —— 退回原值（用户 2026-09-04：「Explore the Family Hub 往上移一点，
+     现在离那个设备太远了，恢复成之前的」）。我一度推到 10.4svh 去凑「两边一样」，
+     结果这一侧被拉得过开。与 .hub__thesis 的 top 是一对，见那边的注释。 */
+  top: calc(var(--pad-bot, 82svh) + 6svh); bottom: auto;
+  z-index: 4;
+  display: flex; flex-direction: column; align-items: center; gap: 1.4rem;
+  padding: 0 var(--gutter);
+  text-align: center;
+}
+
+/* sits ON the title's slot — see the note on .hub__head. Centred on the
+   slot's first line so the two swap in place rather than one arriving
+   lower than the other left. */
+.hub__thesis {
+  /* 🔴 top: 0, and it is allowed to overflow the slot downwards. Measured
+     both ways: the slot is one line tall (the title's) and this line is
+     two, so hanging it from the slot's floor (bottom: 0) pushes its ink UP
+     and opens the gap to the device to 153px, while top: 0 lets the second
+     line hang below the slot and closes it to 110. The slot's height is
+     untouched either way, which is what keeps the pad from moving when the
+     copy swaps.
+
+     🔴 The lift is on `top`, NOT on the transform. The transform is the
+     entrance (translate(-50%, 12px) → 0) and the -50% in it is what centres
+     the line — fold a resting offset into it and either the centring goes
+     or the arrival does. `top` is the free axis here: the line is absolute,
+     so moving it costs the slot nothing and the pad still does not move.
+
+     🔴 2026-09-04：抬升**归零**。这里曾是 -7svh，理由是「这行只在停靠视图里
+     出现，所以连那一视图 5svh 的抬升也一起吃掉」——那条推理本身没错，但把它
+     推到了头重的一侧。1131×744 实测（停靠态，pad 顶恒在 246）：
+
+         top      距窗顶   距设备
+         -7svh      27      103    ← 旧值，字贴着窗顶、离机器一百多
+         -4svh      49       81
+         -2svh      64       66
+          0         79       51    ← 现在
+          2svh      94       36
+
+     用户 2026-09-04：「顶部的字离顶部太近了，能不能离中间那个三维模型近一
+     点」。归零之后这行明显归属于它下面那台机器，而不是浮在窗顶。
+
+     🔴 同日再调两次：0 → -2svh（「往上移一点点」）→ **-4svh**（「网页版这个标题
+     再往上移动一些」）。照上表，距窗顶 79 → 64 → 49，距设备 51 → 66 → 81。
+     不要一路退回 -7svh——那是他更早嫌贴顶的那个值，表里写着距窗顶只有 27，
+     -4svh 是那之前的最后一档。
+
+     ⚠️ 只动桌面。手机在下方断点里另有 `top: calc(-1 * var(--head-lift))`，
+     不受这里影响。
+
+     ⚠️ 抬升归零**不影响设备**：这行是绝对定位的，槽高仍是标题那一行的高度，
+     所以 .hub.is-docked .hub__pad 的 --dock-y 一个数都不用还（实测 pad 顶在
+     五个候选值下都停在 246）。别顺手去补那半份。
+
+     另一头的边界也还在：往下给到 2svh 时距设备只剩 36，再多就要压到机身了。 */
+  /* ⚠️ 2026-09-04 我一度把它改成 bottom: 3.4svh（搬到底部那组房间点的位置），
+     因为把用户那句「one screen 文字要出现在这里」读成了位置。他说的是**这一屏**
+     ——而且实际效果是两行深字压在椅子和床头柜上，可读性直接没了。已退回。
+     这里的 top 抬升是它挂在标题槽里的正确形态，别再动。 */
+  /* 🔴 3.4svh —— 与下面 .hub__close 的 +10.4svh 是**一对**，一起定的。
+     用户 2026-09-04：「One screen… 到屏幕的距离，和屏幕到 Explore the Family
+     Hub 的距离要一样」，其中「屏幕」指的是**那台三维模型**，不是别的。
+
+     ⚠️ 量这两段有个坑，我在这上面栽过一次：`.hub__pad` 的 getBoundingClientRect
+     在**未停靠**时是 789×444（正片那块大屏），量出来上下是 18/34，据此把标题
+     往上抬——结果正好抬反了，用户当场说「怎么又往上移了」。停靠态里那台机器
+     缩小并下移，所以：
+         下面那段（机器→CTA）  34px  —— CTA 挂在 hub.js 量的 --pad-bot 上，
+                                        机器缩放它跟着走，所以这个数是真的
+         上面那段（文字→机器） ~100px —— 标题钉在标题槽里不动，机器一缩，
+                                        这段就被拉开了
+     也就是**上面远大于下面**。所以「两边一样」的方向是把文字往下放、CTA 再
+     往下一点，共同目标取 ~60px（744 视口）：文字下移 40px、CTA 下移 27px。
+
+     ⚠️ 上面那 ~100px 是从用户截图上量的，不是仪器读数——停靠态的
+     `--dock-s` 由 hub.js 每帧写，只加 .is-docked 复现不出来。改这两个数
+     之前先在真机上滚到停靠态看一眼，别再照未停靠的 rect 调。 */
+  /* 🔴 1.7svh —— 桌面端。终于是**量出来的**：1440×900 停靠态实测
+     （scrollY≈17168，.hub 带 is-docked、机器已缩到 199px 高）：
+         文字→机器 45px   机器→CTA 54px
+     用户 2026-09-04：「网页版 One screen 和硬件之间还是太近了，往上移一点」。
+     3.4svh → 1.7svh 把文字提 15px，那段落到 ~60px；CTA 那侧保持 6svh（用户
+     上一轮点名要退回原值，别再动它）。1svh ≈ 9px @900。
+
+     ⚠️ 方向：这个数**变小**是往上提、间距变大（手机那边我搞反过一次）。
+     ⚠️ 量的时候必须确认 .hub 真的带 is-docked 且机器已缩小（未停靠时
+     .hub__pad 的 rect 是 537px 高的大屏，照它算会得出相反的结论——我照那个
+     算过一次，把标题抬反了方向）。
+
+     🔴 1.7svh → 0（用户 2026-09-04：「标题上移动一点点可以吗」，截图是停靠
+     态）。1440×900 复测 1.7svh 那一版：字顶距窗顶 104、字→机器 56、机器→CTA
+     54。归零再提 15px（与上一档同样的步长）：字顶 89、字→机器 71。
+
+     ⚠️ 这一步把「两段一样」拆开了（56/54 → 71/54）。那条对称是他更早点名要
+     的，CTA 那侧的 6svh 现在仍是他定过版的值——**别为了把两段配平顺手去动
+     .hub__close**，那样等于替他撤回这次的上移。下次若他嫌两段不匀，先问是要
+     字回来还是 CTA 下去。
+     ⚠️ 0 是那张老表里的一档（字顶 79 @744），不是新猜的；下一档 -2svh 起就
+     开始往「贴窗顶」那侧走，-7svh 是他明确嫌过的。
+
+     🔴 0 → -2svh（2026-09-05）：**不是又往上提了一档，是把上一档还回来**。
+     同一轮 Meet Nestify 改小，标题槽矮了 36px，居中的列重排把槽顶往下推了
+     18px；这行绝对定位挂在槽上，就跟着掉到 107（用户刚定的是 89）。-2svh 在
+     900 上正好 18px，把它放回 89。
+     配合 --dock-y 那边补的另外 18px（机器回到 308），停靠态这三段——字顶 89、
+     字→机器 71、机器→CTA 54——与用户上一轮看过的完全一致。 */
+  position: absolute; left: 50%; top: -2svh;
+  transform: translate(-50%, 12px);
+  /* 🔴 88vw, NOT 100%. The slot is shrink-to-fit around the TITLE, so a
+     percentage here made this line's wrapping depend on how long the other
+     line in the slot happens to be — shorten the title and this one wraps,
+     for no reason visible from here. Caught by measurement: at the new size
+     against a short title it broke to four lines and ran into the device.
+     The stage's gutter is var(--gutter) a side, so 88vw is the same bound
+     the stage would have given it, stated where it can't drift. */
+  width: max-content; max-width: 88vw;
+  margin: 0;
+  font-family: var(--font--primary);
+  /* 🔴 Up from clamp(23px, 2.8vw, 42px). This line is the section's whole
+     argument and it had been sized like a caption to the device under it.
+     It can take the room: the slot's HEIGHT is the title's and does not
+     move (see the note on top: 0 above), so growing this only lengthens the
+     overhang below — the measured gap to the pad goes from 110px to ~77px
+     at 1440, which is still clear air. Two authored lines, longest 17
+     characters, against ~1300px of stage: width was never the constraint. */
+  /* 🔴 THE FLOOR IS THE TITLE'S FLOOR, 28px, and it is the same 28 that
+     --heading--display bottoms out at. It was 21, which put this line a
+     quarter smaller than the five stage headlines it follows — the reader
+     meets "All your calendars, synced." at 28px and then this at 21, and
+     the section's closing line reads as a caption to the demo rather than
+     as its conclusion.
+
+     The old 21 was protecting against a wrap: "Wherever family life
+     happens." is 29 characters and at 32px it measured 414px against 88vw,
+     i.e. wider than the viewport from 430px down. That reasoning assumed
+     this line does not wrap, which was true when the slot was one line —
+     but the stage headlines above it wrap on a phone as a matter of course
+     ("All your / calendars, synced."), so a third line here is the same
+     shape, not a defect. The line is absolute and hangs below the slot, so
+     the extra line costs the pad nothing (see the note on top: 0 above).
+
+     The two clamps still track: 4.5vw crosses 28px at 622px and the
+     title's 4.45vw crosses it at 629, so both leave their floors within
+     seven pixels of each other and the step between them stays smooth. The
+     CAP is left at 66 — on a desktop this line is meant to be the biggest
+     thing in the section, and that has not changed. */
+  font-size: clamp(28px, 4.5vw, 66px);
+  line-height: 1.14;
+  letter-spacing: -.025em;
+  /* 🔴 600, AND IT IS THE DECISION THE NOTE ON .hub__title LEFT OPEN. That
+     note measured the swap at 1440 — 64px/600 for the title, 64.8px/500 for
+     this line — and called it: "close enough in size to read as a wobble
+     rather than a contrast, while the weight steps a whole notch… the fix
+     is one of these two rules taking the other's four properties." This is
+     that fix, and it takes the title's weight rather than the other way
+     round, because the title's 600 is the page's section-headline weight
+     (.intro__lead, .intro__hero-line, .pv__title and .ft__headline are all
+     600) and this line is the hub's closing headline, not a caption to it.
+
+     The 500 tier does still exist and is untouched: .hero__title,
+     .pv__claim. Those are second-rank lines that sit UNDER something, and
+     none of them shares a slot with a 600 line — which is the whole reason
+     0.8px of size difference mattered here and does not matter there.
+
+     (The old note here read "the contrast is made by weighting THIS line
+     up, not by thinning the second one: Google Sans is served 400..700, so
+     400 is already as light as it goes." That is still true about the font
+     and no longer describes what this rule does.) */
+  font-weight: 600;
+
+  /* 🔴 ONE transform, and it keeps the -50%. There were two declarations
+     here — `translate(-50%, 12px)` up top and a later `translateY(12px)`
+     — and the later one won, so the resting state lost its horizontal
+     centring. The line is `left: 50%` and absolutely positioned, so
+     without the -50% it sat with its LEFT EDGE on the centre line, then
+     slid half its own width leftwards the moment .is-on landed. That is
+     the "why is it coming in from the left" — a lost declaration, not a
+     designed entrance. */
+  opacity: 0;
+  transform: translate(-50%, 12px);
+  transition: opacity .7s ease, transform .7s var(--ease-out-expo);
+}
+.hub__thesis.is-on { opacity: 1; transform: translate(-50%, 0); }
+
+/* Typed, like scene one's "Parent Copilot": hub.js splits the line and
+   the GLYPHS carry the arrival, so the block itself must sit still and
+   fully opaque — otherwise the two fades multiply. This class is only
+   added when the split actually happened, so the CSS above stays the
+   fallback for no-GSAP and reduced-motion. */
+.hub__thesis.is-typed {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  transition: none;
+}
+/* 🔴 出现过之后的退场：整块淡出，字符不动。
+
+   这条替代的是「倒放逐字」——那个在往回滑时会让两行字在各自的 stagger 里
+   错开高度、压成一团（理由全文见 hub.js 里 is-hushed 的那段）。
+   transition 要在这里写回来：.is-typed 上面把它关成了 none（因为那时揭示归
+   字符管），而这一档恰恰需要块级的淡出。 */
+.hub__thesis.is-typed.is-hushed {
+  opacity: 0;
+  transition: opacity .32s var(--ease-out);
+}
+
+/* 🔴 The wrapper no longer fades or lifts. It used to run its own
+   opacity/translateY entrance, which is a second animation on top of the
+   ball opening inside it — the pill arrived twice, once sliding and once
+   growing. The wrapper is now only the row; .is-on on it is the CUE the
+   button reads. */
+.hub__cta {
+  display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; justify-content: center;
+}
+/* the same pill the header wears, and now the same hover too: it carries
+   .btn-disc, so the fill opens from the middle on the page's one shared
+   timing instead of cross-fading its background. See the block at the
+   foot of styles.css. */
+/* 🔴 THE TWO STATES ARE SWAPPED against every other pill on the page: this
+   one rests BLUE and goes to ink when you touch it, where the intro's and
+   the header's rest cream and fill blue.
+
+   That is not an inconsistency, it is what this button is. .btn-ball's
+   closed shape is already the bead — a blue disc that grows into the pill —
+   so resting blue means the bead simply STRETCHES, and the object you
+   watched arrive is the object you press. The old open state repainted it
+   cream halfway through that growth, which is why the arrival read as two
+   things (a ball, then a different button) rather than one.
+
+   The hover disc therefore has to leave blue: filling blue over blue is no
+   feedback at all. Ink is the only other colour in this section that is not
+   the room.
+
+   🔴 2026-09-05：**上面整段是历史，现在是白底黑字、无描边。** 这一天走了四档，
+   记全省得下次重推：蓝底白字（原状）→ 白底黑字 + 2px 黑描边 → 退回蓝底 →
+   白底黑字**不要描边**（用户「白底黑字如何」）。
+
+   被推翻的是那条「静止为蓝」的**构造**理由，不是它的逻辑：珠子只做拉长这一件
+   事，这条现在照样成立，只是两端都写白。三条硬约束跟着颜色走，别拆开改：
+
+     · 背景必须**改两处**。.btn-ball 的基态就是 `background: var(--bead-blue)`
+       ——那是珠子还没展开时的颜色——只改下面 .is-on 那条，珠子会先闪一下蓝再变
+       白，正好复现上面那段说的「先一颗球，再换成另一个按钮」。已按 0.01 步长
+       扫过整个出场期确认无蓝帧。
+     · 静止态变浅之后 **hover 的字色必须翻**。墨盘填充是 --nes-ink，黑字不跟着
+       翻就是黑压黑，扫过之处标签直接消失。所以下面那条 :hover 是这个配色的
+       组成部分，不是装饰。
+     · 没有 border 是**用户点名的**（「不要边框」），不是漏了。真要加回来，写
+       `border: Npx solid` 会让药丸宽高各撑大 2N（box-sizing 是 border-box，但
+       这颗按钮宽度是 auto，描边照样进外框）；要不改几何就写 `box-shadow:
+       inset 0 0 0 Npx`。 */
+.hub__btn {
+  /* the shape is .btn-ball in styles.css — the same object the intro's CTA
+     is, opening from the middle instead of from the left (.btn-ball--mid).
+     What is the hub's own is the pair of colours above. */
+  --btn-disc: var(--nes-ink);
+  background: var(--nes-white);
+  color: var(--nes-ink);
+}
+.hub__btn:hover { color: var(--nes-white); }
+/* the cue: hub.js puts .is-on on the wrapper past CTA_AT */
+.hub__cta.is-on .hub__btn { opacity: 1; scale: 1; background: var(--nes-white); clip-path: inset(0 0 0 0 round 100px); }
+
+/* 前奏先停在 “Nestify lights up family life.”，由这颗按钮明确开始五拍。
+   它固定在舞台底部，不参与 pad 的几何，也不会挤动标题。 */
+.hub__explore {
+  display: none;
+}
+.hub__explore .hub__btn {
+  opacity: 1;
+  scale: 1;
+  clip-path: inset(0 0 0 0 round 100px);
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  /* on the WRAPPER — see the note there. Setting it on .hub__pad made the
+     pad wider than the box it sits in, which reads as "off centre". */
+  /* 🔴 83vw, DOWN FROM 92, AND IT IS DERIVED — 100 / 1.2, not a number that
+     looked better. .hub__pad-3d is `width: 120%` of this pad (it has to be:
+     that 20% is the overhang FILL = 1.20 in hub3d.js renders the soft edge
+     into), so 92vw of pad asks for 110.4vw of canvas. Measured at 390px the
+     canvas came out 430.5px wide spanning x -20.3 to 410.3 — twenty pixels
+     off each side of the screen — and .hub__stage's `overflow: hidden` took
+     them off square. What that clips is the soft edge rather than the
+     housing, which is why it read as the model being CUT rather than as the
+     model being too big: a shadow that fades everywhere except where it
+     meets a straight vertical line at the bezel.
+     At 83vw the canvas is 99.6vw and the edge lands inside the screen.
+
+     🔴 It is the CANVAS that has to fit, not the pad, so this cannot go
+     back up without .hub__pad-3d's 120% (and FILL with it) coming down. The
+     three numbers are one constraint. */
+  .hub__wrap { --pad-w: min(83vw, 120svh); }
+
+  /* 🔴 .92 IS A LEADING FOR A LINE THAT DOES NOT WRAP, and on a phone every
+     one of these wraps. At 28px it resolves to 25.8px — less than the type
+     size — so "All your / calendars, synced." has its two lines closer
+     together than the letters are tall, and the descenders of one run into
+     the caps of the next. That is the right number on a desktop, where the
+     headline is one line and .92 is what stops a 40px display line from
+     looking gappy; it is the wrong one the moment there are two.
+
+     1.06 is the smallest value that clears the face's own overshoot at this
+     size. Left tight on purpose — this is still a display line, not body
+     copy, and the paragraph leading (1.35) would read as a different kind
+     of text entirely. */
+  .hub__title { line-height: 1.06; }
+
+  /* 🔴 标题跟机器同一条比例尺，不再钉死在 28px（2026-09-04）。用户：「统一
+     一下文字和三维模型的大小啊。」
+
+     机器是 vw 驱动的（--pad-w: min(83vw, 120svh)），标题不是：
+     --heading--display 是 clamp(28px, 4.45vw, …)，而 4.45vw 要到 630px 宽才够
+     得着 28px——手机整段都压在**下限**上，于是屏幕一宽机器就跟着长、字号一动
+     不动。实测 660×872：机器 548 宽，标题「All your calendars, synced.」只有
+     350，占机器的 64%；390×844 上同一句排成两行、反而占满 326/324 = 100%。
+     同一段里两个比例，这就是「大小不统一」。
+
+     7.2vw 是照着「一行标题 ≈ 机器宽的九成」定的，两端都夹住：
+       · 上限 40px —— 900px 处桌面的 4.45vw = 40.05px，跨过 media 边界连续，
+         差 0.05px。别往上抬：抬了就在 900/901 之间看见字跳。
+       · 下限 28px —— 与桌面 --heading--display 的底同值；390 处 7.2vw = 28.1px，
+         iPhone 一档的排版（两行 + 断行位置）一个像素没动。
+     实测 660×872 改后 40px，标题 476 宽 = 机器的 87%。
+
+     🔴 **段尾那句必须同步**，所以是一个变量而不是两条规则。.hub__thesis 的
+     clamp(28px, 4.5vw, 66px) 与 --heading--display 的 4.45vw 是**配对**的（那边
+     的注释写着「两条 clamp 仍然同步」，理由是读者先读 28px 的
+     「All your calendars, synced.」、再读同样 28px 的「One screen.」，小一档就
+     变成给 demo 作注脚）。只把标题拉到 7.2vw 会让 660 处 40px 的中间句接一句
+     29.7px 的结束句，正好制造那边防的那件事。
+
+     🔴 2026-09-05 起 .hub__title-line.is-meet（那句 Meet Nestify）**也吃这条**。
+     它原来有自己的 clamp、比这四句大一档，用户要求改成一样大，那条覆盖已删。
+     所以改这个数会连带改到前奏那一句，进而改到 intro 的落地句——两者靠字号
+     逐像素一致完成交接。
+
+     ⚠️ 定义挂 :root 而不是 .hub，就是为了 intro 那句能读到**同一个**值。
+     .intro__room-line 不在 .hub 里，继承不到，而把这条 clamp 抄一份过去正是
+     这个文件里反复出错的那种写法。挂 :root 不改变任何层叠：这个变量只被
+     .hub 内部的规则消费，现在多一个 intro 的消费者。 */
+  :root { --hub-copy: clamp(28px, 7.2vw, 40px); }
+  .hub__title,
+  .hub__thesis { font-size: var(--hub-copy); }
+
+  /* 🔴 五句贴槽的**底**，不是顶。这才是「每一拍离机器一样远」。
+
+     槽是一个 grid 单元格，高度取**最高**那句（两行的那几句）——这条是对的，
+     它保证换句时机器不动（见上面 .hub__title-line 那段）。但五句默认从单元格
+     的**顶**开始排，于是单行的句子底下空着一整行：实测 660×872，两行的
+     「See what's changing in your family.」离机器 46px，单行的「All your
+     calendars, synced.」离 91px——同一段里同一个关系有两个数，换句时字还会
+     跳一行。改前 390×844 上看不出来，是因为那个宽度**每一句都是两行**。
+
+     贴底之后间距只由 .hub__head 的 margin-bottom 决定，与这句排几行无关。
+
+     ⚠️ is-meet 单独留在顶部：那一句是**前奏**接 intro 的落地句，位置和字号
+     必须与 intro 那边逐帧对齐（intro.js 的 syncRoomLine 量的就是这一行）。
+     跟着贴底会把它往下推近半行，而前奏的机器是缩小停靠态、就在下面。它与
+     其余四句从不同屏，分开对齐不会互相影响。 */
+  .hub__title { align-items: end; }
+  .hub__title-line.is-meet { align-self: start; }
+
+  /* (the weight override that was here is gone — .hub__thesis is 600 at
+     every width now, see the note on its base rule. Leaving a phone-only
+     copy of a value that no longer differs is how a rule outlives the
+     reason for it.) */
+
+  /* 🔴 UP, because the line got a third row. At 21px it set on two lines
+     and -7svh was measured against that; at 28px "Wherever family life
+     happens." wraps and the block is 96px tall instead of 48. The line is
+     absolute and hangs DOWNWARDS out of the slot (see the note on top),
+     so the extra row lands entirely below the mark and pushes the whole
+     paragraph toward the device. -12svh is 844 x .05 more lift than -7,
+     i.e. 42px against the 48 the third row added — a little short on
+     purpose, so the block still sits below the slot's top rather than
+     jumping above where the title was. */
+  /* 🔴 手机上标题槽整体抬升，收敛成 --head-lift 这一个变量（2026-09-04）。
+     用户：「Meet Nestify 为什么和三维模型重叠？往上提一点，这几个标题大概跟
+     One screen 那个标题是一样高度的。」
+
+     原来只有 .hub__thesis 抬了 12svh，五句 .hub__title-line 留在槽位原处——
+     实测 390×844 停靠态：标题行 287–346，机器 313–422，**压进去 33px**。
+     现在两者读同一个数，「一样高度」是由构造保证的，不是调出来的。
+
+     ⚠️ 标题行用 translate 而不是 top：.hub__head 的高度就是这行标题的高度、
+     .hub__thesis 又绝对定位在它上面（见文件前面那段），改 top 会让槽自己塌，
+     thesis 跟着失去锚点。translate 不参与布局，槽高不变。 */
+  /* 12svh → 9svh：用户「三维模型上下留那么宽干嘛」。390×844 停靠态实测，
+     文字→机器 63px。⚠️ 方向别搞反（我错过一次）：抬升**变大**是把文字往上
+     提，这段间距跟着**变大**；每 1svh ≈ 8.4px。实测 9svh→38px、8.76svh→36px，
+     用户要 40px，所以落在 9.24svh。标题行跟着一起上去，离机器余量更大
+     （改前是压进去 33px），不会再重叠。 */
+  /* 🔴 抬升是给**停靠态**的，不是给巡览的五拍（2026-09-04）。用户：「这里文字
+     和下面的视觉元素距离太远了。」
+
+     上面那两段调的一直是停靠态（thesis「One screen.」对着缩小后的机器），可
+     `.hub__title` 那条把同一个数原样发给了**每一句**——包括机器开到最大、正在
+     演示的那四屏。那四屏的机器在槽位原处，标题却被抬走 78px（9.24svh × 844），
+     于是中间空出 .hub__head 的 6svh 外边距**加上**这 78px。实测 390×844 第 2 拍
+     「All your calendars, synced.」：字底 239、机顶 365，**126px** 的空白——正是
+     用户截图里那一段。
+
+     停靠态两处都要抬，巡览态一处都不要：
+       · .hub__thesis  只在段尾（.is-slot-busy）出现，照旧抬 —— 那 31px 是调过的
+       · .hub__title   只在**前奏**（.is-prologue，那句 Meet Nestify）需要抬：
+                       前奏也是 docked 态，机器已经缩到 [313,422]，不抬就压上去
+                       ——那正是本段第一条注释记的「压进去 33px」。
+                       其余四拍（唯一另一处标题可见的地方，段尾被
+                       `.hub.is-docked .hub__title{opacity:0}` 藏着）不抬，
+                       字底落到 317，离机器 48px。
+
+     ⚠️ 别改成 `.hub.is-docked .hub__title`：那会把段尾也算进来，而段尾的标题
+     是隐藏的、抬不抬都看不见，却会让 is-prologue 那条失去唯一性。判据就是前奏。
+
+     ⚠️ intro 的交接不受影响：syncRoomLine 量的是前奏那一帧的 .hub__title-line
+     矩形，而前奏这条一个像素没动。 */
+  .hub { --head-lift: 9.24svh; }
+  .hub__thesis { top: calc(-1 * var(--head-lift)); }
+  /* 🔴 巡览这四拍再往下贴 15px（用户 2026-09-04 看过 48px 那一版：「这之间
+     距离可以再近一点吗」）。实测 390×844 与 660×872 都从 48/49 落到 33/34。
+
+     ⚠️ 用 translate 推**标题**，不是把 .hub__head 的 margin-bottom 改小。那条
+     外边距同时定义着「槽到机器」的距离，而 .hub__thesis 是绝对定位挂在槽上、
+     机器又由 flex 居中——减 15px 的外边距会让标题和机器各走一半、thesis 跟着
+     槽顶再走一半，段尾那句到机器只剩 17px（实测推导：三者各分 7.5px）。段尾
+     那 32px 是用户上一轮定过版的，不能被这一次顺手带走。
+     translate 不参与布局：槽不动、机器不动、thesis 不动，只有这四句往下走。 */
+  /* 🔴 判据反过来写：**默认抬升，只有巡览那四拍下移**。原来是反的
+     （默认 15px、`.is-prologue` 才抬），那样写漏了一个状态，代价是重叠。
+
+     漏的是 intro 的**交接期**（.is-early，机器已提前钉住但 .is-prologue 还没
+     加）。intro.js 的 syncRoomLine 每帧量 .hub__title-line.is-meet 的矩形、写进
+     --room-line-top，intro 那句就钉在那个数上——它量的正是这一段。原来的写法
+     让它在交接期量到**未抬升**的位置，等 .is-prologue 一加，hub 这边的标题上跳
+     一整个 --head-lift，而 intro 那句还留在下面，于是压在机器上。
+     实测 592×438：is-meet 离机器 67px，同一时刻 intro 那句只有 12px；
+     592×900 更糟，直接是 **-25px**（用户 2026-09-05 截图：「这一幕字体怎么和
+     中间的图像重合了」）。
+
+     现在默认值就是抬升后的位置，交接期量到的和前奏期是同一个数，两句从头到尾
+     重合。巡览那四拍（唯一一个既不 docked 也不 prologue 的状态）用下面那条
+     覆盖回 15px —— 段尾也是 docked，标题在那里是 opacity:0，抬不抬都看不见。 */
+  .hub__title { translate: 0 calc(-1 * var(--head-lift)); }
+  .hub:not(.is-prologue):not(.is-docked) .hub__title { translate: 0 15px; }
+  /* 🔴 前奏**出场**时这 78px 要滑下去，不能硬切。进场不受影响：
+     `.hub.is-prologue .hub__title{transition:none}`（本文件末尾）压住整条
+     transition，intro→hub 那一帧仍是硬接，重影那条修复照旧成立。
+     摘掉 is-prologue 的一帧 transition 回到这里，标题一边换成第 1 拍一边落向
+     机器——位移和换句是同一个动作，跟上面 -10px 那条记的道理一样。 */
+  .hub__title {
+    transition:
+      opacity .5s ease,
+      transform .5s var(--ease-out-expo),
+      translate .5s var(--ease-out-expo);
+  }
+  /* 下面这段同步：机器→CTA 原为 51px（正好是全局的 6svh）。4.2svh 量到 36px，
+     为了跟上面那段一样落在 40px，取 4.67svh。两个数是一对，改一个要看另一个。 */
+  .hub__close { top: calc(var(--pad-bot, 82svh) + 4.67svh); }
+
+  .hub__glance,
+  .hub__cook { grid-template-columns: 1fr; }
+  .hub.is-docked .hub__pad { --dock-s: .6; }
+}
+
+/* the device stops being a demo and is simply shown, with every scene
+   already at its finished state */
+@media (prefers-reduced-motion: reduce) {
+  .hub__scene.is-active .hub__fly,
+  .hub__scene.is-active .hub__star,
+  .hub__scene.is-active .hub__level i,
+  .hub__scene.is-active .hub__task.is-done .hub__box::after,
+  .hub__scene.is-active .hub__list li.is-new { animation: none; }
+  .hub__scene.is-active .hub__list li.is-new,
+  .hub__scene.is-active .hub__fly { opacity: 1; }
+  .hub__scene.is-active .hub__task.is-done .hub__box::after { transform: scale(1); }
+  .hub__bar i { transition-delay: 0s; }
+  .hub__pad, .hub__glow, .hub__head,
+  .hub__caption, .hub__thesis, .hub__cta { transition-duration: .01s; }
+}
+
+
+/* ============================================================
+   3D PAD + ROOM SWAP — carried across the hub swap, on request
+
+   🔴 THE BRANCH VERSION HAS NEITHER. Its pad is an <iframe> of the live app
+   and its stage has one room. Everything below came from the local build.
+   The two halves compose rather than fight, because .hub__pad-3d is a
+   SIBLING canvas inside .hub__pad: when it lights up it hides
+   .hub__screen, whatever .hub__screen happens to contain. It hid a DOM
+   calendar before; it hides the iframe now, unchanged.
+
+   🔴 ONLY THESE RULES, AND THAT IS THE POINT. The first attempt lifted a
+   CONTIGUOUS RANGE out of the local file and swept up everything sitting
+   between the room layers and the bezel colours — .hub__head, .hub__title,
+   .hub__pad, .hub.is-docked .hub__pad. Appended last, those local copies
+   overrode the BRANCH's own versions of the same selectors, including the
+   dock geometry (--dock-s, --dock-y, --bezel) that its animation is tuned
+   against. Take rules by NAME here, never by range.
+
+   🔴 THE CONTRACT WITH hub3d.js IS TWO ATTRIBUTES. It is self-driving: it
+   observes .hub for `class` and `data-room`, lights .is-on once .is-docked
+   lands, adds .hub--3d, and reads data-room for the rim's coat. The
+   branch's hub.js already sets .is-docked; the room rotation that writes
+   data-room was ported into it alongside this.
+   ============================================================ */
+.hub__glow::before,
+.hub__glow::after {
+  content: "";
+  position: absolute; inset: 0;
+  background-size: cover;
+  background-position: center 26%;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 1.2s var(--ease-out);
+}
+.hub__glow::before { background-image: url("assets/hub-room-1.webp?v=574"); }
+.hub__glow::after  { background-image: url("assets/hub-room-2.webp?v=441"); }
+
+.hub__glow-room4,
+.hub__glow-room5 {
+  position: absolute; inset: 0;
+  background-size: cover;
+  background-position: center 26%;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 1.2s var(--ease-out);
+}
+.hub__glow-room4 {
+  z-index: 1;
+  background-image: linear-gradient(rgba(132, 151, 112, .08), rgba(132, 151, 112, .08)),
+    url("assets/intro-room.webp?v=568");
+}
+.hub__glow-room5 {
+  z-index: 2;
+  background-image: linear-gradient(rgba(91, 130, 156, .28), rgba(224, 232, 230, .08)),
+    url("assets/hub-room-3.webp?v=625");
+  background-position: 58% 26%;
+}
+
+/* 🔴 前奏那一屏用的是**另一张**墙（2026-09-04）。
+   ::before 这一层在整页里被读到两次，中间隔着整段正片：
+       前奏   scroll ≈ 4400–5400   .is-prologue，标题「Everything that matters
+                                    today.」，上面还盖着 intro 的转场层
+       正片   停靠之后              轮换的第 1 张，标题已经走到最后一句
+   两次都是 data-room=1，所以本来是同一张图。用户要的是这两处分开：前奏必须
+   接住 intro 那面绿色客厅（intro 的 .intro__room 正在它上面淡出，两层不是同
+   一张就会在淡出到底的那一刻硬切成另一个房间——用户原话「不要让我往下拉的
+   时候又出现另外一张」），而轮换的第 1 张要的是新的儿童房。
+   ⚠️ 第一版是**改写 ::before 的 background-image**（前奏期换成 intro-room），
+   那是错的，用户当场看到了：走出前奏的那一刻 ::before 才第一次被指向
+   hub-room-1.webp，那张图在整个前奏里从没被请求过，于是它去取图、解码，而
+   opacity 一直是 1 —— 图没到位的那几帧 ::before 就是**透明**的，底图（第 3
+   张，儿童房）原样透出来。用户原话「我放大到这个 Family Hub 之后，那个儿童
+   房的图会露出来」。
+
+   所以三面墙的图一个都不动，前奏那张改用 .hub__glow-pro 这个真元素盖在
+   ::before 上面（伪元素已经被三面墙占满了，凑不出第四层）。这样 ::before
+   从头到尾就是 hub-room-1.webp、第一次绘制时就取好了，前奏结束只是把上面这
+   层撤掉，底下已经画好了 —— 没有任何一帧会露出底图。 */
+.hub__glow-pro {
+  position: absolute; inset: 0;
+  /* 🔴 z-index: 1 —— 上面那句「盖在 ::before 上面」当时只对了一半，而另一半
+     在手机改成时钟驱动之后开始漏（用户 2026-09-05：「为什么手机版这一幕它会
+     自动变场景，背景会从最开始那个变成后面另外一个」）。
+
+     CSS 的绘制顺序是：背景 → ::before → **子元素** → ::after。所以这个真元素
+     压得住 ::before（第 1 张），压不住 ::after（第 2 张）。写那段注释时前奏期
+     data-room 恒为 1，room=1 只点亮 ::before，::after 一直是 0，问题看不出来。
+     后来手机上三面墙改成 2.6s 一换的时钟（hub.js 的 roomClock，用户自己要的
+     「它就自己在那边变」），前奏期照样在轮，轮到 room=2 时 ::after 亮到
+     opacity 1，就从这一层上面盖过来——每 7.8 秒露 2.6 秒的另一个房间。
+
+     z-index 让绘制顺序回到注释所描述的那个意思：这一层在三面墙**全部**之上。
+     它只在 .is-prologue 时 opacity 才是 1，其余时候是 0，压不着任何东西。
+     （hub.js 那边同时停掉了前奏期的时钟——这一条是构造上的保证，那一条是不做
+     无用功；两条各自独立成立。） */
+  z-index: 3;
+  background-image: url("assets/intro-room.webp?v=568");
+  background-size: cover;
+  background-position: center 26%;   /* 与三面墙同一套取景，换层不会位移 */
+  background-repeat: no-repeat;
+  opacity: 0;
+  /* 🔴 **进场瞬时、退场延后**，两头都不是淡的，别照着三面墙给它配淡入淡出。
+
+     进场不能淡：给过它 1.2s 淡入，实测漏图——进前奏时 .hub__glow 自己那条
+     1.1s 已经先把墙点到 opacity 1 了，而这一层和 ::before 还在 0.08 往上爬，
+     那一秒多里露出来的就是底图（第 3 张）。整面墙的淡入本来就归 .hub__glow，
+     这一层再叠一次只会制造空窗。所以 .is-prologue 上写 transition: none。
+
+     退场不能立刻撤：撤掉的那一刻墙还在（.hub__glow 要 1.1s 才淡完），底下的
+     ::before（第 1 张）就顶上来陪着墙一起淡出——读者看到的是「放大的时候背景
+     换成了另一个房间再消失」。用户原话「它不是变成 Family Hub 的时候屏幕放大
+     了，然后你后面显示到了 Room One 的背景还是没有去掉……宁愿这个背景只是变浅
+     了，然后它再放大」。所以这里用 `0s linear 1.3s`：不是淡出，是**等墙淡完
+     再瞬间撤**（1.3 > .hub__glow 的 1.1），撤的那一帧墙已经是 0，看不见。
+     淡出去的自始至终是这面绿墙本身，第 1 张要等到正片停靠才第一次露面。
+
+     ⚠️ 1.3s 和 .hub__glow 的 1.1s 是绑死的，改那条必须同时改这条。 */
+  transition: opacity 0s linear 1.3s;
+}
+/* 🔴 绿客厅只接住**交接的那一下**，然后让位给轮换的三面墙（2026-09-05，用户：
+   「那个动画播完以后，把它的那个背景变到后面几个屏幕，room one、room two、
+   room three 这些都可以放上来」）。
+
+   进场仍是硬切（transition: none —— 上面那段讲了：淡入会漏出底图）；淡出改用
+   animation，因为它要的是「停 2.4s 再走」，而 transition 表达不了「延迟之后自动
+   播放」。2.4s ≈ 房间时钟第一格（ROOM_MS 2600）走完，绿墙退场时下面正好换到第
+   二面，读者看到的是一次换墙、不是一次消失。forwards 让它停在 0，别回弹。 */
+.hub.is-prologue .hub__glow-pro {
+  opacity: 1;
+  transition: none;
+  animation: hubProHandoff 1.1s var(--ease-out) 2.4s forwards;
+}
+@keyframes hubProHandoff { to { opacity: 0; } }
+
+/* 要求不动的那档：绿墙一直在，三面墙的轮换本来也被 REDUCED 关着 */
+@media (prefers-reduced-motion: reduce) {
+  .hub.is-prologue .hub__glow-pro { animation: none; }
+}
+
+.hub[data-room="1"] .hub__glow::before,
+.hub[data-room="2"] .hub__glow::before,
+.hub[data-room="2"] .hub__glow::after,
+.hub[data-room="3"] .hub__glow::before,
+.hub[data-room="3"] .hub__glow::after,
+.hub[data-room="3"] .hub__glow-room4,
+.hub[data-room="4"] .hub__glow::before,
+.hub[data-room="4"] .hub__glow::after,
+.hub[data-room="4"] .hub__glow-room4,
+.hub[data-room="4"] .hub__glow-room5 { opacity: 1; }
+
+/* Hide the lower room immediately on the final 2 → 0 transition so it
+   cannot show through. Keep the top room's 1.2s fade-out: the last room
+   should arrive at the same pace as the earlier change. */
+.hub.is-room-cut .hub__glow::before,
+.hub.is-room-cut .hub__glow-room4,
+.hub.is-room-cut .hub__glow-room5 { transition-duration: 0s; }
+
+/* the housing's rim follows the room */
+/* 🔴 三个房间**都要有**。这里原本只写了 1 和 2，room 0 落空，于是退到
+   `--bezel-c` 的默认值 `var(--nes-ink)` = #1a1a1a —— 近黑。用户 2026-08-31：
+   「One Screen 手机版上这个模型就是黑黑的，感觉没有颜色倾向」。
+
+   平时看不出来，因为 WebGL 起得来时 .hub--3d 会把这圈平面 ring 整个撤掉
+   （见 .hub__pad 的 box-shadow 上方那段），机身是 hub3d.js 里的对象。只有
+   three.js 起不来、退回平面兜底时才会露出来——而三个房间里偏偏只有最后一个
+   是黑的，所以看起来像「这一屏的模型坏了」。
+
+   🔴 值取 nestie-unit.js 里机身自带的阳极蓝 0xaec8de：3D 那边 room 0 是
+   「不涂任何 coat、露出机身本色」（roomNow() 返回 0 → COATS 全关），所以
+   平面兜底的这一圈应该是同一个颜色。另两个是各自 coat 的孪生值，注释在
+   nestie-unit.js 的 COATS 上方——**三个要一起改**。 */
+.hub[data-room="0"] .hub__pad { --bezel-c: #aec8de; }
+/* 🔴 这是 WebGL 起不来时那圈**平面兜底**，取的是 3D 涂层在段尾那一幕的颜色
+   （棕红）。3D 那边现在按幕换色（hub.js 的 setCoatTint），平面兜底做不到分幕，
+   所以取其中一个——取段尾这个，因为「One screen.」那几屏是这一段的落幕，
+   兜底也该落在那儿。 */
+.hub[data-room="1"] .hub__pad { --bezel-c: #a06a52; }
+.hub[data-room="2"] .hub__pad { --bezel-c: #b78a58; }
+.hub[data-room="3"] .hub__pad { --bezel-c: #87966f; }
+.hub[data-room="4"] .hub__pad { --bezel-c: #718a9b; }
+
+/* ---------- the three rooms, read back as three dots ----------
+   Under the pill, on the band of bare wall between the button and the
+   furniture. That band is the last clear thing in the composition and it is
+   NOT deep — the same shelf line that .hub.is-docked .hub__pad and
+   .hub__close are both tuned against is about 20px under these dots at
+   1440x900. Swap a room photo and these get re-checked with the other
+   three. */
+.hub__rooms {
+  /* on the FLOOR of the stage, not under the pill. See the note in
+     index.html for why it had to leave .hub__close to get here. The stage
+     is the containing block (position: sticky counts as positioned), and
+     bottom is measured against its padding box, so this clears the 8svh
+     foot padding on its own without having to know about it. */
+  position: absolute; left: 50%; bottom: 3.4svh;
+  transform: translateX(-50%);
+  z-index: 4;
+  /* 🔴 2026-09-03 用户要求删掉底部这组房间点（他叫它「进度条」）。
+     display 从 flex 改成 none —— 标记与 hub.js 的 syncRooms 都留着，换墙逻辑
+     仍按 data-room 走，去掉的只是指示器。要恢复就把 none 改回 flex。
+     ⚠️ 别在这条规则**前面**另写一条 display:none：下面这些声明排在后面会赢。 */
+  display: none; align-items: center; justify-content: center;
+  gap: 9px;
+  opacity: 0;
+  /* the wall's own cue and the wall's own timing: .hub__glow fades in on
+     this same class over this same 1.1s, so the dots and the thing they
+     are counting arrive as one event rather than two */
+  transition: opacity 1.1s var(--ease-out);
+}
+.hub.is-docked .hub__rooms { opacity: 1; }
+
+.hub__dot {
+  position: relative;
+  width: 8px; height: 8px;
+  border-radius: 1000px;
+  background: color-mix(in srgb, var(--nes-ink) 30%, transparent);
+  /* 🔴 overflow, so the fill is cut to the pill instead of running out of
+     its ends — and it is safe HERE where it was not on .pv__panel, because
+     nothing on this element is transformed. That pairing (overflow + a
+     transform on a rounded box) is what blackened the testimonial cards in
+     Safari; the active state below is a WIDTH, which is why the scale that
+     used to mark it is gone. */
+  overflow: hidden;
+  /* 🔴 NO HALO, AND NO SHADOW OF ANY KIND — flat, on request. There was a
+     white glow here (0 0 5px 1px at 55%) and the measurement that argued
+     for it still stands: the bare wall under the pill runs out at y=518 in
+     room 1 (the mug's handle) and y=533 in room 0 (the toast), against a
+     row that sits at 528, and no height clears every object in all three
+     rooms because room 1's clear band is twelve pixels deep. So the row
+     does graze a mug and a slice of toast, and that is accepted rather than
+     unnoticed — the ink still measures 4.11 / 14.01 / 11.41 against the
+     wall behind it, which is what carries the state. Flat black on flat
+     grey, and nothing lit. */
+  /* 1.2s IS the room's cross-fade — the transition on .hub__glow's layers
+     above, and ROOM_FADE in hub3d.js. The dot turns WITH the wall; any
+     other number here and the indicator and the picture disagree. */
+  /* .45s on the width is .hero__dot's .3s opened up a little: this bar is
+     twice the hero's travel in a row half as tall, and at .3 the open read
+     as a snap rather than the dot growing into the bar. */
+  transition: width .45s var(--ease-out-quint),
+              background 1.2s var(--ease-out);
+  flex: none;
+}
+
+/* the fill, and it is .hero__dot i with one thing taken out — that one is
+   painted per frame from the scroll and so carries `transition: none` to
+   stop it lagging the wheel. Nothing here is chasing a wheel: the width is
+   a keyframe on a clock, so the rule it needed is the rule this does not. */
+.hub__dot i {
+  position: absolute; inset: 0 auto 0 0;
+  display: block;
+  width: 0; height: 100%;
+  background: var(--nes-ink);
+  border-radius: 1000px;
+}
+
+/* 🔴 THE ORDER IS THE SHOWN ORDER, NOT THE STACKING ORDER, and the two are
+   different lists. 0-1-2 is how the pictures are STACKED: room 0 is the
+   ground (hub-room-3.webp, the kid's room — 名字里的 3 是它第三个出现) and 1 and 2 are layers over it,
+   which is why 0 has to be the one with nothing on top. 1-2-0 is the order
+   they are SHOWN in — green, then wood, then blue, opening on 1; see the
+   note on ROOMS in hub.js. The dots count what a reader SEES, so dot 1 is
+   room 1 and dot 3 is room 0. Re-order the clock and this mapping moves
+   with it. */
+.hub[data-room="1"] .hub__dot:nth-child(1),
+.hub[data-room="2"] .hub__dot:nth-child(2),
+.hub[data-room="0"] .hub__dot:nth-child(3) {
+  /* 🔴 INK, NOT --bead-blue, and that was measured rather than picked. The
+     bead is the obvious brand answer for a dot — it IS the dot on the i —
+     and it is unreadable here: sampled at this spot against the three walls
+     it comes out 1.02 / 2.13 / 1.09, so a blue dot on the pale blue-grey
+     kitchen wall is simply not there. Ink measures 4.64 / 13.72 / 4.99 on
+     the same three. It is also what .hub__btn's note already worked out
+     for the pill above — ink is the only colour in this section that is
+     not the room. */
+  /* 76px is .hero__dot.is-active's bar, unchanged — the two rails are the
+     same object and a reader meets this one about a screen after that one,
+     so a second, nearly-equal length would read as a mistake rather than as
+     a distinction. */
+  width: 76px;
+  /* the TRACK, so it has to sit below the fill the way the hero's does:
+     30% is the resting dot, and the active one drops to 20% precisely so
+     the ink running through it is the thing that reads. */
+  background: color-mix(in srgb, var(--nes-ink) 20%, transparent);
+}
+
+/* 🔴 INK, NOT --bead-blue, and that was measured rather than picked. The
+   bead is the obvious brand answer for a dot — it IS the dot on the i — and
+   it is unreadable here: sampled at this spot against the three walls it
+   comes out 1.02 / 2.13 / 1.09, so a blue bar on the pale blue-grey kitchen
+   wall is simply not there. Ink measures 4.64 / 13.72 / 4.99 on the same
+   three. It is also what .hub__btn's note already worked out for the pill
+   above — ink is the only colour in this section that is not the room. */
+.hub.is-rooms-on[data-room="1"] .hub__dot:nth-child(1) i,
+.hub.is-rooms-on[data-room="2"] .hub__dot:nth-child(2) i,
+.hub.is-rooms-on[data-room="0"] .hub__dot:nth-child(3) i {
+  /* 🔴 A WIDTH, NOT A KEYFRAME. This was `animation: hub-room-fill 2800ms
+     linear` back when the wall ran off an interval, and the two numbers had
+     to be kept equal by hand or the bar finished somewhere other than where
+     the wall turned. There is no clock left to agree with: hub.js paints
+     --room-fill per frame from the scroll, so the bar IS the reader's
+     position inside the current room and cannot drift from it.
+
+     It also answers the thing the old note worried about — a bar that came
+     back part-full after the section went off screen. Position has no such
+     state to lose. */
+  width: calc(var(--room-fill, 0) * 100%);
+}
+
+/* 🔴 120%, and it is the canvas that is oversized, not the object — the
+   soft edge needs the room. Held at opacity 0 until hub3d.js says the
+   model is ready, so a failed load leaves .hub__screen showing rather
+   than a blank rectangle. */
+.hub__pad-3d {
+  position: absolute; z-index: 3;
+  left: 50%; top: 50%;
+  /* 🔴 120 / 128, NOT 120 / 120, AND THE SECOND NUMBER IS THE PAD'S NEW
+     ASPECT SHOWING THROUGH. hub3d.js frames the housing off the CANVAS's
+     aspect and its own note says what it expects: "the pad is 16:9.6 and
+     the unit is 16:9 … the canvas takes the pad's aspect". frame() solves
+     for a world WIDTH — camera.z = shown / 2 / (tan(halfFov) * aspect) —
+     so a wider canvas shows the same width and LESS HEIGHT, and the
+     housing loses its top and bottom edges.
+
+     The local pad was 16/9.6. The branch's .hub__wrap is 16/9, because
+     that is the shape its iframe app is drawn to, and the pad now fills
+     it. Both cannot be one aspect, so the canvas takes its own:
+
+       want canvas 16/9.6 = 1.6667
+       pad is      16/9   = 1.7778
+       height = 120% x 1.7778 / 1.6667 = 128%
+
+     which restores exactly the framing hub3d.js was written against while
+     leaving the pad — and the app inside it — at 16/9.
+
+     ⚠️ The 120 is NOT free to change on its own: it pairs with FILL = 1.20
+     in hub3d.js, which is the overhang the soft edge needs. Move one and
+     the other has to move with it, and then this height has to be
+     re-derived from the ratio above. */
+  width: 120%; height: 128%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity .55s var(--ease-out);
+}
+.hub__pad-3d.is-on { opacity: 1; }
+/* 🔴 2026-09-04 用户定的规则：**机身只在贴墙时存在**。
+   「等到 UI 图到了 one screen 的时候三维模型才出现」+「落到墙上的那一瞬间
+   出现就好了」——两句合起来就是一条：飞行中、app 演示中都是一块裸 UI，
+   一贴上墙就长出机身。这正好是 .is-docked 的语义，所以不需要新状态量。
+
+   落点因此有两处，且都天然成立：翻卡从 intro 飞过来落在前奏的墙上，是第一次；
+   五拍 app 演完「上墙」是第二次。中间脱墙的那一段机身自己退掉，等于倒放。
+
+   过渡给了 .42s：机身是包上去的，硬切会像换了个东西。 */
+.hub__pad-3d {
+  opacity: 0;
+  transition: opacity .42s var(--ease-out);
+}
+.hub.is-docked .hub__pad-3d.is-on { opacity: 1; }
+
+/* Lights Up must have a screen before the lazy WebGL chain is ready.
+   Keep this below the canvas and outside .hub__screen: that layer fades
+   out on desktop, but sits above the canvas for the phone feature rail. */
+.hub__poster {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+  pointer-events: none;
+  display: none;
+  opacity: 1;
+  transition: opacity .55s var(--ease-out);
+}
+.hub:is(.is-docked, .is-early, .is-prologue) .hub__poster { display: block; }
+.hub__pad:has(.hub__pad-3d.is-on) .hub__poster,
+.hub.hub--track-on .hub__poster { opacity: 0; }
+
+.hub.hub--3d.is-docked .hub__pad { box-shadow: 0 46px 90px -30px color-mix(in srgb, var(--nes-ink) 55%, transparent); }
+.hub__pad:has(.hub__pad-3d.is-on) .hub__screen { opacity: 0; transition: opacity .55s var(--ease-out); }
+
+@media (prefers-reduced-motion: reduce) {
+  .hub__glow::before,
+  .hub__glow::after { transition-duration: .01s; }
+  /* 🔴 GONE, not just un-animated. syncRooms() in hub.js will not start the
+     clock under reduced motion (the `&& !REDUCED` in `want`), so the wall
+     never turns at all — and three dots with the first one permanently lit
+     is an indicator reporting a rotation that is not happening. Nothing to
+     count, so nothing to draw. */
+  .hub__rooms { display: none; }
+}
+
+/* 🔴 这里曾经有一条「手机上 1235 → 800svh」的滚动预算削减（PR #3200），
+   **已撤回**。撤回的理由值得留着，因为下次想缩短这一段时会再撞上：
+
+   当时的推理是「这一段的全部节拍都是 range 的分数（DOCK = .6916、
+   ROOM_AT = [.6916, .7885, .8678]），所以缩短总长是等比缩放」。那句话对
+   一半——节拍的**切换点**确实是分数，但节拍内的**动画是按秒跑的**
+   （hub.js 的 LINE_SPREAD = 0.42s / LINE_DUR = 0.28s，GSAP 时间轴）。
+   缩短滚动距离压缩了「两拍之间可用的时间」，却没有压缩动画本身，于是上一
+   行还没退完下一行就进来了——用户 2026-08-30：「往下滑，字全部都糊在一起」。
+
+   ⚠️ 要再缩短这一段，必须同时按同样的比例缩短那几个秒数，两者一起动。
+   只改一边就是这次的 bug。 */
+
+/* ============================================================
+   手机上第一屏不淡入
+   ============================================================
+   🔴 用户 2026-08-30：「family hub 能不能一开始不是 fade in 而是已经在那儿了，
+   因为现在不是在 meet nestie 后慢慢出现的交互了」。
+
+   说得对，而且理由正是这一版改出来的：手机上 hub 已经**不和 meet 重叠**了
+   （--hub-overlap = 0），也不再由 --meet-fly 控制淡入（setFly 恒发 1）。
+   「慢慢出现」原本服务的是「卡片冲镜头、hub 从模糊里长出来」那套过场——那套
+   在手机上已经整段拿掉了，剩下这个淡入就成了纯粹的延迟。
+
+   改的是**初始状态**，不是禁用 transition：.hub__title 原本 opacity 0 +
+   translateY(14px)，靠 .is-lit 点亮。这里把初始态直接设成可见即可——后面
+   .is-docked / .is-slot-busy 仍然会把它淡出，那些转场照常工作。
+   （禁 transition 会把退场也一并变成硬切，那不是要的。） */
+@media (max-width: 767px) {
+  .hub__title { opacity: 1; transform: none; }
+}
+
+/* 🔴 手机上去掉 One screen 那一屏底部的三颗房间点（用户 2026-09-02：手机上
+   那几条进度指示「全部都删掉」）。
+
+   它是 <div aria-hidden="true"> 加三个 <span>，**没有任何点击处理** —— 是纯
+   指示器不是控件，拿掉不损失任何功能。（我一度把它说成「可点的房间切换器」，
+   那是错的。）桌面保留。 */
+@media (max-width: 767px) {
+  .hub__rooms { display: none; }
+}
+
+/* 读者还没走到这一段时整个舞台不可见——理由全文在 hub.js 的 is-entered 那段。
+   一句话：sticky 舞台钉住前会跟着滚动从底下往上顶，而 hub 画在 intro 上面，
+   于是 intro 原地渐显的那面墙被 hub 同一面墙从下方拉上来盖掉。 */
+.hub:not(.is-entered) .hub__stage { visibility: hidden; }
+
+/* 🔴 提前钉住：intro 的翻卡一落位就把真机搬到视口上，读者看到的直接是 3D
+   机身，不再有一个「平卡片 + 仿边框」的中间态（用户 2026-09-04：「这个能不能
+   直接变成 3D 而不是中间有一个过度、加了 stroke 的」）。
+
+   舞台是 sticky top:0、无 transform，钉住时盒子就是 [0,0,视口宽,视口高]，所以
+   position:fixed;inset:0 复现的正是它 pinY 那一刻的样子——真机因此落在卡片刚
+   停下的同一个矩形里。到 pinY 这个类撤掉、sticky 接管，位置一模一样。
+
+   🔴 墙用 visibility 关，不用 opacity。.hub__glow 上有 1.1s 的 opacity 过渡，
+   用 opacity 关的话，撤类那一刻墙会花 1.1s 淡进来——而那正是 intro 的彩色墙
+   撤走的时刻，中间会露出一段空。visibility 不在过渡列表里，是硬切。
+   这一段的墙由 intro 那三层（线稿→彩色）负责，hub 自己的要等到交接。
+
+   ⚠️ 必须排在上面 :not(.is-entered) 那条之后：两条特异度相同，靠顺序定胜负。 */
+/* 🔴 z-index: 3 不是可选的。.intro 是 `position: relative; z-index: 2` 的定位
+   元素，而 .hub 是 z-index:auto——正整数层永远画在 auto 层之上，所以 intro 的
+   彩色墙一变不透明就会**把真机整个盖掉**。用户 2026-09-04：「三维模型和它里面
+   的 UI 整体感觉出现了两次…它闪」——那不是闪两次，是出现→被墙盖住→交接时
+   墙撤走又露出来。3 只要比 2 大就够，别往上加：再高会盖过页头。 */
+.hub.is-early .hub__stage {
+  position: fixed; inset: 0; z-index: 3; visibility: visible;
+  /* 🔴 淡入，不是硬出现。intro 那边把线框→真机做成交叉：线框淡出、真机淡入，
+     两条曲线互补（--early-in 由 intro.js 的 morph 写）。硬切的话读者会看到
+     一张线框「啪」地变成全彩设备，而这一拍要的是「落成实体」。 */
+  opacity: var(--early-in, 1);
+}
+.hub.is-early .hub__glow  { visibility: hidden; }
+
+/* 🔴 前奏期标题要**亮着**，接住 intro 那句。
+
+   .hub.is-docked .hub__title 平时是 opacity:0——那条是给段尾「One screen.」
+   那几屏用的（机器回到墙上、标题让位）。但前奏也是 docked 态，而前奏正是
+   「intro 刚交接过来、那句话还立着」的时刻，被那条一起关掉了。
+
+   两句话是同一句、同一字号、同一位置（intro.js 的 syncRoomLine 就是照着
+   hub 这句量的），所以交接那一帧读者看不出换了元素。
+
+   🔴 **只覆盖 opacity，不要碰 transform。** .hub.is-docked .hub__title 上有
+   `transform: translateY(-10px)`；一度在这里写了 `transform: none`，结果前奏
+   的标题比 intro 那句低 10px，交接时字跳一格。intro 那边量的就是 docked 态的
+   位置（syncRoomLine 每帧照着 .hub__title-line 量），所以这里必须保持同一个
+   变换，两句才落在同一行。
+
+   前奏结束、is-docked 摘掉时这 10px 会自然放开——那一刻标题本来就在换成
+   "All your calendars, synced."，位移和换句是同一个动作，不突兀。 */
+/* 🔴 transition: none —— 这一句必须**瞬间**亮起，不能淡入。
+
+   它和 intro 那句是同一句话、同一字号、同一位置，交接靠的就是「换元素但画面
+   不变」。可两者的水平中心差 0.5px（intro 的盒子是 gutter 到 gutter 的 1258，
+   hub 的是收缩到内容的 999），只要**同时**可见就会叠出描边发虚——用户
+   2026-09-04：「为什么 Meet Nestify 滚动的时候会有一个重影？」
+
+   所以两边都改成硬切、并且用**同一个阈值**（hubOrigin − 300，见 hub.js 的
+   inPrologue 与 intro.js 的 lineOut）：这一句瞬间亮、intro 那句同帧撤掉，
+   任何时刻只有一句在画面上。留着 .7s 的淡入就会有 300px 的重叠期。 */
+.hub.is-prologue .hub__title { opacity: 1; transition: none; }
+
+/* 🔴 前奏那句（Meet Nestify）比其余四句大一档，跟 hero 那行同尺寸。
+
+   它和 intro 的落地句是同一句话、靠位置和字号完全一致才做到交接不露馅
+   （intro.js 的 syncRoomLine 每帧照着**这一句**量顶距）。所以这三处的
+   font-size / line-height / letter-spacing 必须一起改，改一处就会在交接那一帧
+   看到字跳一下。 */
+.hub__title-line.is-meet {
+  /* 🔴 2026-09-05：**不再有 font-size / line-height**。用户：「把 meet nestify
+     大小和 everything matters today 那个字体一样大」。
+
+     删掉而不是改成一样的数，是有区别的：这一句和其余四句现在共用 .hub__title
+     上那一份声明（桌面 --heading--display / .92，手机 --hub-copy / 1.06，两个
+     断点各一份），「一样大」由继承保证，不会再出现改了断点 A 忘了断点 B 的
+     半档差。之前那条 clamp(34px, 6.6vw, 96px) 是「跟 hero 那行 A Smart Family
+     Copilot 同尺寸、比其余四句大一档」，那一档到此作废。
+
+     ⚠️ intro 的 .intro__room-line 是另一份声明（它不在 .hub__title 里，继承不
+     到），必须跟着走两个断点——见 intro.css 那边。两句字号差一档，交接就露馅。 */
+  /* 🔴 letter-spacing 仍然要在**这一行自己身上**重新声明，尽管现在字号和父级
+     一样、算出来的绝对值也一样（2026-09-04 用户：「Meet Nestify 滑动的最后
+     一瞬间有一个 glitch」）。
+
+     em 的继承陷阱：.hub__title 上写的 -.02em 是按**它自己的** font-size 算成
+     一个**绝对长度**再继承下来的，子元素换了字号也不会重算。今天两边字号相同，
+     所以这条声明是恒等的；留着是因为下一次有人再给这一句单独调字号时，字距会
+     自动跟上，而不是重演下面这段实测里的 glitch。
+
+     实测 1440×900：两句除字距外完全一致（同字体 / 95.04px / 600 / 同行高 /
+     中心线 dCx=0），但墨迹宽度 561.2 vs 553.6 —— 差 7.6px。两句都居中，所以
+     交接那一帧整行左右各弹 3.8px，就是那个 glitch。
+     在这里声明后它按 95.04px 重算，与 intro 那句逐像素同宽。 */
+  letter-spacing: -.02em;
+  /* 🔴 往下挪，让这句贴近它下面那台机器。用户 2026-09-04：「Meet Nestify 这个
+     文字能不能离这个框更近一点？离这个三维模型更近一些呢？」
+
+     实测（1398×829）改前：字 66..158，设备顶 264（转场）/ 286（前奏），
+     字底到设备 106 / 128，而字顶到窗顶只有 66——重心明显偏上。
+
+     🔴 只改**这里**就够，intro 那句会自己跟上：intro.js 的 syncRoomLine 每帧
+     量的就是这一行的矩形（含 translate），再写进 --room-line-top。所以两处
+     永远同步，不存在「改了一个另一个没动」的交接跳字。
+
+     用 translate 而不是 transform：这些标题行的揭示动画用的是 clip-path，但
+     transform 仍可能被别处占用；translate 是独立属性，不会互相覆盖。 */
+  /* 🔴 5svh → 1.5svh（用户 2026-09-05：「它现在离那个模型太近了，可以放上面
+     一点」）。那 5svh 是 2026-09-04 定的「往下挪、贴近机器」，而机器这一轮从
+     --dock-s .6 放大到 .85，两头一起长，间距就被吃掉了。 */
+  translate: 0 1.5svh;
+}
+
+/* 🔴 前奏这一句比正文标题大一档（用户：「然后它可以大一点字」）。
+   ⚠️ intro.css 的 .intro__room-line 必须**同值**——两句靠字号逐像素一致完成
+   交接，intro.js 的 syncRoomLine 每帧照着这一行量顶距。改一处就会在交接那一帧
+   看到字跳一下。 */
+@media (max-width: 767px) {
+  .hub__title-line.is-meet {
+    font-size: clamp(32px, 8.4vw, 46px);
+    align-self: start;
+  }
+  /* 前一幕不动；Family Hub 五句改为它原有的字号与顶部基线。 */
+  .hub__title {
+    font-size: clamp(32px, 8.4vw, 46px);
+    align-items: start;
+  }
+  /* 前奏交给第一幕时只换文案；两种状态共用同一坐标，避免标题先下坠再回弹。 */
+  .hub .hub__title,
+  .hub:not(.is-prologue):not(.is-docked) .hub__title {
+    translate: 0 calc(-1 * var(--head-lift));
+  }
+  .hub.is-scene-changing .hub__title,
+  .hub.is-scene-changing .hub__screen {
+    opacity: 0 !important;
+    transition: opacity .18s ease;
+  }
+  .hub.is-scene-entering .hub__title,
+  .hub.is-scene-entering .hub__screen {
+    transition: opacity 1.2s var(--ease-out);
+  }
+}
+/* （2026-09-05：这里曾有 position:relative 和两条 -2em 的 clip 覆盖，都是为了
+   兜住一个绝对定位挂在行盒外面的副标。副标已并进标题成一句，三条全删——这一行
+   现在和其余四句用的是**完全同一套**声明，只剩上面的字距和下移两条例外。） */
+
+/* ============================================================
+   手机版：设备是固定的画框，左右滑换框里的画面
+   （2026-09-05 第三版。用户：「三维模型它是一个框，然后你左右滑，你可以看到各种
+   不同的效果，然后框是静止的…然后上面标题也会变…背景也可以跟着它动，每次换一个
+   场景就变一次」）
+
+   🔴 前两版都被推翻，病根是同一个：把设备和它的内容拆成了两个东西。第一版是
+   纵向 sticky 演示（940svh，太长）；第二版把五拍摊成页面上一排白卡，于是墙上挂
+   着一台空设备、下面又是五张各带屏幕截图的卡片——同一块屏幕在一屏里出现两次。
+   现在轨道**就是屏幕**：墙不动、机身不动，滑动只发生在框里。
+
+   🔴 三件事由同一个滚动位置驱动（hub.js 的 deckTrack）：框里的画面、上方的标题、
+   背景的房间。五个画面对三面墙，轮着来。
+
+   🔴 桌面一个字没动：这一整块在 767 断点里，.hub__shots 在断点外是 display:none，
+   那边仍然是 iframe + 纵向时间轴。
+   ============================================================ */
+.hub__shots { display: none; }
+.hub__shots-nav { display: none; }
+.hub__shots-cta { display: none; }
+.hub__mobile-room { display: none; }
+.hub__mobile-dots { display: none; }
+
+@media (max-width: 767px) {
+  /* 手机不使用桌面那层逐张飞入的 DOM 卡片。它偶尔残留在前奏帧上时，就会从
+     屏幕四边探进来；手机版的内容只存在于设备内的横向画面轨道。 */
+  .hub__flies { display: none !important; }
+
+  /* Lights Up fills the viewport. Family Hub leaves a 96px footer for
+     the outlined CTA, with the progress dots inside the scene card. */
+  .hub__glow {
+    transition:
+      opacity 1.1s var(--ease-out),
+      inset .72s var(--ease-out-expo),
+      border-radius .72s var(--ease-out-expo);
+  }
+  /* 手机版的 Lights Up 不能靠一个与滚动无关的 2.4s 倒计时自己退场：读者停得
+     久一点，它就会在最后几秒露出底图闪一下。进入 Family Hub 的那一帧才开始
+     交接，并让旧墙退场与卡片 inset 使用同一个 .72s 节拍。第一张 mobile room
+     已经在下面淡入，因此两层全程交叉覆盖，不会先缩框、过一秒才换背景。 */
+  .hub__glow-pro {
+    opacity: 1;
+    transition: opacity .72s var(--ease-out-expo);
+  }
+  .hub.hub--track-on .hub__glow-pro { opacity: 0; }
+  .hub.is-prologue .hub__glow-pro {
+    opacity: 1;
+    animation: none;
+    transition: none;
+  }
+  /* Shrink and swap are one transaction. `is-explore-unlocked` is set when
+     the CTA/input is accepted, before the first room has necessarily taken
+     ownership; hub--track-on is the actual handoff state. */
+  .hub.hub--track-on:not(.is-prologue) .hub__glow {
+    inset: 12px 12px 96px;
+    border-radius: 28px;
+    overflow: hidden;
+  }
+
+  .hub__mobile-dots {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    position: absolute;
+    left: 50%;
+    bottom: 116px;
+    z-index: 7;
+    translate: -50% 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .28s ease .32s, color 1.2s var(--ease-out);
+  }
+  .hub.hub--track-on:not(.is-prologue) .hub__mobile-dots { opacity: 1; }
+  .hub__mobile-dots i {
+    display: block;
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 50%);
+    box-shadow: none;
+    transition: width .38s var(--ease-out), background .38s ease;
+  }
+  .hub[data-feature-index="0"] .hub__mobile-dots i:nth-child(1),
+  .hub[data-feature-index="1"] .hub__mobile-dots i:nth-child(2),
+  .hub[data-feature-index="2"] .hub__mobile-dots i:nth-child(3),
+  .hub[data-feature-index="3"] .hub__mobile-dots i:nth-child(4),
+  .hub[data-feature-index="4"] .hub__mobile-dots i:nth-child(5) {
+    width: 22px;
+    background: #000;
+  }
+
+  /* 五个独立背景层用交叉淡化换景。绿色
+     intro-room 只属于前面的 lights-up 转场；这些元素在桌面端默认不显示。 */
+  .hub__mobile-room {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background-size: cover;
+    background-position: center 26%;
+    background-repeat: no-repeat;
+    opacity: 0;
+    /* 第一幕交接与卡片收缩同为 .72s；后续换幕的节拍仍由 JS 同帧切换标题、
+       屏内画面与外框颜色，统一时长避免背景落后一截。 */
+    transition: opacity .72s var(--ease-out-expo);
+  }
+  .hub__glow::before,
+  .hub__glow::after,
+  .hub__glow-room4,
+  .hub__glow-room5 { opacity: 0 !important; }
+  .hub__mobile-room--1 { background-image: url("assets/hub-mobile-room-1.webp?v=1"); }
+  .hub__mobile-room--2 { background-image: url("assets/hub-room-2.webp?v=441"); }
+  .hub__mobile-room--3 { background-image: url("assets/hub-mobile-room-3.webp?v=1"); }
+  .hub__mobile-room--4 { background-image: url("assets/hub-mobile-room-4.webp?v=1"); }
+  .hub__mobile-room--5 { background-image: url("assets/hub-mobile-room-5.webp?v=2"); }
+  .hub[data-room="1"] .hub__mobile-room--1,
+  .hub[data-room="2"] .hub__mobile-room--2,
+  .hub[data-room="3"] .hub__mobile-room--3,
+  .hub[data-room="4"] .hub__mobile-room--4,
+  .hub[data-room="0"] .hub__mobile-room--5 { opacity: 1; }
+
+  .hub[data-room="0"] .hub__pad { --bezel-c: #b58a45; }
+  .hub[data-room="1"] .hub__pad { --bezel-c: #a06a52; }
+  .hub[data-room="2"] .hub__pad { --bezel-c: #b59d7f; }
+  .hub[data-room="3"] .hub__pad { --bezel-c: #b88952; }
+  .hub[data-room="4"] .hub__pad { --bezel-c: #82a9c6; }
+  .hub.is-prologue .hub__pad,
+  .hub.is-early .hub__pad { --bezel-c: #9aa66e; }
+
+  /* 手机标题保留房间材质的柔和色相，逐幕提亮而不提高到荧光饱和度。
+     蓝墙/陶土墙提亮较多，卧室及儿童房浅墙上的木色/赭黄提亮较少。 */
+  .hub__title { transition: opacity .5s ease, color 1.2s var(--ease-out); }
+  /* FEATURE_ROOM_ORDER = [1, 2, 4, 3, 0]：最后一句 household 对应 room 0。 */
+  .hub[data-room="0"] .hub__title { color: #dceeff; }
+  .hub[data-room="1"] .hub__title { color: #f6ddd2; } /* Everything: warm near-white terracotta */
+  .hub[data-room="2"] .hub__title { color: #b08548; }
+  .hub[data-room="3"] .hub__title { color: #b8743e; } /* Know: grounded orange */
+  .hub[data-room="4"] .hub__title { color: #e3f2fc; } /* See: near-white sky blue */
+  .hub.is-prologue .hub__title,
+  .hub.is-early .hub__title { color: var(--nes-ink); }
+
+  /* 真正的单一控制槽：定位只写在父层一次，CTA 和 arrows 都以槽的 (0,0)
+     为中心。这样切换前后不可能因为各自测量而产生一两个像素的跳动。 */
+  .hub__mobile-controls {
+    position: absolute;
+    left: 0;
+    right: 0;
+    /* Outside the scene, 12px below the card. */
+    top: auto;
+    bottom: 36px;
+    height: 48px;
+    z-index: 6;
+  }
+  .hub__explore .hub__btn {
+    --cta-ball: 48px;
+    border-radius: 20px;
+    clip-path: none;
+    width: 100%;
+    justify-content: center;
+    min-height: 48px;
+    padding: 12px 16px;
+    font-size: clamp(16px, 4.5vw, 20px);
+    background: transparent;
+    color: #000;
+    border: 1.5px solid #000;
+    box-shadow: none;
+  }
+  .hub__explore .hub__btn:hover { background: transparent; color: #000; }
+  .hub__explore .hub__btn::after { display: none; }
+  .hub__explore {
+    display: block;
+    position: absolute;
+    left: 50%;
+    width: calc(100% - 24px);
+    top: 0;
+    z-index: 1;
+    translate: -50% 0;
+    opacity: 0;
+    scale: .92;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity .24s ease, scale .32s var(--ease-out-cubic), visibility 0s linear .32s;
+  }
+  /* CTA 属于 Family Hub，不属于 Lights Up。只在第一张房间、屏内轨道和标题已经
+     同帧接管后显示；is-intro-rendered 在 Lights Up 尾段就会成立，作为判据太早。 */
+  .hub.hub--track-on:not(.is-prologue) .hub__explore {
+    opacity: 1;
+    scale: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition-delay: .12s, .12s, 0s;
+  }
+  .hub__mobile-controls > .hub__shots-nav {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    z-index: 1;
+    opacity: 1;
+    scale: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform-origin: center;
+    transition: opacity .24s ease .10s, scale .32s var(--ease-out-cubic) .10s, visibility 0s;
+  }
+  .hub:not(.is-explore-unlocked) .hub__mobile-controls > .hub__shots-nav {
+    opacity: 0;
+    scale: .78;
+    visibility: hidden;
+    pointer-events: none;
+    transition-delay: 0s, 0s, .32s;
+  }
+  .hub:not(.is-intro-rendered) .hub__mobile-controls > .hub__shots-nav {
+    opacity: 0;
+    scale: .78;
+    visibility: hidden;
+    pointer-events: none;
+    transition-delay: 0s, 0s, .32s;
+  }
+  .hub:not(.is-mobile-return-mode) .hub__mobile-controls > .hub__shots-nav {
+    opacity: 0;
+    scale: .78;
+    visibility: hidden;
+    pointer-events: none;
+    transition-delay: 0s, 0s, .32s;
+  }
+
+  /* 五个画面只由左右箭头切换。段高恢复为短停留区：纵向滚动只负责进入/离开，
+     不再为了翻完五张卡把读者留在这里四个半屏。 */
+  .hub { height: 560svh; }
+
+  .hub__stage {
+    position: sticky;
+    top: 0;
+    min-height: 100svh;
+  }
+
+  /* 🔴 3D 留着（用户 2026-09-05：「3D 能不能不要关啊？CSS 画的有点丑了」）。
+     搭法是**机身归 3D、屏幕归 DOM**：canvas 照常画机身和房间反射，DOM 的
+     .hub__screen 浮在它的屏幕那一块上，里面是可以横滑的轨道。
+
+     为什么这次对得齐：这一幕的机身是**静止**的（停靠态，不转不缩），canvas 里
+     屏幕的四角因此是一个常数矩形，而 .hub__screen 本来就是照同一个 pad 的几何
+     布的——两者天然重合。之前判断「对齐会漂」说的是机身还在动的那些幕。
+
+     🔴 用 setScreen 换 3D 自己的贴图也能换画面，但那是**硬切**：滑动时框里的
+     东西不跟手，读者看不到"滑"这个动作（用户：「我没有看到动画」）。DOM 轨道
+     滑起来有惯性和吸附，画面跟着手指走。
+
+     ⚠️ 三条一起才成立：屏幕要从 3D 的「接管即隐藏」里放出来、要压在 canvas 上
+     面、canvas 要放行指针事件（它是 aria-hidden 的装饰，本就不该吃手势）。 */
+  .hub__pad:has(.hub__pad-3d.is-on) .hub__screen { opacity: 1; }
+  /* ⚠️ 4，不是 3。canvas 自己就是 `position: absolute; z-index: 3`（见本文件
+     .hub__pad-3d），给屏幕同样的 3 会让 DOM 顺序说了算——canvas 由 hub3d 在
+     运行时 append，永远排在 .hub__screen 后面，于是它赢。读者看到的是 3D 自己
+     那张贴图（日历周视图），DOM 轨道在底下白滑。
+     ⚠️ 不要改 position：.hub__screen 基础规则已经是 `absolute; inset: 0`，那是
+     它贴合屏幕区域的方式；改成 relative 会让它退回文档流。 */
+  .hub__screen { z-index: 4; }
+  .hub__pad-3d { pointer-events: none; }
+
+  /* iframe 在手机上本来就不跑（内存，见 index.html 那段注释），这里连位置也让开 */
+  .hub__inner { display: none; }
+  .hub__still { display: none; }
+
+  .hub__screen {
+    overflow: hidden;
+    /* DOM 截图和 3D screen 共面时，两个圆角各自抗锯齿会在边缘露出一圈断续
+       的白色 3D 屏面。向四边覆盖 2px，只吃掉截图最外侧不足 0.7% 的空白 UI，
+       同时完整盖住白色漏边；外壳和它的 3D 高光仍由 canvas 正常绘制。 */
+    inset: -2px;
+  }
+
+  .hub__shots {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    height: 100%;
+    /* 🔴 宽度要显式给。.hub__screen 是 flex 容器（基础规则），轨道是它的 item，
+       默认 `flex: 0 1 auto` —— 宽度由内容决定。而 li 是 `flex: 0 0 100%`，那个
+       100% 又指向轨道自己的宽度：两边互相等对方，解出来是 0。
+       第一版没暴露这个问题，是因为那时 img 还在文档流里（width:100%），图的固有
+       宽度替轨道撑出了尺寸；改成两张 absolute 叠放之后就没有东西撑它了，实测
+       scrollWidth / clientWidth 双双为 0，点箭头也滚不动。 */
+    flex: 0 0 100%;
+    width: 100%;
+    /* 🔴 圆角裁剪落在**轨道**这一层。.hub__screen 虽然自己是圆角 + overflow:hidden，
+       但滚动容器会自建一个裁剪盒，影片贴着它的方角走，圆角处就漏出一线底色
+       （品红测法：把 .hub__screen 的 background 改成 #f0f，放大看四角）。
+       加在 li 上会让每张卡各自圆角，横滑到两张之间时看到双圆角；加在这里是整条
+       轨道一个圆角，和画框重合。 */
+    border-radius: inherit;
+    /* 🔴 hidden，不是 auto——翻页只能靠按钮（用户 2026-09-06：「下滑不要触发翻页，
+       下滑只有按钮才可以让它翻页」）。
+
+       overflow-x: hidden 挡掉的是**读者的**滚动，脚本的 scrollTo 照常生效，所以
+       箭头一点没变。auto 的时候手指在画框上斜着划一下就会翻页，而这一幕是纵向读
+       下来的——竖着滑页面、横着滑画框，两个手势在同一块区域里抢，读者只会觉得
+       页面在乱跳。
+       ⚠️ 别改成 display:none 或 overflow:hidden 简写：宽度算不出来的话
+       scrollWidth/clientWidth 归零，step() 和箭头的 disabled 判定全错。 */
+    overflow-x: hidden;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .hub__shots::-webkit-scrollbar { display: none; }
+
+  /* 🔴 轨道只在自己接管这一幕时才出现（hub.js 的 showTrack）。
+     在那之前画框里该是 3D 那块屏——hub3d 贴的 device1.webp，Calendar + 一格格
+     彩色事件那张。轨道 z-index 4 盖在 canvas(3) 上，不让开的话前奏期看到的是
+     第一张卡的 poster。
+     ⚠️ 用 opacity 而不是 display:none：display 会让 scrollWidth/clientWidth 归零，
+     箭头和 step() 全部算错（这一段上面 3306 那条注释记过同一个坑）。
+     pointer-events 要跟着关，否则透明的轨道照样吃掉触摸。 */
+  .hub__shots {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .32s ease;
+  }
+  .hub.hub--track-on .hub__shots { opacity: 1; pointer-events: auto; }
+
+  /* 🔴 两态交叉淡入——这一幕的动效（2026-09-06）。
+
+     底图是「正在做」（home-think 的 Working on it、calendar-fly 的空日历），
+     .v--swap 是「做完了」（home-idle、calendar-play 的满日历），淡进来又淡出去，
+     循环。落位那一下就是这一拍要讲的事。
+
+     为什么不是逐帧动画：同样内容做成 24 帧的动画 webp 实测 **630KB**，压不下去
+     （WebP 没有帧间压缩，整屏都在动的内容每帧都得重编码）。两张图一共多 35KB。
+     ⚠️ still-rewards-play.webp 自己是 28 帧的动画 webp，那是因为它只有局部在动、
+     背景不变——所以它 64KB 就够，也不需要 .v--swap。
+
+     动画只在轨道接管这一幕时跑：读者没看到的时候不烧合成器。 */
+  .hub__shots .v--swap { opacity: 0; }
+  .hub.hub--track-on .hub__shots .v--swap {
+    animation: hubBeatSwap var(--hub-swap-speed, 3.2s) ease-in-out infinite;
+  }
+  /* Calendar 与 List 要在进入后马上读出变化；其它两态画面仍沿用较从容的节奏。 */
+  .hub.hub--track-on .hub__shots > li:nth-child(2) .v--swap,
+  .hub.hub--track-on .hub__shots > li:nth-child(3) .v--swap {
+    animation-duration: 2s;
+  }
+  @keyframes hubBeatSwap {
+    0%, 16%   { opacity: 0; }
+    38%, 76%  { opacity: 1; }
+    98%, 100% { opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    /* 关掉循环，停在「做完了」那一态——静止时它比空日历有信息 */
+    .hub.hub--track-on .hub__shots .v--swap { animation: none; opacity: 1; }
+    .hub.is-room-slide-forward:not(.is-prologue) .hub__mobile-room,
+    .hub.is-room-slide-back:not(.is-prologue) .hub__mobile-room { animation: none; }
+  }
+
+  /* Rewards 的动画 WebP 在当前屏循环播放。底图一直可见，JS 完成全新解码后才亮出动画层，
+     因而第一次进入和返回这一屏都不会先闪空白或停在已经播完的最后一帧。 */
+  .hub__shots .v--replay { opacity: 0; }
+  .hub__shots .v--replay.is-replaying { opacity: 1; }
+
+  /* 🔴 手机上这块屏是**透明的窗口**，不是一块米白板。
+
+     圆角裁剪的抗锯齿边缘一定会和底色混合——接多少层 border-radius 继承都消不掉，
+     那是渲染的固有行为，不是漏了哪一层。所以别再去堵那条缝，改成让底色本身不显眼：
+     手机上画框背后就是 hub3d 画的设备（canvas 在 z-index 3，这块屏是 4），混出来
+     的是设备自己的屏，而不是一圈白边。
+
+     ⚠️ 只在手机改。桌面这块底下是 Flutter iframe，加载期需要 #f5f3ee 垫底，
+     透明会露出房间背景。 */
+  .hub__screen { background: transparent; }
+  .hub__shots > li {
+    position: relative;
+    flex: 0 0 100%;
+    height: 100%;
+    scroll-snap-align: start;
+    /* ⚠️ 这里**不要**加 border-radius：圆角属于画框，不属于每一张卡。给 li 加的话
+       横滑到两张之间时会看到中间那道双圆角。裁剪由 .hub__shots 那一层做。 */
+  }
+  /* img 一并选中：第五拍是静图（见 index.html 那条注释），两者要占同一块画框 */
+  .hub__shots video,
+  .hub__shots img {
+    display: block;
+    /* absolute：一格里叠两张图（见下面 .v--swap）。li 的宽高来自 `flex: 0 0 100%`
+       和 `height: 100%`，不靠内容撑，所以抽掉文档流是安全的。 */
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* 🔴 图必须是**精确的 16:9**，和画框同一个比例——不然边上会漏出一道
+       .hub__screen 的底色（用户 2026-09-05：「模型边缘那个白边去掉」「你不应该
+       有这个缝啊」）。
+
+       画框的高是 `calc(--pad-w * 9 / 16)`（见 .hub__wrap），精确 16:9。这批
+       still 图正好是 640×360，对得上。换图时先量比例：1.77841、1.77273 这种
+       「接近」的会在某条边上留缝，底色就从那里透出来一圈。
+
+       ⚠️ 曾经用 transform: scale(1.02) 盖住它——那是膏药不是修法：缝还在，只是
+       被推到画面外，代价是内容被切掉 2% 且每一拍都轻微放大。
+       ⚠️ 上面 545 行那条注释记的是同一个坑的 Safari 版本：WebKit 把 16:9 解析出
+       3.7px 偏差，「那 3.7px 是 .hub__screen 自己的背景沿设备底部露出的一条带」。
+       所以画框那边写成 calc 而不是 aspect-ratio。两处是同一件事，别只改一处。
+
+       诊断手法记一下：把 .hub__screen 的 background 临时改成品红，那圈边会当场
+       变成品红——能一步区分「录进去的」和「透出来的」。 */
+    border-radius: inherit;
+    background: #fff;
+  }
+
+  /* 🔴 落位那一下现在由**影片**演（2026-09-05 定版）。
+
+     走过三版：① 只搬 play 态的静图 → 框里是死的；② fly/play 两态淡入 → 有变化
+     但不是"落"；③ CSS 位移 + 缩放的落位 → 读得出方向，但仍是整屏在动，不是一张张
+     卡片飞进来。现在是第四版：直接放线上那一段的录像，卡片飞进屏幕的那一下就是
+     它本身。
+     ⚠️ 影片不 loop：这一拍讲的是"内容落进来"，落完就该停在结果上。划到哪张，
+     hub.js 把它 currentTime 归零再播（见 deckTrack）。 */
+
+  /* 画框下方的上一张 / 下一张。轨道自身 overflow-x:hidden，所以只有这两个
+     按钮能发起横向翻页。 */
+  .hub__shots-nav {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    position: absolute;
+    left: 0; right: 0;
+    top: calc(var(--pad-bot, 70svh) + 5svh);
+    z-index: 5;
+  }
+  .hub__deck-arrow {
+    appearance: none;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    color: var(--nes-ink);
+    background: rgb(255 255 255 / 94%);
+    box-shadow: 0 4px 14px rgb(29 31 33 / 8%);
+    cursor: pointer;
+    transition: opacity .2s ease, color .2s ease, background .2s ease, transform .2s ease;
+  }
+  .hub__deck-arrow svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .hub__deck-arrow:active:not(:disabled) { transform: scale(.94); }
+  .hub__deck-arrow:focus-visible { outline: 2px solid var(--nes-blue); outline-offset: 2px; }
+  .hub__deck-arrow:disabled {
+    opacity: .38;
+    color: var(--nes-muted);
+    cursor: default;
+    box-shadow: none;
+  }
+
+  /* 段尾那句在手机上没有落幕的对象了 */
+  .hub__thesis { display: none; }
+  .hub__close { display: none; }
+
+  /* 机器放大：它现在是这一幕的主角，读者要在里面看清 UI */
+  /* 首轮下滑只换场景与屏内内容，机身本身始终钉在同一套几何上。 */
+  .hub__pad,
+  .hub.is-docked .hub__pad {
+    --dock-s: .92;
+    --dock-y: -8svh;
+  }
+
+  /* 墙不吃触摸——轨道在它们上面，手指要够得到（两层都是 aria-hidden 的装饰） */
+  .hub__glow,
+  .hub__glow-pro { pointer-events: none; }
+
+  /* 🔴 手机上标题不许被段尾那套淡出规则关掉（2026-09-05）。
+
+     `.hub.is-slot-busy .hub__title{opacity:0}` 是给桌面段尾用的——机器回到墙上、
+     标题让位给「One screen.」那一屏。手机没有那个段尾了：这一段只有 130svh，
+     is-slot-busy 在读者刚滑到轨道时就上身，于是标题在**正要开始看五拍**的那一刻
+     淡成 0，五句话一句都读不到。is-docked 同理。
+
+     🔴 只覆盖 opacity，不碰 transform——上面 3159 那条注释解释了为什么：
+     translateY(-10px) 是 intro 交接时对齐用的，动它字会跳一格。 */
+  .hub.is-slot-busy .hub__title,
+  .hub.is-docked .hub__title { opacity: 1; }
+}
+
+/* Mobile Family Hub is a separate, horizontally browsable section. */
+@media (max-width: 767px) {
+  .hub { height: 100svh; }
+  .hub__title .hub__title-line:not(.is-meet) { visibility: hidden; }
+  .hub.hub--features { height: auto; padding: 32px 0 40px; }
+  .hub__feature-link {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    margin: 0 var(--gutter) 24px; min-height: 48px;
+    padding: 10px 14px; border: 1.5px solid currentColor; border-radius: 24px;
+    color: var(--nes-ink); background: transparent; text-decoration: none;
+    font-size: clamp(16px, 4.4vw, 20px); font-weight: 600;
+  }
+  .hub__feature-link:focus-visible { outline: 2px solid var(--nes-blue); outline-offset: 4px; }
+  .hub.hub--features .hub__carousel {
+    position: relative; inset: auto; display: flex; gap: 16px;
+    width: 100%; height: clamp(460px, 70svh, 640px); margin: 0;
+    padding: 0 32px 0 var(--gutter); border-radius: 0;
+    overflow-x: auto; overflow-y: hidden; opacity: 1; pointer-events: auto;
+    scroll-snap-type: x mandatory; scroll-padding-left: var(--gutter);
+    overscroll-behavior-x: contain; touch-action: pan-x pan-y;
+    transition: none; transform: none;
+  }
+  .hub .hub__carousel > .hub__feature-card {
+    position: relative; flex: 0 0 calc(100vw - var(--gutter) - 32px);
+    height: 100%; overflow: hidden; border-radius: 28px; scroll-snap-align: start;
+    background-size: cover; background-position: center 26%; background-color: var(--page-bg);
+  }
+  .hub__feature-card { --feature-rim: #a06a52; --feature-ink: #f6ddd2; }
+  .hub__feature-card[data-room="1"] { background-image: url("assets/hub-mobile-room-1.webp?v=1"); }
+  .hub__feature-card[data-room="2"] { background-image: url("assets/hub-room-2.webp?v=441"); --feature-rim: #b59d7f; --feature-ink: #b08548; }
+  .hub__feature-card[data-room="3"] { background-image: url("assets/hub-mobile-room-3.webp?v=1"); --feature-rim: #b88952; --feature-ink: #b8743e; }
+  .hub__feature-card[data-room="4"] { background-image: url("assets/hub-mobile-room-4.webp?v=1"); --feature-rim: #b9d5e8; --feature-ink: #e3f2fc; }
+  .hub__feature-card[data-room="0"] { background-image: url("assets/hub-mobile-room-5.webp?v=2"); --feature-rim: #b9d5e8; --feature-ink: #dceeff; }
+  .hub__feature-title {
+    position: absolute; inset: 16% 16px auto; margin: 0;
+    font-family: var(--font--primary); font-size: clamp(24px, 7vw, 32px);
+    font-weight: 600; line-height: 1.08; text-align: center; text-wrap: balance;
+    color: var(--feature-ink);
+  }
+  .hub__feature-screen {
+    position: absolute; left: 14px; right: 14px; top: 50%; transform: translateY(-50%); aspect-ratio: 16 / 9;
+    border-radius: 8px; background: #f5f3ee; overflow: hidden;
+    box-shadow: 0 0 0 6px var(--feature-rim), 0 0 0 7px rgb(0 0 0 / 12%), 0 18px 25px -8px rgb(0 0 0 / 28%);
+  }
+  .hub.hub--track-on .hub__carousel .v--swap { animation-play-state: paused; }
+  .hub.hub--track-on .hub__carousel .is-current .v--swap { animation-play-state: running; }
+  .hub__feature-nav { display: flex; justify-content: center; gap: 16px; margin-top: 24px; }
+  .hub__feature-nav .hub__deck-arrow {
+    width: 48px; height: 48px; border: 1.5px solid currentColor;
+    background: transparent; box-shadow: none;
+  }
+  .hub__feature-nav .hub__deck-arrow svg { width: 24px; height: 24px; }
+}
+
+@media (max-width: 767px) {
+  /* Remove the former scroll runway while retaining the intro copy timing. */
+  .intro { height: 237.76svh; }
+  .hub.hub--auto-lights .hub__stage {
+    position: relative; inset: auto; height: 100svh; visibility: visible;
+    background-color: transparent;
+  }
+  .hub--auto-lights .hub__auto-sketch {
+    position: absolute; inset: 0; z-index: 1; opacity: 1;
+    --sketch-src: url("assets/wall-frame.webp");
+    --sketch-ink: color-mix(in srgb, var(--nes-ink) 28%, var(--nes-sand));
+    --sketch-t: var(--auto-sketch, 0);
+  }
+  .hub.hub--auto-lights .hub__glow { visibility: hidden; }
+  .hub.hub--auto-lights .hub__glow-pro {
+    z-index: 2; opacity: var(--auto-room, 0); transition: none; animation: none;
+  }
+  .hub--auto-lights .hub__wrap { opacity: var(--auto-device, 0); }
+  .hub--auto-lights .hub__head { z-index: 4; translate: 0 -12px; }
+}
+
+@media (max-width: 767px) {
+  .hub__auto-wire {
+    position: absolute; z-index: 3; pointer-events: none;
+    --sketch-ink: color-mix(in srgb, var(--nes-ink) 28%, var(--nes-sand));
+    opacity: var(--auto-wire, 0);
+    clip-path: inset(0 calc((1 - var(--auto-wire-draw, 0)) * 100%) 0 0);
+  }
+  .hub.hub--auto-lights .hub__glow-pro {
+    opacity: 1;
+    -webkit-mask-image: linear-gradient(100deg, #000 calc(var(--auto-room, 0) * 160% - 48%), transparent calc(var(--auto-room, 0) * 160% - 8%));
+    mask-image: linear-gradient(100deg, #000 calc(var(--auto-room, 0) * 160% - 48%), transparent calc(var(--auto-room, 0) * 160% - 8%));
+  }
+}
+
+@media (max-width: 767px) {
+  body:has(.hub.is-entered:not(.is-early)) .hub--auto-lights .hub__auto-sketch { opacity: 1; }
+}
+
+@media (max-width: 767px) {
+  .hub__feature-glow { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; border-radius: inherit; }
+}
+
+@media (max-width: 767px) {
+  .hub__thinking-shade { position: absolute; inset: 0; background: #17202b; opacity: 0; pointer-events: none; }
+  .hub__thinking-badge {
+    position: absolute; left: 50%; bottom: 14%; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 5px; padding: 6px 9px;
+    background: #fff; color: #202020; border-radius: 8px; white-space: nowrap;
+    font-size: clamp(9px, 2.6vw, 13px); font-weight: 600; line-height: 1.2;
+    box-shadow: 0 2px 7px rgb(0 0 0 / 12%); opacity: 0; pointer-events: none;
+  }
+  .hub__thinking-badge span { display: flex; gap: 3px; align-items: center; }
+  .hub__thinking-badge i { width: 3px; height: 3px; border-radius: 50%; background: #3da9ed; }
+  .is-current .hub__thinking-shade { animation: hubThinkingShade .8s ease both; }
+  .is-current .hub__thinking-badge { animation: hubThinkingBadge .4s ease .65s both; }
+  .is-current .hub__thinking-badge i { animation: hubThinkingDot 1.1s ease-in-out infinite; }
+  .is-current .hub__thinking-badge i:nth-child(2) { animation-delay: .15s; }
+  .is-current .hub__thinking-badge i:nth-child(3) { animation-delay: .3s; }
+  @keyframes hubThinkingShade { from { opacity: 0; } to { opacity: .22; } }
+  @keyframes hubThinkingBadge { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes hubThinkingDot { 0%, 65%, 100% { opacity: .4; transform: translateY(0); } 32% { opacity: 1; transform: translateY(-2px); } }
+  @media (prefers-reduced-motion: reduce) {
+    .is-current .hub__thinking-shade { animation: none; opacity: .22; }
+    .is-current .hub__thinking-badge { animation: none; opacity: 1; }
+    .is-current .hub__thinking-badge i { animation: none; }
+  }
+}

@@ -1,0 +1,1164 @@
+/* ============================================================
+   "From the first people to use it." — Wispr Flow section
+   Standalone replica: design tokens, layout + card styles
+   lifted 1:1 from the live Webflow stylesheet.
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {
+  /* ---- Nestify palette (nestifyapp.org) ---- */
+  --nes-ink:    #1a1a1a;  /* the logo's black (assets/nestify-logo.svg) */
+  --nes-cream:  #f5f4f0;  /* review card surface       */
+  --nes-sand:   #f4f2ea;  /* --secondary / --muted     */
+  --nes-tan:    #dcd7c9;  /* --border                  */
+  --nes-muted:  #787165;  /* --muted-foreground        */
+  --nes-white:  #ffffff;
+  --nes-blue:   #2497f0;  /* brand blue (buttons)      */
+  --nes-blue-2: #1e88e5;  /* brand blue (headline)     */
+  /* 🔴 The one blue WHITE TYPE CAN STAND ON, and it exists because none
+     of the others can. Measured against #fff: --bead-blue 2.71:1,
+     --nes-blue 3.11:1, --nes-blue-2 3.68:1 — all three fail AA's 4.5,
+     and the first two fail even the 3:1 that large type gets. They are
+     all correct blues; they are just blues for INK to sit on, which is
+     what the site does everywhere else. This is the lightest step that
+     clears 4.5 (it measures 4.85), so a filled button that has to carry
+     a white label reaches for this and nothing else. */
+  --nes-blue-3: #1573c9;  /* filled buttons with white labels · 4.85:1 */
+
+  /* 🔴 THE CTA BLUE, AND IT IS ITS OWN TOKEN because three buttons on two
+     pages wear it and they had been pointing at three different things.
+     The home page's "Explore the Family Hub" and "Learn more" and the
+     device page's "Join the waitlist" are one object with one job; when
+     the pair of states was inverted and put back, it had to be found in
+     three files. Now it is here.
+
+     🔴 It is NOT --bead-blue. The bead is the logo's i-dot at #14a4fd,
+     which is the right blue for a 12px dot and the wrong one under a white
+     label: white on it measures 2.71:1, under the 3:1 a button label
+     needs. #1A80EA takes the same white to 3.95:1 and still reads as the
+     same blue at pill size. --nes-blue-3 (4.85:1) is darker still and is
+     there if a label ever has to clear 4.5. */
+  --cta-blue:   #1A80EA;  /* filled CTAs, white label · 3.95:1 */
+  --nes-sky:    #dbeafc;  /* light blue tint           */
+  /* 🔴 LIFTED FROM apple.com/ipad-air, and it is not a colour anyone would
+     have typed. `body.ac-theme-light { background-color: #f3f6f6 }` in
+     /v/ipad-air/ah/built/styles/overview.built.css — confirmed against the
+     rendered page, which samples rgb(243,246,246) flat from the header to
+     the footer with no gradient anywhere in it.
+
+     🔴 IT IS CYAN, NOT BLUE, and that is the whole reason it works. R 243,
+     G 246, B 246 — green and blue EQUAL, red one step under, which puts
+     the hue at exactly 180°. The obvious near-white to reach for is
+     Apple's other one, #f5f5f7 (R245 G245 B247, hue 240°, genuinely
+     blue-violet), and it is what the same page uses for its ribbon. At a
+     glance the two are the same grey. Side by side one is cool-green and
+     one is cool-purple, and only the first reads as DAYLIGHT rather than
+     as a screen that has not been colour-calibrated. */
+  --nes-mist:   #f3f6f6;  /* the page's ground         */
+  /* 🔴 THE BLUE THAT SITS ON THAT GROUND, off the same page — and the
+     value that was here before, #d5ebf3, did NOT come off that page. Its
+     note claimed "apple.com/ipad-air at 1440x900, straight down its left
+     edge, rgb(213,235,243) at the top of the wash", and that reading does
+     not reproduce: sampled at 1440x2000 the iPad Air page is FLAT
+     rgb(243,246,246) from the header to y=2000 with no wash at all, and
+     sampled at a viewport tall enough to lay the whole hero out it is
+     rgb(187,226,240) — this value — held essentially solid from y=0 past
+     y=2100, drifting one step over two thousand pixels. Whatever 213,235,243
+     was measured from, it was not this.
+
+     🔴 SAME HUE, MORE WEIGHT, which is why the old one looked close enough
+     to keep for a while:
+
+                    hue    saturation   lightness
+       #d5ebf3      196        56%         89%
+       #bbe2f0      196        64%         84%     <- theirs
+
+     Five points of lightness and eight of saturation is the whole of the
+     difference, and it is the whole of why the wash read as thin.
+
+     🔴 It is NOT --nes-sky. --nes-sky is #dbeafc: blue 18 points over
+     green, a tint of the BRAND blue, and mixed down over a cool ground it
+     reads as a purple cast on a grey page. This one has blue 14 over green
+     — it is daylight on white hardware, not a tinted panel. The brand blue
+     is still the site's; this is the light the product is photographed in. */
+  /* 🔴 PULLED OFF THE REFERENCE'S OWN VALUE, and the number that moved is
+     the BLUE-OVER-GREEN GAP, not the lightness. #bbe2f0 is theirs exactly
+     — sampled edge to edge, x=2 through x=1437, so it is a field and not
+     a photograph — and on our page it read as sky. That gap is why:
+
+                    hue     sat    lightness   B - G
+       #bbe2f0     195.8    64%       84%       14     <- theirs
+       #c1e4ec     191.2    53%       84%        8
+
+     Blue standing 14 points over green is what "sky" IS; closing it to 8
+     leaves the same weight and the same brightness and moves the colour
+     from sky toward daylight on glass. Lightness is untouched at 84%,
+     because the weight was not the complaint.
+
+     🔴 TWO SEPARATE DIALS, if this needs moving again. B-G gap is HOW SKY
+     it reads; saturation is HOW MUCH COLOUR there is. Cutting saturation
+     alone at this lightness is the move that came out DIRTY on the footer
+     band (see the --ft-tint note in footer.css) — on a ground with only
+     14% saturation there is nothing to take away. Close the gap first. */
+  --nes-haze:   #c1e4ec;  /* the hero wash, at its deepest */
+  /* 🔴 THERE WAS A --nes-mist-2 HERE, #ddeaeb, and it is worth one note
+     because the analysis behind it was right and the colour was still no
+     good. Measured, each band against the ground it lies on:
+
+                          hue gap   saturation   lightness drop
+       home: tan on sand      4°       ×0.76          6.1
+       --nes-haze on mist    16°       ×3.89          6.5
+       the rejected one       4°       ×1.81          6.5
+
+     The ×3.89 is real: --nes-mist has almost no colour in it (S 14%) and
+     --nes-haze has a lot (S 56%), so the footer's band comes out nearly
+     four times as saturated as the page it lies on. On paper that is the
+     "different material, not a shadow" failure, and #ddeaeb fixed it by
+     matching the ground's hue and holding the same depth.
+
+     🔴 IT CAME OUT DIRTY, and the numbers do not show it. This palette
+     has been here before, one file over: the note on --ft-tint in
+     footer.css threw out an ink-mixed band for the same reason — a band
+     that keeps its lightness but loses its saturation does not read as
+     shade, it reads as grime. Sand had room to absorb that because it is
+     S 31% to begin with. Mist is S 14%, so there is nothing to take away:
+     any low-saturation step down from it lands in the grey-teal that
+     #ddeaeb is, and grey-teal on a cool white is the cool version of
+     exactly the grubbiness footer.css already rejected.
+
+     So the band stays --nes-haze. It is more saturated than the rule
+     wants and it is the one that looks like light rather than dirt, which
+     on a ground with this little colour in it is the trade that has to be
+     made. If it ever needs pulling back, take it toward --nes-mist a few
+     percent rather than desaturating it in place — that keeps it on the
+     light side of the choice. */
+  --nes-sky-up: #1e88e5;  /* headline blue on cream    */
+  --nes-amber:  #fbbf24;  /* review stars              */
+  --bead-blue:  #14a4fd;  /* the dot on the i, exactly as the logo draws it */
+  --mark-blue:  #cde9f5;  /* the highlight bar, and the dot it becomes */
+
+  /* ---------- ONE GROUND FOR THE WHOLE PAGE ----------
+     🔴 Every section's background comes from here and nowhere else. The
+     page used to run four: white on the body, --nes-sand on the intro and
+     the hero, --nes-cream on the hub, #efeadd on the testimonials and the
+     footer. Three of those are within a few steps of each other, which is
+     the worst possible spacing — too close to read as a deliberate change
+     of ground, too far to read as one surface, so every seam showed as a
+     faint band and the page looked like it had been assembled rather than
+     designed.
+
+     --nes-sand is the one they collapse to, and that argument was already
+     made once: see the note on GROUND in hero.js, which moved the deck off
+     #efeadd because it sits 14 steps of yellow away from both its
+     neighbours. This just finishes the job everywhere else.
+
+     A section with a ground of its OWN — one that is meant to be a
+     different surface, not the page continuing — does not read this. The
+     privacy section is the only one: it is --nes-ink, deliberately dark,
+     and it is left alone. Same for anything INSIDE a section: cards, the
+     device screens in the hub, the testimonial surfaces. Those are objects
+     on the ground, not the ground. */
+  /* 🔴 THE SITE'S GROUND IS STILL SAND, and --nes-mist above is NOT it.
+     The cool grey was briefly this line — the home page and faq.html went
+     cool with it, which is precisely what the one-ground rule promises and
+     precisely what was not wanted. It is scoped to .dv-body in device.css
+     instead. Read that note before moving this one: the device page is
+     deliberately standing on a different surface from the rest of the
+     site, and that is a thing this token is otherwise designed to prevent. */
+  /* 🔴 2026-09-05：**全站白底试过一轮，已退回 sand**。用户先「帮我把网页底色
+     改为白色」，看过实装后「算了背景改回去哦」。
+
+     这是白色在这个 token 上的**第二次**往返——第一次记在 device.css 那段长注释
+     里（那次是 device 页单独变白，结论是「跨页过来像换了个网站」）。两次的场景
+     不同：那次只动一页，这次整个 ground 一起走，所以那条推理并不适用于这次；
+     这次单纯是看过之后不要。都不构成「白色永远不行」，但连续两次都退回来了，
+     下次再提之前先把两处都读一遍。
+
+     实装那一版还留下两个可复用的结论：
+       · 线稿（--sketch-ink，28% ink 混 sand）在白底上**更清楚**不是更淡：对
+         sand 的差值 61，对白 72。「改白会让线稿看不见」是错的直觉。
+       · 换这个 token 必须连 faq-page.css 的 .faqp 一起看——它当时写死
+         --nes-sand，会变成上下白、中间一块米色。现在它已经改读 --page-bg，
+         这个坑填掉了。 */
+  --page-bg: var(--nes-sand);
+
+  /* semantic — the two that are really "the page's ground" now defer to it,
+     so the footer's colour-mix tints keep working untouched */
+  --background-color--background-primary:   var(--page-bg);
+  --background-color--background-secondary: var(--nes-sky);
+  --background-color--background-tertiary:  var(--page-bg);
+  --text-color--text-primary:   var(--nes-ink);
+  --text-color--text-secondary: var(--nes-ink);   /* type that sits on the stage */
+
+  /* type */
+  /* 🔴 ONE FACE ON THE PAGE. THAT IS THE RULE.
+
+       Google Sans — everything. Headlines, body, and the chrome.
+
+     🔴 IT WAS TWO, and Nunito had the chrome — the header's pills, the
+     footer's micro-labels, the calendar's small type. That split is gone
+     and --font--ui now resolves to the same family as the other two, so
+     every reference to it keeps working and nothing has to be chased
+     through six stylesheets. The token stays because "this is chrome" is
+     still worth saying at the point of use, even when the answer is the
+     same face; if a second family ever comes back, it comes back here.
+
+     Nunito also came out of the <link> in index.html, device.html and
+     faq.html — a family nothing renders in is a font file the reader
+     downloads for nothing. If it is ever restored, restore the link with
+     it, and keep the ital axis: the calendar's "Nothing on" is set in
+     italic and a browser-slanted roman looks broken.
+
+     This is labs.google's own arrangement: one sans carrying the 120px
+     headline, the 24px paragraph and the nav, with nothing else invited.
+     The serif is gone — --font--primary and --font--body are now the same
+     family, and the only thing separating display from text is size.
+
+     ✅ GOOGLE SANS 已经在 Google Fonts 的公开字库里，正常引用即可。
+
+     🔴 这段原本写的是相反的话——「GOOGLE SANS IS GOOGLE'S OWN BRAND FACE…
+     not a Google Fonts release and not licensed for general use… has to be
+     cleared or replaced before the page goes public」，并把「Fonts API 居然
+     发得出来」当成一个侥幸。2026-09-04 核实：**那个前提已经不成立**。
+
+     实测（fonts.google.com/metadata/fonts，官方字库清单）：
+       公开字库共 1946 个字族
+       Google Sans        在清单里 ✓   （Google Sans Code / Flex 也在）
+       DM Sans / Inter    在清单里 ✓
+     它跟 DM Sans、Inter 是并列关系，不是特例。上架公开字库即按开源许可发布，
+     商用免费，用法就是 index.html 里那个普通的 <link>。
+
+     留着这段是因为旧注释**会误导人**：它会让下一个人以为上线前必须换字，
+     甚至真的去换成 DM Sans。判断过期了，但结论的痕迹要留着。
+     （DM Sans 仍然是个合理的备选——同样的 Product-Sans 几何骨架，也在这个
+     槽位待过——只是现在没有非换不可的理由。）
+
+     Whatever sits in --font--primary must ship a REAL ITALIC. The page
+     leans on it for every second line: the hero deck, the intro slogan,
+     the hub headline and its caption, the testimonial h2. A face that
+     leaves the browser to slant its own roman looks broken at 60px.
+     The calendar's "Nothing on" needs one too, and now reads it off the
+     same family as everything else.
+
+     The display slot has been round the houses: EB Garamond → Newsreader
+     (chasing claude.ai's Copernicus) → Schibsted Grotesk → Inter Tight
+     (standing in for flim.ai's RL Swizzy) → EB Garamond → Google Sans.
+     Body: Figtree → Nunito → DM Sans → Google Sans. */
+  --font--body:    "Google Sans", Helvetica, Arial, sans-serif;
+  --font--primary: "Google Sans", Helvetica, Arial, sans-serif;   /* display */
+  --font--ui:      "Google Sans", Helvetica, Arial, sans-serif;   /* chrome */
+  --heading--h2:     4rem;
+  --heading--h2-big: 4.6875rem;
+  /* 🔴 The SECTION-OPENER size, named once because two sections now have to
+     agree at every width, not just at 1440: the privacy lockup and the
+     testimonials headline. It is a clamp rather than the flat token so the
+     line steps down with the viewport instead of at one breakpoint — and
+     because the privacy section draws its padlock off this same number
+     (--pv-title), a mark that did not scale with the words beside it would
+     stop being part of the line the moment the clamp moved. */
+  --heading--display: clamp(28px, 4.45vw, var(--heading--h2));
+  --heading--h3:     3rem;
+  --heading--h4:     2rem;
+  --body--regular: 1rem;
+  --body--small:   .875rem;
+  --body--xsmall:  .8125rem;
+
+  /* motion (used by the ported header + hero) */
+  --ease-out-expo:  cubic-bezier(.16, 1, .3, 1);
+  --ease-out-quint: cubic-bezier(.22, 1, .36, 1);
+  --ease-in-out:    cubic-bezier(.65, 0, .35, 1);
+  /* 1-(1-t)^3 — the curve labs.google turns its hero mask on */
+  --ease-out-cubic: cubic-bezier(.33, 1, .68, 1);
+  /* 1-(1-t)^4 — easeOutQuart。2026-09-04 建出来的：family-fit.css 里同一条
+     曲线手写了三遍（.ffit__card-img 的 hover、以及滚动揭示的 opacity 与
+     transform 各一次）。值一位不改地搬过来，所以这是纯收敛、没有观感变化。
+     ⚠️ 它跟 --ease-out-quint (.22,1,.36,1) 只差一点，别互相替换——那会是
+     行为改动，不是收敛。 */
+  --ease-out-quart: cubic-bezier(.25, 1, .5, 1);
+  /* 🔴 2026-09-04：原本是 cubic-bezier(.4, 0, .1, 1)，那条曲线**名不副实**——
+     P1 = (.4, 0) 让 t=0 处切线斜率为 0，起步是静止的；P2 = (.1, 1) 让收尾也平。
+     两头都平 = ease-in-out，跟本文件自己的 --ease-in-out 是同一种签名。它是随
+     header/hero 一起 port 进来的，**没有任何注释为这个值做过论证**。
+
+     实测三条曲线在同一时刻走过的距离：
+                                  10%     25%     50%
+       旧 --ease-out (.4,0,.1,1)   2.7%   30.0%   82.5%
+       --ease-out-cubic           27.1%   57.4%   87.5%
+       --ease-out-expo            49.4%   82.6%   97.2%
+     动画走到十分之一时旧曲线只挪了 2.7% —— 元素入场、指针落上按钮的那一刻，
+     屏幕上几乎什么都没发生。36 处消费方全部继承了这个死启动。
+
+     指向 --ease-out-cubic 而不是另造一条：它就是 easeOutCubic，而 intro.js:251
+     的 settle 用的 `1 - Math.pow(1 - t, 3)` 是同一条曲线的 JS 写法。这样 CSS 与
+     JS 的 "ease-out" 从此是同一个东西，也救活了一个零引用的 token。 */
+  --ease-out:       var(--ease-out-cubic);
+
+  /* 🔴 整页左右 gutter。此前 `max(5vw, 32px)` 在 9 个文件、15 处各写一遍，
+     没有共享变量——想调一次页面边距就得改 15 个地方。收成一个 token 之后
+     改一行即可，这一层保留。
+
+     🔴 值 2026-09-04 试过 **30px**（照 labs.google 的固定 30px，用户要「一起
+     靠边、内容变宽一点」），当天又要求「完全和线上一样」，所以退回线上的
+     max(5vw, 32px)（1440 上 = 72px）。header.css 现在直接写着同一个表达式，
+     两边必须一致，否则顶栏和正文会差 42px——那正是这轮改动最初要修的问题。 */
+  --gutter: max(5vw, 32px);
+
+  /* spacing */
+  --section-radius--large:   3rem;
+  --section-radius--regular: 2rem;     /* card corner — 3rem read too soft */
+  --section-radius--tiny:    1.25rem;  /* the photo/quote block inside a card */
+  --spacers--medium: 1.5rem;
+}
+
+html { -webkit-font-smoothing: antialiased; }
+
+body {
+  margin: 0;
+  background-color: var(--background-color--background-primary);
+  color: var(--text-color--text-primary);
+  font-family: var(--font--body);
+  font-size: 1rem;
+  line-height: 1.3;
+}
+
+img { max-width: 100%; display: inline-block; vertical-align: middle; border: 0; }
+p   { margin: 0; }
+
+h2 {
+  font-family: var(--font--primary);
+  font-size: var(--heading--h2);
+  letter-spacing: -.03em;
+  font-weight: 400;
+  line-height: .95;
+  margin: 0;
+}
+
+/* ---------- utilities ---------- */
+.padding-global   { padding-left: 2.5rem; padding-right: 2.5rem; }
+.container-large  { width: 100%; max-width: 77.5rem; margin-inline: auto; }
+.text-align-center { text-align: center; }
+.text-wrap-balance { text-wrap: balance; }
+.z-index-2        { z-index: 2; position: relative; }
+.opacity-0-5      { opacity: .5; }
+
+.spacer-small  { width: 100%; padding-top: 1rem; }
+.spacer-medium { width: 100%; padding-top: var(--spacers--medium); }
+.spacer-xhuge  { width: 100%; padding-top: 8rem; }
+
+.text-size-regular { font-size: var(--body--regular); }
+.text-size-small   { font-size: var(--body--small); }
+.text-size-xsmall  { font-size: var(--body--xsmall); }
+.text-weight-medium { font-weight: 500; }
+.text-color-secondary { color: var(--text-color--text-secondary); }
+.text-color-muted     { color: var(--nes-muted); }
+.text-brand           { color: var(--nes-sky-up); }
+.opacity-0-6          { opacity: .6; }
+.opacity-0-7          { opacity: .7; }
+
+.tag {
+  color: var(--text-color--text-primary);
+  font-size: 1.25rem;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.tag.is-small {
+  font-size: var(--body--small);
+  letter-spacing: .08em;
+  font-weight: 500;
+  line-height: 1.3;
+}
+.tag.is-small.text-color-secondary { color: var(--text-color--text-secondary); }
+
+/* 🔴 --heading--h2, not --heading--h2-big. This was 75px against 64 for
+   every other h2 on the page, and it is the only heading that ever wore
+   the "bigger" variant — one rule, one user, sized a step above the ladder
+   it belongs to. The privacy block is its opposite number and reads the
+   same token now, so the two section titles are equal by construction
+   rather than by two numbers kept in step by hand.
+
+   (The 991px breakpoint below already stepped it back to --heading--h2 on
+   the way down, which was the same conclusion reached for a narrow screen
+   and not carried up to a wide one.) */
+/* 🔴 Set to the SAME four numbers as .pv__title (privacy.css), because the
+   two are the same thing on the page: a section opener over a block of
+   panels. It used to differ on every one of them — 400 against 600, -.03em
+   against -.02em, line-height 1 against .92, and the flat --heading--h2
+   against the clamp — which is small enough to look like drift rather than
+   a decision when you scroll from one to the other. Change one, change
+   both; the size itself now comes from --heading--display. */
+.h2-bigger {
+  font-size: var(--heading--display);
+  font-weight: 600;
+  letter-spacing: -.02em;
+  line-height: .92;
+}
+/* 🔴 手机上把 .92 放回 1.06。行距是**字号的比例**，但「两行之间该留多少
+   空气」不是——.92 的负余量在 68px 的显示字号上读作紧凑，在手机的 28px 上
+   两行就贴到一起了（用户 2026-08-30 在 What families feel 那句上说「行距
+   有点太小」）。同一个比例在两个字号上不是同一个效果，所以断点在这儿。
+
+   ⚠️ 上面那条注释要求这四个数与 .pv__title 同步——所以这条覆盖同时点了
+   两个选择器，别只改一个。 */
+@media screen and (max-width: 767px) {
+  .h2-bigger, .pv__title { line-height: 1.06; }
+}
+
+/* 🔴 跟「This is Nestify, here to light up family life.」同尺寸
+   （用户 2026-09-05：「这些标题都要和 this is nestify 一样大哦」）。
+   --heading--display 的 4.45vw 是桌面列宽的斜率，到手机整段压在 28px 下限
+   附近：666 宽下 29.6px 对那句的 40px，差了一整档。
+
+   🔴 断点是 **900，不是 767**，尽管上面那条行距用的是 767。--hub-copy 定义在
+   hub.css 的 900 断点里，消费者跟着它走，边界才不会各说各话：写成 767 的话
+   768–900 之间 .h2-bigger 拿回退值（实测 34.18px）而同一屏的 .pv__title 和那句
+   This is Nestify 都是 40px，三个「段落开场白」两个尺寸。
+
+   line-height 一起带过来：字号在这一带涨到 40 之后，原来的 .92 会把两行压到
+   一起——上面那条 1.06 只覆盖到 767，够不着这一带。
+
+   ⚠️ 必须排在上面那个 767 块**之后**：两处特异度都是 0,1,0，媒体查询不加
+   特异度，靠顺序定胜负。
+
+   ⚠️ 这里只点 .h2-bigger。.pv__title 的 font-size 在本文件里写了也不生效：
+   index.html 中 privacy.css（80 行）排在 styles.css（70 行）之后，同特异度
+   后来者赢。它那一档改在 privacy.css 的 900 断点里，而且走 --pv-title 中介
+   ——那边的锁图标是 `calc(--pv-title * 1.15)`，必须跟着一起长。
+   （上面那条 1.06 其实也没点动 .pv__title，实测量到的一直是 .92。那句
+   「别只改一个」描述的是意图，不是当时的效果。）
+
+   回退同 privacy.css：device.html / faq.html 不加载 hub.css。 */
+@media screen and (max-width: 900px) {
+  .h2-bigger { font-size: var(--hub-copy, var(--heading--display)); line-height: 1.06; }
+}
+/* 🔴 NOTHING ON THIS PAGE LEANS. The second line of a headline used to
+   turn in the italic, on the idea that the voice change carried the break;
+   at display sizes it read as a different typeface dropped into the middle
+   of a sentence instead (the same conclusion the hero reached on its own —
+   see the note at .hero__title em).
+
+   It is set on `em` itself rather than on each block that holds one,
+   because the browser's own stylesheet is what makes an <em> lean: drop a
+   block's rule and the emphasis comes back italic on the next <em> anyone
+   writes. This is the one place that has to say normal. */
+em { font-style: normal; font-weight: inherit; }
+
+/* arrow link */
+.text-link {
+  display: flex;
+  gap: .5rem;
+  justify-content: flex-start;
+  align-items: center;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  overflow: visible;
+}
+.text-link-arrow-wrap {
+  width: 1.25rem; min-width: 1.25rem;
+  height: 1.25rem; min-height: 1.25rem;
+  position: relative;
+  overflow: clip;
+}
+.text-link-arrow {
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%; height: 100%;
+  position: absolute; inset: 0%;
+  transition: transform .35s;
+}
+.text-link-arrow.before { left: -100%; }
+.testi_card:hover .text-link-arrow { transform: translateX(100%); }
+
+/* ---------- section shell ---------- */
+.section_new-testi {
+  position: relative;
+  border-radius: 0;   /* square edge against the hero */
+  background-color: var(--background-color--background-tertiary);
+  color: var(--text-color--text-secondary);
+  overflow: clip;
+}
+
+/* deck: tall scroll track + sticky pinned stage. slider.js overwrites the
+   height in px and absolutely positions every .testiv2_card. */
+.testiv2_height {
+  min-height: 350vh;
+  position: relative;
+}
+.testiv2_wrap {
+  display: flex;
+  flex-flow: column;
+  gap: 2rem;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  position: sticky;
+  top: 0;
+}
+.testiv2_card { position: absolute; }
+
+/* ---------- cards ---------- */
+/* 🔴 The corners are cut by clip-path, NOT by overflow. This is the Safari
+   black-corner fix, and it is a rendering-path change, not a taste one.
+
+   Each card is rotated on rotateX inside a perspective, which makes it a
+   composited layer. A `border-radius` + `overflow` on a DESCENDANT of that
+   layer then has to be re-expressed as something the compositor can apply
+   to a finished texture — and on macOS WebKit composites through CALayer,
+   whose `cornerRadius` only works on a layer's OWN bounds. It cannot round
+   someone else's texture that is being projected in 3D, so it falls back,
+   and the region the radius removes is left as the backing store's initial
+   contents: zeroed memory, which reads as opaque black.
+
+   The tell is exact: only the card at the centre of the deck was clean, and
+   that is the one whose rotAt() angle is ~0°. Every card either side of it
+   — every card actually rotated — had black corners. Chrome does not do
+   this because its compositor supports rounded-rect clips on a texture as a
+   first-class operation.
+
+   clip-path sidesteps the whole question: it is applied in the element's
+   own local coordinate space while it PAINTS, so the rounding is baked into
+   the texture before any 3D transform touches it. Nothing is asked of the
+   compositor and the corners stay genuinely transparent — not filled with
+   the page colour, which would only hold for as long as nothing ever passes
+   behind a card.
+
+   border-radius stays: it is what the element's own painting and any
+   `border-radius: inherit` still read. */
+.testi_card {
+  position: relative;
+  border-radius: var(--section-radius--regular);
+  clip-path: inset(0 round var(--section-radius--regular));
+  /* 🔴 BACK TO THE SOURCE'S OWN NUMBERS, ON REQUEST. These were 0.8× for a
+     while — height, both widths, the quote and the author logo all divided
+     by the same factor, on the argument that the deck read as three big
+     slabs rather than as cards you could take in at a glance. The reference
+     this component is lifted from (wisprflow.ai, "From the first people to
+     use it" — same Webflow classes, same slider, same interaction) runs
+     them full size, and full size is what was asked for.
+
+     Taken from their stylesheet rather than eyeballed:
+
+                            theirs      was (0.8×)
+       .testi_card height     28.75rem     23rem
+       .landscape width       46.25rem     37rem
+       .square width          26rem        21rem
+       quote font-size        --h4         --h4 × 0.8
+       author logo            4.375rem     3.5rem
+
+     🔴 AND .testi_card-img's max-height WAS ALREADY THEIRS. It sits at
+     26.75rem, which is 28.75 minus this rule's 1rem padding top and bottom
+     — their number, exact, and inert at the smaller height. It only starts
+     doing its job again now. That is the tell that the 0.8× pass missed a
+     value, and the reason to re-check anything else keyed to the height. */
+  height: 28.75rem;
+  min-height: 28.75rem;
+  color: var(--text-color--text-primary);
+  padding: 1rem;
+  text-decoration: none;
+}
+.testi_card.landscape {
+  display: grid;
+  gap: 2rem;
+  grid-template-rows: auto;
+  grid-template-columns: 1.1fr 1fr;
+  grid-auto-columns: 1fr;
+  width: 46.25rem; min-width: 46.25rem; max-width: 46.25rem;
+}
+.testi_card.square {
+  width: 26rem; min-width: 26rem; max-width: 26rem;
+}
+
+.testi_card-left {
+  z-index: 2;
+  display: flex;
+  flex-flow: column;
+  gap: 2rem;
+  justify-content: space-between;
+  height: 100%;
+  padding: 1rem;
+  position: relative;
+}
+
+.testi_quote-v2 {
+  font-family: var(--font--primary);
+  /* their --_text-collection---heading--h4, unscaled — the 0.8 factor came
+     off with the card's (see .testi_card). Their own line-height of .95 is
+     NOT copied; see the note below it. */
+  /* 🔴 -2px 是用户 2026-08-30 直接指定的量（「稍微有点大 可以变小2px」），
+     不是从 h4 那一档重新推的 —— 所以写成 calc 挂在 h4 上，而不是换一个 token：
+     h4 本身再变的时候，这条差值跟着走。手机 24→22，桌面 32→30。 */
+  font-size: calc(var(--heading--h4) - 2px);
+  letter-spacing: -.03em;
+  text-wrap: balance;
+  font-weight: 400;
+  /* Wispr sets .95 — too tight for these longer, descender-heavy quotes */
+  line-height: 1.18;
+}
+
+.testi_logo { object-fit: contain; height: 1.875rem; }
+.testi_logo.has-margin { margin-bottom: 1.5rem; }
+
+/* same rounding path as .testi_card, and for the same reason — these sit
+   INSIDE the rotated card, so they are descendants of the same composited
+   layer and would blacken their own corners exactly the same way */
+.testi_card-img-wrap {
+  z-index: 2;
+  border-radius: var(--section-radius--tiny);
+  clip-path: inset(0 round var(--section-radius--tiny));
+  width: 100%; height: 100%;
+  position: relative;
+}
+.testi_card-img-wrap.is-first { order: -9999; }
+.testi_card-img {
+  object-fit: cover;
+  width: 100%; height: 100%;
+  max-height: 26.75rem;
+}
+
+.testi_card-author {
+  display: flex;
+  gap: .75rem;
+  justify-content: flex-start;
+  align-items: center;
+}
+.testi_card-author-logo {
+  object-fit: cover;
+  border-radius: 50%;
+  /* theirs, back off the 0.8 factor with the card — see .testi_card */
+  width: 4.375rem; min-width: 4.375rem;
+  height: 4.375rem; min-height: 4.375rem;
+  background-color: #0000000d;
+}
+
+/* five-star row, same amber as the Nestify review cards */
+.testi_stars {
+  display: flex;
+  gap: .25rem;
+  margin-bottom: 1.25rem;
+}
+.testi_stars svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: var(--nes-amber);
+}
+
+.testi_card-bg-image {
+  z-index: 0;
+  object-fit: cover;
+  width: 100%; height: 100%;
+  position: absolute; inset: 0%;
+}
+.testi_card-bottom-wrap {
+  display: flex;
+  flex-flow: column;
+  justify-content: flex-end;
+  width: 100%; height: 100%;
+  position: relative;
+}
+.testi_card-bottom-card {
+  display: flex;
+  flex-flow: column;
+  gap: 2rem;
+  justify-content: space-between;
+  border-radius: var(--section-radius--tiny);
+  clip-path: inset(0 round var(--section-radius--tiny));   /* see .testi_card */
+  padding: 1.5rem;
+  position: relative;
+}
+.testi_card-bottom-card-bg {
+  z-index: 0;
+  background-color: var(--nes-cream);
+  position: absolute; inset: 0%;
+}
+.testi_card-bottom-card-bg.is-amber { background-color: var(--nes-amber); }
+.testi_card-bottom-card-bg.is-sky   { background-color: var(--nes-sky); }
+
+/* ---------- card backdrops — the card's OWN background, not a div ----------
+   🔴 These used to be a `<div class="testi_card-bg-color is-x">` per card,
+   absolutely positioned at inset: 0. That element is what blackened the
+   corners in Safari, and the proof was sitting in the deck the whole time:
+   of the six cards, exactly one had no such div — Priya K., whose backdrop
+   is a full-bleed <img> — and that was exactly the one card whose corners
+   came out clean. Five for five.
+
+   The reason follows from how the corners go black at all (see the note on
+   .testi_card). "Are these contents opaque?" is decided PER COMPOSITED
+   LAYER, and the layer is .testiv2_card. An opaque div pinned to inset: 0
+   covers that layer's box exactly, so the answer is yes, so the backing
+   store is allocated with no alpha channel, so anything the rounded clip
+   removes keeps the buffer's initial contents — black. Priya's <img> could
+   not be proven opaque, her layer kept its alpha, and every rounded clip
+   inside it then behaved — including the little amber card nested in it,
+   which is built the square-opaque-div way and is clean regardless.
+
+   As the card's own background-color there is no full-box opaque rectangle
+   in the layer at all: .testi_card is rounded and clip-path'd, so what it
+   paints is a rounded shape, and the corners stay honestly transparent.
+
+   It is also simply less markup — one element per card, gone. */
+.testi_card.is-cream { background-color: var(--nes-cream); }
+.testi_card.is-sand  { background-color: var(--nes-sand); }
+.testi_card.is-sky   { background-color: var(--nes-sky); }
+.testi_card.is-tan   { background-color: var(--nes-tan); }
+.testi_card.is-white { background-color: var(--nes-white); }
+.testi_card.is-blue  { background-color: var(--nes-blue); }
+.testi_card.is-ink   { background-color: var(--nes-ink); }
+.testi_card.is-amber { background-color: var(--nes-amber); }
+
+/* cards on saturated blue / ink flip to light type */
+.testi_card.on-blue,
+.testi_card.on-ink { color: var(--nes-cream); }
+
+/* stats overlay on the case-study photos */
+.testi_card-stats-wrap {
+  display: flex;
+  flex-flow: column;
+  justify-content: flex-end;
+  /* stronger than Wispr's #000000b3 — these photos are brighter at the bottom */
+  background-image: linear-gradient(#fff0 30%, #000000cc);
+  padding: 0 2rem 1.3rem;
+  position: absolute; inset: 0%;
+}
+.testi_card-stats-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-rows: auto;
+  grid-template-columns: 1fr 1fr;
+  align-items: start;
+  color: var(--nes-cream);   /* sits on the dark gradient, not on the stage */
+}
+.testi_stat-card {
+  display: flex;
+  flex-flow: column;
+  gap: .5rem;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+.testi_card-stat {
+  font-family: var(--font--primary);
+  font-size: var(--heading--h3);
+  letter-spacing: -.03em;
+  line-height: .95;
+}
+
+/* ============================================================
+   responsive — Webflow breakpoints
+   ============================================================ */
+@media screen and (max-width: 991px) {
+  :root {
+    --heading--h2: 4rem;
+    --heading--h3: 3rem;
+    --heading--h4: 2rem;
+  }
+  .spacer-xhuge { padding-top: 6rem; }
+  .testiv2_wrap { padding-top: 3rem; }
+}
+
+@media screen and (max-width: 767px) {
+  :root {
+    --heading--h2: 2.5rem;
+    --heading--h2-big: 2.5rem;
+    --heading--h3: 2rem;
+    --heading--h4: 1.5rem;
+    --section-radius--large: 2rem;
+    --section-radius--regular: 1.25rem;
+    --section-radius--tiny: 1rem;
+  }
+  .padding-global { padding-left: var(--gutter); padding-right: var(--gutter); }
+  .spacer-xhuge { padding-top: 4rem; }
+
+  .testiv2_wrap   { padding-top: 4rem; }
+  .testiv2_height { min-height: 250vh; margin-top: 2rem; }
+
+  .testi_card.landscape {
+    display: flex;
+    flex-flow: column-reverse;
+    gap: .5rem;
+    grid-template-columns: 1fr;
+    width: 20rem; min-width: 20rem; max-width: 20rem;
+    height: auto; min-height: auto;
+  }
+  .testi_card.square {
+    width: 20rem; min-width: 20rem; max-width: 20rem;
+    height: auto; min-height: 20rem;
+  }
+  .testi_card-left { padding-left: 0; padding-right: 0; }
+  .testi_card-left.has-min-height-mobile { min-height: 20rem; }
+  .testi_card-img-wrap { border-radius: 0; order: 9999; }
+  .testi_card-img-wrap.is-first { order: 0; }
+  .testi_card-img {
+    aspect-ratio: 1;
+    object-position: 50% 25%;
+    border-radius: 1rem;
+    width: 100%;
+    max-height: none;
+  }
+  .testi_card-author-logo {
+    width: 3rem; min-width: 3rem;
+    height: 3rem; min-height: 3rem;
+  }
+  .testi_card-bottom-wrap { min-height: 20rem; }
+  .testi_card-stats-wrap {
+    border-radius: 1rem;
+    width: 100%;
+    padding-left: 1rem; padding-right: 1rem;
+  }
+  .testi_card-stat { font-size: 2.5rem; }
+}
+
+@media screen and (max-width: 479px) {
+  .testiv2_wrap { padding-top: 6rem; }
+}
+
+
+/* ============================================================
+   ONE HOVER FOR EVERY PILL ON THE PAGE
+
+   The header's: a disc the colour of the destination opens from the
+   middle of the button and swallows it, .55s on --ease-out. Any button
+   anywhere gets it by taking .btn-disc and setting --btn-disc to the
+   colour it should fill with.
+
+   🔴 The LABEL HAS TO BE IN AN ELEMENT. The disc is a real child in the
+   paint order, so a bare text node inside the button paints underneath
+   it and the word disappears as the disc arrives. It cannot be solved
+   with z-index: -1 the way an outlined button can — that puts the disc
+   behind the button's own background, and a filled pill then hides it
+   completely. Hence .btn-label, which is what .hd__cta-inner already
+   does for the header.
+
+   The header keeps its own .hd__fill span rather than this ::after: it
+   needs the disc as a sibling of two separate label spans (the Menu
+   button swaps label for "Close"), and the numbers there are the same
+   .55s and 120%. If either moves, move both.
+   ============================================================ */
+/* ============================================================
+   THE BALL THAT OPENS INTO A PILL
+
+   One shape, two users: the intro's "Meet Nestify" and the hub's "Explore the
+   Family Hub". It rests as a DISC the colour of the logo's i-dot and opens
+   into a full pill — the clip-path does the opening, `scale` does the
+   arrival, and the blue drains to cream a little behind the opening edge so
+   the colour change is something the stretch DOES rather than a second
+   event after it.
+
+   🔴 It lives HERE, not in either section, because the two buttons have to
+   be the same object. They were separate rules and had already drifted —
+   the hub's was ink/cream at clamp(14px,1vw,18px) in Nunito 700 while the
+   intro's was blue/cream at clamp(16px,1.32vw,21px) in Google Sans 500 —
+   which is two buttons wearing one name.
+
+   🔴 Geometry in `em` off ONE clamped font-size, so the pill scales with
+   the viewport rather than with the 16px root. rem looks relative and is
+   not: pinned to the root, this pill stayed 14px/45px on a 2560 screen
+   while the headline above it grew.
+
+   Opening from the LEFT is the default (the intro's); .btn-ball--mid opens
+   from the middle instead. The only difference is where the closed
+   clip-path sits and what the scale pivots on — and those two have to
+   agree, or the ball stands in one place while it grows from another. */
+.btn-ball {
+  --cta-ball: 2.35em;
+  position: relative;
+  display: inline-flex; align-items: center;
+  font-size: clamp(16px, 1.32vw, 21px);
+  gap: .96em;
+  height: var(--cta-ball); padding: 0 1.3em;
+  border-radius: 100px;
+  border: 0;
+  /* the resting state IS the ball: blue, and clipped to a disc */
+  background: var(--bead-blue);
+  color: var(--nes-ink);
+  font-family: var(--font--primary);
+  /* 🔴 600, up from 500, and it is a real instance rather than a browser's
+     synthesised bold: the face loads as a variable font across 400..700
+     (the <link> in each page's head), so 600 is a drawn weight.
+
+     This is the ONLY thing this button took from a round of trying to make
+     it match the header's pill. The rest — one shared size, one tracking,
+     caps — is gone, because they are not the same kind of object: the
+     header's is chrome, set in caps at 14px, where 700 is what keeps it
+     from dissolving. This is the page's primary action at nearly 19px,
+     where 700 would shout. 600 is what a 19px button wants. */
+  font-weight: 600; letter-spacing: -.01em;
+  text-decoration: none; white-space: nowrap;
+  overflow: hidden;                     /* the fill is clipped to the pill */
+  isolation: isolate;
+  opacity: 0;
+  /* the standalone `scale` property, not `transform` — .btn-disc's hover
+     fill owns a transform of its own and the two must not share a slot */
+  scale: .55;
+  /* 🔴 The pivot is the BALL's centre, not the pill's. Left at the default
+     50% the scale pivots on the middle of the full-width pill, which is
+     nowhere near the ball — measured, the ball landed at x 105 and then
+     slid 23px LEFT to x 72 as it grew, so the thing that is supposed to
+     stand still and open was also travelling. Half the ball's own diameter
+     in from the left edge is the one point that does not move. */
+  transform-origin: calc(var(--cta-ball) / 2) center;
+  clip-path: inset(0 calc(100% - var(--cta-ball)) 0 0 round 100px);
+  /* three beats that overlap rather than queue */
+  transition:
+    opacity .26s ease,
+    scale .44s var(--ease-out-expo),
+    clip-path .64s var(--ease-out-expo) .2s,
+    background-color .44s var(--ease-out) .26s,
+    border-color .35s var(--ease-out),
+    color .3s var(--ease-out),
+    /* 按压：见文件末尾那段 */
+    transform .14s var(--ease-out-quint);
+}
+
+/* opens from the MIDDLE: the closed shape is a ball on the centre line, so
+   the pivot has to be the centre too */
+.btn-ball--mid {
+  transform-origin: center;
+  clip-path: inset(0 calc(50% - var(--cta-ball) / 2) round 100px);
+}
+
+/* the open state, whatever the section calls its cue */
+.btn-ball.is-open {
+  opacity: 1;
+  scale: 1;
+  background: var(--nes-cream);
+  clip-path: inset(0 0 0 0 round 100px);
+}
+
+.btn-disc { position: relative; overflow: hidden; }
+.btn-disc::after {
+  content: "";
+  position: absolute; z-index: 0;
+  /* 🔴 WHERE THE POINTER CAME IN, written by disc.js. The 50% fallback is
+     the old behaviour — dead centre — so a page that never loads that file
+     keeps a working hover instead of losing one. */
+  left: var(--disc-x, 50%); top: var(--disc-y, 50%);
+  /* 🔴 240%, AND THE DOUBLING IS EXACTLY WHAT MOVING THE ORIGIN COSTS.
+     From the centre, a circle covers the button once its radius clears the
+     half-diagonal: width% >= sqrt(1 + (h/w)^2), which is 120% for every
+     pill on the site and is where the old number came from. From an
+     ARBITRARY point the worst case is a corner, and the far corner is a
+     full diagonal away rather than half — so the same coverage costs
+     exactly twice the diameter.
+
+     240% therefore holds the same rule the old note stated: it covers
+     while h <= 0.66w. Measured, the widest and the tightest —
+       JOIN THE WAITLIST  212x56   needs 219, has 254
+       MENU                88x45   needs  99, has 106   <- the tight one
+     A squarer button than 0.66 needs more; re-check these if one appears. */
+  width: 240%; aspect-ratio: 1; height: auto;
+  border-radius: 50%;
+  background: var(--btn-disc, var(--nes-blue-2));
+  transform: translate(-50%, -50%) scale(0);
+  /* 🔴 .55s → .22s（2026-09-04）。这是全站唯一的共用按钮 hover，被触发次数最多，
+     而半秒的墨盘扫过意味着指针落上去要等大半拍才有回应——叠加上面那条曲线原本
+     的零初速，前 60ms 几乎完全静止。
+     ⚠️ styles.css:761 记着「这里和 header 的数字必须一致」，header.css 的
+     .hd__fill 已同步改。那条注释约束的是两处同步，不是时长本身。 */
+  transition: transform .22s var(--ease-out);
+  pointer-events: none;
+}
+.btn-disc:hover::after { transform: translate(-50%, -50%) scale(1); }
+.btn-label { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: .5em; }
+
+/* The arrow that follows a label. It is the page's ONE arrow drawing — the
+   same path the header's pills use — turned 45° so it points up and out of
+   the corner rather than along the line.
+
+   🔴 EVERY BUTTON THAT HAS IT POINTS THE SAME WAY, which is why the turn is
+   a constant and not a variable. It was briefly both, so the intro's CTA
+   could aim down at the page instead of out of it — a scroll cue rather
+   than a link. The arrow went; the variables had nothing left to vary, and
+   a knob nobody turns is just a place for the next person to introduce a
+   second arrow direction. If one is ever genuinely needed, note that the
+   turn and the hover nudge below are ONE decision: an arrow aimed down that
+   leaps up on hover is two controls arguing.
+
+   🔴 `rotate`, not `transform: rotate()`. They are separate properties, and
+   the individual ones compose as translate → rotate → scale: so the hover
+   nudge below still travels up-and-right in the button's own axes. Fold
+   both into one `transform` and the translate inherits the 45°, which
+   sends the arrow off along its own shaft instead.
+
+   Sized in `em`, so it tracks whatever the button's clamped font-size
+   resolves to at that viewport. */
+.btn-arrow {
+  display: inline-flex; flex: none;
+  width: 1em; height: 1em;
+  rotate: -45deg;
+  transition: translate .35s var(--ease-out);
+}
+.btn-arrow svg { width: 100%; height: 100%; display: block; }
+.btn-disc:hover .btn-arrow { translate: .16em -.16em; }
+
+/* ============================================================
+   the lock, and the shackle that swings shut
+
+   🔴 IT IS HERE, NOT IN privacy.css, because two pages draw it now: the
+   home page's privacy heading and the device page's privacy card. It came
+   from privacy.css and this is the whole of what moved — the geometry, the
+   hinge and the keyframes. What did NOT move is the TRIGGER, which is
+   genuinely per-page: the home page gates on .pv--anim (privacy.js) plus
+   its own .is-in, the device page on the card's [data-reveal] .is-in. Each
+   owns one line; neither owns a copy of the animation.
+
+   The alternative was to duplicate 30 lines into device.css, and the
+   numbers below are exactly the kind that get tuned in one copy and not
+   the other.
+
+   🔴 The keyhole is CUT out of the case with a mask, not painted over it
+   in the ground's colour — see the markup. A hole has to stay a hole
+   whatever ends up behind the lock, and on the device page what is behind
+   it is a white card rather than the home page's cream.
+
+   🔴 The bar is drawn UNDER the body in the markup (source order), so as
+   it drops, the last of it disappears behind the case rather than crossing
+   it. Keep that order in any markup that reuses this.
+
+   ---------- the shackle ----------
+   🔴 A TRUE SWIVEL, THROUGH A FULL 180°. The hinge is the fixed leg's own
+   vertical axis — rotateY — which is what a real padlock does, and the
+   travel is the whole of it: the shackle starts swung right round to the
+   far side and comes back.
+
+   That is why 180 and not 90. The two ends of the swing are the SAME arch
+   mirrored about the leg they share: an inverted U reaching left at 180°,
+   an inverted U reaching right at 0°, with the fixed leg common to both.
+   Halfway, at 90°, it is edge-on and projects to a line — the flat state.
+   So one rotation reads as three things in order: out on the far side,
+   flat, home. A 90° version only ever showed the second half.
+
+   (An in-plane rotate was tried and dropped: it TILTS the whole U over
+   like a bin lid, which no shackle does. The foreshortening is the tell
+   that the thing is turning about its own leg rather than falling over.)
+
+   perspective() has to sit INSIDE the transform and BEFORE the rotate, or
+   the Y rotation projects flat and the U merely narrows — the near leg
+   never grows, and without that there is no depth cue at all. 40 is in
+   user units against a 24-unit box.
+
+   Two beats: swing home, then press down. Composed in that order below —
+   CSS applies transforms right to left, so the rotation runs first, about
+   the hinge, and `translateY` then carries the squared-up shackle into the
+   case.
+
+   🔴 2.6, between the two extremes this went through. At 3.8 the shackle
+   floated well clear and the last beat read as a separate part landing on
+   a lock; at 1.3 it never left the rim at all and the press was 4px, which
+   is a twitch rather than a movement.
+
+   The number that divides them is 1.65, and it is arithmetic rather than
+   taste: the legs end at y=11, the 2.1 stroke's round cap paints 1.05 past
+   that to y=12.05, and the case's top edge is at 10.4 — so 1.65 is exactly
+   the lift at which the painted end clears the rim. 2.6 sits just under a
+   unit above it: a real gap you can read as "open", still close enough
+   that the shackle is plainly sitting in its own lock rather than hovering
+   over one, and an 8px press to close it.
+
+   🔴 transform-origin: 0 50% with transform-box: fill-box IS that hinge.
+   The path's own box runs x 8→16, so its left edge is the fixed leg — and
+   for a Y rotation only the x of the origin matters. Without fill-box the
+   origin resolves against the whole SVG viewport and the thing swings
+   around a point off in the corner.
+   ============================================================ */
+.pv__lock {
+  flex: none;
+  display: block;
+  /* 🔴 A VARIABLE WITH A DEFAULT, because the two callers size it two
+     different ways and neither should have to override width and height
+     separately. The home page ties it to its section title; the device
+     page gives it a flat size in its own card. The fallback is the em so
+     that a third caller can just drop it next to type and get something
+     sensible. */
+  width: var(--lock-size, 1.15em);
+  height: var(--lock-size, 1.15em);
+  /* it sits on the type's baseline-ish line, not hanging below it */
+  align-self: center;
+  color: var(--nes-ink);
+}
+.pv__lock svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.pv__lock-bar {
+  transform-box: fill-box;
+  transform-origin: 0 50%;                  /* the fixed leg's axis — the hinge */
+}
+/* 🔴 One keyframe track, because the two beats have to be SEQUENTIAL and a
+   transition cannot express "finish turning, then start dropping" on a
+   single property. 0→62% is the swivel; 62→100% is the press. The shackle
+   is rigid: it cannot be square and swung at once, and it cannot drop until
+   it is square, so the two must never overlap. */
+@keyframes pv-latch {
+  0%   { transform: translateY(-2.6px) perspective(40px) rotateY(-180deg); }
+  62%  { transform: translateY(-2.6px) perspective(40px) rotateY(0deg); }
+  100% { transform: translateY(0)      perspective(40px) rotateY(0deg); }
+}
+
+
+/* ---------- Lenis (see smooth.js) ----------
+   The library's own required rules, inlined rather than pulled as a second
+   CDN request. Nothing here is a style choice: `height: auto` stops a
+   100% html/body from capping the scrollable length, and the
+   scroll-behavior override is because a native `smooth` and Lenis animating
+   the same scrollTop at the same time fight each other every frame. */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+.lenis.lenis-smooth iframe { pointer-events: none; }
+
+/* ============================================================
+   🔴 2026-09-04 —— 按压反馈（触屏上唯一的反馈）
+
+   本站的主 CTA（.btn-ball + .btn-disc，三处：intro / hub / device）、header
+   的 Device 药丸、footer 的商店徽章、hero 的翻页点，此前**全都只有 hover**。
+   全站 `:active` 只在 device.css 出现过——而那个文件自己写着（device.css:277）：
+     「每个可按的东西都要回应一次按压，不能只有 hover……在触摸屏上等于没有反馈」
+   同一个仓库里已经有这条标准，只是没推广到别的页面。这里补齐。
+
+   数值照抄 device.css 已论证过的那套：scale(.97) / 140ms / --ease-out-quint
+   （device.css:275-287 论证了幅度与时长，并说明它**故意在 reduced-motion 下
+   保留**——「这么小这么短的一次缩放没有前庭负担」）。
+
+   ⚠️ .btn-ball 用的是独立的 `scale` 属性（见它自己那段注释：「transform 这个
+   槽位要留给别人」），所以按压走 transform，两者互不占位，也不会打架。
+   ============================================================ */
+.btn-ball:active,
+.hd__btn:active,
+.ft__store:active,
+.hero__dot:active { transform: scale(.97); }
+
+/* ============================================================
+   🔴 2026-09-04 —— prefers-reduced-motion（此前**整个文件一条都没有**）
+
+   这个文件拥有全站共用的按钮原语，每一页都在用，而它们的动效全是大位移：
+     · .btn-disc::after —— 一个 width: 240% 的圆盘从 scale(0) 扫过整个按钮
+     · .btn-disc:hover .btn-arrow —— 箭头位移
+     · .btn-ball —— 球开成药丸：scale .44s + clip-path .64s 的六轨形变
+     · .testi_card:hover .text-link-arrow —— translateX(100%)
+   证据表明这个缺口是已知的：intro.css:552 单独给 .intro__cta 打了补丁，
+   说明有人在**调用点**发现过它，但没有回到定义处修。
+
+   保留什么、去掉什么，照 device.css:3218 那套已经论证过的口径：
+   不做 `* { transition: none }` 一刀切，只砍**位移**，留下 opacity/颜色。
+
+   ⚠️ 按压反馈（scale .97）**故意留着**——device.css:275-286 论证过：
+   「这么小这么短的一次缩放没有前庭负担」，而它在触屏上是唯一的反馈。
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  /* 墨盘不再扫过，直接以最终色出现 */
+  .btn-disc::after { transition: opacity .2s ease; transform: translate(-50%, -50%) scale(1); opacity: 0; }
+  .btn-disc:hover::after { opacity: 1; }
+  /* 箭头不再窜动 */
+  .btn-disc:hover .btn-arrow { translate: 0 0; }
+  .btn-arrow { transition: none; }
+  /* 球→药丸：形变去掉，只留淡入 */
+  .btn-ball { transition: opacity .2s ease, background-color .2s ease, color .2s ease, transform .14s var(--ease-out-quint); }
+  .testi_card:hover .text-link-arrow { transform: none; }
+}
+
+/* One mobile text gutter for the header, intro and section headings. */
+@media (max-width: 767px) {
+  :root { --gutter: 1.25rem; }
+}

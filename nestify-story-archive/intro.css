@@ -1,0 +1,1463 @@
+:root {
+  /* 🔴 线稿的墨色。定义在 :root 而不是 .intro，因为**翻卡是挂在 <body> 上的**
+     （见 intro.js 的 document.body.appendChild），继承不到 .intro 里的变量，而它
+     背面那个线框要和房间线稿是同一支笔、同一个颜色。
+
+     用 color-mix 而不是写死十六进制：这样它永远是「墙底掺多少墨」，哪天墙色改了
+     线色自己跟着走。百分比是唯一的深浅旋钮——11% 等于调色板的 --nes-tan，
+     18% 是「再深一点点」，28% 是同日再一次「还是有点浅了」。
+
+     🔴 这一个值同时管**房间线稿**和**设备线框**——用户说「线稿和 frame SVG 要
+     一起调」，它们本来就共用这个 token，所以改这一处两边一起走，不会脱节。
+     35% 以上线稿开始抢戏，会盖过它托着的那台机器。 */
+  --sketch-ink: color-mix(in srgb, var(--nes-ink) 28%, var(--nes-sand));
+}
+
+/* ============================================================
+   INTRO — logo-shaped video reveal (the zipline.com opener).
+   The video is full-bleed from the first frame; what animates is
+   the cream sheet on top of it, which has the wordmark knocked
+   out of itself. The hole starts at logo size and grows until it
+   has eaten the sheet — the sheet never fades, it is wiped.
+   ============================================================ */
+
+/* the stage pins while the slogan fills; one extra screen of scroll is
+   all that takes */
+/* three screens of track: the film shrinks over the first, then the
+   slogan is read out over the rest */
+/* one number for the film's landing corner — the slot and the film both
+   read it, so they can never disagree.
+
+   🔴 FLUID, not a flat 16px. The slot is sized off the headline's own em,
+   so a fixed corner is a different SHAPE at every width: on the 1440 slot
+   (101px tall) 16px is a .16 corner, on the 700 slot (49px) the same 16px
+   is .33, and at phone size the slot is 17px tall — past h/2, so the
+   browser clamps it and the film renders as a PILL. The corner stopped
+   being a corner. .118 of the headline's font-size holds the 1440 shape
+   at every width; written in vw because intro.js has to read this as a
+   real length. 1.12vw is 16.1px at 1440, so desktop is where it was. */
+:root { --film-r: clamp(4.5px, 1.12vw, 20px); }
+
+.intro {
+  position: relative;
+  /* the dock takes the first stretch, the four hours the rest — four
+     states need room to be read, so the track is longer than a shrink
+     alone would need.
+
+     🔴 900, up from 560, for the same reason the deck below went to
+     300svh per slide: RESISTANCE IS BOUGHT WITH DISTANCE. At 560 the
+     whole of scene two — the film docked in the line, "Time … to just be
+     a parent." coming up, the glow closing down onto the clock — fitted
+     in about four viewports, which one trackpad flick clears. Every mark
+     in intro.js is a FRACTION of this track (SHRINK_END .30, COPY_FROM
+     .28, SUN_FROM/UP/CLOSE), so raising the height stretches all of them
+     together and nothing has to be retuned:
+
+         shrink   0 → .30    1.7 → 2.7 viewports
+         scene 2  .28 → 1    4.0 → 6.5 viewports  */
+  /* 🔴 900 → 675 → **420svh**。第二次减（2026-09-04）的原因和第一次不同，
+     值得写清楚：
+
+     675 那一版里，0.30（收缩结束）到 0.85（翻卡开始）之间那 3.2 屏**不是空的**
+     —— 它是给「一次滚动换一个词」用的，而那套拍子机器每滑一下会把读者直接
+     送到下一个锚点，所以 4.9 屏实际是两下滑完的。用户记得的「视频一下子就缩
+     到 Time to be」就是这么来的。
+
+     同日换词改成了 drift.js 里的自动轮播、拍子机器整块删除，那 3.2 屏于是
+     真的空了：没有快进、也没有任何事发生，只剩手动滚。用户随即反馈「阻尼有点
+     重」「感觉又改回很早以前那版」。距离必须跟着机制一起减。
+
+     420svh：range = 320svh，收缩在 0.96 屏内完成（约一次滚轮），翻卡在 2.7 屏
+     处开始。三个节点仍是 range 的分数，比例一点没动。
+
+     🔴 420 → 520svh（2026-09-04）。这一屏是**给换词的**，不是给转场的。
+
+     parent/child/family 改回滚动驱动之后，可读窗口只有 826px：hero 让开在
+     y≈500，句子开始淡出在 FLIP_FROM=1326。三个词均分，每个只有 275px ≈ 1/3 屏
+     ——一次滚轮就跨过两个。用户 2026-09-04：「换词都看不到，就是因为一滑就
+     过去了嘛？你处理的办法是不是让它滑动的距离更大？」是的，就是距离。
+
+     加的这一屏全部落在换词那一段：FLIP_FROM 同步从 0.50 抬到 0.574，于是
+     **转场那一段的像素长度基本不变**（2156 → 2311），三个词各拿到约 500px。
+     加长度是有代价的（整页又多一屏），但换词要读得到就只能给它距离。 */
+  height: 520svh;
+  background-color: var(--page-bg);   /* the one ground — see --page-bg in styles.css */
+  color: var(--nes-ink);
+  overflow-x: clip;
+}
+
+.intro__stage {
+  position: sticky; top: 0;
+  height: 100svh;
+  min-height: 620px;
+  overflow: hidden;
+  isolation: isolate;
+  /* 🔴 z-index 2, and NO background of its own — the ground moved up to
+     .intro. The halo is a fixed layer at z-index 1, so it needs something
+     to sit above (the section's colour) and something to sit below (this
+     stage's contents). With the colour painted here instead, the halo had
+     nowhere to go: over the stage it covered the headline, under it it was
+     invisible. */
+  z-index: 2;
+}
+
+/* ---------- the film ----------
+   It is the SAME element from full screen to tile — never swapped for a
+   smaller copy, which is what keeps the shot continuous. JS drives --mw
+   only; the height comes off the aspect ratio and the corner off --mr, so
+   there is one number to interpolate and nothing to keep in step.
+
+   Centred with left/top 50% and a translate, so shrinking is automatically
+   about the middle of the frame: at every size the gap either side is
+   (stage − width) / 2 without anyone computing it. */
+/* ---------- the film ----------
+   🔴 It moves on TRANSFORM ONLY — no width, no top, no left. Those are
+   layout properties: animating them re-lays-out and repaints the whole
+   stage every frame, which is exactly what drops a scroll-scrubbed shot
+   below 60fps. A translate + a uniform scale is a compositor job.
+
+   The box is therefore a FIXED 16:10 rectangle the width of the stage,
+   centred, and the scrub only ever changes its transform. Uniform scale
+   throughout, so the picture is never stretched — at the start it is
+   scaled UP just enough to cover a viewport taller than 16:10, and at
+   the end scaled down onto the slot.
+
+   🔴 No position:fixed and no FLIP hand-off, despite the obvious
+   temptation: the stage is already `position: sticky`, so while the
+   section is pinned this box behaves exactly like a fixed one AND it
+   still scrolls away correctly when the section releases. Making it
+   fixed would mean re-parenting it on arrival to stop it hanging over
+   the next section — solving a problem the sticky stage does not have. */
+.intro__media {
+  position: absolute; z-index: 2;
+  left: 0; top: 50%;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  transform-origin: 50% 50%;
+  transform: translate3d(0, -50%, 0);
+  border-radius: var(--mr, 0px);
+  overflow: hidden;
+  will-change: transform;
+}
+.intro__video {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+
+/* the sheet with the wordmark cut out of it.
+   🔴 The mask is INLINE, not url(assets/shapes/logo.svg). Chrome treats
+   every file:// document as its own opaque origin, so an SVG loaded as a
+   mask from a sibling file is refused — mask-image resolves to none, the
+   sheet stays solid, and the opener plays as a blank cream screen. A
+   data: URL is same-origin everywhere, so this works off the filesystem
+   as well as off a server. assets/shapes/logo.svg stays as the source. */
+.intro__cover {
+  position: absolute; inset: 0; z-index: 3;
+  background: var(--page-bg);   /* the sheet must BE the ground it wipes off */
+  --logo: clamp(240px, 44vw, 620px);
+
+  -webkit-mask-image: linear-gradient(#000, #000), url("data:image/svg+xml,%3Csvg width='421' height='115' viewBox='8 42 421 115' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M78.592 131.312C77.3973 132.507 75.648 133.403 73.344 134C71.1253 134.683 68.4373 135.024 65.28 135.024C62.1227 135.024 59.136 134.555 56.32 133.616C53.504 132.677 51.2 130.416 49.408 126.832L36.736 100.976C35.456 98.3307 34.304 95.856 33.28 93.552C32.256 91.1627 31.1467 88.432 29.952 85.36L29.184 85.488C29.5253 90.096 29.696 94.7893 29.696 99.568C29.7813 104.347 29.824 109.04 29.824 113.648V133.488C28.8853 133.744 27.4347 134 25.472 134.256C23.5947 134.512 21.7173 134.64 19.84 134.64C17.9627 134.64 16.2987 134.512 14.848 134.256C13.3973 134 12.2027 133.488 11.264 132.72C10.3253 131.952 9.6 130.928 9.088 129.648C8.576 128.283 8.32 126.533 8.32 124.4V60.4C9.51467 58.6933 11.3493 57.4133 13.824 56.56C16.2987 55.7067 18.944 55.28 21.76 55.28C24.9173 55.28 27.904 55.792 30.72 56.816C33.6213 57.7547 35.9253 59.9733 37.632 63.472L50.432 89.328C51.712 91.9733 52.864 94.4907 53.888 96.88C54.912 99.184 56.0213 101.872 57.216 104.944L57.856 104.816C57.5147 100.208 57.3013 95.6 57.216 90.992C57.1307 86.384 57.088 81.776 57.088 77.168V56.432C58.0267 56.176 59.4347 55.92 61.312 55.664C63.2747 55.408 65.1947 55.28 67.072 55.28C70.8267 55.28 73.6853 55.9627 75.648 57.328C77.6107 58.608 78.592 61.3387 78.592 65.52V131.312ZM126.427 136.048C121.392 136.048 116.699 135.365 112.347 134C108.08 132.549 104.326 130.416 101.083 127.6C97.9257 124.784 95.4083 121.243 93.531 116.976C91.739 112.709 90.843 107.717 90.843 102C90.843 96.368 91.739 91.5467 93.531 87.536C95.4083 83.44 97.8403 80.112 100.827 77.552C103.814 74.9067 107.227 72.9867 111.067 71.792C114.907 70.512 118.832 69.872 122.843 69.872C127.366 69.872 131.462 70.5547 135.131 71.92C138.886 73.2853 142.086 75.1627 144.731 77.552C147.462 79.9413 149.552 82.8 151.003 86.128C152.539 89.456 153.307 93.0827 153.307 97.008C153.307 99.9093 152.496 102.128 150.875 103.664C149.254 105.2 146.992 106.181 144.091 106.608L112.475 111.344C113.414 114.16 115.334 116.293 118.235 117.744C121.136 119.109 124.464 119.792 128.219 119.792C131.718 119.792 135.003 119.365 138.075 118.512C141.232 117.573 143.792 116.507 145.755 115.312C147.12 116.165 148.272 117.36 149.211 118.896C150.15 120.432 150.619 122.053 150.619 123.76C150.619 127.6 148.827 130.459 145.243 132.336C142.512 133.787 139.44 134.768 136.027 135.28C132.614 135.792 129.414 136.048 126.427 136.048ZM122.843 85.744C120.795 85.744 119.003 86.0853 117.467 86.768C116.016 87.4507 114.822 88.3467 113.883 89.456C112.944 90.48 112.219 91.6747 111.707 93.04C111.28 94.32 111.024 95.6427 110.939 97.008L132.827 93.424C132.571 91.7173 131.632 90.0107 130.011 88.304C128.39 86.5973 126 85.744 122.843 85.744ZM216.261 115.44C216.261 121.925 213.829 127.003 208.965 130.672C204.101 134.341 196.933 136.176 187.461 136.176C183.877 136.176 180.549 135.92 177.477 135.408C174.405 134.896 171.76 134.128 169.541 133.104C167.408 131.995 165.701 130.629 164.421 129.008C163.226 127.387 162.629 125.467 162.629 123.248C162.629 121.2 163.056 119.493 163.909 118.128C164.762 116.677 165.786 115.483 166.981 114.544C169.456 115.909 172.272 117.147 175.429 118.256C178.672 119.28 182.384 119.792 186.565 119.792C189.21 119.792 191.216 119.408 192.581 118.64C194.032 117.872 194.757 116.848 194.757 115.568C194.757 114.373 194.245 113.435 193.221 112.752C192.197 112.069 190.49 111.515 188.101 111.088L184.261 110.32C176.837 108.869 171.29 106.608 167.621 103.536C164.037 100.379 162.245 95.8987 162.245 90.096C162.245 86.9387 162.928 84.08 164.293 81.52C165.658 78.96 167.578 76.8267 170.053 75.12C172.528 73.4133 175.472 72.0907 178.885 71.152C182.384 70.2133 186.224 69.744 190.405 69.744C193.562 69.744 196.506 70 199.237 70.512C202.053 70.9387 204.485 71.6213 206.533 72.56C208.581 73.4987 210.202 74.736 211.397 76.272C212.592 77.7227 213.189 79.472 213.189 81.52C213.189 83.4827 212.805 85.1893 212.037 86.64C211.354 88.0053 210.458 89.1573 209.349 90.096C208.666 89.6693 207.642 89.2427 206.277 88.816C204.912 88.304 203.418 87.8773 201.797 87.536C200.176 87.1093 198.512 86.768 196.805 86.512C195.184 86.256 193.69 86.128 192.325 86.128C189.509 86.128 187.333 86.4693 185.797 87.152C184.261 87.7493 183.493 88.7307 183.493 90.096C183.493 91.0347 183.92 91.8027 184.773 92.4C185.626 92.9973 187.248 93.552 189.637 94.064L193.605 94.96C201.797 96.8373 207.6 99.44 211.013 102.768C214.512 106.011 216.261 110.235 216.261 115.44ZM248.541 112.624C248.541 114.843 249.224 116.421 250.589 117.36C252.04 118.299 254.045 118.768 256.605 118.768C257.885 118.768 259.208 118.683 260.573 118.512C261.938 118.256 263.133 117.957 264.157 117.616C264.925 118.555 265.565 119.621 266.077 120.816C266.674 121.925 266.973 123.291 266.973 124.912C266.973 128.155 265.736 130.8 263.261 132.848C260.872 134.896 256.605 135.92 250.461 135.92C242.952 135.92 237.149 134.213 233.053 130.8C229.042 127.387 227.037 121.84 227.037 114.16V59.376C227.976 59.12 229.298 58.864 231.005 58.608C232.797 58.2667 234.674 58.096 236.637 58.096C240.392 58.096 243.293 58.7787 245.341 60.144C247.474 61.424 248.541 64.1973 248.541 68.464V76.656H265.309C265.821 77.5947 266.29 78.7893 266.717 80.24C267.229 81.6053 267.485 83.1413 267.485 84.848C267.485 87.8347 266.802 90.0107 265.437 91.376C264.157 92.656 262.408 93.296 260.189 93.296H248.541V112.624ZM277.519 54.512C277.519 51.2693 278.586 48.5387 280.719 46.32C282.938 44.1013 285.839 42.992 289.423 42.992C293.007 42.992 295.866 44.1013 297.999 46.32C300.218 48.5387 301.327 51.2693 301.327 54.512C301.327 57.7547 300.218 60.4853 297.999 62.704C295.866 64.9227 293.007 66.032 289.423 66.032C285.839 66.032 282.938 64.9227 280.719 62.704C278.586 60.4853 277.519 57.7547 277.519 54.512ZM300.303 133.872C299.364 134.043 297.956 134.256 296.079 134.512C294.287 134.853 292.452 135.024 290.575 135.024C288.698 135.024 286.991 134.896 285.455 134.64C284.004 134.384 282.767 133.872 281.743 133.104C280.719 132.336 279.908 131.312 279.311 130.032C278.799 128.667 278.543 126.917 278.543 124.784V72.688C279.482 72.5173 280.847 72.304 282.639 72.048C284.516 71.7067 286.394 71.536 288.271 71.536C290.148 71.536 291.812 71.664 293.263 71.92C294.799 72.176 296.079 72.688 297.103 73.456C298.127 74.224 298.895 75.2907 299.407 76.656C300.004 77.936 300.303 79.6427 300.303 81.776V133.872ZM314.412 71.792C314.412 67.44 315.137 63.728 316.588 60.656C318.124 57.4987 320.172 54.9387 322.732 52.976C325.292 50.928 328.279 49.4347 331.692 48.496C335.191 47.5573 338.903 47.088 342.828 47.088C349.143 47.088 353.793 47.9413 356.78 49.648C359.767 51.2693 361.26 54.0853 361.26 58.096C361.26 59.8027 360.876 61.3387 360.108 62.704C359.425 64.0693 358.657 65.0933 357.804 65.776C356.183 65.3493 354.476 65.008 352.684 64.752C350.977 64.4107 348.972 64.24 346.668 64.24C342.999 64.24 340.14 64.88 338.092 66.16C336.044 67.3547 335.02 69.488 335.02 72.56V76.656H356.012C356.524 77.5947 356.993 78.7893 357.42 80.24C357.932 81.6053 358.188 83.1413 358.188 84.848C358.188 87.8347 357.505 90.0107 356.14 91.376C354.86 92.656 353.111 93.296 350.892 93.296H336.172V133.872C335.319 134.128 333.953 134.384 332.076 134.64C330.284 134.896 328.407 135.024 326.444 135.024C324.567 135.024 322.86 134.896 321.324 134.64C319.873 134.384 318.636 133.872 317.612 133.104C316.588 132.336 315.777 131.312 315.18 130.032C314.668 128.667 314.412 126.917 314.412 124.784V71.792ZM377.634 118.128C376.695 115.995 375.671 113.605 374.562 110.96C373.538 108.315 372.429 105.285 371.234 101.872C370.125 98.4587 368.93 94.576 367.65 90.224C366.455 85.7867 365.175 80.7093 363.81 74.992C365.005 73.7973 366.583 72.7733 368.546 71.92C370.594 70.9813 372.813 70.512 375.202 70.512C378.189 70.512 380.663 71.152 382.626 72.432C384.589 73.6267 386.039 75.9307 386.978 79.344L397.09 114.544H397.602C398.626 111.643 399.607 108.485 400.546 105.072C401.57 101.659 402.551 98.16 403.49 94.576C404.429 90.9067 405.282 87.28 406.05 83.696C406.903 80.0267 407.629 76.4427 408.226 72.944C411.298 71.3227 414.669 70.512 418.338 70.512C421.325 70.512 423.799 71.152 425.762 72.432C427.725 73.712 428.706 75.9307 428.706 79.088C428.706 81.392 428.407 84.08 427.81 87.152C427.213 90.1387 426.402 93.3387 425.378 96.752C424.439 100.165 423.287 103.707 421.922 107.376C420.642 110.96 419.277 114.501 417.826 118C416.375 121.499 414.882 124.827 413.346 127.984C411.81 131.056 410.317 133.829 408.866 136.304C406.477 140.485 404.258 143.899 402.21 146.544C400.162 149.189 398.199 151.237 396.322 152.688C394.445 154.224 392.567 155.248 390.69 155.76C388.813 156.357 386.85 156.656 384.802 156.656C381.218 156.656 378.317 155.589 376.098 153.456C373.879 151.323 372.557 148.549 372.13 145.136C374.861 143.003 377.591 140.613 380.322 137.968C383.053 135.408 385.527 132.763 387.746 130.032C386.295 129.605 384.717 128.624 383.01 127.088C381.389 125.467 379.597 122.48 377.634 118.128Z' fill='%23fff'/%3E%3Ccircle cx='289.5' cy='54.5' r='12.5' fill='%23fff'/%3E%3C/svg%3E");
+          mask-image: linear-gradient(#000, #000), url("data:image/svg+xml,%3Csvg width='421' height='115' viewBox='8 42 421 115' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M78.592 131.312C77.3973 132.507 75.648 133.403 73.344 134C71.1253 134.683 68.4373 135.024 65.28 135.024C62.1227 135.024 59.136 134.555 56.32 133.616C53.504 132.677 51.2 130.416 49.408 126.832L36.736 100.976C35.456 98.3307 34.304 95.856 33.28 93.552C32.256 91.1627 31.1467 88.432 29.952 85.36L29.184 85.488C29.5253 90.096 29.696 94.7893 29.696 99.568C29.7813 104.347 29.824 109.04 29.824 113.648V133.488C28.8853 133.744 27.4347 134 25.472 134.256C23.5947 134.512 21.7173 134.64 19.84 134.64C17.9627 134.64 16.2987 134.512 14.848 134.256C13.3973 134 12.2027 133.488 11.264 132.72C10.3253 131.952 9.6 130.928 9.088 129.648C8.576 128.283 8.32 126.533 8.32 124.4V60.4C9.51467 58.6933 11.3493 57.4133 13.824 56.56C16.2987 55.7067 18.944 55.28 21.76 55.28C24.9173 55.28 27.904 55.792 30.72 56.816C33.6213 57.7547 35.9253 59.9733 37.632 63.472L50.432 89.328C51.712 91.9733 52.864 94.4907 53.888 96.88C54.912 99.184 56.0213 101.872 57.216 104.944L57.856 104.816C57.5147 100.208 57.3013 95.6 57.216 90.992C57.1307 86.384 57.088 81.776 57.088 77.168V56.432C58.0267 56.176 59.4347 55.92 61.312 55.664C63.2747 55.408 65.1947 55.28 67.072 55.28C70.8267 55.28 73.6853 55.9627 75.648 57.328C77.6107 58.608 78.592 61.3387 78.592 65.52V131.312ZM126.427 136.048C121.392 136.048 116.699 135.365 112.347 134C108.08 132.549 104.326 130.416 101.083 127.6C97.9257 124.784 95.4083 121.243 93.531 116.976C91.739 112.709 90.843 107.717 90.843 102C90.843 96.368 91.739 91.5467 93.531 87.536C95.4083 83.44 97.8403 80.112 100.827 77.552C103.814 74.9067 107.227 72.9867 111.067 71.792C114.907 70.512 118.832 69.872 122.843 69.872C127.366 69.872 131.462 70.5547 135.131 71.92C138.886 73.2853 142.086 75.1627 144.731 77.552C147.462 79.9413 149.552 82.8 151.003 86.128C152.539 89.456 153.307 93.0827 153.307 97.008C153.307 99.9093 152.496 102.128 150.875 103.664C149.254 105.2 146.992 106.181 144.091 106.608L112.475 111.344C113.414 114.16 115.334 116.293 118.235 117.744C121.136 119.109 124.464 119.792 128.219 119.792C131.718 119.792 135.003 119.365 138.075 118.512C141.232 117.573 143.792 116.507 145.755 115.312C147.12 116.165 148.272 117.36 149.211 118.896C150.15 120.432 150.619 122.053 150.619 123.76C150.619 127.6 148.827 130.459 145.243 132.336C142.512 133.787 139.44 134.768 136.027 135.28C132.614 135.792 129.414 136.048 126.427 136.048ZM122.843 85.744C120.795 85.744 119.003 86.0853 117.467 86.768C116.016 87.4507 114.822 88.3467 113.883 89.456C112.944 90.48 112.219 91.6747 111.707 93.04C111.28 94.32 111.024 95.6427 110.939 97.008L132.827 93.424C132.571 91.7173 131.632 90.0107 130.011 88.304C128.39 86.5973 126 85.744 122.843 85.744ZM216.261 115.44C216.261 121.925 213.829 127.003 208.965 130.672C204.101 134.341 196.933 136.176 187.461 136.176C183.877 136.176 180.549 135.92 177.477 135.408C174.405 134.896 171.76 134.128 169.541 133.104C167.408 131.995 165.701 130.629 164.421 129.008C163.226 127.387 162.629 125.467 162.629 123.248C162.629 121.2 163.056 119.493 163.909 118.128C164.762 116.677 165.786 115.483 166.981 114.544C169.456 115.909 172.272 117.147 175.429 118.256C178.672 119.28 182.384 119.792 186.565 119.792C189.21 119.792 191.216 119.408 192.581 118.64C194.032 117.872 194.757 116.848 194.757 115.568C194.757 114.373 194.245 113.435 193.221 112.752C192.197 112.069 190.49 111.515 188.101 111.088L184.261 110.32C176.837 108.869 171.29 106.608 167.621 103.536C164.037 100.379 162.245 95.8987 162.245 90.096C162.245 86.9387 162.928 84.08 164.293 81.52C165.658 78.96 167.578 76.8267 170.053 75.12C172.528 73.4133 175.472 72.0907 178.885 71.152C182.384 70.2133 186.224 69.744 190.405 69.744C193.562 69.744 196.506 70 199.237 70.512C202.053 70.9387 204.485 71.6213 206.533 72.56C208.581 73.4987 210.202 74.736 211.397 76.272C212.592 77.7227 213.189 79.472 213.189 81.52C213.189 83.4827 212.805 85.1893 212.037 86.64C211.354 88.0053 210.458 89.1573 209.349 90.096C208.666 89.6693 207.642 89.2427 206.277 88.816C204.912 88.304 203.418 87.8773 201.797 87.536C200.176 87.1093 198.512 86.768 196.805 86.512C195.184 86.256 193.69 86.128 192.325 86.128C189.509 86.128 187.333 86.4693 185.797 87.152C184.261 87.7493 183.493 88.7307 183.493 90.096C183.493 91.0347 183.92 91.8027 184.773 92.4C185.626 92.9973 187.248 93.552 189.637 94.064L193.605 94.96C201.797 96.8373 207.6 99.44 211.013 102.768C214.512 106.011 216.261 110.235 216.261 115.44ZM248.541 112.624C248.541 114.843 249.224 116.421 250.589 117.36C252.04 118.299 254.045 118.768 256.605 118.768C257.885 118.768 259.208 118.683 260.573 118.512C261.938 118.256 263.133 117.957 264.157 117.616C264.925 118.555 265.565 119.621 266.077 120.816C266.674 121.925 266.973 123.291 266.973 124.912C266.973 128.155 265.736 130.8 263.261 132.848C260.872 134.896 256.605 135.92 250.461 135.92C242.952 135.92 237.149 134.213 233.053 130.8C229.042 127.387 227.037 121.84 227.037 114.16V59.376C227.976 59.12 229.298 58.864 231.005 58.608C232.797 58.2667 234.674 58.096 236.637 58.096C240.392 58.096 243.293 58.7787 245.341 60.144C247.474 61.424 248.541 64.1973 248.541 68.464V76.656H265.309C265.821 77.5947 266.29 78.7893 266.717 80.24C267.229 81.6053 267.485 83.1413 267.485 84.848C267.485 87.8347 266.802 90.0107 265.437 91.376C264.157 92.656 262.408 93.296 260.189 93.296H248.541V112.624ZM277.519 54.512C277.519 51.2693 278.586 48.5387 280.719 46.32C282.938 44.1013 285.839 42.992 289.423 42.992C293.007 42.992 295.866 44.1013 297.999 46.32C300.218 48.5387 301.327 51.2693 301.327 54.512C301.327 57.7547 300.218 60.4853 297.999 62.704C295.866 64.9227 293.007 66.032 289.423 66.032C285.839 66.032 282.938 64.9227 280.719 62.704C278.586 60.4853 277.519 57.7547 277.519 54.512ZM300.303 133.872C299.364 134.043 297.956 134.256 296.079 134.512C294.287 134.853 292.452 135.024 290.575 135.024C288.698 135.024 286.991 134.896 285.455 134.64C284.004 134.384 282.767 133.872 281.743 133.104C280.719 132.336 279.908 131.312 279.311 130.032C278.799 128.667 278.543 126.917 278.543 124.784V72.688C279.482 72.5173 280.847 72.304 282.639 72.048C284.516 71.7067 286.394 71.536 288.271 71.536C290.148 71.536 291.812 71.664 293.263 71.92C294.799 72.176 296.079 72.688 297.103 73.456C298.127 74.224 298.895 75.2907 299.407 76.656C300.004 77.936 300.303 79.6427 300.303 81.776V133.872ZM314.412 71.792C314.412 67.44 315.137 63.728 316.588 60.656C318.124 57.4987 320.172 54.9387 322.732 52.976C325.292 50.928 328.279 49.4347 331.692 48.496C335.191 47.5573 338.903 47.088 342.828 47.088C349.143 47.088 353.793 47.9413 356.78 49.648C359.767 51.2693 361.26 54.0853 361.26 58.096C361.26 59.8027 360.876 61.3387 360.108 62.704C359.425 64.0693 358.657 65.0933 357.804 65.776C356.183 65.3493 354.476 65.008 352.684 64.752C350.977 64.4107 348.972 64.24 346.668 64.24C342.999 64.24 340.14 64.88 338.092 66.16C336.044 67.3547 335.02 69.488 335.02 72.56V76.656H356.012C356.524 77.5947 356.993 78.7893 357.42 80.24C357.932 81.6053 358.188 83.1413 358.188 84.848C358.188 87.8347 357.505 90.0107 356.14 91.376C354.86 92.656 353.111 93.296 350.892 93.296H336.172V133.872C335.319 134.128 333.953 134.384 332.076 134.64C330.284 134.896 328.407 135.024 326.444 135.024C324.567 135.024 322.86 134.896 321.324 134.64C319.873 134.384 318.636 133.872 317.612 133.104C316.588 132.336 315.777 131.312 315.18 130.032C314.668 128.667 314.412 126.917 314.412 124.784V71.792ZM377.634 118.128C376.695 115.995 375.671 113.605 374.562 110.96C373.538 108.315 372.429 105.285 371.234 101.872C370.125 98.4587 368.93 94.576 367.65 90.224C366.455 85.7867 365.175 80.7093 363.81 74.992C365.005 73.7973 366.583 72.7733 368.546 71.92C370.594 70.9813 372.813 70.512 375.202 70.512C378.189 70.512 380.663 71.152 382.626 72.432C384.589 73.6267 386.039 75.9307 386.978 79.344L397.09 114.544H397.602C398.626 111.643 399.607 108.485 400.546 105.072C401.57 101.659 402.551 98.16 403.49 94.576C404.429 90.9067 405.282 87.28 406.05 83.696C406.903 80.0267 407.629 76.4427 408.226 72.944C411.298 71.3227 414.669 70.512 418.338 70.512C421.325 70.512 423.799 71.152 425.762 72.432C427.725 73.712 428.706 75.9307 428.706 79.088C428.706 81.392 428.407 84.08 427.81 87.152C427.213 90.1387 426.402 93.3387 425.378 96.752C424.439 100.165 423.287 103.707 421.922 107.376C420.642 110.96 419.277 114.501 417.826 118C416.375 121.499 414.882 124.827 413.346 127.984C411.81 131.056 410.317 133.829 408.866 136.304C406.477 140.485 404.258 143.899 402.21 146.544C400.162 149.189 398.199 151.237 396.322 152.688C394.445 154.224 392.567 155.248 390.69 155.76C388.813 156.357 386.85 156.656 384.802 156.656C381.218 156.656 378.317 155.589 376.098 153.456C373.879 151.323 372.557 148.549 372.13 145.136C374.861 143.003 377.591 140.613 380.322 137.968C383.053 135.408 385.527 132.763 387.746 130.032C386.295 129.605 384.717 128.624 383.01 127.088C381.389 125.467 379.597 122.48 377.634 118.128Z' fill='%23fff'/%3E%3Ccircle cx='289.5' cy='54.5' r='12.5' fill='%23fff'/%3E%3C/svg%3E");
+  -webkit-mask-size: 100% 100%, var(--logo) auto;
+          mask-size: 100% 100%, var(--logo) auto;
+  -webkit-mask-position: center, center;
+          mask-position: center, center;
+  -webkit-mask-repeat: no-repeat, no-repeat;
+          mask-repeat: no-repeat, no-repeat;
+  -webkit-mask-composite: xor;          /* Safari */
+          mask-composite: exclude;      /* everyone else */
+
+  /* the dot on the i, in the element's own coordinates. The mask is
+     centred, so the dot sits half a logo-width right of centre and a
+     little above it:
+       x = 50% + L·((289.5−8)/421 − 0.5)          = 50% + 0.16865·L
+       y = 50% − L·(115/421)·(0.5 − (54.5−42)/115) = 50% − 0.10689·L
+     (logo.svg: viewBox "8 42 421 115", circle cx 289.5 cy 54.5 r 12.5) */
+  transform-origin:
+    calc(50% + 0.16865 * var(--logo))
+    calc(50% - 0.10689 * var(--logo));
+
+  /* 🔴 2026-09-04：fallback 改成与 token **逐位相同**的值。
+     原本 token 是 cubic-bezier(.65, 0, .35, 1)，而这里的内联 fallback 写的是
+     (.65, .05, .36, 1)——两条差一个舍入的曲线，写在同一条声明里。token 缺失时
+     才会用到 fallback，于是这个不一致平时看不见，只会在某天有人删掉 token
+     之后以「动画好像变了一点点」的形式出现。 */
+  animation: intro-open 2s var(--ease-in-out, cubic-bezier(.65, 0, .35, 1)) both;
+}
+
+/* Hold on the wordmark, then open. No opacity anywhere in here — the
+   sheet is removed by the hole growing past the frame, not by dissolving.
+   That puts the whole job on the mask, and a mask that grows around dead
+   centre never finishes it: the centre of "Nestify" falls in the gap
+   between the s and the t, so blowing it up just enlarges that gap and
+   you end on a full screen of cream.
+
+   So the whole thing blooms out of the dot on the i.
+
+   🔴 It grows by SCALING THE ELEMENT, not by growing mask-size. Animating
+   mask-size while nudging mask-position toward the dot looks obvious and
+   does not work: the position percentage resolves against
+   (box − image), so as the image explodes the anchor swings right off the
+   canvas and drifts back. Measured on 1440×900 — dot at (825, 384) during
+   the hold, then (4470, −2008) at 1300ms, (3535, −1504) at 1500ms, only
+   back in frame for the last 300ms. Middle of the wipe was a blank cream
+   screen. A transform pinned to `transform-origin` has no such coupling:
+   the dot stays exactly where it was in the held wordmark.
+
+   Scale is set by the dot, not picked by eye. Its on-screen radius during
+   the hold is only L × 12.5/421 ≈ 18px at L=620, and the far corner is
+   ~973px away on 1440×900, ~1592px on 2560×1440, ~2326px on 3840×2160 —
+   so ≥127× is needed at the top end. 160 leaves headroom. */
+@keyframes intro-open {
+  0%,
+  35%   { transform: none; }
+  100%  { transform: scale(160); }
+}
+/* belt and braces: once the timeline is done the sheet is gone outright,
+   so nothing can be left sitting over the video */
+.intro.is-open .intro__cover { display: none; }
+
+/* photography needs a foot to sit the type on — weighted to the
+   bottom edge only, not a flat wash over the picture */
+/* bottom left. The gutter is the header's own — max(5vw, 32px) — so the
+   slogan's left edge lines up with the wordmark above it. The 11svh floor
+   is not slack: the drain drop has to sit under the last line and still be
+   a whole circle rather than one clipped by the frame. */
+/* ---------- scene two ----------
+   Laid out from the first frame and simply uncovered as the film shrinks
+   off it — the tiles are never "brought in", they were always there. */
+.intro__copy {
+  position: absolute; z-index: 1;
+  left: 0; right: 0; top: 50%;
+  /* the -50% is the centring, the rest is the arrival — one transform, so
+     the two can never fight over the property */
+  transform: translateY(calc(-50% + (1 - var(--lit, 0)) * 16px));
+  opacity: var(--lit, 0);
+  padding: 0 var(--gutter);
+  /* centred — the film lands INSIDE this sentence, so the block reads as
+     one object on the screen rather than as copy set against an edge */
+  text-align: center;
+}
+
+
+/* the corner, as a share of the card's own width — declared once here
+   because intro.js lands the film on the SAME number. The film ends up
+   sitting in this grid; if the two corners disagree by even a couple of
+   pixels it reads as the odd one out. */
+.intro {
+  --tile-r: .14;
+  /* the film's resting width, as a share of the stage. It is the one
+     rounded rect among the marks, so it does not need to equal any tile —
+     it needs to sit in the same size family as them. */
+  --film-slot: 13%;
+}
+
+
+/* ---------- scene one's line ----------
+   Over the film, dead centre, and in the display serif. It is typed out
+   once the opener has finished and then leaves on the scroll, so it never
+   shares the screen with scene two's copy. */
+/* bottom left, ranged left. The gutter is max(5vw, 32px) — the header's
+   own — so the headline's stem lines up with the wordmark above it rather
+   than merely being "near the edge".
+
+   🔴 No translateY here any more. intro.js writes this transform every
+   frame to lift the block as it leaves, and while the block was centred it
+   had to carry the -50% centring in that same value. Anchored to the
+   bottom there is nothing to centre, so the JS writes a plain translate —
+   leave both alone or they will fight over the property. */
+/* ---------- scene one's block, after zipline.com ----------
+   Two anchors, not one: the name sits at 43.4% of the height and the
+   sentence and the button sit at the foot. Measured off zipline at
+   1440×900 — headline centre y=390 (43.4%), CTA bottom 68px up (7.6svh),
+   everything ranged left off one gutter.
+
+   The container is the whole stage so intro.js can lift and fade it as a
+   single thing on the scroll; the two blocks inside it carry the positions.
+
+   🔴 The gutter is on the BLOCKS, not on the container. Padding on the
+   container does nothing for them: an absolutely positioned child resolves
+   against its ancestor's PADDING BOX, and the padding box *includes* the
+   padding — only in-flow children get inset by it. Set it once on the
+   container and both blocks sit flush against the screen edge at x=0
+   (measured, first attempt). */
+/* 🔴 LEFT, and it has to be set HERE. All three beats — headline, sub and
+   the pill — inherit their alignment from this one box, so a `center` here
+   silently re-centres the lot even though each of their own boxes already
+   starts at the gutter. That is what it was doing: every box at 72, every
+   piece of content somewhere else (headline ink at 465, sub at 256, pill
+   at 652). One property, three symptoms.
+
+   The gutter is var(--gutter) — the header's own, so the column runs
+   straight down from the wordmark. See the ink note on .intro__hero-line
+   for why the headline needs a nudge on top of that and the other two
+   don't. */
+/* 🔴 2026-09-03 用户：「把这个字缩小点，放在底部的上面，现在太大了」。
+   标题原本吊在 top: 43.4%，脚部（sub + 按钮）另外贴在 bottom: 7.6svh，
+   两个绝对定位块中间隔着大半屏。现在两者合成**一个贴底的栈**。
+
+   用 flex-end 而不是继续给标题算一个 bottom 偏移：脚部的高度是活的
+   （sub 两行 + 按钮，字号全是 clamp，还会随断点换行），任何写死的偏移
+   都会在某个视口上撞进脚部或飘开一截。让 flex 去算，两者之间永远只差
+   sub 自己的 margin-top，那一格本来就是按 labs.google 的 head→sub 定的。 */
+.intro__hero {
+  position: absolute; inset: 0; z-index: 2;
+  text-align: left;
+  pointer-events: none;
+}
+/* 线上结构：标题与脚部各自绝对定位。左右仍走 --gutter（30px，2026-09-04 全站
+   一起收的那次），线上那份是写死的 max(5vw, 32px) = 72px —— 这是有意保留的
+   差异，要完全照线上就把这两处换回去。 */
+.intro__hero-line,
+.intro__hero-foot {
+  position: absolute;
+  left: var(--gutter); right: var(--gutter);
+}
+.intro__hero-line { top: 43.4%; transform: translateY(-50%); }
+.intro__hero-foot { bottom: 7.6svh; }
+
+/* A reload returns to the reader's saved scroll position. At that point the
+   scene-one heading must not replay over the small, in-line film. */
+.intro.is-opening-skipped .intro__hero { visibility: hidden; }
+/* 两者现在都在 .intro__hero 的流里，gutter 与贴底都由父级的 padding 给。
+   （原先各自 position:absolute + left/right/top/bottom，见上面那段。） */
+/* ---------- scene one's block, proportioned off labs.google ----------
+   Measured on their featured hero at 1440×900, all three beats:
+
+     headline      120px  w400  line-height 1.15
+     sub            24px  w300              0.20 of the headline
+     button label   21px  w500              0.175, in a 65px pill
+     gap head→sub   15px      gap sub→button 40px
+
+   120px at 1440 is 8.3vw, which is what the headline takes here now — it
+   was 6vw, and the block read as a caption on a video rather than as the
+   first thing on the page. The pill was already built to their spec (see
+   .intro__cta below: 65px, 100px corner, 21px/500, transparent).
+
+   🔴 ONE deliberate departure: the sub stays at ~0.27, not their 0.20.
+   Their line is a caption under a product NAME; ours is a claim answered
+   by a second claim, and at a fifth it reads as a footnote to the title
+   instead of the other half of the thought. Their w300 goes the same way
+   — see the weight note below. */
+.intro__hero-line {
+  font-family: var(--font--primary);
+  /* 🔴 2026-09-04：对齐 labs.google 首屏实测值 **120px**（8.3vw @1440）。
+     本文件上面那段早就记着这个数（"120px at 1440 is 8.3vw, which is what the
+     headline takes here now"），中途被我按你的反馈来回改成 78 → 52 → 76 → 62
+     → 72，现在回到原点。
+     字号在 120 上又收了两号 → **104px**（7.2vw），用户觉得 120 配 600 太重。 */
+  font-size: clamp(28px, 5.4vw, 78px);
+  line-height: 1;         /* display leading: 1.05 opens a corridor at 96px */
+  font-weight: 600;
+  letter-spacing: -.02em;
+  margin: 0;
+  /* The previous P-led title needed a left-bearing correction. This title
+     starts with A, whose ink aligns to the shared gutter without a nudge. */
+  margin-left: 0;
+  color: #fff;
+  /* held until the typing starts — hidden here so the first painted frame
+     is already empty; from a script it would flash the finished line */
+  visibility: hidden;
+}
+.intro.is-typing .intro__hero-line { visibility: visible; }
+
+
+
+/* ---------- the small line under it, after labs.google ----------
+   Their hero is three beats stacked: the name at 120px, one sentence at
+   24px/400 saying what it is, then the button. The sentence is the beat
+   we were missing — the headline was landing straight onto a CTA with
+   nothing in between explaining what the thing does.
+
+   It is body copy, not display: --font--body and a normal weight, at
+   roughly a quarter of the headline. Making it a small version of the
+   headline instead would read as a second title and the hierarchy would
+   flatten. Slightly off pure white so it sits behind the headline in the
+   stack rather than beside it — on moving footage that is the difference
+   between two lines and one block. */
+.intro__hero-sub {
+  font-family: var(--font--body);
+  /* about a third of the headline. labs.google runs 24 under 120 — a fifth
+     — but their headline is a product NAME and the line under it is a
+     caption; ours is a claim answered by a second claim, and at a fifth it
+     read as a footnote to the title rather than the other half of the
+     thought.
+
+🔴 2026-09-04：不再有第二行。文案从两句（"Built to understand your family"
+     ／ "Ready for what's next"）合成了一句，用户要求「一行显示，不要换行」，
+     index.html 里的 <br> 也一并去掉了。
+
+     原注释论证的是**两行怎么断**——断在 "grows" 之后而不是最近的逗号，好让
+     介词跟着它所属的短语走、两行长度也接近；46ch 的 max-width 存在的意义就是
+     「不让宽窗口把这两行又拼回一行」。这两条理由随着单行文案一起失效，所以
+     max-width 去掉，改在桌面断点上直接禁止换行。 */
+  /* 24px —— labs.google 首屏实测值（1440 上 1.67vw）。中途试过 22 与 30。 */
+  font-size: clamp(15px, 1.5vw, 22px);
+  line-height: 1.3;
+  /* 🔴 500, not 400. The headline above it is 400 at 86px, where a thin
+     stroke still has mass; the same weight at 32px over moving footage has
+     none, and white-on-video eats the thin end of a stroke before it eats
+     the thick end. The rule is not "one weight for the page" — it is one
+     APPARENT weight, and holding that across a 2.7× size drop costs a step
+     up. Google Sans is variable 400–700, so this is a real instance, not a
+     faux-bold. */
+  font-weight: 500;
+  letter-spacing: -.01em;
+  color: rgba(255, 255, 255, .92);
+  /* ranged left with the headline — `auto` here would re-centre it */
+  /* 左右 auto：这一句是独立的盒子且有自己的宽度，只有 auto 才把**盒子**也居中；
+     写 0 的话盒子会顶在容器左边，"居中"就只居中了字。
+     🔴 上边距 2026-09-04 收紧（用户「主标题和副标题的行距要近一点」）：
+     clamp(.9rem, 1.8vw, 1.6rem) → clamp(.35rem, .7vw, .65rem)，1440 上从 26px
+     收到 10px。标题的 line-height 是 1，字下面本来就没有多余的行盒空间，所以
+     这个 margin 就是两行之间**全部**的距离。 */
+  margin: clamp(.9rem, 1.8vw, 1.6rem) 0 0;
+  max-width: 46ch;
+  max-width: none;
+  /* 🔴 2026-09-04 改回两行（<br> 在 index.html 里），所以不再需要 nowrap——
+     它当初是为「合成一句、桌面不换行」加的，那个前提没了。 */
+  /* held for the timeline, same as the button below it */
+  opacity: 0; transform: translateY(12px);
+  transition: opacity .7s ease, transform .7s var(--ease-out-expo);
+}
+.intro.is-sub .intro__hero-sub { opacity: 1; transform: none; }
+
+/* ---------- the CTA, after labs.google's "liquid button" ----------
+   Their spec, read off the DOM rather than eyeballed: 65px tall, 100px
+   corner, background fully TRANSPARENT — the pill is an outline, not a
+   fill. Label 21px / 500. On hover an `::after` grows from scale(.1) to
+   scale(1) and the label inverts.
+
+   So: an empty ring at rest, and hovering pours it full. The one change
+   from theirs is the resting ink — they sit on near-black and can use
+   rgb(50,50,50); this sits on moving footage, so it needs white. */
+/* 🔴 Everything here is in `em`, off ONE clamped font-size — so the pill
+   is a single relative number, not five fixed ones. The ratios are the
+   desktop values divided by the 19px they were drawn at: height 54/19 =
+   2.85 and padding 34/19 = 1.79 — both since tightened, to 2.35 and 1.3,
+   in that order: the height was what read wrong, and the original width
+   only looked slack once the pill was shorter. gap 14/19 = .74, opened to
+   .96 — the arrow is a diagonal, so its ink starts further from the label
+   than a vertical glyph's would and the nominal gap reads tighter than it
+   measures. The pill now shrinks with
+   the headline instead of staying chunky next to it on a narrow screen.
+
+   The 16px floor is a touch target, not a taste call: 16 × 2.85 = 45.6px
+   tall, just over the 44px minimum. Below that the button would be the
+   one thing on the screen you cannot reliably hit. */
+/* ---------- it arrives as a BALL and opens into the pill ----------
+   🔴 The opening is a CLIP, not a width. The pill's width is its content's
+   — `inline-flex`, nowrap, two paddings — so animating `width` means
+   animating layout, and there is no keyframe on that path that is not a
+   reflow. So the pill is laid out at full size from the first frame and
+   simply isn't all shown yet: clip-path holds a circle at its left end and
+   then opens rightward. Nothing moves; a window widens over something
+   already in place. The label never re-wraps, and the corner stays exactly
+   the corner the pill was drawn with instead of a radius being stretched.
+
+   🔴 The circle needs no JS and no magic number: inset()'s right edge is
+   `100% - the pill's own height`, and `round 100px` clamps to half the box,
+   so at ball width the clip IS a circle at every viewport the clamp visits.
+   --cta-ball is that height, declared once and read by both.
+
+   🔴 The blue is --bead-blue, which is the logo's i-dot — the same ink the
+   intro's mark flies in as and the same one this button's hover fill pours
+   in (--btn-disc, below). So the ball that opens the button and the ball
+   that fills it are one colour, not two that happen to look alike. */
+.intro__cta {
+  /* the shape is .btn-ball, in styles.css — this is only what is the
+     intro's own: where it sits, and the blue it fills with on hover */
+  /* 在流里，紧跟副标下面；整组（标题 + 副标 + 按钮）一起居中。 */
+  margin-top: clamp(1.75rem, 3.5vw, 3rem);
+  pointer-events: auto;
+}
+/* the cue: intro.js adds .is-cta to the section, which opens the ball —
+   the open state itself is .btn-ball.is-open in styles.css */
+.intro.is-cta .intro__cta { opacity: 1; scale: 1; background: var(--nes-cream); clip-path: inset(0 0 0 0 round 100px); }
+
+/* the label waits for the pill to have somewhere to put it */
+/* 🔴 2026-09-04：改成**淡入 + 轻微上浮**，与 hero deck 的文案出现方式一致
+   （用户点名要「和 hero deck 那部分差不多」）。hero.css 的 heroCopyIn 是
+   translateY(8px) → 0、.34s、--ease-out-expo，这里照抄同一组数。
+
+   ⚠️ 原来是 `translate: -.5em 0`，**从左边滑进来**，配的是药丸由圆球向右展开
+   ——上一段注释里那句「settles rightward — with the opening, not against it」
+   说的就是这个配对。改成上浮之后这一对就断了：药丸横向开、字纵向浮。实测不
+   难看（字是在药丸已经开好之后才进来的，两段几乎不重叠），但那条配对的理由
+   确实被放弃了，别当成疏忽又改回去。
+
+   .38s 的延迟保留，它不是口味：字必须等药丸展开到有地方放它，比 hero 那边的
+   .18s 长，因为这里多一段开球的动作。 */
+/* 🔴 只淡入，而且**等药丸完全开完再出现**（用户 2026-09-04：「老感觉字有放大
+   放小，不需要这个感觉……要不就是黑字，相框突出完以后再出现；最后还会有一个
+   幻影，或者突然变一下」）。
+
+   放大放小和幻影是**同一个原因**：这个标签是 .btn-ball 的子元素，而药丸自己
+   从 scale .55 放到 1（styles.css：`scale .44s var(--ease-out-expo)`）。子元素
+   跟着父层一起缩放时，浏览器把整棵子树光栅化成位图再放大——所以字先是被撑大
+   的模糊位图（「放大放小」），等 scale 落位后重新按最终尺寸光栅化一次，那一
+   帧的清晰度突变就是「幻影 / 突然变一下」。
+
+   所以字不能在药丸还在动的时候露面。药丸两拍：
+       scale      .44s，无延迟          → 0.44s 结束
+       clip-path  .64s，延迟 .2s        → 0.84s 结束
+   延迟取 .86s，压在两拍都收完之后。
+
+   ⚠️ **不要再给它任何 transform / translate / scale**。之前分别试过
+   `translate: -.5em 0`（横向滑入，配药丸向右展开）和 `translate: 0 8px`（上浮，
+   对齐 hero deck）——两者都在药丸 scale 的尾巴上进场，幻影照旧。只留 opacity，
+   不产生自己的合成层，也就没有第二次重新光栅化。 */
+.intro__cta .btn-label {
+  opacity: 0;
+  transition: opacity .28s ease .86s;
+}
+/* translate 已去掉（见上一段），这里只剩淡入的终值 */
+.intro.is-cta .intro__cta .btn-label { opacity: 1; }
+
+/* 🔴 2026-09-03 用户要求删掉开场那个下箭头（`.intro__scroll-unlock`：居中的
+   毛玻璃圆片 + 雪佛龙，读完开场后淡入、循环下弹）。它是 2e3b9feaf 随「修复
+   首页刷新与滚动节拍」一起进来的，装饰件（aria-hidden + pointer-events:none），
+   删掉不影响任何滚动行为。
+
+   `is-scroll-ready` / `is-scroll-committed` 两个类保留：intro.js 仍在打，
+   但现在**没有任何 CSS 消费它们**——要再做开场提示就挂回这两个类上。 */
+
+/* the hover is .btn-disc's, shared with the header and the hub button —
+   see the block at the foot of styles.css. --btn-disc is the bead blue,
+   the same ink the logo's dot carries, so the cream pill fills with the
+   blue already on screen. */
+.intro__cta { --btn-disc: var(--bead-blue); }
+.intro__cta:hover { color: #fff; }
+
+/* 🔴 NO ARROW ON THIS ONE, and it is the only button on the site without.
+   The shared -45° arrow means "this leaves for somewhere" — the header's
+   pills, the privacy card's "Learn more" — and this button doesn't leave,
+   it scrolls. Turning it 90° said the right thing and looked bolted on: a
+   down arrow inside a pill reads as a dropdown or a download, and the pill
+   is already sitting at the bottom of the last frame with the whole page
+   under it. The position is the cue. The word carries the rest. */
+
+/* ---------- scene two's copy ----------
+   The same voice as scene one — "The parent copilot" in the display serif,
+   over the film — carried onto the page. The two scenes are one sentence
+   continuing, so nothing here changes typeface mid-thought.
+
+   The three lines come first and the payoff sits UNDER them, so the block
+   reads top-down in the order it is animated. */
+.intro__steps {
+  font-family: var(--font--primary);
+  /* no caps, no tracking: read out one at a time, these are sentences, and
+     spaced-out small caps would make them labels instead */
+  font-size: clamp(17px, 1.6vw, 25px);
+  font-weight: 400;
+  letter-spacing: 0;
+  margin: 0;
+  color: var(--nes-ink);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(.6rem, 1.6vw, 1.6rem);
+}
+.intro__lead {
+  font-family: var(--font--primary);
+  transition: opacity 0.5s ease;
+
+/* 🔴 It is the only thing on the screen now, so it carries it. The size
+     is capped off the VIEWPORT WIDTH rather than a fixed px ceiling
+     because it may not wrap — at 6vw the whole sentence plus the film
+     measures ~12.6em, which clears a 1440 stage with its gutters and is
+     still the largest it can be without touching them. */
+  /* As large as this copy can be and still hold its two authored lines.
+     🔴 NOT double scene one's 5.4vw. Doubling needs 10.8vw, and at that
+     size "and Nestify runs the day." breaks in half — the block renders as
+     four lines with the film stranded on its own. Binary-searched the
+     largest size that still yields exactly two rendered rows: 8.06vw,
+     identical at 1024, 1440 and 2010, so it is the copy that sets the
+     ceiling, not the viewport. 7.9 keeps a little in hand for a fallback
+     font's wider metrics. That is 1.46× scene one, not 2×. */
+  font-size: clamp(40px, 9.5vw, 170px);
+  /* two authored lines, broken where the sentence breaks — so no nowrap.
+     The leading is open rather than tight: with the film sitting inside
+     line two, .94 pulled the rows close enough that the picture crowded
+     the line above it. */
+  line-height: 1.0;
+  /* matched to scene one's line — the two headlines are the same voice at
+     two moments, so the weight has to agree as well as the size */
+  font-weight: 600;
+  letter-spacing: -.02em;
+  margin: clamp(.25rem, .6vw, .6rem) auto 0;
+  color: var(--nes-ink);
+}
+/* 🔴 桌面只认 .br--d 那一个断点（"Time ▭ to just" / "be a parent"，也就是
+   上面那段注释里反复推导的「两行」）。手机那两个在这里关掉，700 断点里再互换
+   ——见文件下方。两套断法共用同一段文本，靠 display 选，而不是把句子写两遍。 */
+.intro__lead-br--m { display: none; }
+
+
+
+/* 🔴 Both lines arrive TOGETHER, as one block. Nothing here is typed,
+   staggered or read out item by item — the copy is two lines of one
+   thought, and lighting them in sequence made the reader wait on the
+   scroll for the second half of a sentence they could already see was
+   coming. intro.js writes one --lit on .intro__copy and that is all. */
+
+@media (max-width: 640px) {
+  /* three lines in a row is too much at phone widths — stack them */
+  .intro__steps { flex-direction: column; gap: .5rem; }
+}
+
+/* the bar carries the same wordmark as the sheet, so it stays out of
+   the way until the hole has opened past it */
+.site-header {
+  opacity: 0;                                   /* the keyframe's implicit start */
+  animation: intro-fade-in .55s ease 1.6s both;   /* solid before the drop leaves it */
+}
+
+@keyframes intro-fade-in { to { opacity: 1 } }
+@keyframes intro-rise {
+  from { opacity: 0; transform: translateY(26px) }
+  to   { opacity: 1; transform: none }
+}
+
+/* 🔴 THE OPENER DOES NOT START UNTIL THERE IS A PICTURE BEHIND IT.
+   The sheet is cream and the section behind it is cream, so a wordmark
+   punched over a video that has not decoded yet is cream on cream —
+   nothing in the hole to look at. These animations are on a fixed clock
+   from page load, so a heavy file means the hold AND the wipe both play
+   against a blank screen and the opener is over by the time the picture
+   lands. (Measured on the 10.7MB placeholder: first frame ~3.5s, sheet
+   finished at 2.0s. The opener was not missing — it had already been
+   spent.) intro.js flips `is-intro-go` on the first video frame, the
+   poster, or a 2s cap, whichever comes first, and all three timelines
+   start together from there. */
+.intro__cover,
+.site-header { animation-play-state: paused; }
+html.is-intro-go .intro__cover,
+html.is-intro-go .site-header { animation-play-state: running; }
+
+/* no mobile override: the header keeps var(--gutter) at every width,
+   and the slogan has to keep matching it */
+
+/* skip straight to the open state */
+@media (prefers-reduced-motion: reduce) {
+  .intro__cover { animation: none; display: none; }
+  .intro__hero-line,
+  .site-header { animation-duration: .01s; animation-delay: 0s; }
+  /* intro.js's showAll() adds every class at once on this path, so without
+     this the ball-to-pill would still play out in full — the one thing the
+     setting is asking not to happen */
+  .intro__cta,
+  .intro__cta .btn-label { transition-duration: .01s; transition-delay: 0s; }
+}
+
+
+
+/* ---------- the slot the film lands in ---------- */
+/* sized off the headline's own em, so it scales with the type at every
+   viewport: 1.1em tall, 16:10, and a hair of air either side */
+.intro__slot {
+  display: inline-block;
+  vertical-align: 0em;          /* sits on the text baseline */
+  height: 0.74em;
+  aspect-ratio: 16 / 10;
+  /* 🔴 No horizontal margin. The slot already sits between two real space
+     characters, so a margin lands ON TOP of them: measured at 86px, a word
+     space is 18.33px and the film had 18.33 + 13 = 31.3px either side —
+     1.7× every other gap in the sentence, which is what read as broken
+     tracking. With the margin gone it is spaced exactly like a word, and
+     it tracks the font's own space width at every size instead of a
+     hard-coded em. */
+  border-radius: var(--film-r);
+  /* 🔴 No background. The film is scaled onto this box, so its edge is a
+     row of antialiased half-transparent pixels — anything painted
+     underneath shows through them as a halo all the way round. A 12%
+     placeholder grey read as a grey rim on the finished shot.
+     And the corner is the SAME variable the film lands on: a slot at .16em
+     under a film at 24px meant the slot's corner poked out past the
+     picture's at every size. */
+  background: none;
+}
+
+/* the line under the headline: same voice as scene one's sub, and a
+   tighter leading than body copy would take — it is three short lines
+   under a display line, not a paragraph to read at length */
+.intro__sub {
+  font-family: var(--font--body);
+  font-size: clamp(15px, 1.5vw, 22px);
+  line-height: 1.32;
+  font-weight: 600;
+  letter-spacing: -.005em;
+  /* a measure that lands it on three lines, and `balance` to even them —
+   narrowing alone just moves where the greedy break falls */
+  max-width: 52ch;
+  text-wrap: balance;
+  margin: clamp(1.2rem, 2.2vw, 2.2rem) auto 0;
+  color: var(--nes-ink);
+  opacity: .88;
+}
+
+/* 🔴 A phone cannot hold this copy on two lines at the desktop ratio, so
+   the ratio itself drops on narrow screens — but 5.8vw was cut for the
+   OLD copy ("and Nestify runs the day.", 425px of type against 366px of
+   usable width). The line is two authored rows now and the longest of
+   them, "Time ▭ to just", measures 6.62em. At 390 that made the sentence
+   22.6px tall and 150px wide inside a 326px column — it read as a caption
+   under a screen of empty cream, not as the one thing on the page.
+
+   11.5vw fills that column the way the desktop line fills its own: 45px
+   at 390, 297px of type in 326px of width, ~91% at every phone size. The
+   68px ceiling is what keeps the breakpoint invisible — it is reached at
+   591px and desktop's 9.5vw is 66.5px at 701, so nothing jumps when the
+   query flips. */
+@media (max-width: 700px) {
+  /* 🔴 11.5 → 16vw，并且**放开两行的约束**（用户 2026-09-05：「字太小了，可以
+     分成好几行」）。
+
+     上面那段推导把尺寸锁死在「两行都各自装得下」这个条件上：最长的那半句
+     "Time ▭ to just" 是 6.62em，326px 的列宽除下来就是 49px 的天花板，11.5vw
+     在 390 上取到 45——已经贴着它了。所以在两行的前提下，这句**没有变大的
+     余地**，要变大只能允许它排成三行。
+
+     16vw 是照「换词不改变行数」定的，不是照列宽定的：
+       · 第一半 "Time ▭ to just" 6.62em × 62px = 410 > 326，**恒定**折成两行
+       · 第二半 "be a <swap>" 最长的是 family，实测仍装得下一行
+     两半各自的行数都不随 .intro__swap 换词而变，所以 parent → child → family
+     轮换时整块高度和断行位置都是静止的。这正是原来那个 `<br />` 要保的东西，
+     它继续留着——去掉它让整句自由折行，换词就会牵动整块重排。
+
+     上限仍是 68：它在 425px 处就够到了，而桌面 9.5vw 在 701 处是 66.6px，
+     700/701 之间跨断点仍然看不出来。别抬这个数。
+
+     行距 1 → 1.06：那条 1.0 是给**两行**调的（注释在上面：影片嵌在第二行里，
+     .94 会让它挤到上一行）。排到三行之后，1.0 在 62px 上就是行与行之间没有
+     空气。 */
+  /* 🔴 断行由 markup 指定，不交给浏览器（用户 2026-09-05 点名要
+     「Time ▭ / to just be / a parent」）。index.html 里那三个 br 各带一个类，
+     这里换哪一套生效：手机开 .br--m、关 .br--d。
+     balance 因此也不需要了——三行都是写死的，没有可平衡的余地；留着反而会在
+     某个宽度上把某一行再折一次。 */
+  .intro__lead-br--m { display: inline; }
+  .intro__lead-br--d { display: none; }
+  /* 🔴 手机上改**左对齐**，并再放大一档（用户 2026-09-05 给了一张参考图：
+     四行标题贴着左边缘、每行几乎顶满列宽，「能不能类似图二的排列方法，放大」）。
+
+     父级 .intro__copy 的 text-align: center 有它自己的理由（那段注释：影片落在
+     句子**里面**，居中让整块读成一个物件）。那条在桌面的两行版上成立；三行、
+     每行长短不一的版式里，居中会让三条不同长度的行各自浮在中线上，右边缘参差
+     ——参考图的做法是把它们钉在同一条左边缘上，只让右边参差。
+
+     字号 17.5 → 18.5vw、上限 68 → 76：左对齐之后不再有两侧对称留白要顾，行可以
+     一直排到 gutter。实测最长的那行 "to just be" 是 4.176em（68px 下 284px），
+     18.5vw 在每一档都留得下：
+        300 → 55.5px，行宽 232 / 列宽 236
+        320 → 59.2px，247 / 256
+        390 → 72.2px，301 / 326
+        430 → 76px（上限），317 / 366
+     ⚠️ 再往上就是 300px 那档先溢出——它是这条 clamp 的真正约束，不是 390。
+
+     ⚠️ 上限 76 打破了原来「68 让 700/701 跨断点看不出来」那条：桌面在 701 处是
+     66.6px。也就是说 700 附近现在会跳一下字号。这是有意的取舍——那一档是窄桌面
+     窗口，不是手机，而用户要的放大只在手机上有意义。
+
+     🔴 对齐**退回居中**（2026-09-05，用户看过左对齐那一版：「还是居中吧」）。
+     父级 .intro__copy 的 text-align: center 因此重新说了算，这里不再覆盖它。
+
+     🔴 行距 1.06 → 1.18（用户：「字要这么大，行距再大一点，现在感觉有一点点
+     挤」）。1.06 是给三行、字号 68 那一版调的；四行 + 72px 之后，行与行之间
+     只剩 4px 的空气。1.18 在 390 上是 85px 行盒对 72px 的字，13px 的间隙——
+     影片那一行（0.74em ≈ 53px）也因此不再顶着上下两行的字。 */
+  .intro__lead {
+    font-size: clamp(40px, 18.5vw, 76px);
+    line-height: 1.18;
+    /* 🔴 居中（2026-09-05 定版，第三次）。这一行来回过三轮：左 → 居中 → 左 →
+       居中，最后一次是用户看过左对齐的成品之后定的。
+       所以这里**不覆盖**父级 .intro__copy 的 text-align: center，让它说了算。
+       ⚠️ 后来的人别再"顺手改成左对齐"——那一版看过了，退回来的。 */
+  }
+
+  /* 🔴 影片 0.74 → 0.95em。这是两轮反馈之间的落点：用户先说「视频可以大一点吗？
+     有点小」（那时它独占一行、只有 85×53px），改到 1.45em 之后又要求退回三行、
+     「视频变小一点」。
+
+     0.95em 而不是退回 0.74em：它现在重新嵌回句子里（"Time ▭" 是同一行），但
+     0.74em 那个数是照**大写字母高度**定的，而用户两次反馈的方向都是嫌它小。
+     0.95em 在 390 上是 110×69px，第一行 "Time ▭" 合计 ~283px，离 326px 的列宽
+     还有余量，不会把这一行挤出第二行去。
+
+     ⚠️ 没有写 vertical-align，就是要让它落回基础规则的 `0em`（底边坐在基线上）。
+     四行版那会儿用的是 middle，因为独占一行时基线对齐会让它顶进上一行；回到
+     行内之后 middle 反而会让它相对 "Time" 浮起来半个身位。
+     ⚠️ 圆角仍读 --film-r，不在这里另写：那个变量是**翻卡落点**和这个槽共用的
+     （基础规则那段注释记着两者对不齐时角会露出来），改一边就会在交接那一帧
+     看到角对不上。 */
+  .intro__slot { height: .95em; }
+  /* the corner keeps its share of the type: .118 × the lead, as above */
+  :root { --film-r: clamp(3.5px, 1.36vw, 8px); }
+}
+
+
+
+
+
+/* ============================================================
+   THE MARK — one element, two shapes.
+
+   In the sentence it is a marker stroke over the word that turns
+   (parent / child / family) — as tall as the word itself, standing on its
+   baseline, with the type reading through it. On the way out it becomes the
+   clock's ball: width, height and corner are interpolated together, so the
+   line rounds itself into a circle rather than cross-fading into one.
+
+   🔴 Fixed, and a sibling of every section — not a child of the copy. It
+   has to survive the intro's sticky stage releasing, because the thing it
+   turns into lives in the next section entirely.
+
+   🔴 Sized in px from JS rather than scaled with a transform: a transform
+   would stretch the corner radius with the box, and a 3px rule blown up to
+   a 60px ball would carry a 60px-wide flattened corner the whole way. */
+/* the word in flight between scene two's sentence and the deck's headline.
+   Page-level and fixed, because both of the boxes it travels between sit
+   inside overflow:hidden stages — see the note on `carrier` in intro.js.
+   Everything about it is written per frame from the two measured ends; the
+   only thing declared here is that it is out of the flow and out of the
+   way. */
+.intro__carry {
+  position: fixed; z-index: 4;
+  font-family: var(--font--primary);
+  font-weight: 500;
+  line-height: 1;
+  font-style: normal;
+  white-space: pre;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---------- the flip card ----------
+   A fixed-position card that bridges the intro tile to hero slide 1.
+   perspective lives on the wrapper so it applies to flip__inner's
+   rotateY; preserve-3d makes the two faces exist in shared 3D space;
+   backface-visibility: hidden makes each face invisible when it is
+   rotated away from the camera. */
+/* ---------- the copy the bridge carries ----------
+   A fixed clone of the hero's first line, parked where that line will be
+   once the hero stage pins. See the note in intro.js for why the real one
+   cannot do this job: it is a viewport further down the page.
+
+   🔴 Everything in here is SCRUBBED off --wipe-n, with the transitions
+   switched off. The real copy uses a timed transition, which is right when
+   a slide change fires it; here the wipe IS the flip, so it has to be tied
+   to the scroll frame by frame or the two gestures drift apart the moment
+   anyone scrolls slowly.
+
+   🔴 Same z-index band as the flipper — it is the other half of the same
+   bridge, and it has to clear the intro's own sticky stage (z-index 2). */
+.intro__bridge {
+  pointer-events: none;
+  color: var(--nes-ink);
+  opacity: 0;
+}
+/* 🔴 TWO classes, and it has to be two. The clone keeps `hero__content` on
+   purpose — that is where its column layout, padding and type come from, so
+   the words sit exactly where the real ones will. But hero.css loads AFTER
+   intro.css and gives that same single class `position: relative; z-index: 3`,
+   so a one-class selector here LOSES the tie: the clone stopped being fixed,
+   fell back into flow as the last block of <body>, and parked itself at
+   y ≈ 24084 — a mile below the fold, which is why the bridge read as
+   "measured wrong" when the measurement (left 763.2, top 0) was correct all
+   along. Matching both classes wins on specificity and keeps the parking
+   spot. Anything hero.css also sets on .hero__content belongs in HERE. */
+.intro__bridge.hero__content {
+  position: fixed;
+  z-index: 500;
+}
+.intro__bridge .hero__mask > span {
+  clip-path: inset(0 calc(100% - var(--wipe-n, 0) * 100%) 0 0);
+  translate: calc(-.35em + var(--wipe-n, 0) * .35em) 0;
+  transition: none;
+}
+.intro__bridge .hero__eyebrow {
+  opacity: calc(.62 * var(--wipe-n, 0));
+  transform: none;
+  transition: none;
+}
+
+.intro__flipper {
+  position: fixed;
+  z-index: 500;
+  opacity: 0;
+  pointer-events: none;
+  /* perspective: distance from viewer to the card plane. 1000px gives
+     a natural-looking foreshortening without the extreme fish-eye of
+     a very short value. */
+  perspective: 1000px;
+  perspective-origin: 50% 50%;
+}
+.flip__inner {
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.flip__front,
+.flip__back {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+/* 🔴 不再翻转，改成**原地交叉淡出**。用户 2026-09-04：「那个 time to just be
+   可以不用翻转，直接下来就不用转，相当于它变的时候就直接变成那个框就好了。」
+
+   原来是 3D 翻卡：背面预旋 180°，靠 backface-visibility:hidden 在 rotateY 过
+   90° 时换面。去掉旋转之后那两样都得撤——背面还留着 180° 的话它永远背对镜头、
+   被 backface-visibility 藏死，画面上只剩影片。
+
+   两面的不透明度由 intro.js 写，用的还是**原来那个旋转的时钟**（fr / TURN），
+   所以换面的时机和调好的节奏一模一样，只是从翻转变成了淡出。 */
+.flip__back { opacity: 0; }
+/* the front is the intro's film; the back is slide one's.
+   🔴 img 与 video 同规则：手机上这两个面都是 <img>（见 intro.js 里 PHONE
+   那段——为止住 iOS 的并发解码器压力）。.flip__back 的那对选择器早就把 img
+   写进去了，这里当时只写了 video，补齐。漏掉的话手机上正面那张图不会撑满，
+   翻卡到一半会露出底。 */
+.flip__front img,
+.flip__front video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ---------- the picture does not move while the card turns ----------
+   🔴 NOT object-fit: cover, AND THAT IS THE WHOLE POINT. The card's box is
+   interpolated every frame from the intro tile to the hero slot — 488×305 to
+   720×720 at 1440×900 — so its ASPECT travels from 1.60 to 1.00. `cover`
+   re-derives the crop from the box aspect on every one of those frames:
+   which edge binds the scale flips partway through, so the picture zooms and
+   re-crops continuously and the composition drifts around inside the card
+   for the whole flip. That is the "画面弹来弹去".
+
+   Binding the scale to WIDTH ALONE takes the box's height out of the
+   calculation entirely. The image is centred on the card and grows with it,
+   and the changing height simply reveals more of a picture that has not
+   moved — a frame opening, not a photograph being panned. One centred crop,
+   from the turn to the landing.
+
+   🔴 IT STILL COVERS, and that is arithmetic rather than luck. The hero
+   films are SQUARE (1080×1080), so at width:100% the rendered height equals
+   the card's width, and the card is never taller than it is wide — it starts
+   at 1.60 and ends at exactly 1.00. The shortfall case cannot arise; at the
+   landing the two are the same number, which is the tightest this has ever
+   been. (It held for the portrait stills that were here before, 0.67–0.71,
+   for the same reason with more room to spare.)
+
+   ⚠️ A LANDSCAPE HERO ASSET WOULD BREAK THIS. Ratio > 1 means the rendered
+   height is LESS than the width and the card would letterbox top and bottom
+   where the slide behind it still covers. If a wide picture ever joins the
+   deck, this rule and .hero__inner's background-size have to be decided
+   together — see the note there.
+
+   🔴 AND IT MATCHES THE SLIDE AT THE LANDING, which is the one frame where
+   the two must agree exactly. .hero__inner is always square and paints its
+   film with object-fit: cover, centred; a square source in a square box is
+   an untouched 1:1 either way, so both land on the identical scale and the
+   identical centre. The swap is two copies of one crop. */
+.flip__back img,
+.flip__back video {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: auto;
+  display: block;
+}
+/* 🔴 <video> ONLY, and it is not decoration. `height: auto` resolves off the
+   element's intrinsic ratio — an <img> announces its the moment the header
+   bytes land, but a <video> has NO ratio until metadata arrives, and the
+   card can be mid-turn by then: a frame or two of zero-height film inside a
+   card that is otherwise correct. The films are square by construction (see
+   hero.js), so stating it removes the wait without changing the answer.
+   An <img> must never take this rule — it would squash a portrait still. */
+.flip__back video { aspect-ratio: 1; }
+
+/* ============================================================
+   手机上的滚动预算（用户 2026-08-30：「手机要滑动好几下才可以往下」）
+   ============================================================
+   🔴 病因不是阻尼，是**距离**。实测两条都排除了：Lenis 只管滚轮不碰触摸
+   （smoothWheel，没开 syncTouch），播放头的滞后在手机与桌面上一模一样
+   （同样跳 2 屏，都是 2.2 秒出 2 个词）。真正的差别是——
+
+     手机 390×844   总长 52.8 屏
+     桌面 1440×900  总长 53.7 屏     ← 几乎一样
+
+   四个大段的长度全是照桌面配的常量，一处都没按断点调过。而桌面一次滚轮
+   加 Lenis 的惯性尾巴能走很远，手机一次拇指划动走得少得多：**同样的路，
+   手机要多花几倍的手势**。
+
+   所以这里砍的是滚动预算，不是内容——每一拍该看的东西一样多，只是不用
+   滑那么远。各段的节拍都是按 range 的比例算的（hub 的 DOCK/ROOM_AT、
+   intro 的 SHRINK_END/FLIP_FROM、hero 的锚点都从 offsetHeight 现推），
+   所以缩短总长会等比缩放，不会错位。
+   ============================================================ */
+@media (max-width: 767px) {
+  /* 900 → 600svh（9 屏 → 6 屏）。SHRINK_END / FLIP_FROM 都是 range 的
+     分数，settleMs 也按 px 缩放，所以只改这一个数就够。 */
+  .intro { height: 340svh; }   /* 桌面 420 之后同步下调（原 450 会比桌面还长） */
+
+  /* ---------- 手机上「Parent Copilot」放大 ----------
+     桌面那条 clamp(28px, 5.4vw, 78px) 在手机上永远撞下限：390px 宽时
+     5.4vw = 21px，被 28px 兜住。于是整个第一幕最重的那句话，跟正文只差
+     一档字号——用户 2026-08-30 说「有点小」，说的就是这个。
+
+     11.2vw 让它重新跟着视口走，而不是卡在下限上。上限 46px 是量出来的：
+     390px 宽时可用 328px，44px 时墨宽 288（还剩 40px 余量给真机字体
+     回退的宽度差）；下限 34px 保住 320px 那档窄机不换行（可用 256，
+     35.8px 时墨宽约 234）。
+
+     ⚠️ .intro__slot（句子里那个内联小影片）是按 0.74em 定的，会跟着一起
+     长——这是要的，两者本来就该同步；但改这个数之后要顺带看一眼那一格。 */
+  .intro__hero-line { font-size: clamp(34px, 11.2vw, 46px); }
+  /* 🔴 行距 1 → 1.1（用户 2026-09-05：「行距增加一点现在太近了」）。
+
+     基础规则那个 `line-height: 1` 是**给一行的**——它上面的注释写着「display
+     leading: 1.05 opens a corridor at 96px」，说的是桌面那句不换行的大标题。
+     手机上这句是两行（上一条注释里「下限 34px 保住 320px 那档窄机不换行」已
+     经过时：文案从 Parent Copilot 换成了 A Smart Family Copilot，390 上稳定
+     排两行），1 就等于两行之间一点空气都不留，第二行的字冠贴着第一行的下伸部。
+
+     1.1 在 46px 上多出 4.6px，是刚好读得出「两行」而不是「一块」的量。没有取
+     hub 那边的 1.06：那个数是「清得过字面 overshoot 的最小值」，用在 28–40px
+     的标题上；这句大一档，同样的比例换算出来的空气反而更少。
+
+     ⚠️ 只在手机断点里改。桌面那句是一行，1 是对的，而且这行是
+     `fixed + translateY(-50%)` 居中的——改行高会连带改块高，桌面那一档没有
+     换行来消化它。 */
+  .intro__hero-line { line-height: 1.1; }
+
+  /* 副标题同理，也一直撞在下限上：clamp(15px, 1.5vw, 22px) 在 390px 上
+     1.5vw = 5.9px，被 15px 兜住。放大约 1.5 倍到 22px。
+
+     🔴 最后定的是 16px —— 跟它底下那颗「Meet Nestify」按钮的字号**相等**。
+     用户 2026-08-30 先说 15px 太小，我按比例放到 22px，又说太大，最后指定
+     「跟按钮一样大就行」。所以这个数不是从 clamp 推出来的，是跟另一个元素
+     对齐的：这两样东西在第一幕里上下相邻，字号相等时读作同一层级的两句话。
+
+     ⚠️ 因此它是死数不是 clamp。改 .intro__cta 的字号就要同步改这里，
+     否则那个「相等」的关系悄悄断掉，而且看不出来。 */
+  .intro__hero-sub { font-size: 18px; white-space: normal; }
+}
+
+/* 🔴 手机上收掉这些 will-change（用户 2026-08-30 的崩溃排查）。
+   will-change 的作用是强制合成器**预先建一层**，而这几个元素在手机上被排得
+   比视口还大——实测 .intro__media 是 1391×869，按 DPR 3 算单层就 41.5MB 纹理；
+   .testiv2_card 六张合计约 39MB。整页合成层原本 224 个、约 104MB。
+
+   去掉只是去掉一个提示：动画照常，浏览器改为需要时才提层。桌面保留。 */
+@media (max-width: 767px) {
+  .intro__media, .intro__flipper .flip__inner { will-change: auto; }
+}
+
+/* ============================================================
+   🔴 转场的房间背景 —— **从底部升上来，由滚动驱动**（2026-09-04）
+
+   用户第四次修正后的要求：「往下滚不是让屏幕往下滚，往下滚是触发这个渐变的
+   动画」「背景是这个墙壁的背景是从底下往上来的」。
+
+   所以这里没有 transition、也没有任何时钟：位移直接读 --room-t，那个变量由
+   intro.js 每帧按翻卡进度 ft 写入。intro 的舞台是 sticky 的，所以这一段滚起来
+   画面本身是钉住的，滚动只是在擦洗这条转场。
+
+   🔴 **原地渐显，不做任何位移**。中途试过 translateY（从视口下方升上来），
+   用户当场否掉：「墙壁背景不是从底下升上来，它是从原地渐显……如果有 Y 轴的
+   变化，就有上升的感觉」。这一整轮的要求自始至终是「画面不能动」，位移哪怕
+   只发生在一个图层上也违反它。
+
+
+   它原本直接复用 hub.css 的 assets/hub-room-1.webp，理由写的是「转场结束后
+   底下就是真的 hub，两边必须是同一面墙」。2026-09-04 用户把 hub 轮换的第 1
+   张换成了儿童房，同时明确要求 intro 这张**保持原样**，两处从此是两张不同
+   的图 —— 所以旧图在这次改动里被复制成 intro-room.webp 单独留给这一层。
+
+   ⚠️ 因此**不要**再把这里改回 hub-room-1.webp 去「恢复一致」：那条一致性
+   已经被用户显式放弃了。这一层唯一必须对齐的是 wall-frame.webp（线稿照着
+   这张绿色客厅逐像素描的，见本文件下方线稿那段），换这张图就必须同时重描
+   线稿，否则「画出来再上色」会变成画一个房间、上色成另一个房间。
+   ============================================================ */
+.intro__room {
+  position: fixed; inset: 0; z-index: 7;
+  /* 🔴 定位是 `center 26%`，和 hub.css 的 .hub__glow 一致——**图可以不同，
+     定位必须相同**。
+
+     这两层画的是同一面墙的两个版本（拆分理由见上），交接时一个撤一个上。图的
+     比例 1.777 比多数笔记本视口窄（1440×760 = 1.895、1512×760 = 1.989），cover
+     之后是**纵向溢出**，于是 Y 定位真的会挪图：1512×760 下溢出 91px，50% 与
+     26% 差 21.8px。用户 2026-09-04：「背景本身它会移位，就是往下坠一点」。
+
+     我这台 1398×829（比例 1.686）是横向裁切，Y 定位不起作用，所以一直没复现——
+     这类问题必须按**视口比例**算，不能只看自己屏幕。 */
+  background: url("assets/intro-room.webp?v=568") center 26% / cover no-repeat;
+  pointer-events: none;
+  /* 🔴 用**遮罩扫过**上色，不是整块淡入。用户 2026-09-04：「背景图出现能不能是
+     那种渲染出来的效果？现在就是 fade in。」
+
+     100deg 是和线稿**同一个方向**（见 .intro__sketch 的遮罩）：先用这一道扫出
+     线稿，再用同一道把颜色刷上去，读起来是同一支笔走了第二遍，而不是「线稿在
+     那儿，然后一张照片淡进来」。
+
+     软边比线稿宽得多：线稿那道是 145%-32%→-6%（约 26% 视口宽的过渡带），这里
+     是 160%-48%→-8%（40%）。线稿要的是「笔尖」，得利落；上色要的是「洇开」，
+     边太硬就成了一道推进的直线。
+
+     --room-t 仍由 intro.js 每帧写，没有 transition——它本来就是被滚动擦洗的，
+     再叠一层过渡只会让它落后于卡片。 */
+  -webkit-mask-image: linear-gradient(100deg,
+    #000 calc(var(--room-t, 0) * 160% - 48%),
+    transparent calc(var(--room-t, 0) * 160% - 8%));
+  mask-image: linear-gradient(100deg,
+    #000 calc(var(--room-t, 0) * 160% - 48%),
+    transparent calc(var(--room-t, 0) * 160% - 8%));
+  will-change: mask-image;
+}
+/* 减弱动效：不扫，退回整块淡入——一道横扫过全屏的边界对前庭敏感的读者是负担，
+   而「墙出现了」这件事淡入也说得清。 */
+@media (prefers-reduced-motion: reduce) {
+  .intro__room {
+    -webkit-mask-image: none; mask-image: none;
+    opacity: var(--room-t, 0);
+  }
+}
+/* 句子与那块小影片的退场走**自己那一拍**（--copy-out，ft 0→0.22），不再跟
+   房间共用进度。用户要的顺序是「字先隐去 → 屏幕打开 → 模型出来 → 背景才被
+   渲染出来」，共用一个变量就变成三样一起淡，读不出先后。 */
+.intro__copy,
+.intro__media { opacity: calc(1 - var(--copy-out, 0)); }
+
+/* 转场里那句标题。用户：「墙壁出现的时候，这个文字也要接上，Everything…
+   就打在和之前位置一样的顶部」。
+
+   位置与字号照抄 hub 的 .hub__head / .hub__title（3svh 上内距、--gutter 左右、
+   --heading--display 字号、600 字重、.92 行高）——它和 hub 的第一句是同一份
+   文案，转场结束真 hub 接手时必须停在同一个地方，否则那一交接会跳一下。
+
+   🔴 用 clip-path 横向擦除，跟 hub 五句标题现在用的是同一种揭示（2026-09-04
+   把那边的逐字换成擦除的那次）。进度读 --room-line-t，由 intro.js 在墙渲染
+   之后的那一小段推——顺序是：字退场 → 屏幕打开 → 墙渲染 → 这句话擦出来。 */
+.intro__room-line {
+  /* 🔴 fixed 而不是 absolute，而且它已经**不在 .intro__room 里面**了。
+
+     两处都得改，原因不同：
+       · 移出 .intro__room —— 那层的 opacity 绑在 --room-t（彩色墙）上，字套在
+         里面就被父层透明度锁死，永远不可能比墙先出现。而用户要的正是「出现
+         线描稿的时候可以出现字了」，字比墙早一整拍。
+       · absolute → fixed —— 移出来之后它的包含块变成了 sticky 舞台，舞台在段尾
+         前一个视口释放，字就跟着往上飘（实测顶从 107 掉到 −690）。 */
+  position: fixed;
+  z-index: 8;
+  /* 🔴 顶距由 intro.js 量 hub 那句标题得出（--room-line-top），不写死：
+     hub 的标题顶在 3svh 的舞台内距之上还叠了 .hub__head 的 margin，那是一条
+     随视口变的链，照抄数字迟早对不上。居中则跟 hub 一样用 text-align。 */
+  top: var(--room-line-top, 3svh); left: var(--gutter); right: var(--gutter);
+  text-align: center;
+  margin: 0;
+  font-family: var(--font--primary);
+  /* 🔴 字号跟 hero 那行 "A Smart Family Copilot" 走，不是 --heading--display。
+     用户 2026-09-04：「Meet Nestify 这字有点太小，字间距也比较近，还是改成一行
+     的吧，字可以和 A Smart Family Copilot 一样大。」
+
+     行高从 .92 改成 1：.92 是给多行标题收紧行距的，这句现在是一行，.92 只会把
+     行盒压扁、上下留白不对称。
+
+     ⚠️ hub.css 的 .hub__title-line.is-meet 必须同步——那是交接时接住这句的
+     元素，两处字号不一致会在交接那一帧看到字跳一下（实测差 13px）。 */
+  /* 🔴 2026-09-04 再放大一档：clamp(28px,5.4vw,78px) → clamp(34px,6.6vw,96px)。
+     上一版是「和 hero 那行 A Smart Family Copilot 一样大」，用户看过之后
+     「这个文字有点太小了，可能要再大一点」。现在它比 hero 那行大一档——这是
+     有意的：hero 是开场的定位语，这句是转场落幕的报名，让它压过去。
+
+     ⚠️ hub.css 的 .hub__title-line.is-meet 必须同步，那是交接时接住这句的
+     元素，两处不一致会在交接那一帧看到字跳一下。 */
+  /* 🔴 2026-09-05：上面两段的加码全部作废。用户：「把 meet nestify 大小和
+     everything matters today 那个字体一样大」——就是 hub 那五拍标题的尺寸。
+
+     所以这里不再有自己的 clamp，改成直接读 .hub__title 用的那两个变量。hub
+     那边是**继承**（.is-meet 的覆盖已删），这里是**同源引用**，两条路走到同一个
+     计算值上。这是这句话在页面上存在两份、必须逐像素重合所能做到的最接近
+     「只有一个真相」的写法。
+
+     ⚠️ 断点要跟着 hub 走**两个**：hub.css 在 max-width:767px 里把 .hub__title
+     换成了 --hub-copy / 1.06，所以这里也必须换。只改桌面那一份，手机上两句
+     就会差一整档字号——交接那一帧看得见。手机那份在本文件底部的断点里。 */
+  font-size: var(--heading--display);
+  line-height: .92;
+  font-weight: 600;
+  /* 🔴 必须跟 .hub__title 一样是 balance，不能留默认的 wrap（2026-09-05 合成
+     单句标题那次抓到的）。桌面这句排得下一行，两种值没区别；手机 390 上它要
+     折两行，而 balance 和 wrap 断在**不同的词**——实测 hub 是 [243,261]、intro
+     是 [276,228]，交接那一帧整句重排。这是这两句必须逐条对齐的第四个属性，
+     前三个是 font-size / line-height / letter-spacing。 */
+  text-wrap: balance;
+  letter-spacing: -.02em;
+  color: var(--nes-ink);
+  /* 居中之后擦除也从中间往两边开，跟靠左时的单向擦除不同——单向擦在居中的
+     文字上会读成「字在往右长」而不是「被揭开」。 */
+  /* 🔴 从**左到右**擦出，不是从中间往两边。用户 2026-09-04：「Meet Nestify
+     这个文字能不能是从左到右出现？就跟我们那个 Smart Family Copilot 是一样的
+     那种出现方式。」
+
+     hero 那行是逐字 stagger，读起来就是一支笔从左写到右；这里用 clip-path 的
+     左右擦除达到同一个读感。没有跟着改成逐字，是因为逐字在这条时间线上要能
+     随滚动来回 scrub——今天刚修过一个逐字倒放导致两行字压在一起的 bug
+     （hub.js 的 is-hushed）。擦除是纯几何，正反都干净。
+
+     只动右边那个 inset：左边恒为 0（贴着行首），右边从 100% 收到 0。
+
+     （2026-09-05：下缘出血一度放到 -2em，那是为了兜住挂在行盒外面的副标。
+     副标已经并进标题成一句，出血退回 -.35em——现在盒子里只有文字本身，
+     .35em 兜的就是它自己的升降部。hub.css 里 .is-meet 那两条同样的覆盖也
+     一并删了。） */
+  clip-path: inset(-.35em calc((1 - var(--room-line-t, 0)) * 100%) -.35em 0);
+  /* 擦入用 clip-path，退场用 opacity——退场时再把字擦回去会读成「写错了在擦」，
+     而这里要的是「说完了，松手」。退场必须发生在交接**之前**：pastIntro 那一刻
+     所有 intro 变量归零，字还亮着的话就是一记硬切（实测很扎眼）。 */
+  opacity: var(--room-line-o, 1);
+}
+
+/* （2026-09-05：这里曾有 .meet-nestify-sub —— 一个 intro 与 hub 两处共用的
+   副标类。用户把主副两句合并成了一句 “This is Nestify, here to light up
+   family life.”，副标元素连同这条规则一起删了。合并之后「两处必须一致」的
+   属性清单是 font-size / line-height / letter-spacing / text-wrap 四条，
+   都在上面那条 .intro__room-line 里，不再需要共用类。） */
+
+/* 手机断点必须写在 .intro__room-line 那条**后面**：本文件上方两个
+   max-width:767px 块在它之前，同特异度、先出现的会被后面那条盖掉。 */
+/* 🔴 900，不是 767（2026-09-05 修正）。上面这段注释说的「跟 hub.css 同一个
+   断点」正是意图，但写下来的数不是同一个：hub.css 里 .hub__title / is-meet 那
+   两条在 **900** 断点，--hub-copy 也定义在那里。差出来的 768–900 一带，交接的
+   两句就不同大小了——实测 768 宽：这句 34.18px（回退到 --heading--display），
+   hub 那句 40px。而这两句是同一句话、靠字号逐像素一致完成交接，13px 的差就是
+   交接那一帧的跳字。 */
+@media (max-width: 900px) {
+  /* 跟 hub.css 同一个断点里 .hub__title 的那两条一一对应（--hub-copy / 1.06）。
+     变量挂在 :root 上就是为了这里能读到同一个值，见 hub.css 那边的注释。 */
+  /* ⚠️ 与 hub.css 的 .hub__title-line.is-meet **同值**，那边有推导。两句是同一
+     句话，靠字号逐像素一致完成交接。 */
+  .intro__room-line {
+    font-size: clamp(32px, 8.4vw, 46px);
+    line-height: 1.06;
+  }
+}
+
+/* ============================================================
+   🔴 房间线稿（2026-09-04）—— 用户手绘，桌面上叫 wall_frame
+
+   顺序是用户定的：**线稿 → 彩色成品**。这一层是前者。
+
+   源图 3344×1882，正好是 intro-room.webp（1672×941）的 2 倍，是照着同一张
+   描的。所以两层都用 `center / cover`，缩放结果逐像素对齐——线稿画的柜子边
+   就是照片里柜子边，上色那一拍才不会「错位地长出来」。
+
+   🔴 配对的是 assets/intro-room.webp（绿色客厅），**不是** hub-room-1.webp。
+   2026-09-04 之前这两个文件名指的是同一张图，那天 hub 轮换的第 1 张换成了
+   儿童房、intro 这张留下不动，两者才分家（见上方 .intro__room 那段）。改这
+   两个文件里的任意一个，都要连着另一个一起改。
+
+   🔴 **原图直转，不做任何处理。** 这一条是用户 2026-09-04 明确要的
+   （「还是太粗太黑了，能不能恢复成原图啊」），也是我折腾一整天之后的结论：
+
+     线性增益 2.6 倍  → 太粗（增益把抗锯齿淡边也提亮，线变实心）
+     levels 40 / 62   → 还是粗（阈值动不了 5px 的笔画本体）
+     腐蚀 3 轮        → 细了，但画框台灯断成虚线
+     腐蚀 4 轮 + 黑场 3 → 连续了，但纯黑（渲染最深 0，而原作最深只有 104）
+     腐蚀 5 轮        → 整张画被吃掉，着墨量 1.79% → 0.15%，只剩鬼影
+     峰值 170 + opacity .85 → 深浅对了，仍嫌粗
+
+   六轮都在「怎么改用户的画」上打转。他画的就是一支中灰的细笔，不需要我替他
+   加重——**原图直转就是对的**。
+
+   🔴 描边是**灰色 (128,128,128) + alpha**，不是白线。一度以为是白线所以加了
+   `filter: invert(1)`——那其实是空操作（128 反色成 127），真正让线立起来的从来
+   都是 alpha。现在图只当遮罩用，RGB 一个字节都不参与，反色更没有意义。
+
+   🔴 入库前把 RGB 压平成纯白，只保留 alpha：遮罩只读 alpha，彩色的 RGB 纯属
+   占体积。449KB → 210KB，遮罩逐像素完全一致。
+
+   画出来的动作用一道斜向的渐变遮罩扫过去，不是整张淡入——淡入是「图片来
+   了」，扫过是「正在画」，用户要的是后者（「像渲染出来一样」）。
+
+   背景图挂在 .is-room-ready 后面：开场时不能跟 hero 视频抢带宽。
+   类由 intro.js 在视频首帧之后加，那时离读者滚到这儿还有三四屏。
+   ============================================================ */
+.intro__sketch {
+  position: fixed; inset: 0; z-index: 6;
+  pointer-events: none;
+
+  /* 🔴 图当**遮罩**用，不当背景图。用户 2026-09-04：「能不能取一个比背景深一点点
+     颜色」——线的颜色因此必须归 CSS 管，而不是烧死在图里（他画的是中灰 128）。
+     alpha 抠形状、background-color 上色，改色只动这一个 token。
+
+     两层遮罩合成：线稿的 alpha ∩ 扫过去的渐变。所以「画出来」的动作还是那道斜
+     扫，只是现在扫的是一块纯色被线稿抠出来的形状。
+     mask-composite 的两套写法都要写：WebKit 用 source-in，标准用 intersect。 */
+  /* 🔴 墨色。用 color-mix 而不是写死一个十六进制：这样它永远是「墙底掺多少墨」，
+     哪天墙色改了线色自己跟着走，不会脱节。
+
+     百分比就是**唯一的深浅旋钮**：
+       11%  = 恰好等于调色板的 --nes-tan（第一版，用户说「很好」）
+       18%  ← 现在。用户「可不可以再深一点点」，与墙底的差值 24 → 40 级
+     想再深继续加这个数；30% 以上就开始抢戏，线稿会盖过它托着的那台机器。 */
+  background-color: var(--sketch-ink);
+
+  /* 🔴 线稿也是**扫过去**的，和上色同一个方向（100deg）。
+
+     2026-09-04 来回过一次：一度改成整张淡入（用户当时说「每个地方出现一点，
+     然后完全出现」），当天又改回扫描（「算了还是改回原来的线稿也是扫描吧」）。
+     两版都试过，结论留在这儿免得再绕：
+
+       扫描  一支笔走两遍——先描线，再上色。两拍同向，读作同一个动作的两层。
+       淡入  像显影，但和后面那道扫描并置时，前一拍反而显得「没在画」。
+
+     遮罩是两层：线稿自己的 alpha ∩ 扫过去的渐变，用 mask-composite 交集。
+     第一层定位 26%（和 .intro__room 对齐，理由见那边）；第二层是渐变，铺满
+     即可，保持 center。
+
+     软边比上色那道窄：这里约 26% 视口宽，上色是 40%。线稿要的是「笔尖」，
+     得利落；上色要的是「洇开」。 */
+  -webkit-mask-image: var(--sketch-src, none),
+    linear-gradient(100deg,
+      #000 calc(var(--sketch-t, 0) * 145% - 32%),
+      transparent calc(var(--sketch-t, 0) * 145% - 6%));
+  -webkit-mask-composite: source-in;
+  -webkit-mask-size: cover, 100% 100%;
+  -webkit-mask-position: center 26%, center;
+  -webkit-mask-repeat: no-repeat, no-repeat;
+
+  mask-image: var(--sketch-src, none),
+    linear-gradient(100deg,
+      #000 calc(var(--sketch-t, 0) * 145% - 32%),
+      transparent calc(var(--sketch-t, 0) * 145% - 6%));
+  mask-composite: intersect;
+  mask-size: cover, 100% 100%;
+  mask-position: center 26%, center;
+  mask-repeat: no-repeat, no-repeat;
+
+  /* 资源没就位时 --sketch-src 是 none，遮罩只剩渐变，那会漏出一整块纯色。
+     用 opacity 兜住：类没加上就整层不可见。 */
+  opacity: 0;
+}
+.intro.is-room-ready .intro__sketch {
+  --sketch-src: url("assets/wall-frame.webp");
+  /* 进度走遮罩，不走 opacity——见上面那段 */
+  opacity: 1;
+}
+
+/* 减弱动效：不扫，整张随进度淡入。一道横扫过全屏的边界对前庭敏感的读者是
+   负担，而「线稿画出来了」这件事淡入也说得清。 */
+@media (prefers-reduced-motion: reduce) {
+  .intro.is-room-ready .intro__sketch {
+    -webkit-mask-image: var(--sketch-src);
+    mask-image: var(--sketch-src);
+    opacity: var(--sketch-t, 0);
+  }
+}
+
+/* 背面的线框：铺满卡片。落点已经按真机机身轮廓量过（见 intro.js 的 EX_*），
+   而用户画的这张 517×314 = 1.646、真机机身 373.3×227.0 = 1.645，差 0.1%，
+   所以 preserveAspectRatio="none" 拉伸带来的形变可以忽略。
+
+   🔴 non-scaling-stroke：线宽是**屏幕像素**，不随卡片放大变粗。少了它，卡片从
+   157px 长到 373px 的过程中线会跟着粗一倍多，读起来是「一张图在放大」而不是
+   「一支笔画的框」。 */
+.flip__frame {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  display: block;
+  overflow: visible;
+}
+/* 🔴 只打**直接子元素**。字标是 Figma 的「外描边」导出，<mask> 里有一个
+   fill="white" 的 rect —— 用 `.flip__frame rect` 打全了会把它也设成 fill:none，
+   mask 全黑，七个字母一个都画不出来。 */
+.flip__frame > rect,
+.flip__frame > path {
+  fill: none;
+  stroke: var(--sketch-ink);
+  vector-effect: non-scaling-stroke;
+}
+
+/* ============================================================
+   🔴 扫描的亮片（2026-09-04）
+
+   用户：「加一个闪光的，就相当于扫描的时候那种一个亮片，然后它就变成了这个
+   三维模型」。第一版把它做成了卡片的子元素、变身另有其时，用户的反馈是
+   「扫描亮片没看到」——因为那样它就只是一层高光，不承载任何事情。
+
+   现在它是**独立的固定层**，盖在真机上面：光走到一半，平卡片撤下、3D 机身显形。
+   变身发生在最亮那一瞬底下，接缝被光吃掉了。所以 z-index 必须比 flipper(500)
+   和 hub 的舞台都高，位置由 intro.js 按落点算（外扩 9% 包住 3D 外壳）。
+
+   做法：一条窄斜带子，用 transform 横着推。
+     · 用 transform 而不是 background-position：只有前者上 GPU，而这道光正好
+       走在翻卡刚落位、页面还在算线稿遮罩的那一段，主线程不宽裕。
+     · 外层 overflow:hidden + 圆角，带子才不会从机器的圆角处漏出去。
+     · 白色**正常混合**，不是 screen。屏幕里是浅色日历 UI，screen 混合白对白
+       等于什么都没发生——实测不可见。
+   ============================================================ */
+.intro__scan {
+  position: fixed;
+  z-index: 520;
+  border-radius: 12px;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  will-change: opacity;
+}
+.intro__scan > i {
+  position: absolute;
+  top: -60%; bottom: -60%;
+  left: 0; width: 24%;
+  background: linear-gradient(90deg,
+    rgba(255, 255, 255, 0)   0%,
+    rgba(255, 255, 255, .14) 28%,
+    rgba(255, 255, 255, .62) 50%,
+    rgba(255, 255, 255, .14) 72%,
+    rgba(255, 255, 255, 0)  100%);
+  /* 🔴 plus-lighter，不是普通混合。这道光打在**浅色日历 UI + 浅色墙**上，
+     普通混合的白叠白等于什么都没发生——用户 2026-09-04：「闪光挪到最后，
+     完全看不到了」，位置修好之后依然偏弱。plus-lighter 是相加，底下本来就亮的
+     地方会直接被推过 1.0 而过曝成纯白，那才是「闪」。
+
+     因为是相加，芯部的 alpha 要**降**下来（.99 → .62），否则整块糊成白板。
+     不支持 plus-lighter 的浏览器退回普通混合：弱一点，但不会出错。 */
+  mix-blend-mode: plus-lighter;
+  transform: translateX(var(--scan-x, -120%)) skewX(-14deg);
+  will-change: transform;
+}
+
+/* 减弱动效：不扫光。横穿画面的高光是前庭敏感的读者最难受的那种运动，而它
+   承载的信息（机器成型了）由变身本身说得清——intro.js 那边 shineT 直接置 1，
+   卡片照常撤下、真机照常显形，只是没有光。 */
+@media (prefers-reduced-motion: reduce) {
+  .intro__scan { display: none; }
+}
+
+/* ============================================================
+   手机：hub 接管之后，intro 的房间层要退干净
+   （2026-09-05，用户：「我在 Nestify lights up family life 的时候，底部还会有
+   一些东西，就残影，不懂是什么东西」）
+
+   实测 hub 段顶 +40px 处，这两层仍然铺满整屏（intro__sketch[0,844]、
+   intro__room[0,844]），而 hub 的舞台就压在它们上面。舞台自己那面墙在前奏期正
+   处在「绿客厅淡出、轮换的墙淡入」的交接里，有一段是半透明的——底下 intro 的
+   房间就从那里透上来，看着像一层残影。
+
+   ⚠️ 用 :has() 而不是给它们自己加类：这两层的 opacity 由 intro.js 每帧写在
+   --room-t 上（intro 自己的时间轴），在那边加分支等于给 intro 的时间轴打一个只
+   在手机上成立的补丁；从外面按「hub 是否已经接管」关掉，两条时间轴各自完整。
+   ============================================================ */
+@media (max-width: 767px) {
+  /* is-entered arrives 8px early; the Hub wall remains hidden while
+     is-early is set. Keep the intro wall until that handoff is complete. */
+  body:has(.hub.is-entered:not(.is-early)) .intro__room,
+  body:has(.hub.is-entered:not(.is-early)) .intro__sketch { opacity: 0; }
+}
