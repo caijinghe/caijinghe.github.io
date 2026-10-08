@@ -26,6 +26,13 @@
   <meta name="twitter:description" content="Nestify is a family organizer for calendars, lists, tasks, recipes, and meals. Nestie is the assistant within Nestify. Explore the app and check Family Hub availability." />
 
   <link rel="icon" href="favicon.ico" sizes="any" />
+  <link rel="preload" as="image" href="assets/intro-room.webp?v=568" />
+  <link rel="preload" as="image" href="assets/hub-room-1.webp?v=574" />
+  <link rel="stylesheet" href="../css/preloader.css?v=20260924-7" />
+  <style>
+    /* Cover the page from its first painted frame, before archive styles and 3D finish. */
+    #site-preloader { position: fixed; inset: 0; z-index: 999999; display: flex; align-items: center; justify-content: center; background: #fff; }
+  </style>
   <!-- 🔴 THE BAR ARRIVES AT THE SIZE IT LEFT — the twin of the block in
        device.html, and the full reasoning lives there. Short version: the
        header condenses past 90px of scroll and the pills shrink with it, so
@@ -89,6 +96,17 @@
   
 </head>
 <body data-story-archive="2026-10-07">
+  <div id="site-preloader" aria-label="Loading site" role="status">
+    <div class="preloader-box">
+      <picture class="preloader-logo-pic">
+        <source srcset="../media/index/logo.webp" type="image/webp" />
+        <img class="preloader-logo" src="../media/index/logo.gif" alt="Jinghe Cai" width="88" height="92" />
+      </picture>
+      <div class="preloader-progress"><span id="preloader-percent">0%</span></div>
+    </div>
+  </div>
+  <noscript><style>#site-preloader { display: none !important; }</style></noscript>
+  <script src="archive-preloader.js?v=1"></script>
 
   <!-- ==========  THE DAY  ==========
        🔴 ONE element, outside every section and `position: fixed`. It used
