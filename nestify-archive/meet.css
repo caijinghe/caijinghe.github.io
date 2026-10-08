@@ -34,20 +34,6 @@
   font-weight: 600;
   line-height: 1.2;
 }
-.meet-intro__link {
-  display: inline-grid;
-  place-items: center;
-  flex: none;
-  width: clamp(1.75rem, 2.3vw, 2rem);
-  aspect-ratio: 1;
-  border: 1.5px solid currentColor;
-  border-radius: 50%;
-  color: var(--nes-ink);
-  transition: background-color .2s ease, color .2s ease;
-}
-.meet-intro__link svg { width: 52%; height: 52%; }
-.meet-intro__link:hover { background: var(--nes-ink); color: var(--page-bg); }
-.meet-intro__link:focus-visible { outline: 2px solid currentColor; outline-offset: 5px; }
 
 .meet {
   position: relative;
