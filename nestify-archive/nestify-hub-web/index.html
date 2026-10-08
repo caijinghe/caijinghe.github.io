@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <base href="./">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="Nestify Family Hub">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="nestify_hub_web">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>Nestify Family Hub</title>
+  <link rel="manifest" href="manifest.json">
+
+  <!-- 🔴 BEFORE flutter_bootstrap.js, AND NOT async. The demo family is
+       seeded at absolute dates in the week of Aug 18 2026; this hands the
+       app that week's clock so the Home tab has something to draw. It has
+       to run before any Dart does, or the first DateTime.now() is already
+       wrong. Full reasoning in the file — and note that `flutter build web`
+       overwrites THIS file, so this line has to be put back by hand after
+       any rebuild of the hub app.
+
+       🔴 2026-08-28 试过 `canvasKitForceCpuOnly: true`（CanvasKit 改用 CPU
+       光栅化，即所谓「软渲染」，加在 flutter_bootstrap.js 的 config 里）——
+       **实测四个场景全都更慢或持平，已撤回**，别再照着「软渲染能救卡顿」
+       这句话加回来：
+         GPU 正常          8.3ms → 49.9ms  （慢 6 倍）
+         GPU 正常 + CPU×4  9.3ms → 230ms
+         GPU 被封 SwiftShader  258ms → 260ms（持平，本来就废了）
+       它换掉的是 GPU 争用、换来的是每帧 CPU 光栅化，这笔账在这台页面上不划算。 -->
+  <script src="../hub-clock.js"></script>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: #f5f3ee;
+    }
+  </style>
+</head>
+<body>
+  <!--
+    You can customize the "flutter_bootstrap.js" script.
+    This is useful to provide a custom configuration to the Flutter loader
+    or to give the user feedback during the initialization process.
+
+    For more details:
+    * https://docs.flutter.dev/platform-integration/web/initialization
+  -->
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>
