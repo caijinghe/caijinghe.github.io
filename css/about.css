@@ -1015,7 +1015,7 @@ Timeline Ruler
 
 /* 针对手机端的大标题 */
   .about-panel h1 {
-    font-size: 1.5rem !important;
+    font-size: 1.375rem !important;
     line-height: 1.3;
     
     /* 🔥 核心修改：想往下掉，就加正数的 margin-top */
@@ -1031,23 +1031,56 @@ Timeline Ruler
   margin-bottom: 20px;
 }
 
+  .about-panel h2 {
+    font-size: 1rem;
+    line-height: 1.55;
+  }
+
+  .scholar-pill {
+    font-size: 0.75rem;
+  }
+
   .exp-group {
     margin-bottom: 20px;
   }
 
   .exp-group-label {
     margin-bottom: 6px;
+    font-size: 0.75rem;
   }
 
   .exp-row {
-    gap: 10px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
     padding: 8px 0;
-    font-size: 0.95rem;
+    font-size: 0.84375rem;
+    line-height: 1.5;
   }
 
   .exp-title {
     flex-wrap: wrap;
     white-space: normal;
+  }
+
+  .exp-org {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .exp-year {
+    font-size: 0.8125rem;
+  }
+
+  .award-row {
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .award-year,
+  .award-text {
+    font-size: 0.875rem;
+    line-height: 1.5;
   }
 
 }

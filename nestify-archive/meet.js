@@ -778,7 +778,7 @@
      要 336 设备像素——600 是近 1.8 倍的浪费，而六帧一起解码是 8.2MB 常驻。
      解码内存按**源图**像素算，不按显示大小，这是这一整轮减内存的共同前提。 */
   const M = matchMedia('(max-width: 767px)').matches;
-  const birdSrc = (u) => (M ? u.replace('assets/nestie/', 'assets/m/nestie/') : u);
+  const birdSrc = (u) => (M ? u.replace('assets/nestie/', 'assets/m/nestie/') + '?v=20261012-mobile-assets' : u);
   birdIdle.src = birdSrc('assets/nestie/meet-bird-0-idle.webp');
   birdIdle.alt = '';
   birdIdle.decoding = 'async';
@@ -1024,7 +1024,7 @@
          🔴 ?v= 不能省：文件名不变、内容会变，不打版本号读者只会拿到缓存里的
          旧图，而且完全无声（今天已经踩过三次）。改图就改这个数。 */
       face.src = (matchMedia('(max-width: 767px)').matches && cfg.img.startsWith('assets/meet-'))
-        ? cfg.img.replace('assets/', 'assets/m/') + '?v=448'
+        ? cfg.img.replace('assets/', 'assets/m/') + '?v=20261012-mobile-assets'
         : cfg.img;
       face.alt = '';
       face.loading = 'lazy';

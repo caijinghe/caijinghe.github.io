@@ -49,6 +49,17 @@
         .nestify-live-link a:hover { background: #000; border-color: #000; color: #fff; }
         .nestify-live-link a:hover::after { background-color: #fff; }
         @media (prefers-reduced-motion: reduce) { .nestify-live-link a { transition: none; } }
+        @media (max-width: 768px) {
+            .nestify-overview .nestify-live-link { margin-top: calc(28px / var(--project-preview-scale, 1)); }
+            .nestify-live-link a {
+                /* Optical centering for the uppercase font: shift content down 1px. */
+                padding: calc(10px / var(--project-preview-scale, 1)) calc(13px / var(--project-preview-scale, 1)) calc(8px / var(--project-preview-scale, 1));
+                gap: calc(7px / var(--project-preview-scale, 1));
+                border-width: calc(1px / var(--project-preview-scale, 1));
+                font-size: calc(11px / var(--project-preview-scale, 1));
+                line-height: 1.25;
+            }
+        }
         .nestify-live-link a:focus-visible { outline: 2px solid currentColor; outline-offset: 5px; }
         .confidential-section {
             width: 100%;
@@ -152,15 +163,15 @@
     <link rel="stylesheet" href="css/project-typography.css?v=20261001-4" />
     <link rel="stylesheet" href="css/confidential-lock.css?v=20261012-responsive-2" />
     <link rel="stylesheet" href="css/project-loader.css?v=20261001-1" />
-    <link rel="stylesheet" href="css/nestify-hero.css?v=20261012-even-bezel" />
+    <link rel="stylesheet" href="css/nestify-hero.css?v=20261012-bubble-scale" />
     <script src="js/project-asset-loader.js?v=20260928-1" defer></script>
     <script src="js/case-preview-scale.js?v=20261001-1" defer></script>
     <script src="js/scroll-indicator.js?v=20260926-2" defer></script>
     <script src="js/nestify-building.js?v=20261007-scroll-dizzy-1" defer></script>
     <script src="https://unpkg.com/@rive-app/canvas@2.31.6" defer></script>
-    <script src="js/nestify-birth.js?v=20261012-even-bezel" defer></script>
-    <script src="js/nestify-voice-bird.js?v=20261012-even-bezel" defer></script>
-    <script src="js/nestify-voice-glow.js?v=20261012-even-bezel" defer></script>
+    <script src="js/nestify-birth.js?v=20261012-bubble-scale" defer></script>
+    <script src="js/nestify-voice-bird.js?v=20261012-bubble-scale" defer></script>
+    <script src="js/nestify-voice-glow.js?v=20261012-bubble-scale" defer></script>
 </head>
 <body class="project-design-system">
     <div id="loading-overlay">
