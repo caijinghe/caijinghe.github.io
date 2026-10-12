@@ -310,17 +310,23 @@ html .nestify-static-hero .case-cover__title {
 .nestify-cover__device[data-voice-state="speaking"] .nestify-cover__screen { filter: blur(1.4px); }
 @media(prefers-reduced-motion:reduce) { .nestify-cover__screen {transition:none;} }
 
-/* Fixed design proportions, measured against the device, including iframe zoom. */
-.nestify-cover__device { container-type: inline-size; }
+/* Keep speech typesetting fixed; scale the whole bubble with the device.
+   Avoid container-unit text reflow and mobile browser text inflation. */
 .nestie-reply {
     box-sizing: border-box;
-    width: 28cqw;
-    padding: 1.4cqw 1.8cqw;
-    font-size: 1.55cqw;
-    line-height: 1.4;
-    border-width: .14cqw;
-    border-radius: 2cqw;
-    -webkit-backdrop-filter: blur(2cqw) saturate(1.18);
-    backdrop-filter: blur(2cqw) saturate(1.18);
-    box-shadow: 0 1.7cqw 4.3cqw rgba(20,39,55,.30), 0 .57cqw 1.4cqw rgba(20,39,55,.16), inset 0 .14cqw 0 rgba(255,255,255,.95);
+    width: 198px;
+    max-width: none;
+    padding: 10px 13px;
+    font-size: 11px;
+    line-height: 15.4px;
+    border-width: 1px;
+    border-radius: 14px;
+    -webkit-text-size-adjust: none;
+    text-size-adjust: none;
+    -webkit-backdrop-filter: blur(14px) saturate(1.18);
+    backdrop-filter: blur(14px) saturate(1.18);
+    box-shadow: 0 12px 30px rgba(20,39,55,.30), 0 4px 10px rgba(20,39,55,.16), inset 0 1px 0 rgba(255,255,255,.95);
+    transform: translateY(6px) scale(calc(var(--nestie-reply-scale, 1) * .95));
 }
+.nestie-reply span { display: block; white-space: nowrap; }
+.is-speaking .nestie-reply { transform: scale(var(--nestie-reply-scale, 1)); }

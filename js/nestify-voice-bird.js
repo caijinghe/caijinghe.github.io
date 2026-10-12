@@ -3,11 +3,16 @@
  const canvas=document.querySelector('.nestify-voice-bird canvas');
  if(!canvas||!window.rive)return;
  const speakCanvas=document.createElement('canvas');speakCanvas.className='nestie-speaking';speakCanvas.setAttribute('aria-hidden','true');canvas.parentElement.append(speakCanvas);
- const bubble=document.createElement('div');bubble.className='nestie-reply';bubble.textContent='Added soccer practice for Leo every Wednesday at 4pm.';canvas.parentElement.append(bubble);
+ const bubble=document.createElement('div');bubble.className='nestie-reply';bubble.innerHTML='<span>Added soccer practice for Leo</span><span>every Wednesday at 4pm.</span>';canvas.parentElement.append(bubble);
  let speakReady=false;
  const speak=new rive.Rive({src:'media/nestify/hero/bird-speak.riv',canvas:speakCanvas,autoplay:true,layout:new rive.Layout({fit:rive.Fit.Contain,alignment:rive.Alignment.Center}),onLoad(){speakReady=true;speak.resizeDrawingSurfaceToCanvas();sync();}});
  const reduced=matchMedia('(prefers-reduced-motion: reduce)');
  const host=canvas.parentElement, device=host.closest('.nestify-cover__device');
+ // Use unzoomed layout width: the preview already applies its own outer zoom.
+ const replySizeObserver=new ResizeObserver(([entry])=>{
+  bubble.style.setProperty('--nestie-reply-scale',String(entry.contentRect.width/704));
+ });
+ replySizeObserver.observe(device);
  let visible=false,ready=false,started=false;
  function finish(){device.dataset.voiceReady='true';device.dispatchEvent(new Event('nestie-ready'));}
  host.addEventListener('animationend',event=>{if(event.target===canvas&&event.animationName==='nestie-arrive')finish();});
@@ -47,5 +52,5 @@
  new ResizeObserver(()=>{if(ready)bird.resizeDrawingSurfaceToCanvas();if(speakReady)speak.resizeDrawingSurfaceToCanvas();}).observe(canvas);
  new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;sync();}).observe(canvas);
  document.addEventListener('visibilitychange',sync);reduced.addEventListener('change',()=>{if(reduced.matches&&started)finish();sync();});
- window.addEventListener('pagehide',()=>{bird.cleanup();speak.cleanup();},{once:true});
+ window.addEventListener('pagehide',()=>{replySizeObserver.disconnect();bird.cleanup();speak.cleanup();},{once:true});
 })();
