@@ -26,3 +26,42 @@ body.project-design-system .animated-lock .lock-shackle[data-settled] {
   transform: none;
   will-change: auto;
 }
+
+/* Status cards remain readable inside the scaled project preview on phones. */
+@media (max-width: 768px) {
+  html body.project-design-system .confidential-section {
+    zoom: calc(1 / var(--project-preview-scale, 1));
+    width: 100%;
+    margin-top: 0;
+    padding: 48px 20px max(64px, env(safe-area-inset-bottom));
+    box-sizing: border-box;
+  }
+  html body.project-design-system .confidential-card {
+    top: 0;
+    width: 100%;
+    min-width: 0;
+    padding: 32px 24px;
+    border-radius: 20px;
+  }
+  html body.project-design-system .confidential-lock-badge {
+    margin-bottom: 24px;
+  }
+  html body.project-design-system .confidential-lock-badge .animated-lock,
+  html body.project-design-system .nestify-building__icon {
+    zoom: 1;
+    width: auto;
+    height: 51.2px;
+  }
+  html body.project-design-system .confidential-title {
+    max-width: 100%;
+    font-size: 18px;
+    line-height: 1.2;
+    overflow-wrap: break-word;
+  }
+  html body.project-design-system .confidential-desc {
+    max-width: 100%;
+    font-size: 13px;
+    line-height: 1.5;
+    overflow-wrap: break-word;
+  }
+}
