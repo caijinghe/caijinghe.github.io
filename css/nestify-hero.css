@@ -76,7 +76,7 @@ html .nestify-cover .case-cover__title {
     isolation: isolate;
     width: min(880px, 82%);
     /* Match the frame opening to the Display artwork’s native 16:10 ratio. */
-    aspect-ratio: calc(1.6 * .5776515152 / .7830758899);
+    aspect-ratio: 1.2174147555;
     flex: 0 0 auto;
     margin: clamp(24px, 3vw, 44px) auto 0;
 }
@@ -110,17 +110,17 @@ html .nestify-cover .case-cover__title {
 .nestify-cover__screens::before {
     content: '';
     position: absolute;
-    left: 10.87978509%;
-    top: 21.21212121%;
+    left: 10.84620551%;
+    top: 20.30849553%;
     width: 78.30758899%;
-    height: 57.76515152%;
+    height: 59.58300894%;
     background: #f5f3ee;
 }
 
 .nestify-cover__screen {
     position: absolute;
-    left: 10.87978509%;
-    top: 21.21212121%;
+    left: 10.84620551%;
+    top: 20.30849553%;
     width: 78.30758899%;
     height: auto;
     aspect-ratio: 16 / 10;
@@ -135,7 +135,7 @@ html .nestify-cover .case-cover__title {
     height: 100%;
     pointer-events: none;
     filter: saturate(.48) hue-rotate(165deg) brightness(1.14);
-    clip-path: polygon(evenodd, 0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%, 10.87978509% 21.21212121%, 10.87978509% 78.97727273%, 89.18737408% 78.97727273%, 89.18737408% 21.21212121%, 10.87978509% 21.21212121%);
+    clip-path: polygon(evenodd, 0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%, 10.84620551% 20.30849553%, 10.84620551% 79.89150447%, 89.15379449% 79.89150447%, 89.15379449% 20.30849553%, 10.84620551% 20.30849553%);
 }
 
 .nestify-cover__glass-bezel {
@@ -223,8 +223,8 @@ html .nestify-static-hero .case-cover__title {
 
 .nestify-voice-glow {
     position: absolute;
-    left: 10.87978509%; top: 21.21212121%;
-    width: 78.30758899%; height: 57.76515152%;
+    left: 10.84620551%; top: 20.30849553%;
+    width: 78.30758899%; height: 59.58300894%;
     border-radius: clamp(2px, .3vw, 4px);
     pointer-events: none;
 }
@@ -250,7 +250,7 @@ html .nestify-static-hero .case-cover__title {
 /* Original prototype: 176px bird at (1780, 940) on a 1920x1080 screen. */
 .nestify-voice-bird {
     position: absolute; z-index: 3; pointer-events: none;
-    left: 81%; top: 70%;
+    left: 80.96642042%; top: 70.63171882%;
     width: 7.178196%; aspect-ratio: 1;
     opacity: 0;
 }
@@ -287,11 +287,11 @@ html .nestify-static-hero .case-cover__title {
 .is-speaking .nestie-reply {opacity:1;transform:none;}
 @media(prefers-reduced-motion:reduce){.nestify-voice-bird.is-speaking .nestie-speaking{animation:none;}.nestie-reply{transition:none;}}
 
-.nestify-birth-glow {position:absolute;z-index:4;pointer-events:none;left:10.87978509%;top:21.21212121%;width:78.30758899%;height:57.76515152%;border-radius:4px;}
+.nestify-birth-glow {position:absolute;z-index:4;pointer-events:none;left:10.84620551%;top:20.30849553%;width:78.30758899%;height:59.58300894%;border-radius:4px;}
 
 .nestie-reply {background:#fff;color:#111;font-weight:400;box-shadow:0 6px 18px #163b5b40,0 2px 5px #163b5b26;}
 /* Soccer Practice row measured on the 2560x1600 Display PNG. */
-.nestie-delivery {position:absolute;z-index:5;pointer-events:none;left:10.87978509%;top:21.21212121%;width:78.30758899%;height:57.76515152%;container-type:inline-size;}
+.nestie-delivery {position:absolute;z-index:5;pointer-events:none;left:10.84620551%;top:20.30849553%;width:78.30758899%;height:59.58300894%;container-type:inline-size;}
 .nestie-delivery-card {position:absolute;left:3.9%;top:64.8%;width:27.6%;height:10.3%;box-sizing:border-box;border-radius:1.1cqw;background:linear-gradient(115deg,#e6f2d8,#94d6ff);padding:1cqw 1.25cqw;display:flex;flex-direction:column;justify-content:center;gap:.3cqw;text-align:left;color:#30382e;opacity:0;box-shadow:0 4px 12px #183d5b33;}
 .nestie-delivery-card strong {font-size:1.8cqw;font-weight:600;line-height:1.2;}
 .nestie-delivery-card span {font-size:1.4cqw;line-height:1.2;color:#647068;}
