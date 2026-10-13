@@ -3,7 +3,7 @@
  const canvas=document.querySelector('.nestify-voice-bird canvas');
  if(!canvas||!window.rive)return;
  const speakCanvas=document.createElement('canvas');speakCanvas.className='nestie-speaking';speakCanvas.setAttribute('aria-hidden','true');canvas.parentElement.append(speakCanvas);
- const bubble=document.createElement('div');bubble.className='nestie-reply';bubble.innerHTML='<span>Added soccer practice for Leo</span><span>every Wednesday at 4pm.</span>';canvas.parentElement.append(bubble);
+ const bubble=document.createElement('div');bubble.className='nestie-reply';bubble.innerHTML='<span>Added soccer practice for Leo</span><span>every Wednesday at 5:30 PM.</span>';canvas.parentElement.append(bubble);
  let speakReady=false;
  const speak=new rive.Rive({src:'media/nestify/hero/bird-speak.riv',canvas:speakCanvas,autoplay:true,layout:new rive.Layout({fit:rive.Fit.Contain,alignment:rive.Alignment.Center}),onLoad(){speakReady=true;speak.resizeDrawingSurfaceToCanvas();sync();}});
  const reduced=matchMedia('(prefers-reduced-motion: reduce)');
@@ -32,7 +32,7 @@
  if(speakReady){if(active&&talking)speak.play();else speak.pause();}
  }
  const layer=document.createElement('div');layer.className='nestie-delivery';layer.setAttribute('aria-hidden','true');
- const card=document.createElement('div');card.className='nestie-delivery-card';card.innerHTML='<strong>Soccer Practice</strong><span>4:00 PM · Leo</span>';
+ const card=document.createElement('div');card.className='nestie-delivery-card';card.innerHTML='<strong>Soccer Practice</strong><span>5:30 PM · Leo</span>';
  layer.append(card);device.append(layer);
  let delivery=[];
  device.addEventListener('nestie-state',event=>{
