@@ -218,7 +218,10 @@
        as "something new arrived". Without the handover the app holds its
        own two lists still for the whole beat and the cards land under them,
        which is the sentence the headline is making. See LIST_GRID. */
-    { tab: 'lists', phase: 'fly', w: 230, line: 2, at: 0.74 },                              // See what’s changing in your family.
+    /* 🔴 2026-10-17 新屏起 lists 也交接（then + settle），和 calendar 一样。上面那段
+       「不交接」的理由是旧 Flutter 版 `lists|play` 会把新清单插到顶上、把原有的往下挤；
+       新屏的任务行是 embed 层预先占好位的，play 只是让它现身，位置一个像素都不动。 */
+    { tab: 'lists', phase: 'fly', w: 230, line: 2, then: 'lists|play', at: 0.74, settle: true },                              // See what’s changing in your family.
     /* 🔴 idle FIRST, THEN play, and the app has both. This beat used to
        open straight on `rewards|play`, so the screen and the redemption it
        is showing off arrived on the same frame — the reader met the board
@@ -332,20 +335,38 @@
      face, same size, same weight, and it still read as a different font.
      That is what "字间距的问题" was. If the pad ever switches to en dashes,
      these follow it, not the other way round. */
+  /* ==========  2026-10-17：屏幕换成新版 pad UI（nestify-hub-v2/）  ==========
+     旧数据（David / Sarah / Anna / Leo / Noah，Aug 16–22 那一周，Flutter 版的 Lists
+     页）随 Flutter 屏一起退役，git 历史里有。新屏的家庭是 Emma / Sam / Mom / Dad，
+     那一周是 Mon Oct 28 – Sun Nov 3，今天 Tue 29（proto 自己钉死的演示日期）。
+
+     🔴 这里是飞入卡片的**唯一真相**。iframe 加载后 hub.js 把它原样交给
+     hub-v2-embed.js（configure），由那边把每张卡的「落地版本」插进日历 / 任务页
+     占位；落点矩形再从 iframe 里量回来（flyRect）。所以改时间、改哪一天，只改这里。
+
+     `day` 是周一起算的列号（0 = Mon 28 … 6 = Sun 3）。只挑没有自带全天事件的
+     几天放全天卡（Sat / Sun）：同一列多一条全天事件会把全天那一行撑高，整个时间
+     网格下移。定时卡都放在 proto 按种子生成的那一周里**本来空着的时段**——
+     那一周是确定的（按日期种子），换了 proto 数据要重新看一眼有没有撞车。 */
+  const fmtMin = m => `${Math.floor(m / 60) % 12 || 12}:${String(m % 60).padStart(2, '0')} ${m < 720 ? 'AM' : 'PM'}`;
+  const span2 = (start, dur) => `${fmtMin(start)} – ${fmtMin(start + dur)}`;
   const calCards = [
-    { title: 'Beach day', time: 'All day', source: 'sticky', note: 'Pack sunscreen', stack: 'left', slot: 0, day: d(-2), allDay: true, fill: '#E6F2ED', solid: SOLID.sarah, who: [] },
-    { title: 'Movie night', time: '6:00-8:00 PM', source: 'sticky', note: 'Popcorn!', stack: 'right', slot: 1, day: d(3), hour: 18, hours: 2, fill: FILL.nestie, solid: SOLID.nestie, who: ALL },
-    { title: 'Soccer practice', time: '3:00-5:00 PM', source: 'app', note: 'Club calendar', stack: 'left', slot: 1, day: d(-2), hour: 15, hours: 2, fill: '#EEF3E5', solid: SOLID.leo, who: ['leo'] },
-    { title: 'Piano recital', time: '4:30-6:30 PM', source: 'mail', from: 'Lincoln School', note: 'Anna plays second. Please arrive by 4:10.', stack: 'left', slot: 2, day: d(-1), hour: 16.5, hours: 2, fill: '#F9EEDA', solid: SOLID.anna, who: ['anna', 'sarah', 'david'] },
-    { title: 'Camping trip', time: 'All day', source: 'mail', from: 'David', note: 'Leave at 8. Tent is in the garage.', stack: 'right', slot: 0, day: d(4), allDay: true, fill: FILL.david, solid: SOLID.david, who: [] },
-    { title: 'Family dinner', time: '5:00-7:00 PM', source: 'imessage', from: 'Sarah', note: 'Can we do dinner at five? Whole family.', stack: 'right', slot: 2, day: d(0), hour: 17, hours: 2, fill: FILL.nestie, solid: SOLID.nestie, who: ALL },
-    { title: 'Swim lesson', time: '4:00-5:00 PM', source: 'paper', note: 'Bring goggles', stack: 'right', slot: 3, day: d(1), hour: 16, hours: 1, fill: FILL.leo, solid: SOLID.leo, who: ['leo'] },
+    { title: 'Pumpkin patch', time: 'All day', source: 'sticky', note: 'Wear boots!', stack: 'left', slot: 0, day: 5, allDay: true, who: ['all'] },
+    { title: 'Swim meet', time: span2(780, 120), source: 'app', note: 'Club calendar', stack: 'left', slot: 1, day: 5, start: 780, dur: 120, who: ['sam'] },
+    { title: 'Piano recital', time: span2(990, 90), source: 'mail', from: 'Maple Grove', note: 'Emma plays second. Please arrive by 4:10.', stack: 'left', slot: 2, day: 2, start: 990, dur: 90, who: ['emma', 'mom'] },
+    { title: 'Fall festival', time: 'All day', source: 'mail', from: 'Maple Grove PTA', note: 'The bake sale table needs two volunteers.', stack: 'right', slot: 0, day: 6, allDay: true, who: ['mom', 'emma'] },
+    { title: 'Pizza night', time: span2(1080, 90), source: 'sticky', note: 'Extra cheese!', stack: 'right', slot: 1, day: 4, start: 1080, dur: 90, who: ['all'] },
+    { title: 'Family dinner', time: span2(1020, 90), source: 'imessage', from: 'Mom', note: 'Can we do dinner at five? Whole family.', stack: 'right', slot: 2, day: 6, start: 1020, dur: 90, who: ['all'] },
+    { title: 'Dentist', time: span2(780, 60), source: 'paper', note: 'Bring the insurance card', stack: 'right', slot: 3, day: 3, start: 780, dur: 60, who: ['sam'] },
   ];
+  /* 第二拍（"See what's changing in your family."）落在新屏的 **Tasks** 页：新版没有
+     独立的 Lists 页了。四条新任务各落进一个人的那一列；`sec` 是那一列里的分节，
+     `col` 只决定它停在 pad 左边还是右边那一摞。 */
   const listCards = [
-    { kind: 'shop', title: 'Party supplies', items: ['Balloons', 'Paper plates', 'Birthday candles'], done: [false, false, false], who: ['sarah'], col: 0 },
-    { kind: 'shop', title: 'School snacks', items: ['Apples', 'Cheese sticks', 'Granola bars'], done: [false, false, false], who: ['sarah'], col: 0 },
-    { kind: 'todo', title: 'Home projects', items: ['Hang the shelf', 'Replace light bulb'], done: [false, false], who: ['david'], col: 1 },
-    { kind: 'todo', title: 'Library pickup', items: ['Return picture books', 'Pick up holds'], done: [false, false], who: ['sarah'], col: 1 },
+    { m: 'emma', name: 'Feed Biscuit', icon: '1f436', coins: 3, sec: 'Evening', col: 0 },
+    { m: 'sam', name: 'Piano practice', icon: '1f3b9', coins: 5, sec: 'Afternoon', col: 0 },
+    { m: 'mom', name: 'Water the plants', icon: '1fab4', sec: 'Chores', col: 1 },
+    { m: 'dad', name: 'Sweep the porch', icon: '1f9f9', sec: 'Chores', col: 1 },
   ];
   const mealCards = [
     { title: 'Banana pancakes', img: 'hub-fly/meal-05.jpg', from: 'left', day: 0, row: 0 },
@@ -388,6 +409,22 @@
     },
   ];
   const rewardsI = beats.findIndex((b) => b.tab === 'rewards');
+
+  /* 新屏的四口人，头像是 nestify-hub-v2 里同一张图 */
+  const V2 = 'nestify-hub-v2/';
+  const V2_AV = {
+    emma: V2 + 'assets/profile/avatar.jpg', sam: V2 + 'assets/sam.jpg',
+    mom: V2 + 'assets/4a680.png', dad: V2 + 'assets/7903a.png',
+  };
+  const v2People = who => who[0] === 'all' ? ['emma', 'sam', 'mom', 'dad'] : who;
+  /* 和 .cp-ev .avs 同一套：18px、白描边、互相压 5px，全部画出来不收成 +N */
+  function v2AvatarHtml(who) {
+    return '<div class="avs">' + v2People(who).map((p) => (
+      '<span class="av av-photo"><img src="' + V2_AV[p] + '" alt=""></span>'
+    )).join('') + '</div>';
+  }
+  /* 和 calPage.build() 同一个判据：块高 ≥ 54（画布 px）才画头像，≥ 38 才有时间行 */
+  const v2ChipH = card => Math.max(22, card.dur / 60 * 56 - 3);
 
   function avatarHtml(ids) {
     const people = ids.map((id) => PEOPLE[id]).filter(Boolean);
@@ -575,7 +612,6 @@
 
     /* the chip, in the pad's colours — cardInk() is the pad's own
        readableOn(), so the title lands on the ink the app would have used */
-    const ink = cardInk(card.fill, card.solid, card.day < todayCol);
     const ev = document.createElement('div');
     /* an all-day chip is 44 tall and carries the title alone, centred — the
        time row would not fit and there is nothing to put in it anyway */
@@ -583,12 +619,11 @@
     ev.innerHTML = '<div class="t"></div><div class="s"></div>';
     /* both, because the ring around each face is the chip's own colour —
        see .hub__src > .ev .av in hub.css */
-    ev.style.setProperty('--to-fill', card.fill);
-    ev.style.background = card.fill;
+    /* 底色在落点量出来之后由 placeSet 照抄 iframe 里那一块的 background（渐变 +
+       颗粒），这里不猜。字色是新屏的 --ink，时间行 62%。 */
     ev.querySelector('.t').textContent = card.title;
-    ev.querySelector('.t').style.color = ink.title;
     ev.querySelector('.s').textContent = card.time;
-    ev.querySelector('.s').style.color = ink.time;
+    if (!card.allDay && v2ChipH(card) < 38) ev.querySelector('.s').remove();
     /* 🔴 THE FACES ARE PART OF THE MORPH, not part of the handover. Without
        them the chip we land is the app's chip minus its avatars — so the
        moment our card faded out, a row of faces appeared in a box that had
@@ -598,8 +633,8 @@
        chip and the handover has nothing left to introduce.
 
        Sets read off the app's own render — see `who` on each card. */
-    if (card.who && card.who.length) {
-      ev.insertAdjacentHTML('beforeend', avatarHtml(card.who));
+    if (!card.allDay && v2ChipH(card) >= 54) {
+      ev.insertAdjacentHTML('beforeend', v2AvatarHtml(card.who));
     }
     el.appendChild(ev);
     return el;
@@ -660,64 +695,20 @@
     edit: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20.5h4.2L20 8.7a2.9 2.9 0 0 0-4.1-4.1L4 16.3v4.2z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></svg>',
     fold: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 14.5 12 9l6 5.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   };
+  /* 新屏任务页的一行（.tk-row），整张按 --tk 等比缩放：停在旁边时是它自己的大小，
+     落地时 --tk 正好把它缩成 iframe 里那一行。它长得就是它要落进去的样子，所以不交叉
+     淡化，只是长进去——和旧 lists 卡同一个思路。尺寸全在 hub.css 的 .is-task 里。 */
   function makeListEl(card) {
     const el = document.createElement('div');
-    el.className = 'hub__fly-card is-list';
-    const shop = card.kind === 'shop';
-    const accent = shop ? '#D99A15' : '#2497F0';
-    const body = shop ? '#FFF9E6' : '#EFF8FF';
-    const head = shop ? '#FFEEB8' : '#DCF0FE';
-    /* 🔴 NOT readableOn(). That is the pad's rule for an EVENT CHIP, whose
-       ink is derived from its own fill, and it is why our titles were brown
-       (#694B0A measured) beside the app's near-black. A section header is
-       not a chip: sampled on the yellow band and the orange one, the app
-       draws #1C1917 on both. One literal, no derivation. */
-    const ink = SEC.ink;
-    const doneInk = lerpHex(ink, body, 0.44);
-    el.style.background = body;
-    el.style.color = ink;
-    /* the badge and the checkbox are both measured mixes — see SEC */
-    el.style.setProperty('--band', head);
-    el.style.setProperty('--badge-bg', 'color-mix(in srgb, ' + SEC.ink + ' 6%, ' + head + ')');
-    el.style.setProperty('--box-c', 'color-mix(in srgb, ' + accent + ' 55%, ' + body + ')');
-    const hd = document.createElement('div');
-    hd.className = 'hd';
-    hd.style.background = head;
-    hd.style.color = ink;
-    const title = document.createElement('span');
-    title.className = 'hd-t';
-    title.textContent = card.title;
-    hd.appendChild(title);
-    /* done/total, the way the app writes it — ours are all still to do, so
-       these read 0/3 and 0/2 against the app's 5/5 and 2/2 */
-    const done = (card.done || []).filter(Boolean).length;
-    const badge = document.createElement('span');
-    badge.className = 'badge';
-    badge.textContent = done + '/' + card.items.length;
-    hd.appendChild(badge);
-    hd.insertAdjacentHTML('beforeend', avatarHtml(card.who || []));
-    hd.insertAdjacentHTML('beforeend', '<span class="sp"></span>');
-    ['add', 'edit', 'fold'].forEach((name) => {
-      hd.insertAdjacentHTML('beforeend', '<span class="ic">' + SEC_ICONS[name] + '</span>');
-    });
-    const it = document.createElement('div');
-    it.className = 'it';
-    card.items.forEach((name, i) => {
-      const row = document.createElement('div');
-      const isDone = !!(card.done && card.done[i]);
-      row.className = 'row' + (isDone ? ' is-done' : '');
-      row.style.color = isDone ? doneInk : ink;
-      const box = document.createElement('span');
-      box.className = 'box';
-      row.appendChild(box);
-      const label = document.createElement('span');
-      label.className = 'row-t';
-      label.textContent = name;
-      row.appendChild(label);
-      it.appendChild(row);
-    });
-    el.appendChild(hd);
-    el.appendChild(it);
+    el.className = 'hub__fly-card is-task';
+    el.innerHTML = '<span class="ck"></span><img class="emo" alt=""><span class="nm"></span>' +
+      (card.coins ? '<span class="cn"><img alt=""><b></b></span>' : '');
+    el.querySelector('.emo').src = V2 + 'assets/emoji/' + card.icon + '.svg';
+    el.querySelector('.nm').textContent = card.name;
+    if (card.coins) {
+      el.querySelector('.cn img').src = V2 + 'assets/2714f.svg';
+      el.querySelector('.cn b').textContent = card.coins;
+    }
     return el;
   }
   function makeMealEl(card) {
@@ -1074,8 +1065,8 @@
   /* the all-day chip's title, in the app's px like everything in CAL_GRID.
      Smaller than a timed card's 26/28.4 — measured against the app's own
      "School holiday", which sits in the same row and needs no alignment. */
-  const ALLDAY_T = 24.3;
-  const ALLDAY_NUDGE = 1.25;   /* CSS px — see the note at the write site */
+  const ALLDAY_T = 18;   /* .cp-ad 12px × 1.5（新屏画布 → 1920） */
+  const ALLDAY_NUDGE = 0;   /* 旧 Flutter 版量出来的 1.25，新屏的全天条是 flex 居中，不用补 */
 
   /* ---------- where the pad actually draws its week ----------
      🔴 MEASURED OFF THE APP, not guessed. The iframe runs at a fixed
@@ -1106,92 +1097,39 @@
     top: 383, bot: 1032,
   };
 
+  /* ---------- 落点：从 iframe 里量 ----------
+     🔴 不再有 CAL_GRID / LIST_GRID 那种量好写死的常数。新屏是同源的网页，飞入卡片的
+     落地版本已经由 hub-v2-embed.js 插在版面里（fly 阶段隐身占位），直接问它在哪就行：
+     __hub.flyRects() 回的是 iframe 坐标（1920×1200），× scale
+     就是屏幕 px。一帧问一次（placeFly 里），七个 getBoundingClientRect。
+
+     量不到（iframe 还没加载完、或换页中那一帧）就沿用上一次量到的值；从来没量到过就
+     落在屏幕中间，总比 NaN 好。 */
+  const flyRects = { calendar: [], lists: [] };
+  let birdRect = null;
+  function measureFly(kind) {
+    try {
+      const api = iframe.contentWindow && iframe.contentWindow.__hub;
+      if (!api) return;
+      const got = api.flyRects(kind);
+      got.forEach((r, i) => { if (r) flyRects[kind][i] = r; });
+      const b = api.birdRect();
+      if (b) birdRect = b;
+    } catch (err) { /* 跨源（不该发生）或还没就绪 */ }
+  }
+  function flyDest(kind, i, scale) {
+    const r = flyRects[kind][i];
+    /* 还没量到（iframe 还在切页）：返回 null，placeSet 让这张卡原地停着，不往一个
+       猜的坐标飞——新屏一切过来就会发 hub:layout，下一帧就有真落点了 */
+    if (!r) return null;
+    return { x: r.x * scale, y: r.y * scale, w: r.w * scale, h: r.h * scale, bg: r.bg };
+  }
   function calDest(card, scale) {
-    const x = (CAL_GRID.x0 + card.day * CAL_GRID.col) * scale;
-    const w = CAL_GRID.w * scale;
-    if (card.allDay) {
-      return { x: x, y: CAL_GRID.allDayY * scale, w: w, h: CAL_GRID.allDayH * scale };
-    }
-    const y = CAL_GRID.y16 + (card.hour - 16) * CAL_GRID.hour;
-    /* clipped by the grid, exactly as the app clips it — Movie night runs to
-       8 PM and the screen ends before that, so both stop in the same place */
-    const top = Math.max(CAL_GRID.top, y);
-    const bot = Math.min(CAL_GRID.bot, y + (card.hours || 2) * CAL_GRID.hour);
-    return {
-      x: x, y: top * scale, w: w,
-      h: Math.max(CAL_GRID.hour * 0.5, bot - top) * scale,
-    };
+    return flyDest('calendar', calCards.indexOf(card), scale);
   }
 
-  /* ---------- and where it draws the two lists ----------
-     Measured the same way, off the same build. A section is a header bar
-     plus one row per item, and both panels lay theirs out on the same
-     numbers: 71 for the header, 58 per row, 15 between sections.
-
-     🔴 THE CARDS LAND UNDER WHAT IS ALREADY THERE, and this is the whole
-     reason the beat no longer hands over. The pad's own `lists|play` adds
-     these four sections at the TOP of each panel and pushes the existing
-     ones down — so aiming at the top meant a card spent its entire flight
-     descending onto "Weekly groceries", a section that was already sitting
-     there, and only at the handover did everything shuffle. It read as the
-     card going back into a slot that was never empty, which is the exact
-     opposite of the point: these arrived from outside and are NEW.
-
-     So they land after the app's own sections. In `lists|fly` — the state
-     the app now stays in for this whole beat — shopping ends at 490 and
-     to-do at 592, and a section gap is 15. Two cards then fill each panel
-     to 1010, which is where the panel's content area ends: the numbers
-     land exactly, because the panels were drawn to hold this many.
-
-     The cost is that the pad's own rendering of these four is never shown —
-     our cards ARE the four for the length of the beat. See the note on
-     `then` in the beats table.
-
-     🔴 THE OLD listDest RETURNED A RAW 236 AS ITS WIDTH — an app-coordinate
-     number handed back next to an x that HAD been multiplied by scale, so
-     the two were never in the same unit. It went unnoticed because nothing
-     read the width: placeSet used dest.x and dest.y and dropped the rest.
-     It is read now, so it is in screen px like everything else here.
-
-     Gone with it: listCardH, which existed only so this function could
-     stack sections by measuring the FLYING cards, and which had to keep
-     restoring the width it borrowed because those measurements were leaking
-     back into the phone layout. Sections are the app's, so their heights
-     come from the app's numbers and no element gets measured at all. */
-  /* y0 is per panel because the two hold different amounts already: one
-     "Weekly groceries", against a "Piano practice" and a "Soccer bag".
-     🔴 508 / 610, NOT 505 / 607: the app's own sections end at 491 and 593
-     and the gap between two sections is 17, not the 15 this used to carry.
-     Measured on both panels; the old pair was three px high in each. */
-  const LIST_GRID = { x: [184, 1060], w: SEC.w, y0: [508, 610], gap: SEC.gap };
-
-  /* Nestie's perch, app coordinates: the bird occupies 1792–1883 × 953–1042.
-     🔴 r HUGS THE BIRD — 46 is half of its 91, not a radius with air around
-     it. 56 left a 10px ring of whatever the app draws behind the bird
-     showing through, and behind the bird is a green list section and, past
-     the panel's edge, the page's own #f5f3ee: against a pale blue card that
-     reads as a thick white outline drawn round the bird on purpose. There
-     is no plate under it to justify one — sampled across the bird's centre,
-     the pixel outside its outline is the section, immediately. Tight to the
-     silhouette the leftover is a couple of px on the diagonals, which is
-     the antialiasing either way. */
-  const BIRD = { x: 1837, y: 998, r: 46 };
-
   function listDest(card, scale) {
-    const group = listCards.filter((c) => c.col === card.col);
-    let y = LIST_GRID.y0[card.col];
-    for (let i = 0; i < group.length; i++) {
-      const item = group[i];
-      const h = secH(item.items.length);
-      if (item === card) {
-        return {
-          x: LIST_GRID.x[card.col] * scale, y: y * scale,
-          w: LIST_GRID.w * scale, h: h * scale,
-        };
-      }
-      y += h + LIST_GRID.gap;
-    }
-    return { x: LIST_GRID.x[card.col] * scale, y: y * scale, w: LIST_GRID.w * scale, h: 1 };
+    return flyDest('lists', listCards.indexOf(card), scale);
   }
 
   function mealDest(card, scale) {
@@ -1289,6 +1227,10 @@
        right-hand stack does on its way in. state.t past .88 is after the
        last card has arrived, so nothing that is still moving is ever cut. */
     const birdOpen = kind === 'lists' ? clamp((state.t - 0.88) / 0.12) : 0;
+    /* 小鸟的位置也是量的（hub-v2-embed.js 的 birdRect），半径贴着它的外接圆 */
+    const BIRD = birdRect
+      ? { x: birdRect.x + birdRect.w / 2, y: birdRect.y + birdRect.h / 2, r: birdRect.w * 0.42 }
+      : { x: 1801, y: 1092, r: 74 };
     flies.style.setProperty('--bird-x', (sr.left - st.left + BIRD.x * scale).toFixed(1) + 'px');
     flies.style.setProperty('--bird-y', (sr.top - st.top + BIRD.y * scale).toFixed(1) + 'px');
     flies.style.setProperty('--bird-r', (BIRD.r * scale * birdOpen).toFixed(1) + 'px');
@@ -1300,7 +1242,8 @@
     flies.style.setProperty('--to-k', scale.toFixed(5));
     const sized = cards.map((card, i) => {
       const el = els[i];
-      const dest = destOf(card, scale);
+      /* 落点还没量到就是 pending：这张卡原地停着（e = m = 0），见 flyDest */
+      const dest = destOf(card, scale) || { pending: true, x: 0, y: 0, w: 1, h: 1 };
       const left = kind === 'lists' ? card.col === 0 : card.stack === 'left';
       const gutter = left ? padX : (st.width - (padX + pr.width));
       /* 🔴 260, UP FROM 236, AND IT IS THE HEADER THAT SETS IT. A section
@@ -1347,7 +1290,14 @@
          问题，两个状态由两个不同的数控制。
 
          一个常数写在相邻两行、一行缩放一行不缩放，就是这么来的。 */
-      const h = card.source === 'sticky' ? Math.max(rawH, Math.round(158 * flyK)) : rawH;
+      let h = card.source === 'sticky' ? Math.max(rawH, Math.round(158 * flyK)) : rawH;
+      /* 新屏的任务行是整张等比缩放的（--tk，见下面），所以停放时的高度就是落点的宽高比 */
+      if (kind === 'lists' && !dest.pending) h = Math.round(w * dest.h / dest.w);
+      /* 日历 chip 的底色照抄落点那一块（渐变 + 颗粒），量到才写、变了才写 */
+      if (kind === 'calendar' && dest.bg) {
+        const ev = el.querySelector('.ev');
+        if (ev && ev.dataset.bg !== dest.bg) { ev.dataset.bg = dest.bg; ev.style.background = dest.bg; }
+      }
       return { card: card, el: el, dest: dest, left: left, w: w, h: h, wBase: wBase };
     });
     sized.forEach((item, i) => {
@@ -1368,7 +1318,7 @@
       const slot = kind === 'lists' ? group.indexOf(item) : card.slot;
       /* the flight gets the beat AFTER the two lead-ins — see CARD_IN */
       const raw = cardWindow(clamp((state.t - FLY_FROM) / (1 - FLY_FROM)), i);
-      const e = easeOutCubic(raw);
+      const e = dest.pending ? 0 : easeOutCubic(raw);
       /* 🔴 SMOOTHSTEPPED, AND IT WAS THE OTHER HALF OF THE STEP. --m used to
          be the raw fraction, so d(m)/d(scroll) went 0 → 1/.38 on the frame
          raw crossed MORPH_AT: the box, the shadow and the cross-fade all
@@ -1377,7 +1327,7 @@
          DERIVATIVE was, and a derivative step reads exactly like a value
          step. Eased at both ends the landing grows out of the flight and
          settles into the chip instead of being switched on and off. */
-      const m = smoothstep(clamp((raw - MORPH_AT) / (1 - MORPH_AT)));
+      const m = dest.pending ? 0 : smoothstep(clamp((raw - MORPH_AT) / (1 - MORPH_AT)));
       el.style.opacity = clamp(
         (state.t - CARD_IN - i * 0.004) / (FLY_FROM - CARD_IN)
       ).toFixed(3);
@@ -1418,6 +1368,14 @@
          else here: the landing runs backwards if the reader scrolls back up
          through it. */
       el.style.minHeight = '0px';
+      /* 任务行：内部所有尺寸都是新屏画布 px × --tk。--tk = 当前宽 / 落点那一行在画布上的宽，
+         所以宽度从停放走到落点的同时，里面的一切按同一个比例跟着走，落地那一帧正好 1:1。 */
+      if (kind === 'lists' && !dest.pending) {
+        const curW = w + (dest.w - w) * m;
+        el.style.setProperty('--tk', (curW / (dest.w / (scale * 1.5))).toFixed(4));
+      } else if (kind === 'lists') {
+        el.style.setProperty('--tk', (w / 283).toFixed(4));   /* .tk-row 在画布上约 283 宽 */
+      }
       el.style.width = (w + (dest.w - w) * m) + 'px';
       el.style.height = (item.h + (dest.h - item.h) * m) + 'px';
       el.style.setProperty('--m', m.toFixed(4));
@@ -1456,7 +1414,7 @@
 
          ⚠️ THE WEIGHT IS THE ONE EXCEPTION and it is a font-file problem,
          not a timing one — see WEIGHT_SETTLE. */
-      const lift = smoothstep(raw / MORPH_AT);
+      const lift = dest.pending ? 0 : smoothstep(raw / MORPH_AT);
       el.style.setProperty('--lift', lift.toFixed(4));
       el.style.setProperty('--wlift', clamp(lift / WEIGHT_SETTLE).toFixed(4));
 
@@ -1530,6 +1488,7 @@
     const sr = screen.getBoundingClientRect();
     const show = !!(state && state.show);
     setFliesShown(show);
+    if (show && (kind === 'calendar' || kind === 'lists')) measureFly(kind);
     if (kind === 'calendar') {
       hideEls(listEls);
       hideEls(mealEls);
@@ -2145,7 +2104,9 @@
        本版飞行是随滚动的 scrub，没有「在飞的 run」这个状态（run 未声明），
        而 beatFromHubP(p) 本身就已经是当前该在的那一拍，所以直接往下走。 */
     const local = clamp(p / DOCK);
-    return beat.then && local >= span[i].hand
+    /* settle 拍的交接由落地（split）触发，不是提前量 hand——见 armSettle。按 hand 报
+       的话，直接跳进这一拍的读者会看到 app 已经把落点画出来、卡片还在半空，叠成重影。 */
+    return beat.then && local >= (beat.settle ? span[i].split : span[i].hand)
       ? beat.then
       : beat.tab + '|' + beat.phase;
   }
@@ -2157,11 +2118,22 @@
      its boot tab. There is no ready signal from the app, so re-affirm the
      current state a few times; sends are state descriptors, so a repeat
      delivery is idempotent for the app. */
+  /* 新屏切完页、插好飞入占位之后会发 hub:layout（hub-v2-embed.js），这时落点才量得到 */
+  addEventListener('message', (e) => {
+    if (e.source === iframe.contentWindow && e.data === 'hub:layout') onScroll();
+  });
   let retellTimer = null;
   iframe.addEventListener('load', () => {
     /* the initial about:blank also fires load while data-src waits — the
        wheel poll covers that window, and there is no app to talk to yet */
     if (!iframe.getAttribute('src')) return;
+    /* 飞入卡片的落地版本交给新屏去占位（见 calCards 上面那段） */
+    try {
+      iframe.contentWindow.__hub.configure({
+        cal: calCards.map(c => ({ title: c.title, day: c.day, start: c.start, dur: c.dur, allDay: !!c.allDay, who: c.who })),
+        tasks: listCards.map(c => ({ m: c.m, name: c.name, icon: c.icon, coins: c.coins, sec: c.sec })),
+      });
+    } catch (err) {}
     lastTold = '';
     tellToken(currentStateToken());
     attachIframeWheel();

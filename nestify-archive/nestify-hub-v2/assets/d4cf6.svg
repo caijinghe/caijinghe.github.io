@@ -1,0 +1,18 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="388" height="388" viewBox="0 0 388 388" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Decoration / Concentric circle &#194;&#183; &#195;&#152;380" filter="url(#filter0_f_0_1027)">
+<circle cx="194" cy="194" r="190" fill="url(#paint0_radial_0_1027)"/>
+</g>
+<defs>
+<filter id="filter0_f_0_1027" x="0" y="0" width="388" height="388" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="2" result="effect1_foregroundBlur_0_1027"/>
+</filter>
+<radialGradient id="paint0_radial_0_1027" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(194 194) scale(190)">
+<stop stop-color="#D3EAED"/>
+<stop offset="0.8" stop-color="#D3EAED"/>
+<stop offset="0.92" stop-color="#D3EAED" stop-opacity="0.65"/>
+<stop offset="1" stop-color="#D3EAED" stop-opacity="0"/>
+</radialGradient>
+</defs>
+</svg>

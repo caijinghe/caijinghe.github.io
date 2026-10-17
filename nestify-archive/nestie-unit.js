@@ -33,11 +33,13 @@ window.NestieUnit = (function () {
      or against the body, so the picture stays the anchor for everything —
      including whatever the caller frames against. */
   const SCREEN_W = 1.6;
-  const SCREEN_H = 0.9;
+  /* 2026-10-17：0.9 → 1.0，16:9 → 16:10。Family Hub 的屏幕换成了新版 pad UI，设计稿是
+     16:10（见 hub-v2-embed.css）。边框宽度都按 SCREEN_W 取，所以只有机身变高，边一样粗。 */
+  const SCREEN_H = 1.0;
   const WHITE = SCREEN_W * 0.038;   // the white face, inside the lip
   const RIM = SCREEN_W * 0.022;     // the blue band, outside it
   const BODY_W = SCREEN_W + (WHITE + RIM) * 2;   // 1.792
-  const BODY_H = SCREEN_H + (WHITE + RIM) * 2;   // 1.092
+  const BODY_H = SCREEN_H + (WHITE + RIM) * 2;   // 1.192
   const RADIUS = BODY_W * 0.052;
 
   /* 🔴 A SHARE OF THE SCREEN, not a subtraction from the body's radius.

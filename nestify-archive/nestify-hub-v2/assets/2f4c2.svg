@@ -1,0 +1,12 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="720" height="460" viewBox="0 0 720 460" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Atmosphere / Apricot glow" filter="url(#filter0_f_0_1673)">
+<ellipse cx="360" cy="230" rx="260" ry="130" fill="#FFC7A0" fill-opacity="0.28"/>
+</g>
+<defs>
+<filter id="filter0_f_0_1673" x="0" y="0" width="720" height="460" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="50" result="effect1_foregroundBlur_0_1673"/>
+</filter>
+</defs>
+</svg>

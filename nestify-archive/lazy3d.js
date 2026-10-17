@@ -33,7 +33,7 @@
    setTimeout 兜底；两条只会触发一次。
    ============================================================ */
 (function () {
-  const CHAIN = ['vendor/three.js', 'nestie-unit.js?v=588', 'hub3d.js?v=599'];
+  const CHAIN = ['vendor/three.js', 'nestie-unit.js?v=589', 'hub3d.js?v=599'];
 
   let started = false;
   function go() {

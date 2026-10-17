@@ -1,0 +1,37 @@
+/* Family Hub 屏幕里跑的新版 pad UI（nestify-hub-v2/，由 tools/sync-hub-v2.sh 从
+   nestify-proto 生成）的嵌入适配。
+
+   🔴 画布就是设计稿的 1280×800（16:10），1:1，四边留白都是设计稿的 32。iframe 固定
+   1920×1200（hub.css 的 .hub__inner），整体 ×1.5 铺满。2026-10-17 起机身（hub.css 的
+   .hub__wrap、nestie-unit.js 的 SCREEN_H、intro 的翻卡线框）一起改成了 16:10 来配它——
+   之前是反过来把新 UI 硬塞进旧的 16:9 机身，左右边距比上下宽一倍，看着像框不合身。 */
+html.is-embed, html.is-embed body { background: transparent; }
+.is-embed .switcher { display: none; }
+.is-embed .stage {
+  left: 0; top: 0;
+  transform: scale(1.5) !important;
+  transform-origin: 0 0;
+}
+
+/* ---------- 各拍的两态（hub-v2-embed.js 把 token 写进 <html data-hub-tab / data-hub-phase>） ----------
+   calendar|fly  只留今天那一列，其余几天空着，等 hub.js 的卡片落进来；
+                 落点本身（[data-fly]）已经在版面里占好位，只是隐身
+   calendar|play 落点现身（和刚落地的卡片逐像素同一张，hub.js 同一帧切掉自己那张），
+                 一周里其余的事件再陆续补上 */
+html[data-hub-tab="calendar"][data-hub-phase="fly"] .cp-col:not(.today) .cp-ev:not([data-fly]) {
+  opacity: 0; animation: none;
+}
+html[data-hub-tab="calendar"][data-hub-phase="fly"] #s3 [data-fly] { visibility: hidden; }
+html[data-hub-tab="calendar"][data-hub-phase="play"] .cp-col:not(.today) .cp-ev:not([data-fly]) {
+  animation: tile-in 460ms var(--ease-out) both;
+  animation-delay: calc(140ms + var(--k, 0) * 30ms);
+}
+/* lists = 任务页：新任务行同样先占位隐身，交接时现身 */
+html[data-hub-tab="lists"][data-hub-phase="fly"] #s4 [data-fly] { visibility: hidden; }
+/* Nestie 对话时 proto 会把整屏虚化压暗（components.css 那条 [data-voice] 规则）。在 pad 上
+   这是对的——人在跟小鸟说话；放在网站第 0 拍 "Everything that matters today." 下面，被虚化的
+   恰恰是这一拍要展示的那一屏。嵌入时只留光环和气泡。 */
+.is-embed .stage[data-voice] .frame > *,
+.is-embed .stage[data-receipt] .frame > * { filter: none; }
+.is-embed .stage[data-voice] .frame::after,
+.is-embed .stage[data-receipt] .frame::after { opacity: 0; }

@@ -153,6 +153,21 @@
 
      迟滞：越过 FLASH_AT 触发一次就下膛，要退回 FLASH_AT-0.05 以下才重新上膛，
      免得读者在阈值上来回蹭导致连闪不停。 */
+  /* 🔴 3D 机身相对屏幕矩形（.hub__screen）四边各外扩多少，单位是屏幕的宽 / 高。
+     翻卡落点和扫描闪光**共用这一份**——两者都要和机身逐像素重合，各写一套就会像
+     2026-10-17 那样：机身从 16:9 改成 16:10 时只改了落点，闪光框还按旧比例算，
+     比机器宽一圈、又矮一截。量法见下面落点那段注释；机身改比例时上下两个按屏幕高
+     换算（16:9 → 16:10 是 ×0.9）。 */
+  const DEVICE_EX = { l: 0.0717, r: 0.0769, t: 0.1097, b: 0.1067 };
+  function deviceRect(sr) {
+    return {
+      left:   sr.left - sr.width * DEVICE_EX.l,
+      top:    sr.top  - sr.height * DEVICE_EX.t,
+      width:  sr.width  * (1 + DEVICE_EX.l + DEVICE_EX.r),
+      height: sr.height * (1 + DEVICE_EX.t + DEVICE_EX.b),
+    };
+  }
+
   const FLASH_AT = 0.60;
   const FLASH_MS = 900;
   let flashT0 = 0, flashArmed = true, flashRAF = 0;
@@ -160,15 +175,14 @@
   function paintScan(t) {
     /* 位置每帧现量真机：闪光发生在舞台已经释放之后，拿 sticky 舞台的矩形推会
        算到屏幕外去（踩过，光整个跑到 top -445）。真机稳在原地，按它算才不漂。
-       外扩 9% 是为了盖住 3D 外壳——它画在 canvas 上、比屏幕矩形大一圈。 */
-    const pv = document.querySelector('.hub__pad');
-    if (pv) {
-      const pr = pv.getBoundingClientRect();
-      const ex = pr.width * 0.09;
-      scan.style.left   = (pr.left - ex).toFixed(1) + 'px';
-      scan.style.top    = (pr.top  - ex * 0.56).toFixed(1) + 'px';
-      scan.style.width  = (pr.width  + ex * 2).toFixed(1) + 'px';
-      scan.style.height = (pr.height + ex * 1.12).toFixed(1) + 'px';
+       框 = 屏幕矩形按 DEVICE_EX 外扩到 3D 机身轮廓，和翻卡落点同一个框。 */
+    const sv = document.querySelector('.hub__screen');
+    if (sv) {
+      const d = deviceRect(sv.getBoundingClientRect());
+      scan.style.left   = d.left.toFixed(1) + 'px';
+      scan.style.top    = d.top.toFixed(1) + 'px';
+      scan.style.width  = d.width.toFixed(1) + 'px';
+      scan.style.height = d.height.toFixed(1) + 'px';
     }
     scan.style.setProperty('--scan-x', (-120 + t * 340).toFixed(1) + '%');
     scan.style.opacity = (t <= 0 || t >= 1) ? '0'
@@ -1037,12 +1051,11 @@
                分离出来（投影是灰褐，不满足 G>R 且 G>B）。结果 373.3×227.0，
                四边相对屏幕矩形 左 23.3 / 上 22.3 / 右 25.0 / 下 21.7 px —— 左右
                不对称是真的，机身本身就没画正中。 */
-            const EX_L = 0.0717, EX_R = 0.0769, EX_T = 0.1219, EX_B = 0.1186;
+            /* 比例本身在 DEVICE_EX（文件开头，和扫描闪光共用） */
+            const d = deviceRect(hiR);
             heroInnerTarget = {
-              left:   hiR.left - hsR.left - hiR.width * EX_L,
-              top:    hiR.top  - hsR.top  - hiR.height * EX_T,
-              width:  hiR.width  * (1 + EX_L + EX_R),
-              height: hiR.height * (1 + EX_T + EX_B),
+              left: d.left - hsR.left, top: d.top - hsR.top,
+              width: d.width, height: d.height,
             };
           }
         }
