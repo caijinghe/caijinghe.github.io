@@ -85,22 +85,24 @@
   }
   new MutationObserver(() => { injectTasks(); layoutChanged(); }).observe(tkCols, { childList: true });
 
-  /* ---------- Rewards：idle 永远是「Ice Cream 还没兑」 ----------
-     play 真的点了 Redeem（扣币、彩纸、庆祝卡都是 app.js 自己的），读者往回滚再进来时
-     要把它还原，否则第二次看到的是「已兑换」，那一拍就没有东西发生了。 */
-  const ICE = state.rewards.find(r => r.id === 'ice-cream');
+  /* ---------- Rewards：idle 永远是「Stay up 30 min later 刚好攒够、还没兑」 ----------
+     新版孩子页 My goal 里只有 Switch / Stay up / Milkshake / Road trip 四个（state 里的
+     Ice Cream 已经没有卡片了），而起始 22 币一个都换不了——所以这一拍先把余额补到
+     刚好够 Stay up（25），Redeem 亮起来；play 真的点它（扣币、彩纸、庆祝卡都是 app.js
+     自己的）。读者往回滚再进来时还原成「刚好够」，离开这一拍还原成起始余额。 */
+  const PICK = state.rewards.find(r => r.id === 'stay-up');
   const BAL0 = state.balance;
-  function resetRewards() {
+  function resetRewards(bal) {
     $$('.celebrate').forEach(el => el.remove());
-    if (!ICE.done) return;
-    ICE.done = false;
-    state.balance = BAL0;
+    if (!PICK) return;
+    PICK.done = false;
+    state.balance = bal;
     state.history = state.history.filter(h => h.date !== 'Today');
     P.renderBalance();
     P.rwPage.renderHistory();
   }
   function playRewards() {
-    $('#s2 .reward[data-id="ice-cream"] .redeem')?.click();
+    $('#s2 .reward[data-id="stay-up"] .btn')?.click();
   }
 
   /* ---------- Meals：两道菜被收藏，飞进右边 My collection 的顶上 ----------
@@ -185,14 +187,14 @@
     // 小鸟的对话只属于 Home 那一拍；换走就收掉，不然气泡会跟到日历上
     if (tab !== 'home' && nestie && nestie.state !== 'idle') nestie.go('idle');
     if (tab !== 'meals') resetMeals();
-    if (tab === 'rewards' && phase === 'idle') resetRewards();
+    if (tab === 'rewards' && phase === 'idle') resetRewards(Math.max(BAL0, PICK ? PICK.cost : 0));
     if (tab === 'rewards' && phase === 'play') playRewards();
     if (tab === 'meals' && phase === 'play') playMeals();
     if (tab === 'home' && phase === 'think' && nestie && nestie.state === 'idle') {
       nestie.mode = 'query';
       nestie.start();
     }
-    if (prevTab === 'rewards' && tab !== 'rewards') resetRewards();
+    if (prevTab === 'rewards' && tab !== 'rewards') resetRewards(BAL0);
     layoutChanged();
   }
   /* 换页 / 插好占位之后，落点才量得到——告诉 hub.js 重新摆一次卡片。两帧之后再发：

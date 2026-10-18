@@ -35,8 +35,10 @@
     stage.dataset.receipt = 'hold';                      // 回执卡停留期间背景保持压暗、模糊
 
     // 1) 亮相 + 停留
-    card.animate([{ opacity: 0, transform: 'translateY(10px) scale(0.94)' }, { opacity: 1, transform: 'none' }],
-      { duration: reduce.matches ? 150 : 360, easing: 'cubic-bezier(0.2, 1.5, 0.45, 1)' });
+    // 从小鸟身后被"拉起来"：自下而上升起，原点在底边中点（小鸟所在）
+    card.style.transformOrigin = 'center top';   // 挂在小鸟下方
+    card.animate([{ opacity: 0, transform: 'translateY(56px) scale(0.9)' }, { opacity: 1, transform: 'none' }],
+      { duration: reduce.matches ? 150 : 420, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' });
     await wait(HOLD);
 
     // 2) 解析目标：插入占位、滚到可见，等两帧让布局和滚动生效

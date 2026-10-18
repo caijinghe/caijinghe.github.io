@@ -30,60 +30,44 @@
   --success: #1f7a42;
   --danger: #b3261e;
 
-  /* ---------- Color · 家庭成员（日历事件 / 任务） ---------- */
-  --m-emma: 243, 182, 207;  --m-emma-soft: 248, 214, 228;
-  --m-sam: 140, 209, 255;   --m-sam-soft: 220, 232, 239;
-  --m-mom: 202, 232, 233;   --m-mom-soft: 237, 249, 248;
-  --m-dad: 175, 207, 233;   --m-dad-soft: 212, 237, 250;
-  --m-pair: 247, 215, 143;  --m-pair-soft: 255, 240, 201;   /* 两人事件 */
-  --m-all: 241, 184, 208;   --m-all-soft: 247, 213, 227;    /* 全家事件 */
-  /* 多人事件融合用的淡色（每人一段渐变 + 颗粒） */
-  --m-emma-tint: 246, 198, 218; --m-sam-tint: 178, 217, 247; --m-mom-tint: 206, 236, 228; --m-dad-tint: 196, 216, 236;
-  /* 任务行（Figma Task progress）：Emma 是黄色，其余同事件色系；acc = 勾选、进度环 */
-  --task-emma: 244, 215, 148; --task-emma-soft: 255, 240, 200; --task-emma-acc: #a89a1e;
-  --task-sam: 140, 209, 255;  --task-sam-soft: 220, 232, 239;  --task-sam-acc: #2f86c2;
-  --task-mom: 198, 229, 219;  --task-mom-soft: 235, 247, 242;  --task-mom-acc: #d06a6a;
-  --task-dad: 172, 205, 231;  --task-dad-soft: 218, 237, 250;  --task-dad-acc: #6b6be0;
-  /* 实色：圆点、筛选胶囊描边 */
-  --m-emma-solid: 243, 182, 207; --m-sam-solid: 140, 209, 255; --m-mom-solid: 150, 210, 200; --m-dad-solid: 175, 207, 233;
-
   /* ---------- Material 3 · 表面层级（扁平，靠明度分层，不用渐变） ---------- */
-  --md-bg: #f2f2ef;                    /* 页面底 */
-  --md-surface-lowest: #ffffff;        /* 卡片 */
-  --md-surface-low: #f7f7f4;
-  --md-surface: #f0f0ec;               /* 卡片里的条目 */
-  --md-surface-high: #e8e8e3;          /* 装饰形状、按压态 */
+  --md-bg: #f5f2e9;                    /* 页面底：暖奶油 oklch(.96 .012 92)（参考图实测） */
+  --md-surface-lowest: #fdfcf7;        /* 卡片：暖白 oklch(.99 .006 88) */
+  --md-surface-low: #f9f7f1;
+  --md-surface: #f3f0e8;               /* 卡片里的条目 oklch(.955 .011 90) */
+  --md-surface-high: #e9e6dd;          /* 装饰形状、按压态 */
   --md-outline: rgba(52, 54, 47, 0.12);
   --md-primary-container: #dcecfd;     /* 唯一的品牌色大块：语音助手 */
   --md-on-primary-container: #0b4a7f;
 
-  /* ---------- 身份色：每个成员只有一个颜色，只出现在小面积（色条、头像、进度、圆点） ---------- */
-  --id-emma: #d9c93a;
-  --id-sam: #4fa3dc;
-  --id-mom: #e58a8a;
-  --id-dad: #8f8ff0;
-  /* 色板取自参考（Mino notes）：黄 / 天蓝 / 珊瑚粉 / 薰衣草，明度和饱和度一致
-     日历事件实色填充（深色文字在上面要清楚）：每人一块实色；多人事件右下角叠其他人的同心圆弧 */
-  --id-emma-fill: #ebe37f;
-  --id-sam-fill: #74b8e3;
-  --id-mom-fill: #f1aaaa;
-  --id-dad-fill: #b2b2f7;
-  /* 成员浅实色：整块区域的底（Tasks 页每人一列），参考便签式的柔和色块 */
-  --id-emma-soft: #fdfbe6;
-  --id-sam-soft: #e2f0fd;
-  --id-mom-soft: #ffdfdf;
-  --id-dad-soft: #ebebfd;
-  /* 成员亮色：小面积强调（进度环、圆点），比 fill 更饱和明亮，在浅灰 / 白底上也看得清 */
-  --id-emma-vivid: #f2c12e;
-  --id-sam-vivid: #3fa2ee;
-  --id-mom-vivid: #f07c7c;
-  --id-dad-vivid: #8a86f5;
+  /* ---------- 家庭成员色：唯一的一套（参考图实测：暖粉彩，同档内 OKLCH 明度、饱和度一致） ----------
+     色相：蜜桃 61 · 青柠 126 · 薰衣草 288 · 玫瑰 350（四个色相彼此相隔 ≥60°；都避开强调蓝和报错红）
+     青柠在同明度下发闷，单独提亮（同黄色的处理）
+     三档强度：soft 大面积底 · fill 事件实色块 · vivid 小面积强调（进度环、圆点、勾选） */
+  --id-mom-fill: #f8cead;    /* oklch(.88 .065 61) */
+  --id-emma-fill: #d3ecaf;   /* oklch(.91 .085 126) */
+  --id-dad-fill: #cecbf7;    /* oklch(.86 .06 288) */
+  --id-sam-fill: #f7c3da;    /* oklch(.87 .065 350) */
+  --id-mom-soft: #ffeee1;    /* oklch(.96 .025 61) */
+  --id-emma-soft: #effae1;   /* oklch(.97 .035 126) */
+  --id-dad-soft: #efeeff;    /* oklch(.955 .022 288) */
+  --id-sam-soft: #ffebf3;    /* oklch(.958 .024 350) */
+  --id-mom-vivid: #de8f57;   /* oklch(.72 .12 55) */
+  --id-emma-vivid: #8bbd50;  /* oklch(.74 .15 130) */
+  --id-dad-vivid: #8f84dd;   /* oklch(.66 .13 288) */
+  --id-sam-vivid: #d375a4;   /* oklch(.68 .13 350) */
+  /* 圆点 = vivid（不再单独一档） */
+  --id-emma: var(--id-emma-vivid);
+  --id-sam: var(--id-sam-vivid);
+  --id-mom: var(--id-mom-vivid);
+  --id-dad: var(--id-dad-vivid);
   --on-id-fill: #26281f;            /* 实色上的文字 */
   --on-id-fill-muted: rgba(38, 40, 31, 0.66);
 
   /* ---------- Radius ---------- */
   --r-xs: 6px;     /* 进度条、细条、事件块 */
   --r-sm: 10px;    /* 小控件 */
+  --step-h: 32px;  /* 前后翻按钮高度；带按钮的卡片标题行也用它，按钮离上边 = 离右边 = 卡片内边距 */
   --r-md: 14px;    /* 列表条目（= Figma item） */
   --r-lg: 18px;    /* 小卡片、弹出卡 */
   --r-xl: 22px;    /* 卡片（= Figma card） */
@@ -99,12 +83,19 @@
   --fs-body: 18px;     /* Figma body */
   --fs-heading: 20px;  /* Figma heading：所有卡片标题 */
   --fs-title: 24px;    /* 页面 / 浮层标题 */
-  --fs-display: 46px;  /* 页头时间 */
+  --fs-display: 40px;  /* 页头时间 */
+  /* 孩子页贴纸：每枚一种字体，跟主题走（只用在贴纸上） */
+  --font-sticker-streak: "Lilita One", system-ui, sans-serif;   /* 连胜：粗壮、运动感 */
+  --font-sticker-book: "Fraunces", Georgia, serif;              /* 书虫：故事书衬线，软圆歪 */
+  --font-sticker-bird: "Chewy", system-ui, sans-serif;          /* 早起鸟：泡泡手写 */
 
   /* ---------- Spacing（2px 网格；常用 4 · 8 · 12 · 16 · 20 · 24） ---------- */
   --gutter: 20px;     /* 卡片之间（所有屏一致） */
   --card-pad: 16px;   /* 卡片内边距 */
   --screen-pad: 32px; /* 屏幕边距 */
+  --header-h: 44px;   /* 页头（时间 + 导航）：压矮，把空间还给内容 */
+  --content-h: 672px; /* 内容区高度 = 800 − 上下边距 64 − 页头 44 − 间距 20 */
+  --head-gap: 20px;   /* 卡片标题行到下面内容的距离（标题已去掉行高空白，这里给足呼吸） */
   --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 20px; --sp-6: 24px; --sp-8: 32px;
 
   /* ---------- Elevation ---------- */
@@ -120,4 +111,10 @@
   --dur-fast: 160ms;   /* 按压反馈 */
   --dur-base: 240ms;   /* 颜色、透明度 */
   --dur-slow: 420ms;   /* 位移、进场 */
+
+  /* ---------- 语音对话时的背景退后 ---------- */
+  --voice-blur: 6px;                 /* 轻微模糊：形状认得出，字读不出 */
+  --voice-veil: var(--glass-2);      /* 均匀覆盖一层 55% 白 */
+  --voice-delay: 400ms;              /* 小鸟先出来，背景再退后 */
+  --voice-recede: 900ms;             /* 背景逐渐变淡、变模糊的时长 */
 }

@@ -2,24 +2,24 @@
    尺寸照 Figma；颜色 / 圆角 / 字号尽量取 tokens.css。 */
 
 /* ---------- 布局 ---------- */
-.home-grid { position: relative; display: flex; gap: var(--sp-5); width: 1216px; height: 656px; flex-shrink: 0; overflow: clip; }
-.home-widgets { display: flex; flex-direction: column; gap: var(--sp-5); width: 810px; height: 656px; flex-shrink: 0; overflow: clip; }
+.home-grid { position: relative; display: flex; gap: var(--sp-5); width: 1216px; height: var(--content-h); flex-shrink: 0; overflow: clip; }
+.home-widgets { display: flex; flex-direction: column; gap: var(--sp-5); width: 810px; height: var(--content-h); flex-shrink: 0; overflow: clip; }
 .home-row { display: flex; gap: var(--sp-5); width: 810px; flex-shrink: 0; overflow: clip; }
 .home-row--top { height: 340px; }
-.home-row--bottom { height: 296px; }
+.home-row--bottom { height: 312px; }
 
 /* 共用：小号大写标签 */
 
 
 /* ---------- Our Little World（照片轮播） ---------- */
+/* 家的墙：一家人做出来的东西贴在一起——照片、孩子的画、留言（像冰箱门 / 软木板），每张微微歪着 */
 .memories {
-  --sc: var(--glass-4);
-  display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start;
-  width: 370px; height: 340px; flex-shrink: 0; overflow: clip; padding: 21px 15px 15px; border-radius: var(--card);
+  --sc: transparent;   /* 玻璃时代的白描边，扁平后不要了 */
+  position: relative; width: 370px; height: 340px; flex-shrink: 0; overflow: clip; border-radius: var(--card);
+  background: var(--md-surface-high);
 }
 .slides img[data-focus="62"] { object-position: 50% 62%; }
 .slides img[data-focus="38"] { object-position: 50% 38%; }
-.memories-fade { position: absolute; left: 0; top: 190px; width: 370px; height: 150px; opacity: 0.65; background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.55)); }
 
 
 .memories-caption {
@@ -72,29 +72,41 @@
 
 
 /* ---------- Tonight’s dinner ---------- */
-.meal { display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-2); width: 216px; height: 296px; padding: 7px 7px 13px; }
-.meal-photo { position: relative; display: flex; flex-direction: column; align-items: flex-start; width: 204px; height: 166px; border-radius: var(--r-lg); overflow: clip; flex-shrink: 0; }
-.meal-photo > img { border-radius: var(--r-lg); }
-.meal-time { position: absolute; left: 131px; top: 134px; }
+.meal { display: flex; flex-direction: column; align-items: stretch; gap: var(--head-gap); width: 216px; height: 312px; padding: var(--card-pad); }
+.meal-photo { position: relative; width: 100%; flex: 1 1 0; min-height: 0; border-radius: var(--r-sm); overflow: clip; flex-shrink: 0; }
+.meal-photo > img { border-radius: inherit; }
+.meal-time { position: absolute; right: 8px; bottom: 8px; z-index: 1; }
 .meal-time p { font-size: var(--fs-micro); font-weight: 500; line-height: 1.2; white-space: nowrap; }
-.meal-plate { position: relative; width: 207px; height: 295px; flex-shrink: 0; }
-.meal-plate img { height: 100%; left: -0.4%; top: -23.36%; width: 100.2%; }
-.meal-text { display: flex; flex-direction: column; gap: var(--sp-2); width: 204px; height: 100px; padding: 0 var(--sp-2); overflow: clip; flex-shrink: 0; }
-.meal-name { width: 173px; font-size: var(--fs-heading); font-weight: 700; line-height: 1.15; }
+.meal-plate { position: absolute; inset: 0; }
+.meal-plate img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 62%; }   /* 盘子居中露出来 */
+.meal-text { display: flex; flex-direction: column; gap: var(--sp-1); overflow: clip; flex-shrink: 0; }   /* 照片撑满剩下的高度，文字贴底，不留空白 */
+.meal-name { font-size: var(--fs-body-sm); font-weight: 600; line-height: 1.3; }   /* 菜名是内容，不是标题：比卡片标题小一级 */
 .meal-meta { font-size: var(--fs-small); font-weight: 400; line-height: 1.3; color: var(--muted); white-space: nowrap; }
 
 /* ---------- Shopping list ---------- */
-.shopping { display: flex; flex-direction: column; align-items: flex-start; width: 234px; height: 296px; padding: 19px 17px 0; }
-.shopping .shop-scroll { margin-top: var(--sp-3); }
+.shopping { display: flex; flex-direction: column; align-items: flex-start; width: 234px; height: 312px; padding: var(--card-pad) var(--card-pad) 0; }
+.shopping .shop-scroll { margin-top: var(--head-gap); }
 
 /* ---------- Tasks for today ---------- */
-.family-tasks { display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-3); width: 320px; height: 296px; padding: 21px 21px 1px; }
-.family-tasks-scroll { height: 236px; width: 280px; }
-.family-tasks-list { display: flex; flex-direction: column; gap: var(--sp-3); padding-bottom: var(--sp-4); width: 280px; }
+.family-tasks { display: flex; flex-direction: column; align-items: stretch; gap: var(--head-gap); width: 320px; height: 312px; padding: var(--card-pad) var(--card-pad) 0; }
+.family-tasks-scroll { flex: 1 1 0; min-height: 0; width: 100%; margin-bottom: -1px; }   /* 宽度跟卡片走、延伸到卡片底边 */
+.family-tasks-list { display: flex; flex-direction: column; gap: var(--sp-3); padding-bottom: var(--sp-4); width: 100%; }
+.family-tasks-list > .task { width: 100%; }   /* 行宽跟卡片走（原来写死 280，卡片内宽 288，右边多出 8） */
 
 /* ---------- 成员色（任务行 / 事件，全站共用） ---------- */
-.m-emma { --acc: var(--task-emma-acc); }
-.m-mom { --acc: var(--task-mom-acc); }
-.m-dad { --acc: var(--task-dad-acc); }
-.m-sam { --acc: var(--task-sam-acc); }
+.m-emma { --acc: var(--id-emma-vivid); }
+.m-mom { --acc: var(--id-mom-vivid); }
+.m-dad { --acc: var(--id-dad-vivid); }
+.m-sam { --acc: var(--id-sam-vivid); }
 .memories-count p { font-size: var(--fs-small); font-weight: 500; line-height: 1.3; white-space: nowrap; }
+
+/* 家的墙：一家人的照片铺满整张卡做底（自己轮播），左上角标签、右上角张数，Mom 的便签用图钉端正地贴在右下 */
+.wall-tag { position: absolute; z-index: 2; left: var(--card-pad); top: var(--card-pad); }
+.wall-photo { position: absolute; inset: 0; border-radius: inherit; overflow: clip; cursor: pointer; }
+.wall-photo .slides { inset: 0; border-radius: inherit; }
+.wall-photo .memories-count { position: absolute; right: var(--card-pad); top: var(--card-pad); left: auto; width: auto; height: 22px; padding: 0 8px; }
+.wall-note { position: absolute; z-index: 2; right: var(--card-pad); bottom: var(--card-pad); width: 196px; padding: var(--sp-4) var(--sp-4) var(--sp-3); border-radius: var(--r-md); background: var(--id-mom-soft); box-shadow: var(--elev-2); display: flex; flex-direction: column; }
+/* 便签顶上一颗图钉：Mom 的颜色、扁平圆头 + 一点落影，像钉在墙上 */
+.wall-note::before { content: ''; position: absolute; top: -6px; left: 50%; width: 14px; height: 14px; margin-left: -7px; border-radius: var(--r-pill); background: var(--id-mom-vivid); box-shadow: 0 2px 3px var(--ink-a3), inset 0 -2px 0 color-mix(in srgb, var(--ink) 18%, transparent); }
+.wall-note p { font-family: "Caveat", cursive; font-size: 22px; font-weight: 600; line-height: 1.25; color: var(--ink); font-variation-settings: normal; }
+.wall-note span { align-self: flex-end; margin-top: var(--sp-2); font-size: var(--fs-small); font-weight: 600; color: var(--muted); }

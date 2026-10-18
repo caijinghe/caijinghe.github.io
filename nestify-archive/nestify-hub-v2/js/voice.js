@@ -5,6 +5,7 @@
 (() => {
   const SHADERS = window.NESTIE_SHADERS;
   const RIV = window.NESTIE_RIV;
+  // 品牌四色彩带：边缘光与出生动画的液态小球共用（青 / 蓝 / 粉 / 黄）
   const COLORS = [[56, 212, 230], [91, 156, 246], [241, 79, 206], [244, 209, 78]];
   const K = 1.5; // 画布 1280×800 → shader 坐标 1920×1200
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
@@ -77,15 +78,28 @@
       this.glowCanvas.className = 'voice-glow';
       layer.append(this.glowCanvas);
 
+      // 底部的光：边缘模糊的三角形，唤醒时从底边升起；文字写在光里，小鸟停在光中
+      this.aura = document.createElement('div');
+      this.aura.className = 'voice-aura';
+      this.aura.innerHTML = '<i></i>';
+      layer.insertBefore(this.aura, this.glowCanvas);   // 白雾在下、彩带在上：彩带不被冲淡
+
       const [cx, cy] = this.o.center, s = this.o.size;
       const host = document.createElement('button');
       host.className = 'nestie';
       host.type = 'button';
       host.setAttribute('aria-label', 'Talk to Nestie');
-      host.style.cssText = `left:${cx - s / 2}px;top:${cy - s / 2}px;width:${s}px;height:${s}px`;
-      host.innerHTML = '<canvas class="nestie-blink"></canvas><canvas class="nestie-speak"></canvas>';
+      host.style.cssText = `left:${cx - s / 2}px;top:${cy - s / 2}px;width:${s}px;height:${s}px`;   // 对话位：底部正中；平时藏在底边下面
+      host.innerHTML = '<canvas class="nestie-blink"></canvas><canvas class="nestie-speak"></canvas><i class="nestie-lid is-l"></i><i class="nestie-lid is-r"></i>';   // 眼皮：没唤醒时闭着眼，唤醒时睁开
       layer.append(host);
       this.host = host;
+      // 两只小手搭在卡片顶边上，手指垂下来盖住边沿（只在常驻位出现，不被脑袋的裁切影响）
+      const hand = flip => `<svg class="nestie-hand${flip ? ' is-r' : ''}" viewBox="0 0 28 18" aria-hidden="true"><rect x="2" y="0" width="24" height="11" rx="5"/><circle cx="7.5" cy="10.5" r="4.5"/><circle cx="14" cy="12" r="4.6"/><circle cx="20.5" cy="10.5" r="4.5"/></svg>`;
+      this.hands = document.createElement('div');
+      this.hands.className = 'nestie-hands';
+      this.hands.style.cssText = `left:${cx - s / 2}px;top:${cy - s / 2}px;width:${s}px;height:${s}px`;
+      this.hands.innerHTML = hand(false) + hand(true);
+      layer.append(this.hands);
       host.addEventListener('click', () => this.state === 'listening' ? this.go('thinking') : this.start());
 
       // 用户气泡：屏幕下方居中，标题行（Listening + 竖条 / Working on it + 圆点）+ 转写
@@ -95,14 +109,13 @@
       // 小鸟气泡：右沿在小鸟左边 16px，底边和用户气泡同高，往上长
       this.say = document.createElement('div');
       this.say.className = 'vb vb-bird';
-      this.say.style.right = `${frame.offsetWidth - (cx - s / 2) + 16}px`;
       this.say.innerHTML = '<p class="vb-text"></p>';
       layer.append(this.ear, this.say);
       this.timers = [];
 
       this.initGlow();
       this.initRive();
-      if (this.o.resident) this.appear(false);
+      if (this.o.resident) { this.host.classList.add('is-home'); this.appear(false); }   // 常驻：待在右下角
     }
 
     initGlow() {
@@ -164,7 +177,8 @@
     leave() {
       this.shown = false;
       this.host.classList.add('is-leaving');
-      setTimeout(() => { if (!this.shown) this.host.classList.remove('is-shown', 'is-leaving'); this.syncRive(); }, 320);
+      // 淡出完成后再撤掉对话位：此时已经看不见，直接回到底边下面（无过渡），下次唤醒再升上来
+      setTimeout(() => { if (!this.shown) this.host.classList.remove('is-shown', 'is-leaving', 'is-talking'); this.syncRive(); }, 320);
     }
 
     birth() {
@@ -177,8 +191,9 @@
       const center = [this.o.center[0] * K, this.o.center[1] * K];
       u.v2('uSize', 1920, 1200);
       u.v2('uCorePos', ...center);
+      // 小球在小鸟周围不远处出现，向内汇聚融合成它（路程短，不从底部一路升上来）
       const balls = Array.from({ length: 8 }, (_, i) => {
-        const a = i * Math.PI / 4, sr = 117 + Math.random() * 108, ta = Math.random() * Math.PI * 2, to = 16 + Math.random() * 28;
+        const a = i * Math.PI / 4 + Math.random() * 0.4, sr = 120 + Math.random() * 70, ta = Math.random() * Math.PI * 2, to = 16 + Math.random() * 28;
         return {
           start: [center[0] + Math.cos(a) * sr, center[1] + Math.sin(a) * sr],
           end: [center[0] + Math.cos(ta) * to, center[1] + Math.sin(ta) * to],
@@ -191,7 +206,7 @@
         if (p >= 1) { u.dispose(); canvas.remove(); return; }
         sizeCanvas(gl, canvas);
         const conv = smooth((p - .04) / .56), merged = smooth((p - .58) / .22), fade = 1 - smooth((p - .86) / .14), appear = smooth(p / .12);
-        u.f('uCoreR', 125 * (1 - .7 * conv) * fade);
+        u.f('uCoreR', 60 * smooth((p - .3) / .35) * fade);   // 核心随小球汇聚长出来（不再一开始就在中间），比小鸟小，弹出时被盖住
         u.f('uSoft', merged);
         u.f('uTail', 1.3 * Math.max(0, 4 * conv * (1 - conv)));
         u.f('uBlue', smooth((conv - .45) / .45));
@@ -213,10 +228,16 @@
       if (this.state !== 'idle') return;
       const r = typeof this.o.reply === 'function' ? this.o.reply() : this.o.reply;
       this.script = Array.isArray(r) ? { heard: '', status: [], say: [r.join(' ')] } : { status: [], ...r };
+      // 唤醒：光从底边升起，小鸟跟着从底下升上来（上方留给下拉的 Control Center）
+      this.aura.classList.add('is-on');
+      this.frame.dataset.voice = 'waking';
       if (!this.shown) {
-        this.appear(true);
+        this.host.classList.add('is-talking');
+        this.appear(true);   // 出生动画：小球从底下升起、汇聚成小鸟
         this.timer = setTimeout(() => this.go('listening'), reduce.matches ? 0 : 1300);
       } else {
+        this.host.classList.remove('is-home');   // 从角落滑到中间
+        this.host.classList.add('is-talking');
         this.go('listening');
       }
     }
@@ -252,6 +273,9 @@
       this.state = state;
       this.frame.dataset.voice = state;
       this.host.classList.toggle('is-speaking', state === 'speaking');
+      if (state !== 'idle') this.host.classList.add('is-talking');   // 对话位；结束时不往下沉（会穿过结果卡），在原地淡出
+      this.aura.dataset.state = state;
+
       this.syncRive();
       const { heard = '', status = [], say = [] } = this.script || {};
       if (state !== 'listening') this.o.onHear?.(false);
@@ -289,7 +313,7 @@
       if (state === 'speaking') {
         this.ear.classList.remove('is-on');
         const p = this.say.querySelector('.vb-text');
-        let t = 0;
+        let t = fast ? 0 : 220;   // 等用户气泡淡出（180ms）再出现，同一位置不叠
         say.forEach((line, i) => {
           this.after(t, () => {
             this.caption(p, line);
@@ -301,15 +325,18 @@
       }
 
       if (state === 'complete') {
-        this.o.onComplete?.();
+        this.say.classList.remove('is-on');
+        this.after(fast ? 0 : 220, () => this.o.onComplete?.());   // 回答淡出后，结果卡再升起，不叠在一起
         this.after(1000, () => this.go('idle'));
       }
 
       if (state === 'idle') {
         this.ear.classList.remove('is-on');
         this.say.classList.remove('is-on');
+        this.aura.classList.remove('is-on');
         delete this.frame.dataset.voice;
-        if (!this.o.resident) this.leave();
+        this.leave();   // 在中间原地淡出（不穿过结果卡）
+        if (this.o.resident) setTimeout(() => { if (this.state !== 'idle') return; const h = this.host; h.style.transition = 'none'; h.classList.add('is-home'); void h.offsetWidth; h.style.transition = ''; this.appear(false); }, 400);   // 看不见时瞬移回角落，再淡入   // 再回到角落淡入
         return;
       }
       this.loop();

@@ -11,28 +11,27 @@
     if (!ps.length) return null;
     const fill = p => tok(`--id-${p}-fill`);
     const strip = ps.length === 1 ? fill(ps[0]) : `linear-gradient(to right, ${ps.map((p, i) => `${fill(p)} ${i / ps.length * 100}% ${(i + 1) / ps.length * 100}%`).join(', ')})`;
-    // 单人：右下角一团同色亮光；多人：右下角其他人的颜色柔和地晕开（实色打底，只在角落有渐变）
-    // 光晕尺寸用 --glow / --glow-multi，由容器按卡片大小给（日历页的小块用小光晕，避免整块被晕脏）
-    if (ps.length === 1) {
-      const c = fill(ps[0]);
-      return { bg: `radial-gradient(var(--glow, 140px 100px) at 100% 100%, color-mix(in srgb, ${c} 45%, #fff) 0%, transparent 100%), ${c}`, strip };
-    }
-    // 色带顺序：和底色越接近的放越外层（和底色相接、过渡自然），差别最大的放圆心
-    const rgb = h => { const v = parseInt(h.replace('#', ''), 16); return [v >> 16 & 255, v >> 8 & 255, v & 255]; };
-    const dist = (a, b) => { const [r1, g1, b1] = rgb(a), [r2, g2, b2] = rgb(b), rm = (r1 + r2) / 2; return Math.sqrt((2 + rm / 256) * (r1 - r2) ** 2 + 4 * (g1 - g2) ** 2 + (2 + (255 - rm) / 256) * (b1 - b2) ** 2); };
-    const base = fill(ps[0]);
-    const rest = ps.slice(1).sort((a, b) => dist(fill(b), base) - dist(fill(a), base));   // 远 → 近 = 圆心 → 外层
-    // 色带均匀：圆心先实实占住一块（0–14%），其余等距排开，88% 前淡完（最外层不再拖成一大片）
-    const n = rest.length, step = n > 1 ? 48 / (n - 1) : 0;
-    const stops = rest.map((p, i) => i === 0 ? `${fill(p)} 0%, ${fill(p)} 14%` : `${fill(p)} ${Math.round(14 + i * step)}%`).join(', ');
-    return { bg: `radial-gradient(var(--glow-multi, 170px 120px) at 100% 100%, ${stops}, transparent 88%), ${fill(ps[0])}`, strip };
+    // 单人：一块平的实色
+    if (ps.length === 1) return { bg: fill(ps[0]), strip };
+    // 多人：第一个人的颜色打底，其他参与者的颜色从右下角铺成硬边同心圆弧（不渐变）。
+    // 圈数 = 人数，一眼看出几个人、是谁；圆弧大小随卡片走（--arc-u 由 ResizeObserver 按卡片短边给）
+    const rest = ps.slice(1), n = rest.length, U = 'var(--arc-u, 40px)';
+    const r = k => `calc(${U} * ${(0.9 + 0.38 * k).toFixed(2)})`;   // 最里一圈 0.9U，往外每圈 +0.38U
+    const stops = rest.slice().reverse().map((p, k) => `${fill(p)} ${k ? r(k - 1) : '0'} ${r(k)}`).join(', ');
+    return { bg: `radial-gradient(circle at 100% 100%, ${stops}, transparent ${r(n - 1)}), ${fill(ps[0])}`, strip };
   }
+  // 圆弧尺寸 = 卡片短边的 0.62 倍：大卡片大圆弧，周视图小块也成比例
+  const arcRO = new ResizeObserver(es => es.forEach(e => {
+    const { width: w, height: h } = e.contentRect;
+    e.target.style.setProperty('--arc-u', `${Math.round(Math.min(w + 32, h + 16) * 0.62)}px`);
+  }));
   function paintIdentity(root) {
     for (const el of root.querySelectorAll ? root.querySelectorAll('[data-who]') : []) {
       const who = el.dataset.who === 'all' ? ID : el.dataset.who.split(',');
       const v = identity(who);
       if (!v) continue;
       el.style.setProperty('--ev-bg', v.bg);
+      if (who.length > 1) arcRO.observe(el);
     }
   }
   new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => { if (n.nodeType === 1) { paintIdentity(n); if (n.matches?.('[data-who]')) paintIdentity(n.parentNode); } })))
@@ -45,20 +44,53 @@
     else slot.replaceWith(frag);
   }
 
-  // 导航：Family / Personal 都是 Home（走近时识别是谁，切成对应的 Home），Calendar、Tasks 是独立页面
-  let lastHome = 's1';
-  const PAGE_NAV = { s3: 'Calendar', s4: 'Tasks', s7: 'Meals' };
+  // 导航按功能分：Home（= Family 首页）/ Calendar / Tasks / Meals / Settings；最右是"谁的视图"——点开选某个人，去这个人的页。
+  // 原型里只做了 Emma（孩子页 s2）和 Mom（父母页 s9），Sam 用孩子页模板、Dad 用父母页模板代替
+  let lastHome = 's1', viewer = null;   // 最近看的是谁的页；Family 不算一个人，Home 就是它
+  const PAGE_NAV = { s3: 'Calendar', s4: 'Tasks', s7: 'Meals', s10: 'Lists' };   // 共享功能页
+  const HOME_OF = { emma: 's2', sam: 's2', mom: 's9', dad: 's9' };
+  const OWNER = { s2: 'emma', s9: 'mom' };   // 个人页属于谁：在这些页上，头像按钮是当前页，Home 不亮
   for (const f of $$('.frame')) {
-    const cur = PAGE_NAV[f.id] || 'Home';
-    for (const b of $$('.nav', f)) {
-      const on = b.getAttribute('aria-label') === cur;
-      b.classList.toggle('cur', on); b.classList.toggle('st', on);
-    }
+    const cur = PAGE_NAV[f.id] || (OWNER[f.id] ? '' : 'Home');
+    for (const b of $$('.nav', f)) b.classList.toggle('cur', b.getAttribute('aria-label') === cur);
   }
-  $$('.nav.home').forEach(b => b.addEventListener('click', () => show(lastHome)));
+  $$('.nav.home').forEach(b => b.addEventListener('click', () => show('s1')));
   $$('.nav[aria-label="Calendar"]').forEach(b => b.addEventListener('click', () => show('s3')));
   $$('.nav[aria-label="Tasks"]').forEach(b => b.addEventListener('click', () => show('s4')));
   $$('.nav[aria-label="Meals"]').forEach(b => b.addEventListener('click', () => show('s7')));
+  $$('.nav[aria-label="Lists"]').forEach(b => b.addEventListener('click', () => show('s10')));
+  // 谁的视图：按钮跟着"这一页是谁的"走——在某人自己的页上，就是他的脸 + 他颜色的一圈；
+  // 在共享页（Home / Calendar / Tasks / Meals / Lists）上谁都没选：和其他导航一样的圆形图标（两个人 = 切换到某个人的视图），菜单里也不圈任何人
+  const ALL_FACES = `<span class="nav-face who-icon"><img src="assets/icon-people.svg" alt=""></span>`;
+  function paintViewer() {
+    for (const w of $$('.who')) {
+      const fid = w.closest('.frame')?.id, owner = OWNER[fid];
+      const who = owner && (HOME_OF[viewer] === fid ? viewer : owner);
+      if (who) {
+        const face = $(`.who-opt[data-who="${who}"] .nav-face`, w).cloneNode(true);
+        face.classList.add('cur');
+        $('.who-btn', w).replaceChildren(face);
+      } else $('.who-btn', w).innerHTML = ALL_FACES;
+      $$('.who-opt .nav-face', w).forEach(f => f.classList.toggle('cur', f.dataset.go === who));
+    }
+  }
+  const whoMenu = open => $$('.who').forEach(w => { $('.who-menu', w).hidden = !open; $('.who-btn', w).setAttribute('aria-expanded', open); });
+  $$('.who-btn').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); whoMenu($('.who-menu', b.parentNode).hidden); }));
+  $$('.who-opt').forEach(b => b.addEventListener('click', e => {
+    e.stopPropagation();
+    viewer = b.dataset.who;
+    paintViewer(); whoMenu(false);
+    show(HOME_OF[viewer]);
+  }));
+  document.addEventListener('pointerdown', e => { if (!e.target.closest('.who')) whoMenu(false); });
+  paintViewer();
+  // 首页卡片就是入口：日历 → Calendar，Tasks → Tasks，Shopping list → Lists，晚饭 → Meals
+  const s1home = $('#s1');
+  [['.cal .cal-head', 's3'], ['.family-tasks', 's4'], ['.shopping', 's10'], ['.meal', 's7']].forEach(([sel, id]) => {
+    const el = $(sel, s1home); if (!el) return;
+    el.classList.add('go-card');
+    el.addEventListener('click', e => { if (!e.target.closest('button:not(.go-card), input, .cal-days')) show(id); });
+  });
 
   // ---------- 等比缩放 ----------
   const stage = $('#stage');
@@ -74,15 +106,6 @@
   const btns = $$('.switcher button');
   const voices = {};
 
-  // 灵动岛：Personal 页常驻显示 Emma；她开口时展开成 "Emma is speaking"，别的页说完就收回
-  const island = $('.island', stage);
-  let speaking = false;
-  function syncIsland() {
-    island.classList.toggle('is-speaking', speaking);
-    const rwOpenNow = !!document.querySelector('.rw-modal:not([hidden])');   // Rewards 浮层打开时让出顶部
-    // 只在 Emma 的 Personal 屏、有人说话时出现；Family 首页是全家共用的，不显示个人身份
-    island.classList.toggle('is-on', speaking && $('#s2').classList.contains('on') && !rwOpenNow);
-  }
   function show(id) {
     if (id === 's5') { show('s2'); openRewards(); return; }   // Rewards 现在是 Personal 上的浮层，不是独立页面
     $$('.frame').forEach(f => f.classList.toggle('on', f.id === id));
@@ -90,10 +113,11 @@
     history.replaceState(null, '', '#' + id);
     if (id !== 's2' && typeof rwOpen !== 'undefined' && rwOpen) closeRewards();
     if (!PAGE_NAV[id] && id !== 's5' && id !== 's6') lastHome = id;   // s5 = Rewards（Personal 子页），s6 = 屏保
-    syncIsland();
+    if (HOME_OF[viewer] !== id && OWNER[id]) { viewer = OWNER[id]; paintViewer(); }
+    whoMenu(false);
     Object.values(voices).forEach(v => v.syncRive());
     enter($('#' + id));
-    if (id === 's2') { growBars(); growProgress(); growRewards(); }
+    if (id === 's2') { growProgress(); growRewards(); renderNow(); }
     if (id === 's3') calPage.restore();
     if (id === 's5') rwPage.restore();
     screensaver(id === 's6');
@@ -102,15 +126,16 @@
   }
 
   // 面板按从左上到右下的对角顺序错落入场
+  // 页头（时间、导航）一直都在，切页时不重新入场——否则点的头像会闪一下消失
   function enterables(frame) {
-    if (frame.id === 's2') return [$('.header', frame), ...$$('.board > .tile', frame)];
-    if (frame.id === 's3') return [$('.header', frame), $('.calpage', frame)];
-    if (frame.id === 's5') return [$('.header', frame), $('.rwpage', frame)];
+    if (frame.id === 's2') return [...$$('.board > .tile', frame)];
+    if (frame.id === 's3') return [$('.calpage', frame)];
+    if (frame.id === 's5') return [$('.rwpage', frame)];
     if (frame.id === 's6') return [];
-    if (frame.id === 's4') return [$('.header', frame), $('.tkpage', frame)];
-    if (frame.id === 's7') return [$('.header', frame), ...$$('.mlpage > .card', frame)];
+    if (frame.id === 's4') return [$('.tkpage', frame)];
+    if (frame.id === 's7') return [...$$('.mlpage > .card', frame)];
     const widgets = $$('.memories, .card', frame).filter(el => !el.closest('.cal') || el.classList.contains('cal'));
-    return [$('.header', frame), ...new Set([$('.cal', frame), ...widgets, $('.memories', frame)?.parentElement.children[1], $('.memories', frame)?.parentElement.children[2]])].filter(Boolean);
+    return [...new Set([$('.cal', frame), ...widgets, $('.memories', frame)?.parentElement.children[1], $('.memories', frame)?.parentElement.children[2]])].filter(Boolean);
   }
   let enterTimer = 0;
   function enter(frame) {
@@ -143,8 +168,9 @@
   const s2 = $('#s2');
   const clock = $('.clock', s2);
 
-  // 12 瓣花边表盘
+  // 12 瓣花边表盘（时钟已从 Personal 移除，没有就跳过）
   (() => {
+    if (!clock) return;
     const pts = [];
     for (let i = 0; i <= 240; i++) {
       const t = i / 240 * Math.PI * 2, r = 84 + 4.2 * Math.cos(12 * t);
@@ -162,6 +188,7 @@
     $$('.header .time').forEach(el => { if (el.textContent !== hm) el.textContent = hm; });
     $$('.header .pm').forEach(el => { el.textContent = h < 12 ? 'AM' : 'PM'; });
     $$('[data-ss-big]').forEach(el => { if (el.textContent !== hm) el.textContent = hm; });
+    if (!clock) return;
     $('.hand-h', clock).setAttribute('transform', `rotate(${(h % 12 + m / 60) * 30} 94 100)`);
     $('.hand-m', clock).setAttribute('transform', `rotate(${(m + s / 60) * 6} 94 100)`);
     $('.hand-s', clock).setAttribute('transform', `rotate(${s * 6} 94 100)`);
@@ -169,7 +196,7 @@
   }
   tick();
   setInterval(tick, 1000);
-  clock.addEventListener('click', () => clock.classList.toggle('digital'));
+  clock?.addEventListener('click', () => clock.classList.toggle('digital'));
 
   // ---------- 日历：点日期 / 左右箭头切换，每天的事件按日期种子生成（同一天每次一样） ----------
   const WEEK = [28, 29, 30, 31, 1, 2, 3].map((d, i) => new Date(2024, i < 4 ? 9 : 10, d));
@@ -180,8 +207,6 @@
     mom: { name: 'Mom', av: '<img class="fill cover" src="assets/4a680.png" alt="">' },
     dad: { name: 'Dad', av: '<img class="fill cover" src="assets/7903a.png" alt="">' },
   };
-  // Family 屏：每个成员一种渐变（取自 Figma 原事件色）
-  const FAMILY_COLOR = Object.fromEntries(['emma', 'sam', 'mom', 'dad', 'pair', 'all'].map(k => [k, [tok(`--m-${k}-soft`), tok(`--m-${k}`)]]));
   // Emma 屏：混合事件融进对方的颜色
   const FAMILY_POOL = [
     ['Piano Lesson', ['emma']], ['Art Club', ['emma']], ['Spelling Quiz Prep', ['emma']],
@@ -233,8 +258,6 @@
   const ALL_DAY = { 20025: [{ title: 'Call Pediatrician · before 6 PM', who: ['dad'] }], 20026: [{ title: 'Mom’s Birthday', who: ['mom'] }], 20027: [{ title: 'Halloween', who: ['all'] }], 20028: [{ title: 'No School', who: ['emma', 'sam'] }] };
   const fmtTime = m => `${Math.floor(m / 60) % 12 || 12}:${String(m % 60).padStart(2, '0')} ${m < 720 ? 'AM' : 'PM'}`;
   const peopleOf = who => who[0] === 'all' ? ['emma', 'sam', 'mom', 'dad'] : who;
-  const colorKey = who => who[0] === 'all' ? 'all' : who.length > 1 ? 'pair' : who[0];
-  const colorOf = who => FAMILY_COLOR[colorKey(who)];
   const labelOf = who => who[0] === 'all' ? 'Everyone' : who.map(p => PEOPLE[p].name).join(' & ');
   function familyEvents(date) {
     const k = dayNum(date);
@@ -307,7 +330,7 @@
   function familyDay(i) { return familyEvents(WEEK[i]).map(familyRow).join(''); }
   function familyRow({ title, who, before, start, dur, rings }) {
     {
-      const people = who[0] === 'all' ? ['emma', 'sam', 'mom'] : who, color = colorOf(who);
+      const people = who[0] === 'all' ? ID : who;   // 全家 = 四个人都显示（和圆弧圈数一致）
       const [main, ...rest] = people.slice().reverse();
       const extras = rest.map((p, m) => `<div class="extra st extra-${m + 1}">${PEOPLE[p].av}</div>`).join('');
       const time = before ? 'Before ' + fmtTime(start + dur) : fmtTime(start);
@@ -345,7 +368,8 @@
       cur = i;
       days.forEach((d, j) => d.classList.toggle('cur', i === j));
       title.textContent = fmt(WEEK[i]);
-      sub.textContent = i === TODAY ? 'Today' : i === TODAY + 1 ? 'Tomorrow' : '';
+      if (sub) sub.textContent = i === TODAY ? 'Today' : i === TODAY + 1 ? 'Tomorrow' : '';
+      todayBtn?.classList.toggle('is-off', i === TODAY);
       // 旧的一页整体滑出，新的一页从另一侧滑入
       const old = list.cloneNode(true);
       old.classList.add('events-out');
@@ -368,7 +392,9 @@
       if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.4) select(cur + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1);
     });
     days.forEach((d, i) => d.addEventListener('click', () => select(i)));
-    const [prev, next] = $$('.cal-head button', cal);
+    const prev = $('[data-cal-prev]', cal), next = $('[data-cal-next]', cal), todayBtn = $('[data-cal-today]', cal);
+    todayBtn?.addEventListener('click', () => select(TODAY));
+    todayBtn?.classList.add('is-off');   // 一开始就在今天
     prev.addEventListener('click', () => select(cur - 1, -1));
     next.addEventListener('click', () => select(cur + 1, 1));
   }
@@ -379,20 +405,12 @@
     const s3 = $('#s3'), card = $('.calpage', s3), grid = $('.cp-grid', card), pop = $('.cp-pop', card);
     const H0 = 7, H1 = 22, PX = 56;                       // 7:00–22:00，每小时 56px
     const DOW = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
-    const CHIP = { emma: 1, sam: 1, mom: 1, dad: 1 };   // 颜色见 tokens.css --m-*-solid
+    const CHIP = { emma: 1, sam: 1, mom: 1, dad: 1 };   // 颜色见 tokens.css --id-*
     const st = { offset: 0, view: 'week', day: TODAY_DATE, sel: new Set() /* 空 = 显示全部 */, scroll: (12 - H0) * PX };
     const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
     const same = (a, b) => dayNum(a) === dayNum(b);
     const weekStart = () => addDays(new Date(2024, 9, 28), st.offset * 7);
     const avHTML = p => `<div class="av st">${PEOPLE[p].av}</div>`;
-    // 单人 = 自己的颜色；多人 = 各成员颜色渐变融合 + 颗粒（同 Personal 屏混合事件）
-    const TINT = Object.fromEntries(['emma', 'sam', 'mom', 'dad'].map(k => [k, tok(`--m-${k}-tint`)]));
-    const grad = (who, deg = 160) => {
-      const ps = peopleOf(who);
-      if (ps.length === 1) { const c = colorOf(who); return `linear-gradient(${deg}deg, rgb(${c[0]}), rgb(${c[1]}))`; }
-      const stops = ps.map((p, i) => `rgb(${TINT[p]}) ${Math.round(8 + i / (ps.length - 1) * 84)}%`).join(', ');
-      return `var(--grain) 0 0 / 140px 140px, linear-gradient(115deg, ${stops})`;
-    };
     const visible = who => !st.sel.size || peopleOf(who).some(p => st.sel.has(p));
 
     // 成员筛选
@@ -495,11 +513,11 @@
       const e = familyEvents(new Date(+d * 864e5 + 12 * 36e5)).find(x => x.start === +start && x.title === title);
       const date = new Date(+d * 864e5 + 12 * 36e5).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
       const time = e.before ? 'Before ' + fmtTime(e.start + e.dur) : `${fmtTime(e.start)} – ${fmtTime(e.start + e.dur)}`;
-      pop.innerHTML = `<div class="strip" style="background:${identity(peopleOf(e.who)).strip}"></div><p class="t">${e.title}</p><p class="s">${date} · <span class="nw">${time}</span></p>
+      pop.innerHTML = `<p class="t">${e.title}</p><p class="s">${date}<br>${time}</p>
         <div class="who">${peopleOf(e.who).map(p => `<span>${avHTML(p)}${PEOPLE[p].name}</span>`).join('')}</div>
-        <div class="cp-pop-acts">
-          <button type="button" data-pop-edit><svg viewBox="0 0 16 16"><path d="M10.6 2.9l2.5 2.5-7.4 7.4-3.2.7.7-3.2z"/></svg>Edit</button>
-          <button type="button" class="del" data-pop-del><svg viewBox="0 0 16 16"><path d="M2.8 4.3h10.4M6.2 4.3V2.8h3.6v1.5M4.2 4.3l.6 8.9h6.4l.6-8.9M6.8 6.6v4.4M9.2 6.6v4.4"/></svg>Delete</button>
+        <div class="popover-acts">
+          <button type="button" class="btn btn--ghost btn--sm" data-pop-edit><svg viewBox="0 0 16 16"><path d="M10.2 3.3l2.5 2.5M11.4 2.1a1.77 1.77 0 0 1 2.5 2.5L5.6 12.9l-3.1.6.6-3.1z"/></svg>Edit</button>
+          <button type="button" class="icon-btn icon-btn--ghost icon-btn--sm" data-pop-del aria-label="Delete"><svg viewBox="0 0 16 16"><path d="M2.75 4.25h10.5M6.25 4.25V3a.75.75 0 0 1 .75-.75h2a.75.75 0 0 1 .75.75v1.25M4.25 4.25l.6 8.4a1 1 0 0 0 1 .93h4.3a1 1 0 0 0 1-.93l.6-8.4"/></svg></button>
         </div>`;
       const evDate = new Date(+d * 864e5 + 12 * 36e5);
       $('[data-pop-del]', pop).addEventListener('click', () => {
@@ -611,9 +629,117 @@
     } };
   })();
 
+  // ---------- 父母页：全家今天一人一列（和 Calendar 页同一套时间轴 / 事件块）----------
+  (() => {
+    const host = $('#s9 [data-pday]');
+    if (!host) return;
+    const H0 = 7, H1 = 22, PX = 72;   // 比 Calendar 页高：半小时的事也放得下两行
+    const COLS = ['mom', 'emma', 'sam', 'dad'];
+    // 今天的事和首页日历对得上（3:30 作业、4:30 体检、5:30 足球、6:30 BBQ），再补上各人自己的
+    const DAY = [
+      { t: 'School drop-off', who: ['mom', 'emma', 'sam'], s: 465, d: 30, sub: 'Mom drives' },
+      { t: 'Yoga', who: ['mom'], s: 540, d: 60 },
+      { t: 'Library Book Due', who: ['emma'], s: 540, d: 30 },
+      { t: 'Team standup', who: ['dad'], s: 570, d: 30 },
+      { t: 'Spelling quiz', who: ['sam'], s: 600, d: 30 },
+      { t: 'Team sync', who: ['mom'], s: 630, d: 30 },
+      { t: 'Car service', who: ['dad'], s: 720, d: 60 },
+      { t: 'Lunch with Priya', who: ['mom'], s: 750, d: 60 },
+      { t: 'School pick-up', who: ['mom', 'emma', 'sam'], s: 900, d: 30, sub: 'Mom drives' },
+      { t: 'Check over your homework', who: ['emma', 'sam'], s: 930, d: 45 },
+      { t: 'Annual Check-up @ Smith', who: ['mom'], s: 990, d: 60 },
+      { t: 'Piano lesson', who: ['emma'], s: 1020, d: 60, sub: 'No ride yet', needs: true },   // 妈妈 4:30–5:30 在体检、爸爸送 Sam：没人开车 → Heads-up 第一条
+      { t: 'Soccer practice', who: ['sam', 'dad'], s: 1050, d: 60, sub: 'Dad drives' },
+      { t: 'Neighborhood BBQ', who: ['all'], s: 1110, d: 120 },
+      { t: 'Reading time', who: ['emma'], s: 1260, d: 30 },
+      { t: 'Book club', who: ['mom'], s: 1260, d: 60 },
+    ];
+    // 列头的胶囊：这个人第一件还没做的任务，后面 +N = 还剩几件
+    const TODO = { mom: ['Fold laundry'], emma: ['Morning reading', 'Help cook dinner'], sam: ['Soccer practice', 'Pack school bag'], dad: ['Take out trash', 'Pay bills'] };
+    const avHTML = p => `<div class="av st">${PEOPLE[p].av}</div>`;
+    const card = host.closest('.pb-day'), title = $('[data-pd-title]', card), todayBtn = $('[data-pd-today]', card);
+    const head = COLS.map(p => `<div class="pd-ph"><div class="pd-who"><div class="av av30 st">${PEOPLE[p].av}</div><b>${p === 'mom' ? 'You' : PEOPLE[p].name}</b></div>
+      <div class="pd-pill" data-who="${p}"><i></i><span>${TODO[p][0]}</span>${TODO[p].length > 1 ? `<em>+${TODO[p].length - 1}</em>` : ''}</div></div>`).join('');
+    const hours = Array.from({ length: H1 - H0 }, (_, h) => `<p style="top:${h * PX}px">${h === 0 ? '' : fmtTime((H0 + h) * 60).replace(':00', '')}</p>`).join('');
+    const lines = Array.from({ length: H1 - H0 }, (_, h) => `<div class="cp-line" style="top:${h * PX}px"></div>`).join('');
+    const now = new Date(Date.now() + offset), nowMin = now.getHours() * 60 + now.getMinutes();
+    host.innerHTML = `<div class="cp-grid-in" style="--cols:${COLS.length}">
+      <div class="cp-row pd-head"><div></div>${head}</div>
+      <div class="cp-body"><div class="cp-inner"></div></div></div>`;
+    const body = $('.cp-body', host), inner = $('.cp-inner', host);
+    // 别的天：用全家共享的事件数据（和 Calendar 页同一份），每个参与者那列都放一块
+    // 工作日固定有上学接送（妈妈开车），周末没有
+    const SCHOOL = [DAY[0], DAY.find(e => e.t === 'School pick-up')];
+    const eventsOf = d => {
+      if (d === 0) return DAY;
+      const date = new Date(2024, 9, 29 + d), weekday = ![0, 6].includes(date.getDay());
+      return [...(weekday ? SCHOOL : []), ...familyEvents(date).filter(e => !weekday || peopleOf(e.who).every(p => p === 'dad') || e.start >= 540 && (e.start + e.dur <= 900 || e.start >= 930)).map(e => ({ t: e.title, who: e.who, s: e.start, d: e.dur }))];
+    };
+    let day = 0;
+    function render() {
+      const evs = eventsOf(day);
+      const cols = COLS.map(p => {
+        const blocks = evs.filter(e => e.who[0] !== 'all' && peopleOf(e.who).includes(p)).map(e => {
+          const ps = peopleOf(e.who), who = [p, ...ps.filter(x => x !== p)];   // 这一列的人放第一个 = 底色是他的，其余的人是圆弧
+          const top = (e.s - H0 * 60) / 60 * PX, h = Math.max(22, e.d / 60 * PX - 3);
+          const time = `${fmtTime(e.s)} – ${fmtTime(e.s + e.d)}`;
+          return `<div class="cp-ev${h < 38 ? ' short' : h < 56 ? ' mid' : ''}${e.needs ? ' needs' : ''}" data-t="${e.t}" data-who="${who}" style="top:${top + 1}px;height:${h}px;left:3px;width:calc(100% - 6px)">
+            <p class="t">${e.t}</p>${h >= 38 ? `<p class="s">${e.sub ? e.sub + ' · ' : ''}${time}</p>` : ''}${h >= 54 && ps.length > 1 ? `<div class="avs">${who.map(avHTML).join('')}</div>` : ''}</div>`;
+        }).join('');
+        return `<div class="cp-col" style="height:${(H1 - H0) * PX}px">${blocks}</div>`;
+      }).join('');
+      // 全家都在的事：一块横跨四列，不在每列各放一份（四块一模一样的 BBQ 看起来像假数据）
+      const wide = evs.filter(e => e.who[0] === 'all').map(e => {
+        const top = (e.s - H0 * 60) / 60 * PX, h = Math.max(22, e.d / 60 * PX - 3);
+        return `<div class="cp-ev pd-wide" data-who="${COLS}" style="top:${top + 1}px;height:${h}px">
+          <p class="t">${e.t}</p><p class="s">Everyone · ${fmtTime(e.s)} – ${fmtTime(e.s + e.d)}</p><div class="avs">${COLS.map(avHTML).join('')}</div></div>`;
+      }).join('');
+      // 现在：一条线横穿所有人的列，只在开头一个点；只在今天出现
+      const nowLine = day === 0 && nowMin > H0 * 60 && nowMin < H1 * 60 ? `<div class="cp-now" style="top:${(nowMin - H0 * 60) / 60 * PX}px"></div>` : '';
+      inner.innerHTML = `${lines}<div class="cp-hours">${hours}</div>${cols}${wide}${nowLine}`;
+      const date = new Date(2024, 9, 29 + day);
+      title.textContent = date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+      title.classList.toggle('off', day !== 0);        // 看的不是今天：标题变灰，Today 可按
+      todayBtn.classList.toggle('is-off', day === 0);
+      card.classList.toggle('is-other-day', day !== 0);   // 列头的任务胶囊只对今天有效，别的天变淡
+    }
+    function go(d) { day = d; render(); inner.classList.remove('pd-swap'); void inner.offsetWidth; inner.classList.add('pd-swap'); }
+    $('[data-pd-prev]', card).addEventListener('click', () => go(day - 1));
+    $('[data-pd-next]', card).addEventListener('click', () => go(day + 1));
+    todayBtn.addEventListener('click', () => { if (day) go(0); });
+    render();
+
+    // ---- Heads-up：点条目 = 在日历里找到它；每条同一个 Done 按钮 = 处理完了，这一条滑走 ----
+    const hu = $('#s9 .pb-heads'), huList = $('.hu-list', hu), huCount = $('[data-hu-count]', hu);
+    const syncHu = () => {
+      const n = $$('.hu:not(.gone)', huList).length;
+      huCount.textContent = n ? `${n} thing${n > 1 ? 's' : ''}` : '';
+      if (!n) huList.innerHTML = '<li class="hu-clear">All clear for today</li>';
+    };
+    const dismiss = li => { li.classList.add('gone'); setTimeout(() => { li.remove(); syncHu(); }, 260); };
+    $('[data-hu="ride"]', hu).addEventListener('click', e => {
+      const piano = DAY.find(x => x.needs);
+      if (e.target.closest('.btn')) {   // Done = 她已经安排好了：日历里那块去掉描边和"No ride yet"
+        Object.assign(piano, { sub: '', needs: false });
+        if (day === 0) render();
+        dismiss(e.currentTarget);
+        return;
+      }
+      if (day !== 0) go(0);
+      const el = $$('.cp-ev', inner).find(x => x.dataset.t === piano.t && x.closest('.cp-col') === $$('.cp-col', inner)[1]);
+      if (!el) return;
+      body.scrollTo({ top: el.offsetTop - 40, behavior: 'smooth' });
+      el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+    });
+    for (const k of ['sign', 'pay', 'tmrw']) $(`[data-hu="${k}"] .btn`, hu).addEventListener('click', e => dismiss(e.currentTarget.closest('.hu')));
+
+    // 打开时停在"现在"前一小时，留出半行让整点标签不贴边；页面没显示时设不了 scrollTop，等它第一次有高度再设
+    new ResizeObserver((es, ro) => { if (!es[0].contentRect.height) return; body.scrollTop = (nowMin / 60 - H0 - 1) * PX - 14; ro.disconnect(); }).observe(body);
+  })();
+
   // ---------- Our Little World 轮播：点击/左右滑切换，6 秒自动播放 ----------
   (() => {
-    const card = $('#s1 .memories');
+    const card = $('#s1 .wall-photo');   // 照片铺满整张卡做底，自己轮播；便签贴在上面
     const imgs = $$('.slides img', card);
     const count = $('[data-slide-count]', card);
     if (imgs.length < 2) { count.textContent = `1 / ${imgs.length}`; return; }
@@ -684,7 +810,7 @@
     if (reduceMotion.matches) return;
     const card = $('.rewards', s2);
     if (!card) return;
-    const D0 = 300, spring = 'cubic-bezier(0.2, 1.5, 0.45, 1)', out = 'cubic-bezier(0.23, 1, 0.32, 1)';
+    const D0 = 120, out = 'cubic-bezier(0.23, 1, 0.32, 1)';
     const countUp = (el, delay, dur = 650) => {
       if (!el) return;
       const target = +el.textContent || 0, t0 = performance.now() + delay;
@@ -697,22 +823,12 @@
       requestAnimationFrame(step);
       setTimeout(() => { el.textContent = target; }, delay + dur + 30);   // 兜底：保证最终值
     };
-    countUp($('.balance b', card), D0);
     $$('.reward', card).forEach((li, i) => {
-      const d = D0 + 80 + i * 70;
-      li.animate([{ opacity: 0, transform: 'translateY(14px) scale(0.97)' }, { opacity: 1, transform: 'none' }],
-        { duration: 460, delay: d, easing: out, fill: 'backwards' });
-      const art = $('.reward-art', li);
-      if (art) {
-        const base = getComputedStyle(art).transform, b = base === 'none' ? '' : base;
-        art.animate([{ opacity: 0, transform: `${b} scale(0.5) rotate(-14deg)` }, { opacity: 1, transform: b || 'none' }],
-          { duration: 620, delay: d + 90, easing: spring, fill: 'backwards' });
-      }
+      const d = D0 + i * 30;
+      li.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }],
+        { duration: 240, delay: d, easing: out, fill: 'backwards' });   // 高频：短、轻、不回弹
       countUp($('.reward-prog b', li), d + 120, 600);
-      if (li.classList.contains('can')) {
-        $('.redeem', li)?.animate([{ opacity: 0, transform: 'scale(0.6)' }, { opacity: 1, transform: 'none' }],
-          { duration: 520, delay: d + 260, easing: spring, fill: 'backwards' });
-      }
+      $('.ring-fill', li)?.animate([{ strokeDasharray: '0px 100px' }, {}], { duration: 700, delay: d + 120, easing: out, fill: 'backwards' });   // 圈和数字一起涨
     });
   }
 
@@ -720,17 +836,68 @@
     $$('[data-balance]').forEach(el => { el.textContent = state.balance; });
     $('[data-coins]', s2).textContent = state.balance;
     rwPage?.render();
+    renderNow?.();
     for (const li of $$('.reward', s2)) {
       const r = rewardById(li.dataset.id), btn = $('.btn', li), can = !r.done && state.balance >= r.cost;
       li.classList.toggle('done', !!r.done);
       li.classList.toggle('can', can);
       btn.disabled = !can;
       btn.textContent = r.done ? 'Redeemed' : 'Redeem';
-      const prog = $('.reward-prog b', li);
-      if (prog) prog.textContent = Math.min(state.balance, r.cost);
+      li.style.setProperty('--p', Math.min(100, Math.round(state.balance / r.cost * 100)));
+      const prog = $('.reward-prog', li);
+      // 每一项都写还差多少（不只是正在攒的那一个）
+      if (prog) prog.innerHTML = `<b>${Math.min(state.balance, r.cost)}</b>/${r.cost} · ${state.balance >= r.cost ? 'ready!' : `${r.cost - state.balance} more coins`}`;
+    }
+    sortRewards();
+  }
+
+  // 按"快完成"排：攒够的最前，其余按进度（已攒 / 目标）从高到低，兑换过的沉底；顺序变了就让条目滑到新位置
+  function sortRewards() {
+    const list = $('.reward-list', s2);
+    if (!list) return;
+    const items = $$('.reward', list);
+    const key = li => { const r = rewardById(li.dataset.id); return [r.done ? 1 : 0, -Math.min(1, state.balance / r.cost), r.cost]; };
+    const cmp = (a, b) => { const x = key(a), y = key(b); return x[0] - y[0] || x[1] - y[1] || x[2] - y[2]; };
+    const next = [...items].sort(cmp);
+    if (next.every((li, i) => li === items[i])) return;
+    const before = new Map(items.map(li => [li, li.getBoundingClientRect().top]));
+    list.append(...next);
+    if (reduceMotion.matches) return;
+    const k = window.__stageScale || 1;
+    for (const li of next) {
+      const dy = (before.get(li) - li.getBoundingClientRect().top) / k;
+      if (dy) li.animate([{ transform: `translateY(${dy}px)` }, { transform: 'none' }], { duration: 360, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' });
     }
   }
 
+  // ---------- 现在（Personal 主角）：下一个没做的任务 + 今天下一件事还有多久 ----------
+  function renderNow() {
+    const card = $('.now', s2);
+    if (!card) return;
+    const i = state.tasks.findIndex(t => !t.done), t = state.tasks[i];
+    card.classList.toggle('all-done', !t);
+    $('[data-now-name]', card).textContent = t ? t.name : 'All done today!';
+    if (t) { $('[data-now-coins]', card).textContent = `+${t.coins}`; $('[data-now-icon]', card).src = t.icon; }
+    const goal = rewardById('switch');
+    const more = $('[data-goal-more]', s2);
+    if (more) more.textContent = state.balance >= goal.cost ? 'ready!' : `${goal.cost - state.balance} more coins`;
+  }
+  $('[data-now-done]', s2)?.addEventListener('click', () => {
+    const i = state.tasks.findIndex(t => !t.done);
+    if (i >= 0) $('.check', checklist.children[i])?.click();   // 复用清单里的完成逻辑（金币飞入、进度更新）
+  });
+  // 孩子的 Tasks 左右翻：昨天看完成情况，明天看已经安排的
+  (() => {
+    const head = $('[data-kt-step]', s2); if (!head) return;
+    let off = 0;
+    const sub = document.createElement('p'); sub.className = 'kt-day'; head.before(sub);
+    const set = d => { off = d; $('[data-kt-today]', s2).classList.toggle('is-off', d === 0);
+      sub.textContent = d === 0 ? '' : d < 0 ? 'Yesterday · 3 of 3 done' : 'Tomorrow · 2 planned';
+      $('.tasks2', s2).classList.toggle('is-other-day', d !== 0); };
+    $('[data-kt-prev]', s2).addEventListener('click', () => set(Math.max(-1, off - 1)));
+    $('[data-kt-next]', s2).addEventListener('click', () => set(Math.min(1, off + 1)));
+    $('[data-kt-today]', s2).addEventListener('click', () => set(0));
+  })();
   function renderProgress() {
     const done = state.tasks.filter(t => t.done).length, total = state.tasks.length;
     $('[data-done]', s2).textContent = `${done} of ${total} done`;
@@ -739,11 +906,12 @@
     $('[data-pct]', s2).textContent = pct + '%';
     $('.progress', s2).setAttribute('aria-valuenow', pct);
     tkPage?.syncFamily();
+    renderNow();
   }
 
   // 金币从 from 飞到余额胶囊（反向则飞出）
-  function flyCoins(fromEl, toEl, n) {
-    const b = board.getBoundingClientRect(), s = window.__stageScale || 1;
+  function flyCoins(fromEl, toEl, n, host = board) {   // host：金币画在哪一层（默认 Personal 的 board）
+    const b = host.getBoundingClientRect(), s = window.__stageScale || 1;
     const p = el => { const r = el.getBoundingClientRect(); return [(r.left + r.width / 2 - b.left) / s, (r.top + r.height / 2 - b.top) / s]; };
     const [x0, y0] = p(fromEl), [x1, y1] = p(toEl);
     const count = Math.min(5, Math.max(1, Math.round(n / 2)));
@@ -753,7 +921,7 @@
       c.className = 'fly-coin';
       c.style.left = x0 - 7 + 'px';
       c.style.top = y0 - 6 + 'px';
-      board.append(c);
+      host.append(c);
       const dx = x1 - x0, dy = y1 - y0, lift = -60 - i * 6;
       c.animate([
         { transform: 'translate(0,0) rotate(42deg) scale(1)', opacity: 0 },
@@ -780,7 +948,7 @@
       const chip = $('.chip', li);
       if (t.done) {
         const ms = flyCoins(chip, coinsEl, t.coins);
-        setTimeout(() => { state.balance += t.coins; renderBalance(); bump(balanceEl); }, ms);
+        setTimeout(() => { state.balance += t.coins; renderBalance(); if (balanceEl) bump(balanceEl); }, ms);
       } else {
         state.balance = Math.max(0, state.balance - t.coins);
         renderBalance();
@@ -797,8 +965,8 @@
     bar.style.width = '0';
     pctEl.textContent = '0%';
     void bar.offsetWidth;
-    const delay = 320, dur = 760;
-    bar.style.transition = `width ${dur}ms cubic-bezier(0.2, 1.5, 0.45, 1) ${delay}ms`;
+    const delay = 120, dur = 400;
+    bar.style.transition = `width ${dur}ms cubic-bezier(0.23, 1, 0.32, 1) ${delay}ms`;   // 不回弹（M15）
     bar.style.width = target + '%';
     const t0 = performance.now() + delay;
     const step = now => {
@@ -817,7 +985,7 @@
     renderProgress();
   }
 
-  const GRABS_EMPTY = '<li class="grabs-empty"><img src="assets/emoji/1f60a.svg" alt=""><p>All claimed, nice!</p><span>New tasks show up tomorrow</span></li>';
+  const GRABS_EMPTY = '<li class="grabs-empty"><img src="assets/emoji/1f60a.svg" alt=""><p>All claimed, nice!</p></li>';
 
   function claim(g, card) {
     const i = state.grabs.indexOf(g);
@@ -869,10 +1037,29 @@
     state.balance -= r.cost;
     r.done = true;
     state.history.unshift({ name: r.name, art: r.art, cost: r.cost, date: 'Today' });
-    $$('.balance, .tasks-coins, .rw-balance').forEach(bump);
+    $$('.tasks-coins, .rw-balance').forEach(bump);
     renderBalance();
     rwPage.renderHistory();
     celebrate(r.name, r.art, r.cost);
+    addPromise(r);   // 兑换即成立：给父母的待办里加一条"兑现承诺"
+  }
+  // ---------- 父母的待办：孩子兑换的奖励 = 父母要兑现的承诺 ----------
+  const ptodo = $('[data-ptodo]');
+  // 父母页的清单（她自己的 Tasks + 孩子卡里的任务）：和孩子页同一种勾选；进度跟着更新
+  const syncTodoCount = () => {
+    const rows = $$('.check-row', ptodo), done = rows.filter(r => r.classList.contains('done')).length, pct = Math.round(done / rows.length * 100);
+    const card = ptodo.closest('.pb-tasks');
+    $('.progress-label p', card).textContent = `${done} of ${rows.length} done`;
+    $('.progress-pct', card).textContent = pct + '%';
+    $('.progress-track i', card).style.width = pct + '%';
+  };
+  function bindTodo(li) { $('.check', li).addEventListener('click', e => { const on = !li.classList.contains('done'); li.classList.toggle('done', on); e.currentTarget.setAttribute('aria-pressed', on); if (li.closest('[data-ptodo]')) syncTodoCount(); }); }
+  $$('#s9 .check-row').forEach(bindTodo);
+  function addPromise(r) {
+    const li = document.createElement('li');
+    li.className = 'check-row';
+    li.innerHTML = `<button class="check" type="button" aria-pressed="false"><svg viewBox="0 0 16 16"><path d="M3.5 8.3l3 3 6-6.4"/></svg></button><p><span class="pt-t">${r.name} for Emma</span><span class="pt-sub">Promise · Emma redeemed ${r.cost} coins</span></p>`;
+    ptodo.prepend(li); bindTodo(li); syncTodoCount();
   }
 
   for (const li of $$('.reward', s2)) {
@@ -880,7 +1067,7 @@
     btn.addEventListener('click', () => redeem(rewardById(li.dataset.id)));
   }
   // 点 Rewards 卡（Redeem 按钮以外）进 Rewards 页看全部礼物
-  $('.rewards', s2).addEventListener('click', e => { if (!e.target.closest('.redeem')) openRewards(); });
+  // My goal 卡片不再点开 Rewards 浮层（只在卡上直接 Redeem）
 
   // ---------- Rewards 页（s5）：全部礼物 + 分类 + 兑换记录 ----------
   var rwPage = (() => {
@@ -979,14 +1166,13 @@
     if (!s2.classList.contains('on')) show('s2');
     rwPage.restore?.();
     rwModal.hidden = false;
-    syncIsland();
     const card = $('.rewards', s2), fast = reduceMotion.matches;
     const from = cardInset();
     card.style.visibility = 'hidden';
     rwPanel.animate([{ clipPath: from }, { clipPath: 'inset(0px 0px 0px 0px round 28px)' }], { duration: fast ? 0 : 560, easing: rwEase });
     $('.rw-scrim', rwModal).animate([{ opacity: 0 }, { opacity: 1 }], { duration: fast ? 150 : 360, easing: 'ease-out' });
     rwContent.animate([{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: fast ? 150 : 360, delay: fast ? 0 : 200, easing: 'cubic-bezier(0.23, 1, 0.32, 1)', fill: 'backwards' });
-    $('.rw-collapse', rwModal).animate([{ opacity: 0, transform: 'scale(0.6)' }, { opacity: 1, transform: 'none' }], { duration: 320, delay: fast ? 0 : 320, easing: 'cubic-bezier(0.2, 1.5, 0.45, 1)', fill: 'backwards' });
+    $('.rw-collapse', rwModal).animate([{ opacity: 0, transform: 'scale(0.9)' }, { opacity: 1, transform: 'none' }], { duration: 320, delay: fast ? 0 : 320, easing: 'cubic-bezier(0.2, 1.5, 0.45, 1)', fill: 'backwards' });
   }
   function closeRewards() {
     if (!rwOpen) return;
@@ -999,7 +1185,6 @@
     setTimeout(() => {
       card.style.visibility = '';
       rwModal.hidden = true;
-      syncIsland();
       rwModal.getAnimations({ subtree: true }).forEach(a => a.cancel());
     }, fast ? 130 : 520);
   }
@@ -1035,7 +1220,7 @@
     canvas.width = W * dpr; canvas.height = H * dpr;
     const ctx = canvas.getContext('2d');
     ctx.scale(dpr, dpr);
-    const COLORS = ['--m-emma-solid', '--m-sam-solid', '--m-mom-solid', '--m-pair'].map(n => `rgb(${tok(n)})`).concat([tok('--accent'), tok('--gold')]);
+    const COLORS = ['--id-emma-vivid', '--id-sam-vivid', '--id-mom-vivid', '--id-dad-vivid', '--accent', '--gold'].map(tok);
     const STAR = tok('--gold');
     const coin = new Image(); coin.src = 'assets/2714f.svg';
     const cx = W / 2, cy = H / 2 - 40;
@@ -1076,19 +1261,19 @@
     // 配色取自 Family 屏 "Tasks for today" 的成员行；acc = 进度环/勾选色
     const MEMBERS = [
       { id: 'emma', kid: true, tasks: state.tasks, coins: () => state.balance,
-        bg: [tok('--task-emma-soft'), tok('--task-emma')], acc: tok('--task-emma-acc') },
-      { id: 'sam', kid: true, bank: 15, bg: [tok('--task-sam-soft'), tok('--task-sam')], acc: tok('--task-sam-acc'), tasks: [
+        acc: tok('--id-emma-vivid') },
+      { id: 'sam', kid: true, bank: 15, acc: tok('--id-sam-vivid'), tasks: [
         { name: 'Brush teeth', icon: E('1faa5'), coins: 2, done: true, when: 'Morning' },
         { name: 'Soccer practice', icon: E('26bd'), coins: 5, done: false, when: 'Afternoon' },
         { name: 'Pack school bag', icon: E('1f392'), coins: 3, done: false, when: 'Evening' },
       ] },
-      { id: 'mom', bg: [tok('--task-mom-soft'), tok('--task-mom')], acc: tok('--task-mom-acc'), tasks: [
+      { id: 'mom', acc: tok('--id-mom-vivid'), tasks: [
         { name: 'Pack lunches', icon: E('1f96a'), done: true, when: 'Morning' },
         { name: 'Grocery run', icon: E('1f6d2'), done: true, when: 'Afternoon' },
         { name: 'Set the table', icon: E('1f374'), done: true, when: 'Evening' },
         { name: 'Fold laundry', icon: E('1f9fa'), done: false, when: 'Chores' },
       ] },
-      { id: 'dad', bg: [tok('--task-dad-soft'), tok('--task-dad')], acc: tok('--task-dad-acc'), tasks: [
+      { id: 'dad', acc: tok('--id-dad-vivid'), tasks: [
         { name: 'Make the bed', icon: E('1f6cf'), done: true, when: 'Morning' },
         { name: 'Car service', icon: E('1f697'), done: true, when: 'Afternoon' },
         { name: 'Take out trash', icon: E('1f5d1'), done: false, when: 'Evening' },
@@ -1148,10 +1333,59 @@
     function row(m, t) {
       const li = document.createElement('li');
       li.className = 'check-row tk-row st' + (t.done ? ' done' : '');
-      li.innerHTML = `<button class="check" type="button" aria-label="Mark ${t.name} done" aria-pressed="${t.done}"><svg viewBox="0 0 16 16"><path d="M3.5 8.3l3 3 6-6.4"/></svg></button><p>${t.name}</p>${t.coins ? `<span class="tk-coins">+${t.coins}</span>` : ''}`;
+      li.innerHTML = `<button class="check" type="button" aria-label="Mark ${t.name} done" aria-pressed="${t.done}"><svg viewBox="0 0 16 16"><path d="M3.5 8.3l3 3 6-6.4"/></svg></button><p>${t.name}</p>${t.coins ? coinChip(t.coins).replace('class="chip', 'class="tk-coins chip') : ''}`;
       $('.check', li).addEventListener('click', e => { e.stopPropagation(); toggle(m, t); });
       li.addEventListener('click', () => open(m, t, li));
       return li;
+    }
+
+    // Up for grabs：全家都能领的任务，单独一列放在最前；长得和成员列一样（头部卡 + 行），每行底下一个 Claim，点了选谁领，领了就进那个人的列
+    function grabsColumn() {
+      const col = document.createElement('section');
+      col.className = 'tk-col tk-col--grabs';
+      col.style.cssText = '--i:0';
+      const n = state.grabs.length;
+      col.innerHTML = `<div class="task st tk-head tk-head--grabs">
+        <div class="avw st"><img class="tk-grabs-ico" src="assets/emoji/1f64c.svg" alt=""></div>
+        <div class="lbl"><p class="n">Up for grabs</p><p class="d">${n ? `${n} open · anyone can claim` : 'All claimed'}</p></div>
+      </div>`;
+      const list = document.createElement('div'); list.className = 'tk-list scroll';
+      const ul = document.createElement('ul');
+      for (const g of state.grabs) {
+        const li = document.createElement('li');
+        li.className = 'tk-grab';
+        li.innerHTML = `<div class="tk-grab-top"><p>${g.name}</p>${coinChip(g.coins)}</div>
+          <span class="tk-grab-date">${g.date}</span>
+          <div class="tk-grab-bot"><button class="btn btn--neutral btn--block" type="button" data-claim>Claim</button></div>
+          <div class="tk-grab-who" hidden><span>Who’s taking it?</span>${MEMBERS.map(m => `<button class="av av30 st" type="button" data-who="${m.id}" aria-label="${PEOPLE[m.id].name}">${PEOPLE[m.id].av}</button>`).join('')}</div>`;
+        $('[data-claim]', li).addEventListener('click', () => {
+          $$('.tk-grab.is-picking', ul).forEach(x => x !== li && x.classList.remove('is-picking'));
+          li.classList.toggle('is-picking');
+        });
+        $$('[data-who]', li).forEach(btn => btn.addEventListener('click', () => claimTo(g, btn.dataset.who, li)));
+        ul.append(li);
+      }
+      list.append(ul); col.append(list);
+      return col;
+    }
+    // 领走：从可领里拿掉，放进这个人今天的列表（孩子才有金币），Personal 屏的 Up for grabs / 清单同步
+    function claimTo(g, who, li) {
+      const i = state.grabs.indexOf(g);
+      if (i < 0) return;
+      state.grabs.splice(i, 1);
+      const m = MEMBERS.find(x => x.id === who);
+      m.today.push({ name: g.name, icon: g.icon, when: 'Chores', coins: m.kid ? g.coins : 0, done: false });
+      renderGrabs();
+      if (!state.grabs.length) grabsEl.innerHTML = GRABS_EMPTY;
+      if (who === 'emma') renderTasks();
+      li.classList.add('claimed');
+      setTimeout(() => {
+        render();
+        syncFamily();
+        const row = $$(`.tk-col[data-m="${who}"] .tk-row`, cols).find(el => $('p', el).textContent === g.name);
+        row?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        row?.classList.add('tk-new');
+      }, 220);
     }
 
     function column(m, i) {
@@ -1195,7 +1429,11 @@
         $('.lbl .d', head).textContent = `${doneOf(m)} of ${m.tasks.length} done`;
         $('.tk-ring circle:last-child', head).style.strokeDasharray = ringDash(m);
         const bank = $('.tk-bank', head);
-        if (bank) { $('b', bank).textContent = coinsOf(m); if (t.done && t.coins) bump(bank); }
+        if (bank) {
+          const set = () => { $('b', bank).textContent = coinsOf(m); };
+          if (t.done && t.coins) setTimeout(set, flyCoins($('.tk-coins', li), bank, t.coins, page));   // 金币从这一行飞进列头的余额，落地再变数字（flyCoins 自带 bump）
+          else set();
+        }
         if (!pop.hidden && pop.task === t) close();
       }
       summary();
@@ -1253,7 +1491,7 @@
 
     function render(entering) {
       close();
-      cols.replaceChildren(...MEMBERS.map(column));
+      cols.replaceChildren(grabsColumn(), ...MEMBERS.map((m, i) => column(m, i + 1)));
       cols.classList.remove('in'); void cols.offsetWidth;
       cols.classList.toggle('in', !!entering);
       summary();
@@ -1334,6 +1572,7 @@
     { from: 'from Sam', text: 'BBQ tonight. Save me a cookie!' },
   ];
   const note = $('.note', s2), noteText = $('[data-note-text]', s2), noteDots = $('[data-note-dots]', s2);
+  if (note) {   // 便签已从孩子页移到首页的墙上；没有就跳过
   noteDots.innerHTML = NOTES.map(() => '<i></i>').join('');
   let noteIdx = 0;
   function drawNote() {
@@ -1378,67 +1617,9 @@
     if (e.key === 'ArrowLeft') { e.preventDefault(); nextNote(-1); }
   });
 
+  }
   // ---------- Peak Hours ----------
   // Emma 的一天，按小时
-  const PEAK = [
-    [0, ''], [0, ''], [0, ''], [0, ''], [0, ''], [0, ''], [.08, ''], [.3, 'Breakfast'],
-    [.46, 'School drop-off'], [.4, 'Math class'], [.52, 'Reading group'], [.6, 'Science'],
-    [.42, 'Lunch & recess'], [.5, 'Art class'], [.38, 'Pickup'], [.62, 'Library'],
-    [.88, 'Homework with Sam'], [.74, 'Piano practice'], [.82, 'Neighborhood BBQ'], [.56, 'BBQ'],
-    [.4, 'Reading time'], [.2, 'Pack school bag'], [.06, ''], [0, ''],
-  ];
-  const hourLabel = i => `${i % 12 || (i === 0 ? 0 : 12)} ${i < 12 ? 'AM' : 'PM'}`;
-  const barsEl = $('.bars', s2), peakSub = $('.peak-sub', s2);
-  const maxI = PEAK.reduce((m, p, i) => p[0] > PEAK[m][0] ? i : m, 0);
-  PEAK.forEach(([v, what], i) => {
-    const b = document.createElement('div');
-    b.className = 'bar' + (i === maxI ? ' peak-max' : '');
-    b.setAttribute('role', 'listitem');
-    b.innerHTML = `<i style="height:0"></i>${i % 4 === 0 ? `<span>${hourLabel(i)}</span>` : ''}`;
-    b.addEventListener('click', () => {
-      const was = b.classList.contains('sel');
-      $$('.bar', barsEl).forEach(x => x.classList.remove('sel'));
-      if (was) { peakSub.textContent = 'Today'; return; }
-      b.classList.add('sel');
-      peakSub.textContent = `${hourLabel(i)} · ${what || 'Free'}`;
-    });
-    barsEl.append(b);
-  });
-  function growBars() {
-    const fills = $$('.bar i', barsEl);
-    fills.forEach(el => { el.style.transition = 'none'; el.style.height = '0'; });
-    void barsEl.offsetWidth;
-    requestAnimationFrame(() => fills.forEach((el, i) => {
-      el.style.transition = '';
-      el.style.transitionDelay = 260 + i * 18 + 'ms';
-      el.style.height = PEAK[i][0] ? Math.max(6, PEAK[i][0] * 66) + 'px' : '0';
-    }));
-  }
-
-  // ---------- 天气 ----------
-  const weather = $('.weather72', s2);
-  let celsius = false;
-  weather.addEventListener('click', () => {
-    const t = $('.w-temp', weather);
-    t.classList.add('swap');
-    setTimeout(() => {
-      celsius = !celsius;
-      $('[data-temp]', weather).textContent = celsius ? 22 : 72;
-      t.classList.remove('swap');
-    }, 160);
-  });
-
-  // ---------- 快捷操作 ----------
-  const fab = $('.fab', s2), fabMain = $('.fab-main', fab);
-  fabMain.addEventListener('click', () => {
-    const open = !fab.classList.contains('is-open');
-    fab.classList.toggle('is-open', open);
-    fabMain.setAttribute('aria-expanded', open);
-  });
-  $$('.fab-act', fab).forEach(a => a.addEventListener('click', () => {
-    a.classList.remove('pinged'); void a.offsetWidth; a.classList.add('pinged');
-  }));
-
   // 点小鸟（非 Tap to ask）时依次新建的事件
   const CREATE = [
     { title: 'Movie Night', who: ['all'], start: 1245, dur: 60, heard: 'Add movie night tonight at 8:45 for everyone.' },
@@ -1451,9 +1632,9 @@
     const s1 = $('#s1');
     const onHome = () => !$('#s2').classList.contains('on') && !$('#s5').classList.contains('on');
     voices.nestie = new Nestie(stage, {
-      center: [1201, 728],
+      center: [640, 270],
+      // 常驻底边正中：这块屏是用来看和说话的，小鸟就是语音 CTA；对话时升到中间，结束后回到底边
       resident: true,
-      onHear: on => { if (speaking !== on) { speaking = on; syncIsland(); } },
       // heard = 演示用的识别结果；status = 工具状态（进行中 / ✓ 完成）；say = 小鸟一句一句说
       reply: () => {
         const mode = voices.nestie.mode; voices.nestie.mode = null;
@@ -1497,6 +1678,8 @@
       },
     });
     $('[data-ask]', s1).addEventListener('click', () => { voices.nestie.mode = 'query'; voices.nestie.start(); });
+
+    $('[data-wake]')?.addEventListener('click', () => voices.nestie.start());   // 原型用：模拟说出唤醒词
 
     // ---- 语音回执：完成后先亮回执卡，再飞进它在界面上的位置 ----
     const ICON = {
@@ -1553,16 +1736,10 @@
       });
     }
 
-    // 滑 Tasks for today 时小鸟先让开（它压在列表右下角），停手 450ms 后回来；语音进行中不躲
-    const taskList = $('.task', s1)?.closest('.scroll');
-    let duckTimer = 0;
-    taskList?.addEventListener('scroll', () => {
-      if (voices.nestie.state !== 'idle') return;
-      voices.nestie.host.classList.add('is-ducking');
-      clearTimeout(duckTimer);
-      duckTimer = setTimeout(() => voices.nestie.host.classList.remove('is-ducking'), 450);
-    }, { passive: true });
   }
+
+  // ---------- Lists：勾掉买到的 ----------
+  $$('#s10 .lst-item .check').forEach(c => c.addEventListener('click', () => { const on = c.getAttribute('aria-pressed') !== 'true'; c.setAttribute('aria-pressed', on); c.closest('.lst-item').classList.toggle('done', on); }));
 
   // ---------- 鼠标拖拽滚动（触屏本来就能滑） ----------
   for (const el of $$('.scroll')) {
@@ -1926,5 +2103,5 @@
 
   paintIdentity(document);
   window.__proto = { state, renderBalance, rwPage, voices, calPage, tkPage, show, $, $$ };
-  show(['#s2', '#s3', '#s4', '#s5', '#s6', '#s7', '#s8'].includes(location.hash) ? location.hash.slice(1) : 's1');
+  show(['#s2', '#s3', '#s4', '#s5', '#s6', '#s7', '#s8', '#s9', '#s10'].includes(location.hash) ? location.hash.slice(1) : 's1');
 })();

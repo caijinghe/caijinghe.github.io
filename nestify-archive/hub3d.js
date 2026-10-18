@@ -604,7 +604,7 @@
   /* the picture on it. The docked device is showing the end of the demo,
      so it shows the same screen the hero's front unit does. */
   new THREE.TextureLoader().load(
-    canvas.dataset.screen || 'assets/device/device1.webp',
+    canvas.dataset.screen || 'assets/device/device1.webp?v=20261018b',
     (tex) => {
       tex.colorSpace = THREE.SRGBColorSpace;
       tex.anisotropy = renderer.capabilities.getMaxAnisotropy();

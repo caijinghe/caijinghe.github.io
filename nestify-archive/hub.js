@@ -817,7 +817,7 @@
      rewards-play 这一张 2026-08-30 就从静态图换成了播一次的动图。没有这个
      查询串，已经缓存过旧图的读者永远看不到新的，而且完全无声无息。
      改图就改这个数。 */
-  const STILL_V = '?v=403';
+  const STILL_V = '?v=20261018c';
   const stillSrc = tok => 'assets/hub/still-' + tok.replace('|', '-') + '.webp' + STILL_V;
   const warmed = new Set();
   let stillTok = '';
@@ -1223,7 +1223,10 @@
        taken out of any card that crossed that corner in flight, which the
        right-hand stack does on its way in. state.t past .88 is after the
        last card has arrived, so nothing that is still moving is ever cut. */
-    const birdOpen = kind === 'lists' ? clamp((state.t - 0.88) / 0.12) : 0;
+    /* 2026-10-18：Archive 里小鸟只在语音那一拍出现（hub-v2-embed.css），Lists 拍屏上没有鸟，
+       不再挖洞——否则停着的卡片上会多出一个空的圆缺口。要恢复改回下面这行即可：
+       kind === 'lists' ? clamp((state.t - 0.88) / 0.12) : 0 */
+    const birdOpen = 0;
     /* 小鸟的位置也是量的（hub-v2-embed.js 的 birdRect），半径贴着它的外接圆 */
     const BIRD = birdRect
       ? { x: birdRect.x + birdRect.w / 2, y: birdRect.y + birdRect.h / 2, r: birdRect.w * 0.42 }
@@ -2829,8 +2832,8 @@
            关掉时 setScreen 会 stopLive()，每帧重绘的 rAF 循环一并停掉，不空转。 */
         const GLOW_ON = false;
         window.hub3d.setScreen(wantEarly
-          ? 'assets/device/device1.webp'
-          : 'assets/device/device1.webp', wantEarly && GLOW_ON);
+          ? 'assets/device/device1.webp?v=20261018b'
+          : 'assets/device/device1.webp?v=20261018b', wantEarly && GLOW_ON);
       }
       /* 🔴 还没走到这一段时也要停在第 0 句。beatFromHubP(p) 在 p >= DOCK 时返回
          **最后一拍**（段尾那几屏本该如此），而读者还在 intro 里时 p 恒等于

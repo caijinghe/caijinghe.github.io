@@ -41,7 +41,7 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
   overflow: hidden;
   display: none;
   flex-direction: column;
-  gap: 24px;
+  gap: var(--gutter);
   padding: 32px;
   background: var(--md-bg);
 }
@@ -60,6 +60,7 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
   z-index: 10;
 }
 .switcher button {
+  white-space: nowrap;
   padding: 6px 14px;
   border-radius: var(--r-pill);
   font-size: var(--fs-small);
@@ -68,6 +69,9 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
   transition: background-color 160ms ease, color 160ms ease;
 }
 .switcher button[aria-pressed="true"] { background: var(--glass-5); color: #1d1e1b; }
+/* 原型用：模拟唤醒词（不是产品 UI） */
+.wake { position: fixed; right: 16px; bottom: 12px; z-index: 10; padding: 10px 16px; border-radius: var(--r-pill); background: var(--accent); color: #fff; font-size: var(--fs-small); font-weight: 600; }
+.wake:active { transform: scale(0.96); }
 
 /* ---------- Figma inside-stroke：不占布局、画在子元素之上 ---------- */
 .st { position: relative; }
@@ -104,15 +108,15 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
   display: flex;
   align-items: center;
   gap: 16px;
-  height: 56px;
+  height: var(--header-h);
   width: 1216px;
   flex-shrink: 0;
-  overflow: clip;
+  overflow: visible;   /* 选中头像的外圈不被裁掉 */
   position: relative;
 }
-.header .time { font-size: var(--fs-display); line-height: 56px; font-weight: 700; }
+.header .time { font-size: var(--fs-display); line-height: var(--header-h); font-weight: 700; }
 .header .pm { font-size: var(--fs-body); line-height: 1.3; font-weight: 500; color: var(--muted); }
-.header .date { font-size: var(--fs-body); line-height: 1.3; font-weight: 500; color: #626b60; }
+.header .date { font-size: var(--fs-body); line-height: 1.3; font-weight: 500; color: var(--muted); }
 .header .sun { width: 22px; height: 22px; }
 .flex1 { flex: 1 0 0; height: 1px; min-width: 1px; }
 
@@ -134,16 +138,18 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
 /* ---------- 日历卡 ---------- */
 .cal {
   width: 386px;
-  height: 656px;
+  height: var(--content-h);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--head-gap);
   padding: 16px 16px 1px;
 }
-.cal-head { display: flex; align-items: center; gap: 8px; height: 36px; width: 354px; flex-shrink: 0; overflow: clip; }
+.cal-head { display: flex; align-items: center; gap: 8px; height: 20px; width: 354px; flex-shrink: 0; overflow: visible; }   /* 高度 = 标题字高：标题顶到卡片上边 = 内边距 16 */
+.cal-head .s { text-box: trim-both cap alphabetic; align-self: center; }
+.cal-head img { width: 16px; height: 16px; }
 .cal-head .t { font-size: var(--fs-heading); line-height: 1.3; font-weight: 700; }
 .cal-head .s { font-size: var(--fs-caption); line-height: 1.3; font-weight: 400; color: var(--muted); }
-.cal-head img { width: 18px; height: 18px; }
+/* (箭头尺寸见上) */
 
 .week { display: flex; gap: 8px; height: 44px; width: 354px; flex-shrink: 0; overflow: clip; line-height: 1.25; white-space: nowrap; }
 .day {
@@ -160,10 +166,10 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
   font-weight: 500;
   background: var(--glass-1);
 }
-.day .l { font-size: var(--fs-micro); color: #777f74; }
+.day .l { font-size: var(--fs-micro); color: var(--muted); }
 .day .n { font-size: var(--fs-body-sm); color: var(--ink); }
 .day.cur { background: var(--accent); }
-.day.cur .l { color: #e8ecd8; }
+.day.cur .l { color: var(--glass-4); }
 .day.cur .n { color: #fff; font-weight: 700; }
 
 .scroll {
@@ -173,12 +179,12 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
   flex-shrink: 0;
 }
 .scroll::-webkit-scrollbar { display: none; }
-.cal .scroll { height: 540px; width: 354px; }
+.cal .scroll { flex: 1 1 0; min-height: 0; width: 354px; margin-bottom: -1px; }   /* 一直延伸到卡片底边：底部不封口，看得出能往下拉 */
 .events { display: flex; flex-direction: column; gap: 12px; padding-bottom: 16px; width: 354px; }
 
 .event {
   --sc: transparent;
-  /* 实色事件卡：每人一块实色；多人事件右下角叠其他人的同心圆弧（JS 按 data-who 设 --ev-bg） */
+  /* 事件卡：单人 = 成员实色块；多人 = 第一个人的颜色 + 右下角其他人的硬边同心圆弧（JS 按 data-who 设 --ev-bg） */
   background: var(--ev-bg, var(--md-surface));
   display: flex;
   align-items: center;
@@ -285,7 +291,7 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
   white-space: nowrap;
 }
 .task .lbl .n { font-size: var(--fs-body); font-weight: 500; }
-.task .lbl .d { font-size: var(--fs-small); font-weight: 400; color: #6f756b; }
+.task .lbl .d { font-size: var(--fs-small); font-weight: 400; color: var(--muted); }
 .task .prog { width: 34px; height: 34px; flex-shrink: 0; }
 
 /* ---------- 购物/任务清单行 ---------- */

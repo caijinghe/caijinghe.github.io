@@ -38,6 +38,7 @@
 .icon-btn img, .icon-btn svg { width: 20px; height: 20px; }
 .icon-btn svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 .icon-btn--primary, .icon-btn.cur { background: var(--accent); color: #fff; }   /* .cur = 当前页（导航） */
+.icon-btn--primary img, .icon-btn.cur img { filter: brightness(0) invert(1); }   /* 图标是 img：选中时跟着变白 */
 .icon-btn--ghost { background: var(--ink-a1); }
 .icon-btn--bare { background: transparent; }
 .icon-btn--sm { width: 32px; height: 32px; }
@@ -67,6 +68,8 @@
 .badge--surface { background: var(--md-surface-lowest); color: var(--ink); }
 .badge--glass { background: rgba(255, 255, 255, 0.72); color: var(--ink); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
 .badge--lg { height: 28px; padding: 0 12px; font-size: var(--fs-label); }
+.badge--icon { width: 18px; height: 18px; padding: 0; }   /* 只有图标：放不下文字的小块（周视图事件） */
+.badge--icon svg { width: 11px; height: 11px; }
 
 /* ---------- FilterChip（可切换的筛选胶囊；选中 = 主色浅底 + 主色描边，全站一致） ---------- */
 .filter-chip {
@@ -88,12 +91,37 @@
 
 /* ---------- CardHeader / PageHeader ---------- */
 .card-title { font-size: var(--fs-heading); font-weight: 700; line-height: 1.3; white-space: nowrap; color: var(--ink); }
+/* 标题去掉行高在文字上下多留的空白：卡片内边距 16 时，标题到上边和到左边看起来一样宽（D2、D14） */
+.card-title, .cal-head .t, .page-title { text-box: trim-both cap alphabetic; }
 .card-sub { font-size: var(--fs-caption); font-weight: 400; color: var(--muted); white-space: nowrap; }
 .page-title { font-size: var(--fs-title); font-weight: 700; line-height: 1.2; white-space: nowrap; color: var(--ink); }
+
+/* ---------- ProgressRing ---------- */
+/* 圆形进度：金色 = 金币（攒到多少），圆头；中间放金币。进度由 --p（0–100）驱动，可写在自身或祖先上 */
+.ring { position: relative; flex-shrink: 0; width: 36px; height: 36px; display: grid; place-items: center; }
+.ring svg { position: absolute; inset: 0; width: 100%; height: 100%; rotate: -90deg; scale: -1 1; overflow: visible; }   /* 从 12 点开始顺时针涨 */
+.ring circle { fill: none; stroke-width: 4; }
+.ring-track { stroke: var(--ink-a2); }
+.ring-fill { stroke: var(--gold); stroke-linecap: round; stroke-dasharray: calc(var(--p, 0) * 1px) 100px; transition: stroke-dasharray 420ms var(--ease-out); }
+.ring > img.coin { width: 15px; height: 14px; }
 
 /* ---------- Avatar ---------- */
 .avatar { position: relative; flex-shrink: 0; border-radius: var(--r-pill); overflow: hidden; background: var(--md-surface-lowest); box-shadow: 0 0 0 1.5px var(--md-surface-lowest); }
 .avatar img { width: 100%; height: 100%; object-fit: cover; }
+.avatar--20 { width: 20px; height: 20px; }
 .avatar--24 { width: 24px; height: 24px; }
 .avatar--30 { width: 30px; height: 30px; }
 .avatar--36 { width: 36px; height: 36px; }
+/* 叠放：后一个压前一个三分之一；超过 3 个只露 3 个，其余折成 +N（人多时也读得清） */
+.avatar-stack { display: inline-flex; flex-shrink: 0; }
+.avatar-stack > .avatar + .avatar { margin-left: -6px; }
+.avatar--more { display: grid; place-items: center; background: var(--md-surface); font-size: var(--fs-micro); font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+/* ---------- Popover ---------- */
+/* 浮在内容上的小面板（事件详情、任务详情、谁的视图）：和卡片同一种实色面 + elev-3 阴影，四边同一个内边距。
+   不用毛玻璃：背后的事件块会透出来，成了噪点；也不加描边。位置、宽度由各屏 CSS 定 */
+.popover { padding: var(--card-pad); border-radius: var(--r-xl); background: var(--md-surface-lowest); box-shadow: var(--elev-3); animation: popover-in var(--dur-base) var(--ease-out); }
+@keyframes popover-in { from { opacity: 0; transform: scale(0.96) translateY(4px); } }
+.popover .t { font-size: var(--fs-body); font-weight: 700; line-height: 1.25; translate: none; }
+.popover .s { margin-top: var(--sp-1); font-size: var(--fs-label); line-height: 1.35; color: var(--muted); translate: none; }
+.popover-acts { display: flex; justify-content: flex-end; align-items: center; gap: var(--sp-2); margin-top: var(--sp-4); }   /* 操作靠右：主操作在前，删除（只有图标）在后 */

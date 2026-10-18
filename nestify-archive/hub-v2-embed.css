@@ -6,7 +6,7 @@
    .hub__wrap、nestie-unit.js 的 SCREEN_H、intro 的翻卡线框）一起改成了 16:10 来配它——
    之前是反过来把新 UI 硬塞进旧的 16:9 机身，左右边距比上下宽一倍，看着像框不合身。 */
 html.is-embed, html.is-embed body { background: transparent; }
-.is-embed .switcher { display: none; }
+.is-embed .switcher, .is-embed .wake { display: none; }   /* 切换条和「Hey Nestie」原型调试按钮都不属于产品界面 */
 .is-embed .stage {
   left: 0; top: 0;
   transform: scale(1.5) !important;
@@ -28,16 +28,15 @@ html[data-hub-tab="calendar"][data-hub-phase="play"] .cp-col:not(.today) .cp-ev:
 }
 /* lists = 任务页：新任务行同样先占位隐身，交接时现身 */
 html[data-hub-tab="lists"][data-hub-phase="fly"] #s4 [data-fly] { visibility: hidden; }
-/* Nestie 对话时 proto 会把整屏虚化压暗（components.css 那条 [data-voice] 规则）。在 pad 上
-   这是对的——人在跟小鸟说话；放在网站第 0 拍 "Everything that matters today." 下面，被虚化的
-   恰恰是这一拍要展示的那一屏。嵌入时只留光环和气泡。 */
-/* 只对 Archive 那块屏生效：nestify.html 的 hero 也嵌这一页，那里要保留原样的虚化压暗
-   （它在 iframe 的 <html> 上加 .keep-voice-dim）。 */
-.is-embed:not(.keep-voice-dim) .stage[data-voice] .frame > *,
-.is-embed:not(.keep-voice-dim) .stage[data-receipt] .frame > * { filter: none; }
-.is-embed:not(.keep-voice-dim) .stage[data-voice] .frame::after,
-.is-embed:not(.keep-voice-dim) .stage[data-receipt] .frame::after { opacity: 0; }
+/* Nestie 对话时用 proto 自己的背景退后（轻微模糊 + 去色 + 55% 白雾，components.css 的 [data-voice]）。
+   2026-10-18 用户：Archive 里小鸟说话时背景不够虚，字看不清——之前这里把虚化关掉了
+   （怕挡住第 0 拍要展示的首页），现在 proto 的虚化很轻、卡片形状还认得出，直接沿用。 */
 
 /* 屏幕和机身白边分得开：proto 的页面底 #f2f2ef 和 3D 机身的白色面板几乎同色，放进设备里
    看不出屏幕在哪结束（像画面直接贴在外框上）。嵌入时把页面底压深一档，卡片仍是纯白。 */
 html.is-embed { --md-bg: #e7e7e2; }
+
+/* 小鸟只在语音那一拍（home|think）出现；其余每一拍都不趴在页头上——Archive 里每一屏
+   讲的是那一页本身，常驻的小鸟会抢眼。2026-10-18 用户定。 */
+html.is-embed:not([data-hub-phase="think"]) .nestie,
+html.is-embed:not([data-hub-phase="think"]) .nestie-hands { visibility: hidden; }
