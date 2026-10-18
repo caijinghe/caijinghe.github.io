@@ -1,0 +1,123 @@
+/* =====================================================================
+   Nestify Display · Design tokens
+   一切组件只从这里取值；新增数值先问「能不能用已有的一级」。
+   文档：DESIGN_SYSTEM.md
+   ===================================================================== */
+:root {
+  /* ---------- Color · 墨色 / 表面 ---------- */
+  --ink: #34362f;            /* 主文字 */
+  --muted: #7d8076;          /* 次要文字、说明 */
+  --surface: #ffffff;
+  --ink-a1: rgba(52, 54, 47, 0.06);   /* 极淡填充：分段控件底、图标底 */
+  --ink-a2: rgba(52, 54, 47, 0.10);   /* 轨道、按压态 */
+  --ink-a3: rgba(52, 54, 47, 0.16);   /* 细描边、弱阴影色 */
+  --ink-a4: rgba(52, 54, 47, 0.25);   /* 选中描边 */
+  --ink-a5: rgba(52, 54, 47, 0.42);   /* 禁用文字 */
+  --glass-1: rgba(255, 255, 255, 0.35);
+  --glass-2: rgba(255, 255, 255, 0.55);
+  --glass-3: rgba(255, 255, 255, 0.70);  /* 玻璃卡片底 */
+  --glass-4: rgba(255, 255, 255, 0.85);
+  --glass-5: rgba(255, 255, 255, 0.95);  /* 玻璃描边、浮层底 */
+  --hairline: rgba(168, 173, 160, 0.34);
+
+  /* ---------- Color · 品牌 / 语义 ---------- */
+  --accent: #14a4fd;         /* 主操作、今天、选中 */
+  --accent-strong: #0f7fc6;  /* 浅蓝底上的蓝字、按压 */
+  --accent-soft: #dcedfa;    /* 浅蓝底：金币胶囊等 */
+  --gold: #f0b23c;           /* 金币、进度、星星 */
+  --gold-soft: #f7d78f;
+  --gold-strong: #e8901c;
+  --success: #1f7a42;
+  --danger: #b3261e;
+
+  /* ---------- Color · 家庭成员（日历事件 / 任务） ---------- */
+  --m-emma: 243, 182, 207;  --m-emma-soft: 248, 214, 228;
+  --m-sam: 140, 209, 255;   --m-sam-soft: 220, 232, 239;
+  --m-mom: 202, 232, 233;   --m-mom-soft: 237, 249, 248;
+  --m-dad: 175, 207, 233;   --m-dad-soft: 212, 237, 250;
+  --m-pair: 247, 215, 143;  --m-pair-soft: 255, 240, 201;   /* 两人事件 */
+  --m-all: 241, 184, 208;   --m-all-soft: 247, 213, 227;    /* 全家事件 */
+  /* 多人事件融合用的淡色（每人一段渐变 + 颗粒） */
+  --m-emma-tint: 246, 198, 218; --m-sam-tint: 178, 217, 247; --m-mom-tint: 206, 236, 228; --m-dad-tint: 196, 216, 236;
+  /* 任务行（Figma Task progress）：Emma 是黄色，其余同事件色系；acc = 勾选、进度环 */
+  --task-emma: 244, 215, 148; --task-emma-soft: 255, 240, 200; --task-emma-acc: #a89a1e;
+  --task-sam: 140, 209, 255;  --task-sam-soft: 220, 232, 239;  --task-sam-acc: #2f86c2;
+  --task-mom: 198, 229, 219;  --task-mom-soft: 235, 247, 242;  --task-mom-acc: #d06a6a;
+  --task-dad: 172, 205, 231;  --task-dad-soft: 218, 237, 250;  --task-dad-acc: #6b6be0;
+  /* 实色：圆点、筛选胶囊描边 */
+  --m-emma-solid: 243, 182, 207; --m-sam-solid: 140, 209, 255; --m-mom-solid: 150, 210, 200; --m-dad-solid: 175, 207, 233;
+
+  /* ---------- Material 3 · 表面层级（扁平，靠明度分层，不用渐变） ---------- */
+  --md-bg: #f2f2ef;                    /* 页面底 */
+  --md-surface-lowest: #ffffff;        /* 卡片 */
+  --md-surface-low: #f7f7f4;
+  --md-surface: #f0f0ec;               /* 卡片里的条目 */
+  --md-surface-high: #e8e8e3;          /* 装饰形状、按压态 */
+  --md-outline: rgba(52, 54, 47, 0.12);
+  --md-primary-container: #dcecfd;     /* 唯一的品牌色大块：语音助手 */
+  --md-on-primary-container: #0b4a7f;
+
+  /* ---------- 身份色：每个成员只有一个颜色，只出现在小面积（色条、头像、进度、圆点） ---------- */
+  --id-emma: #d9c93a;
+  --id-sam: #4fa3dc;
+  --id-mom: #e58a8a;
+  --id-dad: #8f8ff0;
+  /* 色板取自参考（Mino notes）：黄 / 天蓝 / 珊瑚粉 / 薰衣草，明度和饱和度一致
+     日历事件实色填充（深色文字在上面要清楚）：每人一块实色；多人事件右下角叠其他人的同心圆弧 */
+  --id-emma-fill: #ebe37f;
+  --id-sam-fill: #74b8e3;
+  --id-mom-fill: #f1aaaa;
+  --id-dad-fill: #b2b2f7;
+  /* 成员浅实色：整块区域的底（Tasks 页每人一列），参考便签式的柔和色块 */
+  --id-emma-soft: #fdfbe6;
+  --id-sam-soft: #e2f0fd;
+  --id-mom-soft: #ffdfdf;
+  --id-dad-soft: #ebebfd;
+  /* 成员亮色：小面积强调（进度环、圆点），比 fill 更饱和明亮，在浅灰 / 白底上也看得清 */
+  --id-emma-vivid: #f2c12e;
+  --id-sam-vivid: #3fa2ee;
+  --id-mom-vivid: #f07c7c;
+  --id-dad-vivid: #8a86f5;
+  --on-id-fill: #26281f;            /* 实色上的文字 */
+  --on-id-fill-muted: rgba(38, 40, 31, 0.66);
+
+  /* ---------- Radius ---------- */
+  --r-xs: 6px;     /* 进度条、细条、事件块 */
+  --r-sm: 10px;    /* 小控件 */
+  --r-md: 14px;    /* 列表条目（= Figma item） */
+  --r-lg: 18px;    /* 小卡片、弹出卡 */
+  --r-xl: 22px;    /* 卡片（= Figma card） */
+  --r-2xl: 28px;   /* 浮层、面板、对话框 */
+  --r-pill: 999px; /* 胶囊按钮、标签、头像 */
+
+  /* ---------- Type（Google Sans Flex） ---------- */
+  --fs-micro: 11px;    /* 轴标签、角标 */
+  --fs-small: 12px;    /* Figma small */
+  --fs-label: 13px;    /* 按钮、胶囊 */
+  --fs-caption: 14px;  /* Figma caption */
+  --fs-body-sm: 16px;
+  --fs-body: 18px;     /* Figma body */
+  --fs-heading: 20px;  /* Figma heading：所有卡片标题 */
+  --fs-title: 24px;    /* 页面 / 浮层标题 */
+  --fs-display: 46px;  /* 页头时间 */
+
+  /* ---------- Spacing（2px 网格；常用 4 · 8 · 12 · 16 · 20 · 24） ---------- */
+  --gutter: 20px;     /* 卡片之间（所有屏一致） */
+  --card-pad: 16px;   /* 卡片内边距 */
+  --screen-pad: 32px; /* 屏幕边距 */
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 20px; --sp-6: 24px; --sp-8: 32px;
+
+  /* ---------- Elevation ---------- */
+  --elev-1: 0 1px 3px rgba(52, 54, 47, 0.10), 0 1px 2px rgba(52, 54, 47, 0.06);   /* 静止的按钮、胶囊 */
+  --elev-2: 0 6px 16px rgba(52, 54, 47, 0.12);                                      /* 抬起：弹出卡、拖动中 */
+  --elev-3: 0 24px 60px rgba(20, 24, 18, 0.20), 0 6px 18px rgba(52, 54, 47, 0.10);  /* 浮层、对话框、回执卡 */
+
+  /* ---------- Motion ---------- */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);       /* 进场、状态变化（默认） */
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);    /* 翻页、展开 / 收起面板 */
+  --ease-spring: cubic-bezier(0.2, 1.5, 0.45, 1);   /* 弹出、强调（带回弹） */
+  --ease-in-out: cubic-bezier(0.45, 0, 0.25, 1);    /* 飞行轨迹 */
+  --dur-fast: 160ms;   /* 按压反馈 */
+  --dur-base: 240ms;   /* 颜色、透明度 */
+  --dur-slow: 420ms;   /* 位移、进场 */
+}

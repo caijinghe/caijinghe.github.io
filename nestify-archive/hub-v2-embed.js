@@ -21,24 +21,12 @@
 
   const nestie = P.voices.nestie;
 
-  /* ---------- 和 app.js 同一套配色（那几个常量在它的闭包里，拿不到） ---------- */
-  const FAMILY_COLOR = {
-    emma: ['248,214,228', '243,182,207'], sam: ['220,232,239', '140,209,255'],
-    mom: ['237,249,248', '202,232,233'], dad: ['212,237,250', '175,207,233'],
-    pair: ['255,240,201', '247,215,143'], all: ['247,213,227', '241,184,208'],
-  };
-  const TINT = { emma: '246,198,218', sam: '178,217,247', mom: '206,236,228', dad: '196,216,236' };
+  /* 颜色不在这里写：落点元素只标 data-who，由 proto 自己的 paintIdentity（app.js）按
+     tokens.css 的成员色上色——和 proto 里的日历事件同一套实色 + 角落光晕。 */
   const AV = {
     emma: 'assets/profile/avatar.jpg', sam: 'assets/sam.jpg', mom: 'assets/4a680.png', dad: 'assets/7903a.png',
   };
   const peopleOf = who => who[0] === 'all' ? ['emma', 'sam', 'mom', 'dad'] : who;
-  const colorOf = who => FAMILY_COLOR[who[0] === 'all' ? 'all' : who.length > 1 ? 'pair' : who[0]];
-  function grad(who, deg = 160) {
-    const ps = peopleOf(who);
-    if (ps.length === 1) { const c = colorOf(who); return `linear-gradient(${deg}deg, rgb(${c[0]}), rgb(${c[1]}))`; }
-    const stops = ps.map((p, i) => `rgb(${TINT[p]}) ${Math.round(8 + i / (ps.length - 1) * 84)}%`).join(', ');
-    return `var(--grain) 0 0 / 140px 140px, linear-gradient(115deg, ${stops})`;
-  }
   const fmtTime = m => `${Math.floor(m / 60) % 12 || 12}:${String(m % 60).padStart(2, '0')} ${m < 720 ? 'AM' : 'PM'}`;
   const H0 = 7, PX = 56;   // calPage：7:00 起，每小时 56px
 
@@ -58,7 +46,7 @@
         const ad = document.createElement('div');
         ad.className = 'cp-ad';
         ad.dataset.fly = i;
-        ad.style.background = grad(e.who, 100);
+        ad.dataset.who = peopleOf(e.who);
         ad.textContent = e.title;
         adcs[e.day]?.append(ad);
         return;
@@ -68,7 +56,8 @@
       b.type = 'button';
       b.className = 'cp-ev' + (h < 38 ? ' short' : h < 56 ? ' mid' : '');
       b.dataset.fly = i;
-      b.style.cssText = `z-index:5;top:${top + 1}px;height:${h}px;left:3px;width:calc(100% - 6px);background:${grad(e.who)}`;
+      b.dataset.who = peopleOf(e.who);
+      b.style.cssText = `z-index:5;top:${top + 1}px;height:${h}px;left:3px;width:calc(100% - 6px)`;
       b.innerHTML = `<p class="t">${e.title}</p>${h >= 38 ? `<p class="s">${fmtTime(e.start)} – ${fmtTime(e.start + e.dur)}</p>` : ''}`
         + (h >= 54 ? `<div class="avs">${peopleOf(e.who).map(p => `<div class="av st"><img class="fill cover" src="${AV[p]}" alt=""></div>`).join('')}</div>` : '');
       cols[e.day]?.append(b);
@@ -78,28 +67,19 @@
 
   /* ---------- 任务页：新任务的落地版本 ----------
      tkPage.render() 每次进页面都整列重建，同样靠 MutationObserver 补回。行的结构照抄
-     tkPage 的 row()。只有目标所在的那一节（Morning / Evening / Chores…）不存在时才补一个节标题。 */
+     tkPage 的 row()：新版每人一条连续列表，不分时段、行里没有图标，金币是行尾的「+N」。 */
   const tkCols = $('#s4 .tk-cols');
   function injectTasks() {
     cfg.tasks.forEach((t, i) => {
       const col = $(`.tk-col[data-m="${t.m}"]`, tkCols);
       if (!col || $(`[data-fly="${i}"]`, col)) return;
-      const list = $('.tk-list', col);
-      let ul = null;
-      for (const h of $$('.tk-sec', list)) if (h.textContent === t.sec) ul = h.nextElementSibling;
-      if (!ul) {
-        const h = document.createElement('p');
-        h.className = 'tk-sec';
-        h.dataset.flySec = '';
-        h.textContent = t.sec;
-        ul = document.createElement('ul');
-        list.append(h, ul);
-      }
+      const ul = $('.tk-list ul', col);
+      if (!ul) return;
       const li = document.createElement('li');
       li.className = 'check-row tk-row st';
       li.dataset.fly = i;
-      li.innerHTML = `<button class="check" type="button" aria-pressed="false"><svg viewBox="0 0 16 16"><path d="M3.5 8.3l3 3 6-6.4"/></svg></button><img class="emo" src="assets/emoji/${t.icon}.svg" alt=""><p>${t.name}</p>`
-        + (t.coins ? `<span class="chip"><img class="coin" src="assets/2714f.svg" alt=""><b>${t.coins}</b></span>` : '');
+      li.innerHTML = `<button class="check" type="button" aria-pressed="false"><svg viewBox="0 0 16 16"><path d="M3.5 8.3l3 3 6-6.4"/></svg></button><p>${t.name}</p>`
+        + (t.coins ? `<span class="tk-coins">+${t.coins}</span>` : '');
       ul.append(li);
     });
   }
@@ -231,12 +211,14 @@
     if (!el) return null;
     const r = el.getBoundingClientRect();
     if (!r.width) return null;
-    return { x: r.left, y: r.top, w: r.width, h: r.height, bg: getComputedStyle(el).backgroundImage };
+    // 背景：日历落点取 proto 算好的 --ev-bg（实色 + 角落光晕，光晕是百分比尺寸，缩放不变形）
+    const cs = getComputedStyle(el);
+    return { x: r.left, y: r.top, w: r.width, h: r.height, bg: cs.getPropertyValue('--ev-bg').trim() || cs.backgroundImage };
   }
   window.__hub = {
     configure(c) {
       cfg = { cal: c.cal || [], tasks: c.tasks || [] };
-      $$('[data-fly], [data-fly-sec]').forEach(el => el.remove());
+      $$('[data-fly]').forEach(el => el.remove());
       injectCal();
       injectTasks();
     },

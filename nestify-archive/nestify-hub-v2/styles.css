@@ -1,10 +1,9 @@
 /* Nestify display · personal — 1:1 复刻自 Figma 2026-WEBSITE / nestify (350:912, 353:3119) */
 
 :root {
-  --ink: #34362f;
-  --muted: #7d8076;
-  --card: 22px;
-  --item: 14px;
+  /* 颜色、字号等全部见 tokens.css；这里只保留 Figma 原名的别名 */
+  --card: var(--r-xl);
+  --item: var(--r-md);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -44,7 +43,7 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
   flex-direction: column;
   gap: 24px;
   padding: 32px;
-  background-image: linear-gradient(140.194deg, rgb(244, 243, 237) 10.714%, rgb(233, 238, 233) 82.143%);
+  background: var(--md-bg);
 }
 .frame.on { display: flex; }
 
@@ -56,19 +55,19 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
   display: flex;
   gap: 4px;
   padding: 4px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--r-pill);
+  background: var(--glass-1);
   z-index: 10;
 }
 .switcher button {
   padding: 6px 14px;
-  border-radius: 999px;
-  font-size: 12px;
+  border-radius: var(--r-pill);
+  font-size: var(--fs-small);
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--glass-2);
   transition: background-color 160ms ease, color 160ms ease;
 }
-.switcher button[aria-pressed="true"] { background: rgba(255, 255, 255, 0.9); color: #1d1e1b; }
+.switcher button[aria-pressed="true"] { background: var(--glass-5); color: #1d1e1b; }
 
 /* ---------- Figma inside-stroke：不占布局、画在子元素之上 ---------- */
 .st { position: relative; }
@@ -76,7 +75,7 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
   content: '';
   position: absolute;
   inset: 0;
-  border: var(--sw, 1px) solid var(--sc, rgba(255, 255, 255, 0.82));
+  border: var(--sw, 1px) solid var(--sc, var(--glass-4));
   border-radius: inherit;
   pointer-events: none;
 }
@@ -96,7 +95,7 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
 .w7 { font-weight: 700; }
 
 /* ---------- 背景光晕 ---------- */
-.glow { position: absolute; }
+.glow { position: absolute; display: none; }   /* 扁平：去掉背景光晕 */
 .glow > div { position: absolute; }
 .glow img { width: 100%; height: 100%; }
 
@@ -111,31 +110,22 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
   overflow: clip;
   position: relative;
 }
-.header .time { font-size: 46px; line-height: 56px; font-weight: 700; }
-.header .pm { font-size: 18px; line-height: 1.3; font-weight: 500; color: var(--muted); }
-.header .date { font-size: 17px; line-height: 1.3; font-weight: 500; color: #626b60; }
+.header .time { font-size: var(--fs-display); line-height: 56px; font-weight: 700; }
+.header .pm { font-size: var(--fs-body); line-height: 1.3; font-weight: 500; color: var(--muted); }
+.header .date { font-size: var(--fs-body); line-height: 1.3; font-weight: 500; color: #626b60; }
 .header .sun { width: 22px; height: 22px; }
 .flex1 { flex: 1 0 0; height: 1px; min-width: 1px; }
 
-.nav {
-  width: 44px;
-  height: 44px;
-  border-radius: 22px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #fff;
-  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
-}
-.nav:active { transform: scale(0.94); }
-.nav img { width: 21px; height: 21px; }
-.nav.home { background: rgba(255, 255, 255, 0.65); }
-.nav.cur { background: #14a4fd; --sc: rgba(255, 255, 255, 0.7); }
+
+
+
+
+
 
 /* ---------- 通用卡片 ---------- */
 .card {
-  background: rgba(255, 255, 255, 0.5); /* 代码标注 0.66，但 Figma 实际渲染（含未导出的玻璃效果）实测≈0.5 */
+  --sc: transparent;   /* 纯白卡不需要内描边（白线会压在卡里的灰色条目上） */
+  background: var(--md-surface-lowest);
   border-radius: var(--card);
   overflow: clip;
   flex-shrink: 0;
@@ -148,18 +138,18 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 17px 17px 1px;
+  padding: 16px 16px 1px;
 }
 .cal-head { display: flex; align-items: center; gap: 8px; height: 36px; width: 354px; flex-shrink: 0; overflow: clip; }
-.cal-head .t { font-size: 20px; line-height: 1.3; font-weight: 700; }
-.cal-head .s { font-size: 14px; line-height: 1.3; font-weight: 400; color: var(--muted); }
+.cal-head .t { font-size: var(--fs-heading); line-height: 1.3; font-weight: 700; }
+.cal-head .s { font-size: var(--fs-caption); line-height: 1.3; font-weight: 400; color: var(--muted); }
 .cal-head img { width: 18px; height: 18px; }
 
-.week { display: flex; gap: 7px; height: 44px; width: 354px; flex-shrink: 0; overflow: clip; line-height: 1.25; white-space: nowrap; }
+.week { display: flex; gap: 8px; height: 44px; width: 354px; flex-shrink: 0; overflow: clip; line-height: 1.25; white-space: nowrap; }
 .day {
   width: 44px;
   height: 44px;
-  border-radius: 14px;
+  border-radius: var(--r-md);
   flex-shrink: 0;
   overflow: clip;
   display: flex;
@@ -168,11 +158,11 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
   justify-content: center;
   gap: 1px;
   font-weight: 500;
-  background: rgba(255, 255, 255, 0.28);
+  background: var(--glass-1);
 }
-.day .l { font-size: 10px; color: #777f74; }
-.day .n { font-size: 16px; color: #34362f; }
-.day.cur { background: #28acfd; }
+.day .l { font-size: var(--fs-micro); color: #777f74; }
+.day .n { font-size: var(--fs-body-sm); color: var(--ink); }
+.day.cur { background: var(--accent); }
 .day.cur .l { color: #e8ecd8; }
 .day.cur .n { color: #fff; font-weight: 700; }
 
@@ -187,18 +177,20 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
 .events { display: flex; flex-direction: column; gap: 12px; padding-bottom: 16px; width: 354px; }
 
 .event {
-  --sc: rgba(255, 255, 255, 0.65);
+  --sc: transparent;
+  /* 实色事件卡：每人一块实色；多人事件右下角叠其他人的同心圆弧（JS 按 data-who 设 --ev-bg） */
+  background: var(--ev-bg, var(--md-surface));
   display: flex;
   align-items: center;
   gap: 12px;
   height: 84px;
   width: 354px;
   flex-shrink: 0;
-  padding: 0 17px;
+  padding: 0 16px;
   border-radius: var(--item);
   overflow: clip;
 }
-.event .ring { position: absolute; }
+.event .ring { position: absolute; display: none; }   /* 扁平：去掉同心圆装饰 */
 .event .ring > div { position: absolute; }
 .event .ring img { width: 100%; height: 100%; }
 .event .ring.r380 { left: 140px; top: -20px; width: 380px; height: 380px; }
@@ -216,16 +208,16 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
   line-height: 1.3;
   white-space: nowrap;
 }
-.ev-text .t { font-size: 18px; font-weight: 500; }
-.ev-text .s { font-size: 14px; font-weight: 400; color: var(--muted); }
+.ev-text .t { font-size: var(--fs-body); font-weight: 500; }
+.ev-text .s { font-size: var(--fs-caption); font-weight: 400; color: var(--muted); }
 
 /* 头像 */
 .member {
   --sw: 1.5px;
-  --sc: rgba(255, 255, 255, 0.9);
+  --sc: var(--glass-5);
   width: 30px;
   height: 30px;
-  border-radius: 15px;
+  border-radius: var(--r-pill);
   background: #fff;
   flex-shrink: 0;
   display: flex;
@@ -233,9 +225,9 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
   justify-content: center;
 }
 .av {
-  --sc: rgba(255, 255, 255, 0.9);
+  --sc: var(--glass-5);
   position: relative;
-  border-radius: 18px;
+  border-radius: var(--r-lg);
   overflow: clip;
   flex-shrink: 0;
 }
@@ -249,29 +241,30 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
   top: 0;
   width: 30px;
   height: 30px;
-  border-radius: 15px;
+  border-radius: var(--r-pill);
   overflow: clip;
 }
 .emma-crop { height: 232.56%; left: -106.9%; top: -83.72%; width: 344.83%; }
 
 /* ---------- 任务行 ---------- */
 .task {
-  --sc: rgba(255, 255, 255, 0.65);
+  --sc: transparent;
+  background: var(--md-surface);
   display: flex;
   align-items: center;
   gap: 10px;
   height: 76px;
   width: 280px;
-  padding: 0 15px;
+  padding: 0 16px;
   border-radius: var(--item);
   flex-shrink: 0;
 }
 .task .avw {
   --sw: 1.5px;
-  --sc: rgba(255, 255, 255, 0.85);
+  --sc: var(--glass-4);
   width: 36px;
   height: 36px;
-  border-radius: 18px;
+  border-radius: var(--r-pill);
   background: #fff;
   overflow: clip;
   flex-shrink: 0;
@@ -291,8 +284,8 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
   line-height: 1.3;
   white-space: nowrap;
 }
-.task .lbl .n { font-size: 17px; font-weight: 500; }
-.task .lbl .d { font-size: 12px; font-weight: 400; color: #6f756b; }
+.task .lbl .n { font-size: var(--fs-body); font-weight: 500; }
+.task .lbl .d { font-size: var(--fs-small); font-weight: 400; color: #6f756b; }
 .task .prog { width: 34px; height: 34px; flex-shrink: 0; }
 
 /* ---------- 购物/任务清单行 ---------- */
@@ -309,8 +302,8 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
 .li.abs { position: absolute; }
 .li .emo { width: 22px; height: 22px; flex-shrink: 0; }
 .li .dot { width: 27px; height: 27px; flex-shrink: 0; }
-.li p { font-size: 14px; font-weight: 500; line-height: 1.2; color: #34362f; white-space: nowrap; }
-.li .hr { position: absolute; left: 0; top: 50px; width: 202px; height: 1px; background: rgba(168, 173, 160, 0.34); }
+.li p { font-size: var(--fs-caption); font-weight: 500; line-height: 1.2; color: var(--ink); white-space: nowrap; }
+.li .hr { position: absolute; left: 0; top: 50px; width: 202px; height: 1px; background: var(--hairline); }
 
 /* ---------- 绝对定位文本（Figma 垂直居中文本框） ---------- */
 .vc {
@@ -335,8 +328,6 @@ p, span.w5 { translate: 0 0.75px; }
 .day p,
 .task .lbl .d,
 
-[style*="font-size:10px"]:not(.vc),
-[style*="font-size:11px"]:not(.vc),
-[style*="font-size:12px"]:not(.vc) { translate: 0 0.5px; }
-.vc { translate: none; }
-[style*="line-height:1.15"] { translate: none; }
+.memories-tag p, .memories-count p, .kicker, .meal-meta, .meal-time p, .tap-ask span,
+.weather-place, .weather-range, .weather-note, .weather-hour p { translate: 0 0.5px; }   /* ≤12px 的小字 */
+.vc, .meal-name { translate: none; }

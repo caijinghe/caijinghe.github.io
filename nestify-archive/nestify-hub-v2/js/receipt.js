@@ -25,7 +25,7 @@
     layer.className = 'receipt-layer';
     layer.innerHTML = `<div class="receipt">
       <div class="rc-bg"></div>
-      <div class="rc-top"><span class="rc-chip"><svg viewBox="0 0 16 16"><path d="M3.5 8.4l3 3 6-6.6"/></svg>Completed</span><div class="rc-avs">${o.people.join('')}</div></div>
+      <div class="rc-top"><span class="rc-chip badge badge--success badge--lg"><svg viewBox="0 0 16 16"><path d="M3.5 8.4l3 3 6-6.6"/></svg>Completed</span><div class="rc-avs">${o.people.join('')}</div></div>
       <p class="rc-action">${o.action}</p>
       <div class="rc-item">${o.preview}</div>
       <div class="rc-details">${o.details.map(([i, t]) => `<p>${i}<span>${t}</span></p>`).join('')}</div>
@@ -36,7 +36,7 @@
 
     // 1) 亮相 + 停留
     card.animate([{ opacity: 0, transform: 'translateY(10px) scale(0.94)' }, { opacity: 1, transform: 'none' }],
-      { duration: reduce.matches ? 150 : 360, easing: 'cubic-bezier(0.2, 1.3, 0.4, 1)' });
+      { duration: reduce.matches ? 150 : 360, easing: 'cubic-bezier(0.2, 1.5, 0.45, 1)' });
     await wait(HOLD);
 
     // 2) 解析目标：插入占位、滚到可见，等两帧让布局和滚动生效
@@ -89,7 +89,7 @@
     const box = d => ({ left: `${R.x - d}px`, top: `${R.y - d}px`, width: `${R.w + 2 * d}px`, height: `${R.h + 2 * d}px`, borderRadius: `${r0 + d}px` });
     layer.append(ring);
     ring.animate([{ ...box(0), opacity: 0 }, { ...box(2), opacity: 1, offset: .3 }, { ...box(5), opacity: 0 }],
-      { duration: 520, easing: 'cubic-bezier(0.215, 0.61, 0.355, 1)', fill: 'forwards' });
+      { duration: 520, easing: 'cubic-bezier(0.23, 1, 0.32, 1)', fill: 'forwards' });
     await wait(520);
     layer.remove();
   }

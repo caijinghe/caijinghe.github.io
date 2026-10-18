@@ -1,6 +1,42 @@
 (() => {
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+  // 颜色只有一个来源：tokens.css。canvas / WAAPI / 拼 rgb() 的地方都从这里读，不在 JS 里写色值
+  const tok = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  // 身份色：单人 = 左侧色条 + 一点点同色底；多人 = 中性底 + 按人分段的色条（扁平，不用渐变过渡）
+  const ID = ['emma', 'sam', 'mom', 'dad'];
+  const idColor = p => tok(`--id-${p}`);
+  function identity(whoList) {
+    const ps = whoList.filter(p => ID.includes(p));
+    if (!ps.length) return null;
+    const fill = p => tok(`--id-${p}-fill`);
+    const strip = ps.length === 1 ? fill(ps[0]) : `linear-gradient(to right, ${ps.map((p, i) => `${fill(p)} ${i / ps.length * 100}% ${(i + 1) / ps.length * 100}%`).join(', ')})`;
+    // 单人：右下角一团同色亮光；多人：右下角其他人的颜色柔和地晕开（实色打底，只在角落有渐变）
+    // 光晕尺寸用 --glow / --glow-multi，由容器按卡片大小给（日历页的小块用小光晕，避免整块被晕脏）
+    if (ps.length === 1) {
+      const c = fill(ps[0]);
+      return { bg: `radial-gradient(var(--glow, 140px 100px) at 100% 100%, color-mix(in srgb, ${c} 45%, #fff) 0%, transparent 100%), ${c}`, strip };
+    }
+    // 色带顺序：和底色越接近的放越外层（和底色相接、过渡自然），差别最大的放圆心
+    const rgb = h => { const v = parseInt(h.replace('#', ''), 16); return [v >> 16 & 255, v >> 8 & 255, v & 255]; };
+    const dist = (a, b) => { const [r1, g1, b1] = rgb(a), [r2, g2, b2] = rgb(b), rm = (r1 + r2) / 2; return Math.sqrt((2 + rm / 256) * (r1 - r2) ** 2 + 4 * (g1 - g2) ** 2 + (2 + (255 - rm) / 256) * (b1 - b2) ** 2); };
+    const base = fill(ps[0]);
+    const rest = ps.slice(1).sort((a, b) => dist(fill(b), base) - dist(fill(a), base));   // 远 → 近 = 圆心 → 外层
+    // 色带均匀：圆心先实实占住一块（0–14%），其余等距排开，88% 前淡完（最外层不再拖成一大片）
+    const n = rest.length, step = n > 1 ? 48 / (n - 1) : 0;
+    const stops = rest.map((p, i) => i === 0 ? `${fill(p)} 0%, ${fill(p)} 14%` : `${fill(p)} ${Math.round(14 + i * step)}%`).join(', ');
+    return { bg: `radial-gradient(var(--glow-multi, 170px 120px) at 100% 100%, ${stops}, transparent 88%), ${fill(ps[0])}`, strip };
+  }
+  function paintIdentity(root) {
+    for (const el of root.querySelectorAll ? root.querySelectorAll('[data-who]') : []) {
+      const who = el.dataset.who === 'all' ? ID : el.dataset.who.split(',');
+      const v = identity(who);
+      if (!v) continue;
+      el.style.setProperty('--ev-bg', v.bg);
+    }
+  }
+  new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => { if (n.nodeType === 1) { paintIdentity(n); if (n.matches?.('[data-who]')) paintIdentity(n.parentNode); } })))
+    .observe(document.getElementById('stage') || document.body, { childList: true, subtree: true });
 
   // ---------- 共享片段注入 ----------
   for (const slot of $$('[data-slot]')) {
@@ -44,7 +80,8 @@
   function syncIsland() {
     island.classList.toggle('is-speaking', speaking);
     const rwOpenNow = !!document.querySelector('.rw-modal:not([hidden])');   // Rewards 浮层打开时让出顶部
-    island.classList.toggle('is-on', speaking || (!rwOpenNow && ($('#s2').classList.contains('on') || $('#s5').classList.contains('on'))));
+    // 只在 Emma 的 Personal 屏、有人说话时出现；Family 首页是全家共用的，不显示个人身份
+    island.classList.toggle('is-on', speaking && $('#s2').classList.contains('on') && !rwOpenNow);
   }
   function show(id) {
     if (id === 's5') { show('s2'); openRewards(); return; }   // Rewards 现在是 Personal 上的浮层，不是独立页面
@@ -60,7 +97,7 @@
     if (id === 's3') calPage.restore();
     if (id === 's5') rwPage.restore();
     screensaver(id === 's6');
-    if (id === 's4') tkPage.render(true);
+    if (id === 's4') tkPage.setDay(0);
     else tkPage.close();
   }
 
@@ -114,6 +151,9 @@
       pts.push(`${(94 + r * Math.cos(t)).toFixed(2)},${(100 + r * Math.sin(t)).toFixed(2)}`);
     }
     $('.clock-face', clock).setAttribute('d', 'M' + pts.join('L') + 'Z');
+    // 画布裁到表盘的外接框：花瓣正好顶到格子边，不留内缩
+    const R = 84 + 4.2;
+    $('svg', clock).setAttribute('viewBox', `${94 - R} ${100 - R} ${2 * R} ${2 * R}`);
   })();
 
   function tick() {
@@ -121,8 +161,7 @@
     const hm = `${h % 12 || 12}:${String(m).padStart(2, '0')}`;
     $$('.header .time').forEach(el => { if (el.textContent !== hm) el.textContent = hm; });
     $$('.header .pm').forEach(el => { el.textContent = h < 12 ? 'AM' : 'PM'; });
-    $('[data-ss-time]').textContent = hm;
-    $('[data-ss-ampm]').textContent = h < 12 ? 'AM' : 'PM';
+    $$('[data-ss-big]').forEach(el => { if (el.textContent !== hm) el.textContent = hm; });
     $('.hand-h', clock).setAttribute('transform', `rotate(${(h % 12 + m / 60) * 30} 94 100)`);
     $('.hand-m', clock).setAttribute('transform', `rotate(${(m + s / 60) * 6} 94 100)`);
     $('.hand-s', clock).setAttribute('transform', `rotate(${s * 6} 94 100)`);
@@ -142,13 +181,8 @@
     dad: { name: 'Dad', av: '<img class="fill cover" src="assets/7903a.png" alt="">' },
   };
   // Family 屏：每个成员一种渐变（取自 Figma 原事件色）
-  const FAMILY_COLOR = {
-    emma: ['248,214,228', '243,182,207'], sam: ['220,232,239', '140,209,255'],
-    mom: ['237,249,248', '202,232,233'], dad: ['212,237,250', '175,207,233'],
-    pair: ['255,240,201', '247,215,143'], all: ['247,213,227', '241,184,208'],
-  };
+  const FAMILY_COLOR = Object.fromEntries(['emma', 'sam', 'mom', 'dad', 'pair', 'all'].map(k => [k, [tok(`--m-${k}-soft`), tok(`--m-${k}`)]]));
   // Emma 屏：混合事件融进对方的颜色
-  const MIX = { sam: 'var(--c-sam)', mom: 'rgb(198, 229, 219)', dad: 'rgb(175, 207, 233)', all: 'var(--c-all)' };
   const FAMILY_POOL = [
     ['Piano Lesson', ['emma']], ['Art Club', ['emma']], ['Spelling Quiz Prep', ['emma']],
     ['Swim Class', ['sam']], ['Soccer Practice', ['sam']], ['Dentist @ Bright Smiles', ['sam']],
@@ -184,7 +218,7 @@
     const free = SLOTS.filter(s => !used.has(s)).sort(() => rand() - .5);
     return events.map(e => [e, fixedOf(e) || free.pop()]).sort((a, b) => toMin(a[1]) - toMin(b[1]));
   }
-  const RINGS = '<div class="ring r380"><div><img src="assets/d4cf6.svg" alt=""></div></div><div class="ring r260"><div style="inset:-1.54%"><img src="assets/51820.svg" alt=""></div></div>';
+  const RINGS = '<div class="ring r380"><div><img src="assets/d4cf6.svg" alt=""></div></div><div class="ring r260"><div><img src="assets/51820.svg" alt=""></div></div>';
 
   // ---- 共享数据：按日期给出 Family 事件（列表和 Calendar 页共用） ----
   const dayNum = d => Math.round(new Date(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5);
@@ -199,7 +233,8 @@
   const ALL_DAY = { 20025: [{ title: 'Call Pediatrician · before 6 PM', who: ['dad'] }], 20026: [{ title: 'Mom’s Birthday', who: ['mom'] }], 20027: [{ title: 'Halloween', who: ['all'] }], 20028: [{ title: 'No School', who: ['emma', 'sam'] }] };
   const fmtTime = m => `${Math.floor(m / 60) % 12 || 12}:${String(m % 60).padStart(2, '0')} ${m < 720 ? 'AM' : 'PM'}`;
   const peopleOf = who => who[0] === 'all' ? ['emma', 'sam', 'mom', 'dad'] : who;
-  const colorOf = who => FAMILY_COLOR[who[0] === 'all' ? 'all' : who.length > 1 ? 'pair' : who[0]];
+  const colorKey = who => who[0] === 'all' ? 'all' : who.length > 1 ? 'pair' : who[0];
+  const colorOf = who => FAMILY_COLOR[colorKey(who)];
   const labelOf = who => who[0] === 'all' ? 'Everyone' : who.map(p => PEOPLE[p].name).join(' & ');
   function familyEvents(date) {
     const k = dayNum(date);
@@ -211,14 +246,62 @@
     const evs = schedule(pick(pool, n, rand, weekend), e => e[3], rand).map(([[title, who, before], time]) => {
       const dur = before ? 30 : [30, 45, 60, 60, 90][Math.floor(rand() * 5)];
       return { title, who, before, dur, start: toMin(time) - (before ? 30 : 0), rings: who.length > 1 || who[0] === 'all' || rand() < .25 };
-    }).sort((a, b) => a.start - b.start);
+    });
+    // 周末下午 / 晚上补两个固定活动，避免周视图右下角空着
+    const WEEKEND_EXTRA = {
+      6: [{ title: 'Family Bike Ride', who: ['all'], start: 960, dur: 90 }, { title: 'Backyard S’mores', who: ['all'], start: 1110, dur: 75 }],
+      0: [{ title: 'Grandma’s Visit', who: ['all'], start: 900, dur: 120 }, { title: 'Board Game Night', who: ['emma', 'sam', 'dad'], start: 1140, dur: 60 }],
+    };
+    for (const x of WEEKEND_EXTRA[date.getDay()] || []) {
+      if (!evs.some(e => e.start < x.start + x.dur && x.start < e.start + e.dur)) evs.push({ ...x, rings: true });
+    }
+    evs.sort((a, b) => a.start - b.start);
     // 不重叠：先缩短前一个，还撞就把后一个顺延
     for (let i = 1; i < evs.length; i++) {
       const p = evs[i - 1], e = evs[i];
       if (p.start + p.dur > e.start) p.dur = Math.max(30, e.start - p.start);
       if (p.start + p.dur > e.start) e.start = p.start + p.dur;
     }
-    return evs;
+    const kept = DELETED_EVENTS[k] ? evs.filter(e => !DELETED_EVENTS[k].has(`${e.start}|${e.title}`)) : evs;
+    return ADDED_EVENTS[k] ? [...kept, ...ADDED_EVENTS[k]].sort((a, b) => a.start - b.start) : kept;
+  }
+  // 删掉的生成事件（按日期种子算出来的删不掉，只能记下来生成时跳过）
+  const DELETED_EVENTS = {};
+  // 用 + Add 新建的事件：今天的直接进 TODAY_EVENTS，其它天按 dayNum 存这里，生成当天事件时并进去
+  const ADDED_EVENTS = {};
+  function addFamilyEvent(date, e) {
+    const k = dayNum(date);
+    const list = k === dayNum(TODAY_DATE) ? TODAY_EVENTS : (ADDED_EVENTS[k] ??= []);
+    list.push(e);
+    list.sort((a, b) => a.start - b.start);
+    if (k === dayNum(TODAY_DATE)) familyTodayInsert(e);
+  }
+  function removeFamilyEvent(date, e) {
+    const k = dayNum(date), list = k === dayNum(TODAY_DATE) ? TODAY_EVENTS : ADDED_EVENTS[k];
+    const i = list ? list.indexOf(e) : -1;
+    if (i >= 0) list.splice(i, 1);
+    else (DELETED_EVENTS[k] ??= new Set()).add(`${e.start}|${e.title}`);
+    if (k === dayNum(TODAY_DATE)) familyTodayRemove(e);
+  }
+  // Family 屏今天的列表是单独缓存的，改了今天的事件要同步那一行
+  function familyTodayRemove(e) {
+    const api = $('#s1 .cal')?._api;
+    if (!api) return;
+    if (!api.isToday()) api.goToday();
+    [...api.list.children].find(r => $('.t', r)?.textContent === e.title)?.remove();
+    api.save();
+  }
+  function familyTodayInsert(e) {
+    const api = $('#s1 .cal')?._api;
+    if (!api) return;
+    if (!api.isToday()) api.goToday();
+    const rows = [...api.list.children];
+    const at = rows.find(r => { const s = $('.s', r)?.textContent || ''; return !s.startsWith('Before') && toMin(s.split(' · ')[0]) > e.start; })
+      || rows.find(r => ($('.s', r)?.textContent || '').startsWith('Before'));
+    const tmp = document.createElement('div');
+    tmp.innerHTML = familyRow({ ...e, rings: e.who.length > 1 || e.who[0] === 'all' });
+    api.list.insertBefore(tmp.firstElementChild, at || null);
+    api.save();
   }
 
   function familyDay(i) { return familyEvents(WEEK[i]).map(familyRow).join(''); }
@@ -226,9 +309,9 @@
     {
       const people = who[0] === 'all' ? ['emma', 'sam', 'mom'] : who, color = colorOf(who);
       const [main, ...rest] = people.slice().reverse();
-      const extras = rest.map((p, m) => `<div class="extra st" style="left:${-20 * (m + 1)}px">${PEOPLE[p].av}</div>`).join('');
+      const extras = rest.map((p, m) => `<div class="extra st extra-${m + 1}">${PEOPLE[p].av}</div>`).join('');
       const time = before ? 'Before ' + fmtTime(start + dur) : fmtTime(start);
-      return `<div class="event st" style="background-image:linear-gradient(164.688deg, rgb(${color[0]}) 12.857%, rgb(${color[1]}) 84.286%)">
+      return `<div class="event st" data-who="${peopleOf(who)}">
         ${rings ? RINGS : ''}
         <div class="ev-text"><p class="t">${title}</p><p class="s">${time} · ${labelOf(who)}</p></div>
         <div class="member st">${extras}<div class="av av30 st">${PEOPLE[main].av}</div></div></div>`;
@@ -243,8 +326,8 @@
       const label = !with_ ? 'Emma' : with_ === 'all' ? 'Everyone' : 'Emma & ' + PEOPLE[with_].name;
       const avs = me + others.map(p => `<div class="av av30 st">${PEOPLE[p].av}</div>`).join('');
       return with_
-        ? `<div class="event st ev-emma ev-mix grain" style="--mix:${MIX[with_]}"><div class="ev-text"><p class="t">${title}</p><p class="s">${time} · ${label}</p></div><div class="stack">${avs}</div></div>`
-        : `<div class="event st ev-emma grain-soft"><div class="ev-text"><p class="t">${title}</p><p class="s">${time} · ${label}</p></div><div class="stack">${avs}</div></div>`;
+        ? `<div class="event st ev-emma" data-who="emma,${with_ === 'all' ? 'sam,mom,dad' : with_}"><div class="ev-text"><p class="t">${title}</p><p class="s">${time} · ${label}</p></div><div class="stack">${avs}</div></div>`
+        : `<div class="event st ev-emma" data-who="emma"><div class="ev-text"><p class="t">${title}</p><p class="s">${time} · ${label}</p></div><div class="stack">${avs}</div></div>`;
     }).join('');
   }
 
@@ -296,14 +379,14 @@
     const s3 = $('#s3'), card = $('.calpage', s3), grid = $('.cp-grid', card), pop = $('.cp-pop', card);
     const H0 = 7, H1 = 22, PX = 56;                       // 7:00–22:00，每小时 56px
     const DOW = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
-    const CHIP = { emma: 'rgb(243,182,207)', sam: 'rgb(140,209,255)', mom: 'rgb(150,210,200)', dad: 'rgb(175,207,233)' };
+    const CHIP = { emma: 1, sam: 1, mom: 1, dad: 1 };   // 颜色见 tokens.css --m-*-solid
     const st = { offset: 0, view: 'week', day: TODAY_DATE, sel: new Set() /* 空 = 显示全部 */, scroll: (12 - H0) * PX };
     const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
     const same = (a, b) => dayNum(a) === dayNum(b);
     const weekStart = () => addDays(new Date(2024, 9, 28), st.offset * 7);
     const avHTML = p => `<div class="av st">${PEOPLE[p].av}</div>`;
     // 单人 = 自己的颜色；多人 = 各成员颜色渐变融合 + 颗粒（同 Personal 屏混合事件）
-    const TINT = { emma: '246,198,218', sam: '178,217,247', mom: '206,236,228', dad: '196,216,236' };
+    const TINT = Object.fromEntries(['emma', 'sam', 'mom', 'dad'].map(k => [k, tok(`--m-${k}-tint`)]));
     const grad = (who, deg = 160) => {
       const ps = peopleOf(who);
       if (ps.length === 1) { const c = colorOf(who); return `linear-gradient(${deg}deg, rgb(${c[0]}), rgb(${c[1]}))`; }
@@ -314,7 +397,7 @@
 
     // 成员筛选
     const peopleEl = $('.cp-people', card);
-    peopleEl.innerHTML = Object.keys(CHIP).map(p => `<button class="cp-chip" type="button" data-p="${p}" aria-pressed="false" style="--chip:${CHIP[p]}"><div class="av st">${PEOPLE[p].av}</div>${PEOPLE[p].name}</button>`).join('');
+    peopleEl.innerHTML = Object.keys(CHIP).map(p => `<button class="cp-chip filter-chip" type="button" data-p="${p}" aria-pressed="false"><div class="av st">${PEOPLE[p].av}</div>${PEOPLE[p].name}</button>`).join('');
     $$('.cp-chip', peopleEl).forEach(b => b.addEventListener('click', () => {
       // 先点 = 只看这个人；再点别人 = 加进来；点已选的 = 去掉，全去掉回到显示全部
       const p = b.dataset.p;
@@ -349,18 +432,21 @@
     function build() {
       const days = st.view === 'week' ? Array.from({ length: 7 }, (_, i) => addDays(weekStart(), i)) : [st.day];
       const ws = days[0], we = days[days.length - 1];
-      const m = d => d.toLocaleDateString('en-US', { month: 'long' });
-      $('[data-cp-month]', card).textContent = m(ws) === m(we) ? `${m(ws)} ${ws.getFullYear()}` : `${m(ws).slice(0, 3)} – ${m(we).slice(0, 3)} ${we.getFullYear()}`;
-      $('[data-cp-range]', card).textContent = st.view === 'week'
-        ? `${ws.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${we.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
+      // 标题只一行：日视图 "Monday, Oct 7"，周视图 "Oct 7 – 13"（跨月 "Oct 28 – Nov 3"）；看的不是今天就变灰，且 Today 按钮不可按的反过来
+      const md = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const title = $('[data-cp-month]', card), hasToday = days.some(d => same(d, TODAY_DATE));
+      title.textContent = st.view === 'week'
+        ? (ws.getMonth() === we.getMonth() ? `${md(ws)} – ${we.getDate()}` : `${md(ws)} – ${md(we)}`)
         : ws.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+      title.classList.toggle('off', !hasToday);
+      $('[data-cp-today]', card).disabled = hasToday;
 
       const now = new Date(Date.now() + offset), nowMin = now.getHours() * 60 + now.getMinutes();
       const g = document.createElement('div');
       g.className = 'cp-grid-in' + (st.view === 'day' ? ' day-view' : '');
       g.style.setProperty('--cols', days.length);
       const head = days.map(d => `<div class="cp-dh${same(d, TODAY_DATE) ? ' today' : ''}" data-d="${dayNum(d)}"><span>${DOW[d.getDay()]}</span><b>${d.getDate()}</b></div>`).join('');
-      const allday = days.map(d => `<div class="cp-adc">${(ALL_DAY[dayNum(d)] || []).filter(e => visible(e.who)).map(e => `<div class="cp-ad" data-who="${e.who}" style="background:${grad(e.who, 100)}">${e.title}</div>`).join('')}</div>`).join('');
+      const allday = days.map(d => `<div class="cp-adc">${(ALL_DAY[dayNum(d)] || []).filter(e => visible(e.who)).map(e => `<div class="cp-ad" data-who="${e.who}">${e.title}</div>`).join('')}</div>`).join('');
       const hours = Array.from({ length: H1 - H0 }, (_, h) => `<p style="top:${h * PX}px">${h === 0 ? '' : fmtTime((H0 + h) * 60).replace(':00', '')}</p>`).join('');
       const lines = Array.from({ length: H1 - H0 }, (_, h) => `<div class="cp-line" style="top:${h * PX}px"></div>`).join('');
       let k = 0;
@@ -371,7 +457,7 @@
           const time = e.before ? 'Before ' + fmtTime(e.start + e.dur) : `${fmtTime(e.start)} – ${fmtTime(e.start + e.dur)}`;
           const avs = h >= 54 ? `<div class="avs">${peopleOf(e.who).map(avHTML).join('')}</div>` : '';
           return `<button class="cp-ev pop-in${ov ? ' ov' : ''}${h < 38 ? ' short' : h < 56 ? ' mid' : ''}" type="button" data-who="${e.who}" data-i="${dayNum(d)}:${e.start}:${e.title}"
-            style="--k:${k++};z-index:${z};top:${top + 1}px;height:${h}px;left:calc((100% - ${indent * INDENT}px) * ${i / n} + ${indent * INDENT + 3}px);width:calc((100% - ${indent * INDENT}px) / ${n} - 6px);background:${grad(e.who)}">
+            style="--k:${k++};z-index:${z};top:${top + 1}px;height:${h}px;left:calc((100% - ${indent * INDENT}px) * ${i / n} + ${indent * INDENT + 3}px);width:calc((100% - ${indent * INDENT}px) / ${n} - 6px)">
             <p class="t">${e.title}</p>${h >= 38 ? `<p class="s">${time}</p>` : ''}${avs}</button>`;
         }).join('');
         const nowLine = same(d, TODAY_DATE) && nowMin > H0 * 60 && nowMin < H1 * 60 ? `<div class="cp-now" style="top:${(nowMin - H0 * 60) / 60 * PX}px"></div>` : '';
@@ -409,8 +495,21 @@
       const e = familyEvents(new Date(+d * 864e5 + 12 * 36e5)).find(x => x.start === +start && x.title === title);
       const date = new Date(+d * 864e5 + 12 * 36e5).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
       const time = e.before ? 'Before ' + fmtTime(e.start + e.dur) : `${fmtTime(e.start)} – ${fmtTime(e.start + e.dur)}`;
-      pop.innerHTML = `<div class="strip" style="background:${grad(e.who, 90)}"></div><p class="t">${e.title}</p><p class="s">${date} · ${time}</p>
-        <div class="who">${peopleOf(e.who).map(p => `<span>${avHTML(p)}${PEOPLE[p].name}</span>`).join('')}</div>`;
+      pop.innerHTML = `<div class="strip" style="background:${identity(peopleOf(e.who)).strip}"></div><p class="t">${e.title}</p><p class="s">${date} · <span class="nw">${time}</span></p>
+        <div class="who">${peopleOf(e.who).map(p => `<span>${avHTML(p)}${PEOPLE[p].name}</span>`).join('')}</div>
+        <div class="cp-pop-acts">
+          <button type="button" data-pop-edit><svg viewBox="0 0 16 16"><path d="M10.6 2.9l2.5 2.5-7.4 7.4-3.2.7.7-3.2z"/></svg>Edit</button>
+          <button type="button" class="del" data-pop-del><svg viewBox="0 0 16 16"><path d="M2.8 4.3h10.4M6.2 4.3V2.8h3.6v1.5M4.2 4.3l.6 8.9h6.4l.6-8.9M6.8 6.6v4.4M9.2 6.6v4.4"/></svg>Delete</button>
+        </div>`;
+      const evDate = new Date(+d * 864e5 + 12 * 36e5);
+      $('[data-pop-del]', pop).addEventListener('click', () => {
+        hidePop();
+        el.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'scale(0.94)' }], { duration: 200, easing: 'ease-in', fill: 'forwards' }).onfinish = () => {
+          removeFamilyEvent(evDate, e);
+          render(0);
+        };
+      });
+      $('[data-pop-edit]', pop).addEventListener('click', () => { hidePop(); editEvent(evDate, e); });
       // 按弹窗实际尺寸定位：优先放事件右侧，放不下放左侧；两侧都放不下（日视图满宽）就跟着点击位置；纵向夹在卡片内
       pop.hidden = false;
       const c = card.getBoundingClientRect(), r = el.getBoundingClientRect(), s = window.__stageScale || 1;
@@ -424,6 +523,25 @@
       pop.style.left = x + 'px'; pop.style.top = y + 'px';
     }
     const hidePop = () => { pop.hidden = true; };
+    function editEvent(date, e) {
+      const { days } = addCtx();
+      const TIMES = [...new Set([480, 600, 720, 900, 1020, 1140, e.start])].sort((a, b) => a - b);
+      addSheet.open({
+        title: 'Edit event', placeholder: 'What’s happening?', text: e.title, saveLabel: 'Save',
+        rows: [
+          { label: 'Day', value: String(dayNum(date)), options: days.map(x => ({ v: String(dayNum(x)), label: x.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' }) })) },
+          { label: 'Time', value: String(e.start), options: TIMES.map(t => ({ v: String(t), label: fmtTime(t) })) },
+          { label: 'Who', multi: true, value: e.who, options: [{ v: 'all', label: 'Everyone' }, ...['emma', 'sam', 'mom', 'dad'].map(personChip)] },
+        ],
+        onSave(title, d, t, who) {
+          const to = days.find(x => String(dayNum(x)) === d) || date;
+          const next = { ...e, title, who, start: +t, before: e.before && +t === e.start ? e.before : undefined };
+          removeFamilyEvent(date, e);
+          addFamilyEvent(to, next);
+          showAdded(to, next);
+        },
+      });
+    }
     card.addEventListener('click', e => { if (!e.target.closest('.cp-pop, .cp-ev')) hidePop(); });
 
     function setView(v, dir) {
@@ -471,7 +589,23 @@
       el?.classList.add('rc-awaiting');
       return el;
     }
-    return { render, card, place, restore() { const b = $('.cp-grid-in .cp-body', grid); if (b) b.scrollTop = st.scroll; }, flashBBQ() {
+    // + Add：弹窗里的日期选项 = 正在看的这一周；默认选中正在看的那天（周视图里有今天就选今天）
+    function addCtx() {
+      const base = st.view === 'day' ? st.day : addDays(weekStart(), 0);
+      const mon = addDays(base, -((base.getDay() + 6) % 7));
+      const days = Array.from({ length: 7 }, (_, i) => addDays(mon, i));
+      const day = st.view === 'day' ? st.day : days.find(d => same(d, TODAY_DATE)) || days[0];
+      return { days, day };
+    }
+    function showAdded(date, e) {
+      if (st.view === 'day') st.day = date;
+      else st.offset = Math.floor((dayNum(date) - dayNum(new Date(2024, 9, 28))) / 7);
+      st.scroll = Math.max(0, (e.start / 60 - H0) * PX - 140);
+      render(0);
+      const el = $$('.cp-grid-in:last-child .cp-ev', grid).find(b => b.dataset.i === `${dayNum(date)}:${e.start}:${e.title}`);
+      if (el) { el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); }
+    }
+    return { render, card, place, addCtx, showAdded, restore() { const b = $('.cp-grid-in .cp-body', grid); if (b) b.scrollTop = st.scroll; }, flashBBQ() {
       const el = $$('.cp-ev', grid).find(b => b.textContent.includes('Neighborhood BBQ'));
       if (el) { el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); }
     } };
@@ -543,7 +677,7 @@
   const bump = el => { el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); };
   const checklist = $('.checklist', s2);
   const grabsEl = $('.grabs', s2);
-  const coinChip = n => `<span class="chip"><img class="coin" src="assets/2714f.svg" alt=""><b>${n}</b></span>`;
+  const coinChip = n => `<span class="chip badge badge--coin"><img class="coin" src="assets/2714f.svg" alt=""><b>${n}</b></span>`;
 
   // 进入 Personal 屏：Rewards 里的奖品依次滑入、奖品图带回弹蹦出来、余额和进度数字往上数，可兑换的 Redeem 最后弹出
   function growRewards() {
@@ -585,19 +719,15 @@
   function renderBalance() {
     $$('[data-balance]').forEach(el => { el.textContent = state.balance; });
     $('[data-coins]', s2).textContent = state.balance;
-    for (const li of [...$$('.reward', s2), ...$$('.rw-card')]) {
-      const r = rewardById(li.dataset.id), btn = $('.pill-btn, .redeem', li), can = !r.done && state.balance >= r.cost;
+    rwPage?.render();
+    for (const li of $$('.reward', s2)) {
+      const r = rewardById(li.dataset.id), btn = $('.btn', li), can = !r.done && state.balance >= r.cost;
       li.classList.toggle('done', !!r.done);
       li.classList.toggle('can', can);
       btn.disabled = !can;
       btn.textContent = r.done ? 'Redeemed' : 'Redeem';
       const prog = $('.reward-prog b', li);
       if (prog) prog.textContent = Math.min(state.balance, r.cost);
-      const left = $('.rw-left', li);
-      if (left) {
-        left.textContent = r.done ? 'Redeemed' : `${Math.min(state.balance, r.cost)}/${r.cost}`;
-        $('.rw-track i', li).style.width = Math.min(1, state.balance / r.cost) * 100 + '%';
-      }
     }
   }
 
@@ -640,7 +770,7 @@
   function taskRow(t, enter) {
     const li = document.createElement('li');
     li.className = 'check-row' + (t.done ? ' done' : '') + (enter ? ' enter' : '');
-    const icon = `<img class="emo" src="${t.icon}" alt="">`;
+    const icon = '';   // 和 Tasks 页一致：列表不放图标
     li.innerHTML = `<button class="check" type="button" aria-label="Mark ${t.name} done" aria-pressed="${t.done}"><svg viewBox="0 0 16 16"><path d="M3.5 8.3l3 3 6-6.4"/></svg></button>${icon}<p>${t.name}</p>${coinChip(t.coins)}<div class="hr"></div>`;
     $('.check', li).addEventListener('click', () => {
       t.done = !t.done;
@@ -668,7 +798,7 @@
     pctEl.textContent = '0%';
     void bar.offsetWidth;
     const delay = 320, dur = 760;
-    bar.style.transition = `width ${dur}ms cubic-bezier(0.34, 1.32, 0.64, 1) ${delay}ms`;
+    bar.style.transition = `width ${dur}ms cubic-bezier(0.2, 1.5, 0.45, 1) ${delay}ms`;
     bar.style.width = target + '%';
     const t0 = performance.now() + delay;
     const step = now => {
@@ -728,8 +858,8 @@
     grabsEl.replaceChildren(...state.grabs.map(g => {
       const li = document.createElement('li');
       li.className = 'grab st';
-      li.innerHTML = `<p class="g-name">${g.name}</p><p class="g-date">${g.date}</p>${coinChip(g.coins)}<button class="pill-btn" type="button">Claim</button>`;
-      $('.pill-btn', li).addEventListener('click', () => claim(g, li));
+      li.innerHTML = `<p class="g-name">${g.name}</p><p class="g-date">${g.date}</p>${coinChip(g.coins)}<button class="btn btn--neutral btn--sm" type="button">Claim</button>`;
+      $('.btn', li).addEventListener('click', () => claim(g, li));
       return li;
     }));
   }
@@ -747,32 +877,69 @@
 
   for (const li of $$('.reward', s2)) {
     const btn = $('.redeem', li);
-    btn.classList.add('pill-btn');
     btn.addEventListener('click', () => redeem(rewardById(li.dataset.id)));
   }
   // 点 Rewards 卡（Redeem 按钮以外）进 Rewards 页看全部礼物
   $('.rewards', s2).addEventListener('click', e => { if (!e.target.closest('.redeem')) openRewards(); });
 
   // ---------- Rewards 页（s5）：全部礼物 + 分类 + 兑换记录 ----------
-  const rwPage = (() => {
-    const s5 = $('#s5'), grid = $('.rw-grid', s5), hist = $('.rw-hist', s5), histBtn = $('.rw-hist-btn', s5);
-    grid.replaceChildren(...state.rewards.map(r => {
-      const li = document.createElement('li');
-      li.className = 'rw-card st';
-      li.dataset.id = r.id;
-      li.dataset.cat = r.cat;
-      li.innerHTML = `<div class="rw-art"><img${r.tilt ? ' class="tilt"' : ''} src="${r.art}" alt=""></div>
-        <div class="rw-info"><p class="rw-name">${r.name}</p>
-          <div class="rw-row"><span class="chip"><img class="coin" src="assets/2714f.svg" alt=""><b class="rw-left"></b></span><button class="pill-btn" type="button">Redeem</button></div>
-          <div class="rw-track"><i></i></div></div>`;
-      $('.pill-btn', li).addEventListener('click', () => redeem(r));
-      return li;
-    }));
+  var rwPage = (() => {
+    const s5 = $('#s5'), body = $('.rw-body', s5), hist = $('.rw-hist', s5), histBtn = $('.rw-hist-btn', s5);
+    // 分层：最想要的大目标 → 现在就能换的 → 继续攒的；同一份进度只说一遍
+    const GOAL = 'switch';
+    let cat = 'all';
+    const coin = n => `<span class="chip badge badge--coin"><img class="coin" src="assets/2714f.svg" alt=""><b>${n}</b></span>`;
+    const art = r => `<span class="rw-ico" data-cat="${r.cat}"><img${r.tilt ? ' class="tilt"' : ''} src="${r.art}" alt=""></span>`;
+    const pct = r => Math.min(1, state.balance / r.cost) * 100;
+    const el = html => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstChild; };
+
+    function render() {
+      const keep = body.scrollTop;
+      const show = r => !r.done && (cat === 'all' || r.cat === cat);
+      const goal = rewardById(GOAL);
+      const ready = state.rewards.filter(r => show(r) && r.id !== GOAL && state.balance >= r.cost);
+      const saving = state.rewards.filter(r => show(r) && r.id !== GOAL && state.balance < r.cost).sort((a, b) => a.cost - b.cost);
+      const out = [];
+      if (show(goal)) {
+        out.push(el(`<section class="rw-goal st">
+          <div class="rw-goal-art"><img${goal.tilt ? ' class="tilt"' : ''} src="${goal.art}" alt=""></div>
+          <div class="rw-goal-info">
+            <p class="rw-kicker">Saving for</p>
+            <p class="rw-goal-name">${goal.name}</p>
+            <div class="rw-goal-track"><i style="width:${pct(goal)}%"></i></div>
+            <p class="rw-goal-meta"><b>${Math.min(state.balance, goal.cost)}</b> of ${goal.cost} coins · ${Math.max(0, goal.cost - state.balance)} to go</p>
+          </div>
+          ${state.balance >= goal.cost ? '<button class="btn btn--primary btn--sm rw-redeem" type="button">Redeem</button>' : ''}
+        </section>`));
+        $('.rw-redeem', out[0])?.addEventListener('click', () => redeem(goal));
+      }
+      if (ready.length) {
+        out.push(el(`<p class="rw-sec section-label">Ready to redeem</p>`));
+        const ul = el(`<ul class="rw-ready"></ul>`);
+        for (const r of ready) {
+          const li = el(`<li class="rw-tile st">${art(r)}<p class="rw-name">${r.name}</p><div class="rw-txt rw-foot">${coin(r.cost)}<button class="btn btn--primary btn--sm rw-redeem" type="button">Redeem</button></div></li>`);
+          $('.rw-redeem', li).addEventListener('click', () => redeem(r));
+          ul.append(li);
+        }
+        out.push(ul);
+      }
+      if (saving.length) {
+        out.push(el(`<p class="rw-sec section-label">Save up for</p>`));
+        const ul = el(`<ul class="rw-saving"></ul>`);
+        for (const r of saving) ul.append(el(`<li class="rw-line st">${art(r)}<div class="rw-txt"><p class="rw-name">${r.name}</p><div class="rw-track"><i style="width:${pct(r)}%"></i></div></div><p class="rw-more">${r.cost - state.balance} more</p></li>`));
+        out.push(ul);
+      }
+      if (!out.length) out.push(el(`<p class="rw-none">Nothing here yet</p>`));
+      body.replaceChildren(...out);
+      body.scrollTop = keep;
+    }
+
     const seg = $$('.rw-seg button', s5);
     seg.forEach(b => b.addEventListener('click', () => {
       seg.forEach(x => x.setAttribute('aria-pressed', x === b));
-      for (const li of $$('.rw-card', grid)) li.hidden = b.dataset.cat !== 'all' && li.dataset.cat !== b.dataset.cat;
-      grid.scrollTop = 0;
+      cat = b.dataset.cat;
+      render();
+      body.scrollTop = 0;
     }));
     const toggleHist = open => { hist.hidden = !open; histBtn.setAttribute('aria-expanded', open); };
     histBtn.addEventListener('click', e => { e.stopPropagation(); toggleHist(hist.hidden); });
@@ -781,9 +948,10 @@
     return {
       renderHistory() {
         hist.innerHTML = `<h3>Redeemed by Emma</h3><ul>${state.history.map(h =>
-          `<li><img src="${h.art}" alt=""><p>${h.name}<span>${h.date}</span></p><span class="chip"><img class="coin" src="assets/2714f.svg" alt=""><b>−${h.cost}</b></span></li>`).join('')}</ul>`;
+          `<li><img src="${h.art}" alt=""><p>${h.name}<span>${h.date}</span></p><span class="chip badge badge--coin"><img class="coin" src="assets/2714f.svg" alt=""><b>−${h.cost}</b></span></li>`).join('')}</ul>`;
       },
-      restore() { toggleHist(false); grid.scrollTop = 0; },
+      render,
+      restore() { toggleHist(false); body.scrollTop = 0; },
     };
   })();
   rwPage.renderHistory();
@@ -793,7 +961,7 @@
   rwModal.className = 'rw-modal';
   rwModal.hidden = true;
   rwModal.innerHTML = `<div class="rw-scrim"></div><div class="rw-panel" role="dialog" aria-label="Rewards">
-    <button class="rw-collapse" type="button" aria-label="Close rewards"><svg viewBox="0 0 16 16"><path d="M9.5 2.5v4h4M6.5 13.5v-4h-4M9.5 6.5l4.5-4.5M6.5 9.5 2 14"/></svg></button></div>`;
+    <button class="rw-collapse icon-btn icon-btn--sm icon-btn--ghost" type="button" aria-label="Close rewards"><svg viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div>`;
   s2.append(rwModal);
   const rwPanel = $('.rw-panel', rwModal), rwContent = $('.rwpage', $('#s5'));
   rwPanel.append(rwContent);
@@ -849,7 +1017,7 @@
         <div class="cele-badge"><i></i><img src="${art}" alt=""></div>
         <p class="cele-title"><svg viewBox="0 0 24 24"><path d="M12 2.5l2.7 6.2 6.8.6-5.2 4.5 1.6 6.6L12 16.9l-5.9 3.5 1.6-6.6-5.2-4.5 6.8-.6z"/></svg>You got it!<svg viewBox="0 0 24 24"><path d="M12 2.5l2.7 6.2 6.8.6-5.2 4.5 1.6 6.6L12 16.9l-5.9 3.5 1.6-6.6-5.2-4.5 6.8-.6z"/></svg></p>
         <p class="cele-sub">Emma redeemed</p>
-        <div class="cele-item st"><img src="${art}" alt=""><p>${name}</p><span class="chip"><img class="coin" src="assets/2714f.svg" alt=""><b>−${cost}</b></span></div>
+        <div class="cele-item st"><img src="${art}" alt=""><p>${name}</p><span class="chip badge badge--coin"><img class="coin" src="assets/2714f.svg" alt=""><b>−${cost}</b></span></div>
       </div>`;
     $('.frame.on').append(root);
     const close = () => {
@@ -867,7 +1035,8 @@
     canvas.width = W * dpr; canvas.height = H * dpr;
     const ctx = canvas.getContext('2d');
     ctx.scale(dpr, dpr);
-    const COLORS = ['#f3b6cf', '#8cd1ff', '#b9e3d8', '#f7d78f', '#14a4fd', '#ffd36b'];
+    const COLORS = ['--m-emma-solid', '--m-sam-solid', '--m-mom-solid', '--m-pair'].map(n => `rgb(${tok(n)})`).concat([tok('--accent'), tok('--gold')]);
+    const STAR = tok('--gold');
     const coin = new Image(); coin.src = 'assets/2714f.svg';
     const cx = W / 2, cy = H / 2 - 40;
     const parts = Array.from({ length: 90 }, (_, i) => {
@@ -888,7 +1057,7 @@
       for (const p of parts) {
         p.vx *= .985; p.vy = p.vy * .985 + .32; p.x += p.vx; p.y += p.vy; p.r += p.vr;
         ctx.save(); ctx.globalAlpha = Math.max(0, 1 - Math.max(0, t - 1.6) / .9);
-        ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.fillStyle = p.kind === 'star' ? '#ffcb47' : p.c;
+        ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.fillStyle = p.kind === 'star' ? STAR : p.c;
         if (p.kind === 'coin') ctx.drawImage(coin, -p.s / 2, -p.s * .45, p.s, p.s * .9);
         else if (p.kind === 'star') star(0, 0, p.s);
         else if (p.kind === 'dot') { ctx.beginPath(); ctx.arc(0, 0, p.s / 2, 0, Math.PI * 2); ctx.fill(); }
@@ -907,19 +1076,19 @@
     // 配色取自 Family 屏 "Tasks for today" 的成员行；acc = 进度环/勾选色
     const MEMBERS = [
       { id: 'emma', kid: true, tasks: state.tasks, coins: () => state.balance,
-        bg: ['255,240,200', '244,215,148'], acc: '#9a7d35' },
-      { id: 'sam', kid: true, bank: 15, bg: ['220,232,239', '140,209,255'], acc: '#2c78ae', tasks: [
+        bg: [tok('--task-emma-soft'), tok('--task-emma')], acc: tok('--task-emma-acc') },
+      { id: 'sam', kid: true, bank: 15, bg: [tok('--task-sam-soft'), tok('--task-sam')], acc: tok('--task-sam-acc'), tasks: [
         { name: 'Brush teeth', icon: E('1faa5'), coins: 2, done: true, when: 'Morning' },
         { name: 'Soccer practice', icon: E('26bd'), coins: 5, done: false, when: 'Afternoon' },
         { name: 'Pack school bag', icon: E('1f392'), coins: 3, done: false, when: 'Evening' },
       ] },
-      { id: 'mom', bg: ['235,247,242', '198,229,219'], acc: '#52796b', tasks: [
+      { id: 'mom', bg: [tok('--task-mom-soft'), tok('--task-mom')], acc: tok('--task-mom-acc'), tasks: [
         { name: 'Pack lunches', icon: E('1f96a'), done: true, when: 'Morning' },
         { name: 'Grocery run', icon: E('1f6d2'), done: true, when: 'Afternoon' },
         { name: 'Set the table', icon: E('1f374'), done: true, when: 'Evening' },
         { name: 'Fold laundry', icon: E('1f9fa'), done: false, when: 'Chores' },
       ] },
-      { id: 'dad', bg: ['218,237,250', '172,205,231'], acc: '#557da0', tasks: [
+      { id: 'dad', bg: [tok('--task-dad-soft'), tok('--task-dad')], acc: tok('--task-dad-acc'), tasks: [
         { name: 'Make the bed', icon: E('1f6cf'), done: true, when: 'Morning' },
         { name: 'Car service', icon: E('1f697'), done: true, when: 'Afternoon' },
         { name: 'Take out trash', icon: E('1f5d1'), done: false, when: 'Evening' },
@@ -927,6 +1096,38 @@
       ] },
     ];
     const SECTIONS = ['Morning', 'Afternoon', 'Evening', 'Chores'];
+    // 翻天：0 = 今天。今天用上面这份（Emma 的就是 state.tasks）；别的天从各人的任务池按日期种子挑 3 个，过去的都已完成，未来的都没做
+    const POOL = {
+      emma: [['Morning reading', '1f4d6', 'Morning'], ['Piano practice', '1f3b9', 'Afternoon'], ['Feed Biscuit', '1f436', 'Morning'], ['Water plants', '1fab4', 'Afternoon'], ['Tidy my room', '1f9f9', 'Chores'], ['Pack school bag', '1f392', 'Evening']],
+      sam: [['Brush teeth', '1faa5', 'Morning'], ['Soccer practice', '26bd', 'Afternoon'], ['Pack school bag', '1f392', 'Evening'], ['Walk Biscuit', '1f436', 'Afternoon'], ['Homework', '1f4da', 'Evening']],
+      mom: [['Pack lunches', '1f96a', 'Morning'], ['Grocery run', '1f6d2', 'Afternoon'], ['Set the table', '1f374', 'Evening'], ['Fold laundry', '1f9fa', 'Chores'], ['Water the garden', '1f331', 'Morning']],
+      dad: [['Make the bed', '1f6cf', 'Morning'], ['Take out trash', '1f5d1', 'Evening'], ['Pay bills', '1f4b3', 'Chores'], ['Car wash', '1f697', 'Afternoon'], ['Cook breakfast', '1f373', 'Morning']],
+    };
+    let day = 0;
+    MEMBERS.forEach(m => { m.today = m.tasks; m.byDay = {}; });
+    function tasksFor(m, d) {
+      if (!d) return m.today;
+      return m.byDay[d] ??= (() => {
+        const rand = rng(d * 131 + MEMBERS.indexOf(m) * 17 + 7), pool = POOL[m.id].slice();
+        return Array.from({ length: 3 }, () => {
+          const [name, icon, when] = pool.splice(Math.floor(rand() * pool.length), 1)[0];
+          return { name, icon: E(icon), when, coins: m.kid ? 2 + Math.floor(rand() * 4) : 0, done: d < 0 };
+        });
+      })();
+    }
+    const DAY_FMT = { weekday: 'short', month: 'short', day: 'numeric' };
+    function setDay(d) {
+      day = d;
+      MEMBERS.forEach(m => { m.tasks = tasksFor(m, d); });
+      const date = new Date(2024, 9, 29 + d), rel = { '-1': 'Yesterday', 0: 'Today', 1: 'Tomorrow' }[d];
+      $('[data-tk-date]', page).textContent = (rel ? rel + ' · ' : '') + date.toLocaleDateString('en-US', DAY_FMT);
+      page.classList.toggle('tk-other', d !== 0);
+      $('[data-tk-today]', page).disabled = d === 0;
+      render(true);
+    }
+    $('[data-tk-prev]', page).addEventListener('click', () => setDay(day - 1));
+    $('[data-tk-next]', page).addEventListener('click', () => setDay(day + 1));
+    $('[data-tk-today]', page).addEventListener('click', () => { if (day) setDay(0); });
     const coinsOf = m => m.coins ? m.coins() : m.bank;
     const doneOf = m => m.tasks.filter(t => t.done).length;
     const ringSVG = m => {
@@ -936,10 +1137,10 @@
 
     function header(m) {
       const p = PEOPLE[m.id];
-      return `<div class="task st tk-head" style="background-image:linear-gradient(162.61deg, rgb(${m.bg[0]}) 12.857%, rgb(${m.bg[1]}) 84.286%)">
+      return `<div class="task st tk-head m-${m.id}">
         <div class="avw st"><div class="av av36 st">${p.av}</div></div>
         <div class="lbl"><p class="n">${p.name}</p><p class="d">${doneOf(m)} of ${m.tasks.length} done</p></div>
-        ${m.kid ? `<span class="chip tk-bank"><img class="coin" src="assets/2714f.svg" alt=""><b>${coinsOf(m)}</b></span>` : ''}
+        ${m.kid ? `<span class="chip badge badge--coin tk-bank"><img class="coin" src="assets/2714f.svg" alt=""><b>${coinsOf(m)}</b></span>` : ''}
         ${ringSVG(m)}
       </div>`;
     }
@@ -947,7 +1148,7 @@
     function row(m, t) {
       const li = document.createElement('li');
       li.className = 'check-row tk-row st' + (t.done ? ' done' : '');
-      li.innerHTML = `<button class="check" type="button" aria-label="Mark ${t.name} done" aria-pressed="${t.done}"><svg viewBox="0 0 16 16"><path d="M3.5 8.3l3 3 6-6.4"/></svg></button><img class="emo" src="${t.icon}" alt=""><p>${t.name}</p>${t.coins ? coinChip(t.coins) : ''}`;
+      li.innerHTML = `<button class="check" type="button" aria-label="Mark ${t.name} done" aria-pressed="${t.done}"><svg viewBox="0 0 16 16"><path d="M3.5 8.3l3 3 6-6.4"/></svg></button><p>${t.name}</p>${t.coins ? `<span class="tk-coins">+${t.coins}</span>` : ''}`;
       $('.check', li).addEventListener('click', e => { e.stopPropagation(); toggle(m, t); });
       li.addEventListener('click', () => open(m, t, li));
       return li;
@@ -955,22 +1156,16 @@
 
     function column(m, i) {
       const col = document.createElement('section');
-      col.className = 'tk-col';
+      col.className = `tk-col tk-col--${m.id}`;
       col.dataset.m = m.id;
-      col.style.cssText = `--acc:${m.acc};--tint:${m.bg[0]};--i:${i}`;
+      col.style.cssText = `--i:${i}`;   // 颜色全部来自 .tk-col--{id}（同一套成员色板）
       col.innerHTML = header(m);
       const list = document.createElement('div');
       list.className = 'tk-list scroll';
-      for (const sec of SECTIONS) {
-        const ts = m.tasks.filter(t => (t.when || 'Chores') === sec);
-        if (!ts.length) continue;
-        const h = document.createElement('p');
-        h.className = 'tk-sec';
-        h.textContent = sec;
-        const ul = document.createElement('ul');
-        ul.append(...ts.map(t => row(m, t)));
-        list.append(h, ul);
-      }
+      // 不分时段：一条连续列表（仍按时段先后排序）
+      const ul = document.createElement('ul');
+      ul.append(...SECTIONS.flatMap(sec => m.tasks.filter(t => (t.when || 'Chores') === sec)).map(t => row(m, t)));
+      list.append(ul);
       col.append(list);
       return col;
     }
@@ -1011,11 +1206,10 @@
     function open(m, t, li) {
       if (!pop.hidden && pop.task === t) return close();
       pop.task = t;
-      pop.innerHTML = `<img class="tk-pop-emo" src="${t.icon}" alt="">
-        <p class="t">${t.name}</p>
+      pop.innerHTML = `        <p class="t">${t.name}</p>
         <p class="s">${t.when || 'Chores'} · ${PEOPLE[m.id].name}</p>
         ${t.coins ? `<div class="tk-pop-coins">${coinChip(t.coins)}<span>${t.done ? 'earned' : 'to earn'}</span></div>` : ''}
-        <button class="tk-pop-btn${t.done ? ' undo' : ''}" type="button">${t.done ? 'Mark as not done' : 'Mark as complete'}</button>`;
+        <button class="btn btn--primary btn--lg btn--block tk-pop-btn${t.done ? ' undo' : ''}" type="button">${t.done ? 'Mark as not done' : 'Mark as complete'}</button>`;
       pop.style.setProperty('--acc', m.acc);
       $('.tk-pop-btn', pop).addEventListener('click', () => { close(); toggle(m, t); });
       const r = li.getBoundingClientRect(), o = page.getBoundingClientRect(), k = window.__stageScale || 1;
@@ -1040,8 +1234,7 @@
 
     function summary() {
       const all = MEMBERS.flatMap(m => m.tasks), done = all.filter(t => t.done).length;
-      $('[data-tk-sum]', page).textContent = `Family · ${done} of ${all.length} done`;
-      $('[data-tk-bar]', page).style.width = Math.round(done / all.length * 100) + '%';
+      // 全家总进度已去掉（顶栏不再显示）
     }
 
     // Family 屏 "Tasks for today" 的计数和进度环跟着这里走
@@ -1050,9 +1243,10 @@
       for (const m of MEMBERS) {
         const r = rows.find(el => $('.lbl .n', el)?.textContent === PEOPLE[m.id].name);
         if (!r) continue;
-        $('.lbl .d', r).textContent = `${doneOf(m)} of ${m.tasks.length} done`;
+        const t = { ...m, tasks: m.today };   // Family 屏永远是今天
+        $('.lbl .d', r).textContent = `${doneOf(t)} of ${t.tasks.length} done`;
         const old = $('.prog, .tk-ring', r);
-        old.insertAdjacentHTML('afterend', ringSVG(m));
+        old.insertAdjacentHTML('afterend', ringSVG(t));
         old.remove();
       }
     }
@@ -1066,7 +1260,18 @@
     }
     render();
     syncFamily();
-    return { render, close, syncFamily };
+    // + Add：加到正在看的那一天、选中的人、选中的时段
+    const SEC_ICON = { Morning: '23f0', Afternoon: '1f4da', Evening: '1f6cf', Chores: '1f9f9' };
+    function add(name, who, when) {
+      const m = MEMBERS.find(x => x.id === who);
+      m.tasks.push({ name, icon: E(SEC_ICON[when]), when, coins: m.kid ? 3 : 0, done: day < 0 });
+      render();
+      if (!day) syncFamily();
+      const row = $$(`.tk-col[data-m="${who}"] .tk-row`, cols).find(el => $('p', el).textContent === name);
+      row?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      row?.classList.add('tk-new');
+    }
+    return { render, close, syncFamily, add, setDay };
   })();
 
   // ---------- Meals 页 s7：静态内容，左右两栏各自可滑 ----------
@@ -1084,7 +1289,7 @@
       cal: '<svg viewBox="0 0 16 16"><rect x="2.5" y="3.5" width="11" height="10" rx="2"/><path d="M2.5 7h11M5.5 2v3M10.5 2v3"/></svg>',
       fork: '<svg viewBox="0 0 21 21"><path d="M4 2.6v4.2a2.1 2.1 0 0 0 4.2 0V2.6M6.1 2.6v15.8M15.75 18.4V2.6c-1.85.7-3 2.7-3 5.5v3.3h3"/></svg>',
     };
-    const chip = (icon, label, on) => `<span class="ml-chip${on ? ' on' : ''}">${icon}${label}</span>`;
+    const chip = (icon, label, on) => `<span class="ml-chip filter-chip${on ? ' on' : ''}">${icon}${label}</span>`;
     $('[data-ml-cats]', s7).innerHTML = [[I.all, 'All', 1], [I.dessert, 'Dessert'], [I.fast, 'Fast prep'], [I.pot, 'One-Pot'], [I.app, 'Appetizer'], [I.prep, 'Meal prep']].map(c => chip(...c)).join('');
     $('[data-ml-tabs]', s7).innerHTML = [[I.all, 'All', 1], [I.saved, 'Saved by you'], [I.created, 'Created by you']].map(c => chip(...c)).join('');
 
@@ -1125,7 +1330,7 @@
   // ---------- 便签：家人留言，点一下翻页 ----------
   const NOTES = [
     { from: 'from Mom', text: 'Don’t forget your library book today!' },
-    { from: 'from Dad', text: 'Piano at 5 — I’ll pick you up after school.' },
+    { from: 'from Dad', text: 'Piano at 5. I’ll pick you up after school.' },
     { from: 'from Sam', text: 'BBQ tonight. Save me a cookie!' },
   ];
   const note = $('.note', s2), noteText = $('[data-note-text]', s2), noteDots = $('[data-note-dots]', s2);
@@ -1138,12 +1343,40 @@
     $$('i', noteDots).forEach((d, k) => d.classList.toggle('on', k === noteIdx));
   }
   drawNote();
-  const nextNote = () => {
-    noteText.classList.add('swap');
-    setTimeout(() => { noteIdx = (noteIdx + 1) % NOTES.length; drawNote(); noteText.classList.remove('swap'); }, 180);
+  // 翻页：dir = 1 下一张（文字往左出、从右进），-1 上一张；from = 松手时文字已经被拖到的位置
+  const ease = 'cubic-bezier(0.23, 1, 0.32, 1)';
+  const nextNote = (dir = 1, from = 0) => {
+    noteText.animate([{ transform: `translateX(${from}px)`, opacity: Math.max(0, 1 - Math.abs(from) / 120) }, { transform: `translateX(${-dir * 40}px)`, opacity: 0 }], { duration: 160, easing: 'ease-in', fill: 'forwards' }).onfinish = () => {
+      noteIdx = (noteIdx + dir + NOTES.length) % NOTES.length;
+      drawNote();
+      noteText.animate([{ transform: `translateX(${dir * 40}px)`, opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 280, easing: ease, fill: 'forwards' });
+    };
   };
-  note.addEventListener('click', nextNote);
-  note.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); nextNote(); } });
+  // 左右滑：文字跟手，过 40px 松手就翻页，不够就弹回；没怎么动 = 单点，也翻到下一张
+  let nx = null, ndx = 0;
+  note.addEventListener('pointerdown', e => { nx = e.clientX; ndx = 0; note.setPointerCapture(e.pointerId); });
+  note.addEventListener('pointermove', e => {
+    if (nx === null) return;
+    ndx = (e.clientX - nx) / (window.__stageScale || 1);
+    noteText.getAnimations().forEach(a => a.cancel());
+    noteText.style.transform = `translateX(${ndx}px)`;
+    noteText.style.opacity = Math.max(0.2, 1 - Math.abs(ndx) / 140);
+  });
+  const noteUp = () => {
+    if (nx === null) return;
+    nx = null;
+    const dx = ndx;
+    noteText.style.transform = noteText.style.opacity = '';
+    if (Math.abs(dx) < 6) nextNote(1);
+    else if (Math.abs(dx) >= 40) nextNote(dx < 0 ? 1 : -1, dx);
+    else noteText.animate([{ transform: `translateX(${dx}px)` }, { transform: 'none' }], { duration: 260, easing: ease });
+  };
+  note.addEventListener('pointerup', noteUp);
+  note.addEventListener('pointercancel', noteUp);
+  note.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight') { e.preventDefault(); nextNote(1); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); nextNote(-1); }
+  });
 
   // ---------- Peak Hours ----------
   // Emma 的一天，按小时
@@ -1313,7 +1546,7 @@
     function receiptTask(g) {
       flyReceipt(stage, {
         action: 'Task added',
-        preview: `<div class="rc-task"><span class="rc-check"></span><img class="emo" src="${g.icon}" alt=""><p>${g.name}</p>${coinChip(g.coins)}</div>`,
+        preview: `<div class="rc-task rc-task--emma"><span class="rc-check"></span><p>${g.name}</p>${coinChip(g.coins)}</div>`,
         details: [[ICON.cal, 'Today · Emma’s tasks'], [ICON.coin, `+${g.coins} coins when it’s done`]],
         people: avs(['emma']),
         prepare: () => claimForReceipt(g),
@@ -1348,13 +1581,170 @@
     el.addEventListener('click', e => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
   }
 
+  // 横向的也一样：Up for grabs 用鼠标左右拖；拖时先关掉吸附，松手后再打开让它吸到最近一张
+  for (const el of $$('.grabs')) {
+    let x0 = null, left0 = 0, moved = false;
+    el.addEventListener('pointerdown', e => {
+      if (e.pointerType !== 'mouse' || e.target.closest('button')) return;
+      x0 = e.clientX; left0 = el.scrollLeft; moved = false;
+    });
+    addEventListener('pointermove', e => {
+      if (x0 === null) return;
+      const dx = (e.clientX - x0) / (window.__stageScale || 1);
+      if (Math.abs(dx) > 3 && !moved) { moved = true; el.classList.add('dragging'); el.style.scrollSnapType = 'none'; }
+      if (moved) el.scrollLeft = left0 - dx;
+    });
+    addEventListener('pointerup', () => {
+      if (x0 === null) return;
+      x0 = null;
+      el.classList.remove('dragging');
+      if (!moved) return;
+      const cards = $$('.grab', el), pad = 26;
+      const near = cards.reduce((best, c) => Math.abs(c.offsetLeft - pad - el.scrollLeft) < Math.abs(best.offsetLeft - pad - el.scrollLeft) ? c : best, cards[0]);
+      if (near) el.scrollTo({ left: near.offsetLeft - pad, behavior: 'smooth' });
+      setTimeout(() => { el.style.scrollSnapType = ''; }, 400);
+    });
+    el.addEventListener('click', e => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
+  }
+
+  // ---------- + Add 新建弹窗（Calendar 事件 / Tasks 任务共用）：标题 + 几行选项，填了标题才能加 ----------
+  const addSheet = (() => {
+    const root = document.createElement('div');
+    root.className = 'as-wrap';
+    root.hidden = true;
+    root.innerHTML = `<div class="as-card card st" role="dialog" aria-modal="true">
+      <p class="as-title o18"></p>
+      <input class="as-input" type="text" maxlength="40" autocomplete="off">
+      <div class="as-rows"></div>
+      <div class="as-actions"><button class="btn btn--neutral btn--sm" type="button" data-as-cancel>Cancel</button><button class="btn btn--primary add-btn" type="button" data-as-save disabled>Add</button></div>
+    </div>`;
+    stage.append(root);
+    const input = $('.as-input', root), save = $('[data-as-save]', root);
+    let rows = [], done = null;
+    const close = () => { root.hidden = true; done = null; };
+    function open(o) {
+      $('.as-title', root).textContent = o.title;
+      input.value = o.text || ''; input.placeholder = o.placeholder;
+      save.textContent = o.saveLabel || 'Add';
+      rows = o.rows.map(r => ({ ...r, value: r.multi ? new Set([].concat(r.value)) : r.value }));
+      $('.as-rows', root).replaceChildren(...rows.map(r => {
+        const el = document.createElement('div');
+        el.className = 'as-row';
+        el.innerHTML = `<p>${r.label}</p><div class="as-chips">${r.options.map(op =>
+          `<button class="as-chip filter-chip" type="button" data-v="${op.v}">${op.html || ''}${op.label}</button>`).join('')}</div>`;
+        const sync = () => $$('.as-chip', el).forEach(b => b.setAttribute('aria-pressed', r.multi ? r.value.has(b.dataset.v) : r.value === b.dataset.v));
+        el.addEventListener('click', e => {
+          const b = e.target.closest('.as-chip');
+          if (!b) return;
+          const v = b.dataset.v;
+          if (!r.multi) r.value = v;
+          else if (v === 'all') r.value = new Set(['all']);
+          else {   // 选具体的人就去掉 Everyone；全取消了回到 Everyone
+            r.value.delete('all');
+            r.value.has(v) ? r.value.delete(v) : r.value.add(v);
+            if (!r.value.size) r.value.add('all');
+          }
+          sync();
+        });
+        sync();
+        return el;
+      }));
+      done = o.onSave;
+      save.disabled = !input.value.trim();
+      root.hidden = false;
+      input.focus();
+    }
+    input.addEventListener('input', () => { save.disabled = !input.value.trim(); });
+    input.addEventListener('keydown', e => { if (e.key === 'Enter' && !save.disabled) save.click(); });
+    save.addEventListener('click', () => {
+      const fn = done, vals = rows.map(r => r.multi ? [...r.value] : r.value);
+      close();
+      fn?.(input.value.trim(), ...vals);
+    });
+    $('[data-as-cancel]', root).addEventListener('click', close);
+    root.addEventListener('click', e => { if (e.target === root) close(); });
+    addEventListener('keydown', e => { if (e.key === 'Escape' && !root.hidden) close(); });
+    return { open };
+  })();
+  const personChip = p => ({ v: p, label: PEOPLE[p].name, html: `<span class="av st">${PEOPLE[p].av}</span>` });
+
+  $('[data-cp-add]').addEventListener('click', () => {
+    const { days, day } = calPage.addCtx();
+    const TIMES = [480, 600, 720, 900, 1020, 1140];
+    addSheet.open({
+      title: 'New event', placeholder: 'What’s happening?',
+      rows: [
+        { label: 'Day', value: String(dayNum(day)), options: days.map(d => ({ v: String(dayNum(d)), label: d.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' }) })) },
+        { label: 'Time', value: '900', options: TIMES.map(t => ({ v: String(t), label: fmtTime(t) })) },
+        { label: 'Who', multi: true, value: 'all', options: [{ v: 'all', label: 'Everyone' }, ...['emma', 'sam', 'mom', 'dad'].map(personChip)] },
+      ],
+      onSave(title, d, t, who) {
+        const date = days.find(x => String(dayNum(x)) === d), e = { title, who, start: +t, dur: 60 };
+        addFamilyEvent(date, e);
+        calPage.showAdded(date, e);
+      },
+    });
+  });
+  $('[data-tk-add]').addEventListener('click', () => addSheet.open({
+    title: 'New task', placeholder: 'What needs doing?',
+    rows: [
+      { label: 'For', value: 'emma', options: ['emma', 'sam', 'mom', 'dad'].map(personChip) },
+      { label: 'When', value: 'Afternoon', options: ['Morning', 'Afternoon', 'Evening', 'Chores'].map(v => ({ v, label: v })) },
+    ],
+    onSave: (name, who, when) => tkPage.add(name, who, when),
+  }));
+
   // ---------- 屏保（s6）：三张小鸟油画每 5s 交叉淡入（pad slideshowInterval），字一律白色；点一下回到之前的页面 ----------
   const ssEl = $('#s6'), ssImgs = $$('.ss-slides img', ssEl);
   let ssIdx = 0, ssTimer = 0;
   function ssGo(i) {
     ssIdx = i;
     ssImgs.forEach((im, k) => im.classList.toggle('on', k === i));
+    clockTone(ssImgs[i]);
   }
+  // 时钟颜色跟着背景走（用户换任何背景都成立）：读时钟背后那块区域的平均亮度和主色调，
+  // 暗背景 → 提亮的玻璃白（带一点主色），亮背景 → 半透明白 + 亮边（带一点主色）。
+  // file:// 下浏览器不让读本地图片像素，就退回图片上手写的 data-tone。
+  const toneCache = new WeakMap();
+  function analyze(img) {
+    if (toneCache.has(img)) return toneCache.get(img);
+    let res = null;
+    try {
+      const c = document.createElement('canvas'), w = 48, h = 24;
+      c.width = w; c.height = h;
+      const iw = img.naturalWidth, ih = img.naturalHeight;
+      // 时钟在画面里的区域（frame 1280×800，object-fit: cover）：左下角 ≈ x 36–560、y 520–760
+      const s = Math.max(1280 / iw, 800 / ih), ox = (iw * s - 1280) / 2, oy = (ih * s - 800) / 2;
+      const sx = (36 + ox) / s, sy = (520 + oy) / s, sw = 524 / s, sh = 240 / s;
+      const ctx = c.getContext('2d', { willReadFrequently: true });
+      ctx.drawImage(img, sx, sy, sw, sh, 0, 0, w, h);
+      const d = ctx.getImageData(0, 0, w, h).data;
+      let r = 0, g = 0, b = 0;
+      for (let k = 0; k < d.length; k += 4) { r += d[k]; g += d[k + 1]; b += d[k + 2]; }
+      const n = d.length / 4; r /= n; g /= n; b /= n;
+      const L = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      const mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+      let hue = 0;
+      if (mx !== mn) { const dd = mx - mn; hue = mx === r ? ((g - b) / dd) % 6 : mx === g ? (b - r) / dd + 2 : (r - g) / dd + 4; hue = Math.round(hue * 60 + 360) % 360; }
+      const sat = mx ? (mx - mn) / mx : 0;
+      res = { tone: L > 140 ? 'light' : 'dark', hue, sat: Math.min(sat, 0.5) };
+    } catch { res = { tone: img.dataset.tone || 'dark', hue: 0, sat: 0 }; }
+    toneCache.set(img, res);
+    return res;
+  }
+  function clockTone(img) {
+    const apply = () => {
+      const { tone, hue, sat } = analyze(img), S = Math.round(sat * 100);
+      ssEl.dataset.tone = tone;
+      // 文字墨色（日期行、COMING UP）：同一色系，浅背景用深墨、深背景用白
+      ssEl.style.setProperty('--ss-ink', tone === 'dark' ? '#fff' : `hsla(${hue}, ${Math.max(18, Math.round(S * .9))}%, 20%, 0.86)`);
+      ssEl.style.setProperty('--ss-fill', tone === 'dark' ? `hsla(${hue}, ${S}%, 88%, 0.5)` : `hsla(${hue}, ${Math.max(18, Math.round(S * .9))}%, 42%, 0.62)`);
+    };
+    // 画面交叉淡入 600ms，数字样式在一半时切换，和画面同步
+    const go = () => setTimeout(apply, 300);
+    img.complete && img.naturalWidth ? go() : img.addEventListener('load', go, { once: true });
+  }
+
   function screensaver(on) {
     clearInterval(ssTimer);
     if (!on) return;
@@ -1363,6 +1753,178 @@
   }
   ssEl.addEventListener('click', () => show(lastHome));
 
+  // ---------- 控制中心：从屏幕顶边往下拉出来（鼠标可点顶部小横条），上滑 / 点空白 / Esc 收起 ----------
+  (() => {
+    const ICON = {
+      wifi: '<svg viewBox="0 0 20 20"><path d="M2.36 7.36A10.8 10.8 0 0 1 17.64 7.36M4.91 9.91A7.2 7.2 0 0 1 15.09 9.91M7.45 12.45A3.6 3.6 0 0 1 12.55 12.45"/><circle cx="10" cy="15" r="1.25" fill="currentColor" stroke="none"/></svg>',
+      wifiOff: '<svg viewBox="0 0 20 20"><path d="M2.36 7.36A10.8 10.8 0 0 1 17.64 7.36M4.91 9.91A7.2 7.2 0 0 1 15.09 9.91M7.45 12.45A3.6 3.6 0 0 1 12.55 12.45M3 2.5l14 14.5"/><circle cx="10" cy="15" r="1.25" fill="currentColor" stroke="none"/></svg>',
+      lock: '<svg viewBox="0 0 20 20"><rect x="4.5" y="9" width="11" height="8" rx="2" fill="currentColor" stroke="none"/><path d="M7 9V6.8a3 3 0 0 1 6 0V9"/></svg>',
+      screenOff: '<svg viewBox="0 -960 960 960"><path fill="currentColor" stroke="none" d="M819-251q-12 12-28.5 12T763-250q-12-12-12-28.5t12-28.5q14-13 23.5-26t18.5-32q-85-8-161.5-44.5T506-507q-63-63-99-139t-43-160q-20 11-31 19t-28 24q-11 11-28 11t-28-11q-11-11-11-28t11-28q30-27 60.5-46t77.5-40q20-9 39.5 5t18.5 37q-3 85 27.5 162T563-564q60 60 138 91.5T862-444q23-1 36.5 18t5.5 41q-15 39-35.5 71T819-251ZM748-66l-81-80q-35 13-71 19.5t-72 6.5q-84 0-157.5-32t-128-86.5Q184-293 152-366.5T120-524q0-36 6.5-72t19.5-71l-78-78q-12-12-12-29t12-29q12-12 29-12t29 12l678 680q11 11 11 28t-11 28q-11 11-28 11.5T748-66ZM524-200q20 0 39.5-2.5T603-210L210-603q-5 21-7.5 40.5T200-524q0 135 94.5 229.5T524-200ZM406-407Zm116-116Z"/></svg>',   // Material Symbols bedtime_off（月亮划掉）
+      restart: '<svg viewBox="0 0 20 20"><path d="M15.4 11.2A5.6 5.6 0 1 1 13.9 5.8M14.2 2.8v3.4h-3.4"/></svg>',
+      vol: '<svg viewBox="0 0 20 20"><path d="M3.5 7.8h2.6L9.8 4.6v10.8l-3.7-3.2H3.5z" fill="currentColor" stroke="none"/><path d="M13 7.3a3.6 3.6 0 0 1 0 5.4M15.2 5.2a6.6 6.6 0 0 1 0 9.6"/></svg>',
+      bright: '<svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="3.6"/><path d="M10 6.4a3.6 3.6 0 0 1 0 7.2z" fill="currentColor"/><path d="M10 2.5v1.6M10 15.9v1.6M2.5 10h1.6M15.9 10h1.6M4.7 4.7l1.1 1.1M14.2 14.2l1.1 1.1M4.7 15.3l1.1-1.1M14.2 5.8l1.1-1.1"/></svg>',
+      moon: '<svg viewBox="0 0 20 20"><path d="M15.6 12.6A6.4 6.4 0 0 1 7.4 4.4a6.4 6.4 0 1 0 8.2 8.2z" fill="currentColor" stroke="none"/></svg>',
+      timer: '<svg viewBox="0 0 20 20"><circle cx="10" cy="11" r="5.8"/><path d="M10 8v3l2 1.4M8 2.8h4M15 5.6l1-1"/></svg>',
+      alarm: '<svg viewBox="0 0 20 20"><circle cx="10" cy="10.8" r="5.6"/><path d="M10 8v2.9l1.9 1.2M3.6 5.2l2.3-2M16.4 5.2l-2.3-2"/></svg>',
+      micOff: '<svg viewBox="0 0 20 20"><rect x="7.6" y="2.8" width="4.8" height="9" rx="2.4"/><path d="M5 9.6a5 5 0 0 0 10 0M10 14.6v2.6"/><path class="slash-gap" d="M4 3.5l12 13"/><path d="M4 3.5l12 13"/></svg>',
+      mic: '<svg viewBox="0 0 20 20"><rect x="7.6" y="2.8" width="4.8" height="9" rx="2.4"/><path d="M5 9.6a5 5 0 0 0 10 0M10 14.6v2.6"/></svg>',
+      wake: '<svg viewBox="0 0 20 20"><path d="M4.5 13.5c1.5-1 2-2.6 2-4.5a3.5 3.5 0 0 1 7 0c0 1.9.5 3.5 2 4.5zM8.3 15.6a1.8 1.8 0 0 0 3.4 0"/><path class="slash-gap" d="M4.5 4l11 12"/><path d="M4.5 4l11 12"/></svg>',
+      wakeOn: '<svg viewBox="0 0 20 20"><path d="M4.5 13.5c1.5-1 2-2.6 2-4.5a3.5 3.5 0 0 1 7 0c0 1.9.5 3.5 2 4.5zM8.3 15.6a1.8 1.8 0 0 0 3.4 0"/></svg>',
+      open: '<svg viewBox="0 0 20 20"><path d="M7 5h8v8M15 5 5 15"/></svg>',
+    };
+    const TIPS = [
+      ['Calendar', '“Hey Nestie, add dinner with Mom at 7 tonight”', '<svg viewBox="0 0 16 16"><rect x="2.5" y="3.5" width="11" height="10" rx="2"/><path d="M2.5 7h11M5.5 2v3M10.5 2v3"/></svg>'],
+      ['Tasks', '“Hey Nestie, what’s left on Sam’s list?”', '<svg viewBox="0 0 16 16"><rect x="2.5" y="2.5" width="11" height="11" rx="2.5"/><path d="M5.5 8l1.8 1.8L10.8 6"/></svg>'],
+      ['Shopping', '“Hey Nestie, add milk and eggs to the list”', '<svg viewBox="0 0 16 16"><path d="M2 3h1.8l1.6 7.2h7l1.4-5H4.6"/><circle cx="6.2" cy="13" r=".9"/><circle cx="11.4" cy="13" r=".9"/></svg>'],
+      ['Rewards', '“Hey Nestie, how many coins does Emma have?”', '<svg viewBox="0 0 16 16"><rect x="2.5" y="6" width="11" height="7.5" rx="1.5"/><path d="M2 6h12M8 6v7.5M8 6C6.5 3 4 3.3 4.6 4.8 5 5.8 8 6 8 6zm0 0c1.5-3 4-2.7 3.4-1.2C11 5.8 8 6 8 6z"/></svg>'],
+      ['Timer', '“Hey Nestie, set a timer for 10 minutes”', '<svg viewBox="0 0 16 16"><circle cx="8" cy="8.8" r="5"/><path d="M8 6.3v2.5l1.6 1M6.5 2.5h3"/></svg>'],
+      ['Meals', '“Hey Nestie, what’s for dinner tonight?”', '<svg viewBox="0 0 16 16"><path d="M4 2.5v3.2a1.5 1.5 0 0 0 3 0V2.5M5.5 2.5v11M11.5 13.5V2.5C10.3 3 9.6 4.3 9.6 6.2v2.3h1.9"/></svg>'],
+    ];
+    const st = { wifi: true, night: true, mic: false, wake: false, vol: 0.52, bright: 0.8, tip: 0, timer: 0, left: 0 };
+
+    const cc = document.createElement('div');
+    cc.className = 'cc';
+    cc.innerHTML = `<div class="cc-scrim"></div>
+      <div class="cc-panel" role="dialog" aria-label="Control center">
+        <button class="cc-tile cc-wide" data-k="wifi" type="button"><span class="cc-ico">${ICON.wifi}</span><span class="cc-txt"><b>Wi-Fi</b><i></i></span></button>
+        <div class="cc-tile cc-wide cc-off ga-lock"><span class="cc-ico">${ICON.lock}</span><span class="cc-txt"><b>Parents Lock</b><i>Set up in the Nestify app</i></span></div>
+        <div class="cc-pair ga-power">
+          <button class="cc-tile cc-small" data-k="screenOff" type="button">${ICON.screenOff}<b>Screen Off</b></button>
+          <button class="cc-tile cc-small" data-k="restart" type="button">${ICON.restart}<b>Restart</b></button>
+        </div>
+        <div class="cc-tile cc-sliders ga-sliders">
+          <label><span class="cc-lab">${ICON.vol}Volume</span><input type="range" min="0" max="1" step="0.01" data-s="vol"></label>
+          <label><span class="cc-lab">${ICON.bright}Brightness</span><input type="range" min="0" max="1" step="0.01" data-s="bright"></label>
+        </div>
+        <button class="cc-tile cc-wide ga-night" data-k="night" type="button"><span class="cc-ico">${ICON.moon}</span><span class="cc-txt"><b>Night Mode</b><i></i></span></button>
+        <div class="cc-tile cc-wide ga-timer"><span class="cc-ico">${ICON.timer}</span><span class="cc-txt"><b data-timer-t>Timer</b><i data-timer-s>Start a timer</i></span></div>
+        <div class="cc-trio ga-mins">${[5, 10, 15].map(m => `<button class="cc-tile cc-min" data-min="${m}" type="button"><b>${m}</b> min</button>`).join('')}</div>
+        <div class="cc-tile cc-wide ga-alarm"><span class="cc-ico">${ICON.alarm}</span><span class="cc-txt"><b>Alarm</b><i>Set an alarm</i></span></div>
+        <div class="cc-tile cc-tips ga-tips">
+          <div class="cc-tips-head"><b>How to use Nestie</b><span class="cc-open">${ICON.open}</span></div>
+          <p class="cc-quote"></p>
+          <div class="cc-tips-foot"><span class="cc-cat"></span><span class="cc-dots">${TIPS.map(() => '<i></i>').join('')}</span></div>
+        </div>
+        <div class="cc-pair ga-mic">
+          <button class="cc-tile cc-wide cc-half" data-k="wake" type="button"><span class="cc-ico"></span><span class="cc-txt"><b>“Hey Nestie”</b><i></i></span></button>
+          <button class="cc-tile cc-wide cc-half" data-k="mic" type="button"><span class="cc-ico"></span><span class="cc-txt"><b>Microphone</b><i></i></span></button>
+        </div>
+      </div>
+      <button class="cc-grab" type="button" aria-label="Open control center"></button>
+      <div class="cc-black" hidden></div>`;
+    stage.append(cc);
+    const panel = $('.cc-panel', cc), scrim = $('.cc-scrim', cc), black = $('.cc-black', cc);
+    $('.cc-tile[data-k="wifi"]', cc).style.gridArea = 'wifi';
+
+    function paint() {
+      const set = (k, on, sub) => { const b = $(`[data-k="${k}"]`, cc); b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); if (sub != null) $('.cc-txt i', b).textContent = sub; };
+      set('wifi', st.wifi, st.wifi ? 'Connected' : 'Off');
+      $('[data-k="wifi"] .cc-ico', cc).innerHTML = st.wifi ? ICON.wifi : ICON.wifiOff;
+      set('night', st.night, st.night ? 'Scheduled 23:00 – 07:00' : 'Off');
+      set('mic', st.mic, st.mic ? 'On' : 'Muted');
+      $('[data-k="mic"] .cc-ico', cc).innerHTML = st.mic ? ICON.mic : ICON.micOff;
+      // 麦克风关着时唤醒词也没法用
+      const wakeOn = st.mic && st.wake, wakeBtn = $('[data-k="wake"]', cc);
+      set('wake', wakeOn, !st.mic ? 'Mic is off' : st.wake ? 'Listening' : 'Off');
+      wakeBtn.classList.toggle('cc-off', !st.mic);
+      $('.cc-ico', wakeBtn).innerHTML = wakeOn ? ICON.wakeOn : ICON.wake;
+      $$('.cc-dots i', cc).forEach((d, i) => d.classList.toggle('on', i === st.tip));
+      $('.cc-cat', cc).innerHTML = TIPS[st.tip][2] + TIPS[st.tip][0];
+      const q = $('.cc-quote', cc);
+      if (q.dataset.tip !== String(st.tip)) {
+        q.dataset.tip = st.tip;
+        // 统一两行："Hey Nestie," 独占第一行，指令在第二行
+        const [, cmd] = TIPS[st.tip][1].match(/^“Hey Nestie, (.*)$/);
+        q.innerHTML = `<span class="cc-wake">Hey Nestie,</span><span>${cmd.replace(/”$/, '')}</span>`;
+        q.animate([{ opacity: 0, transform: 'translateY(4px)' }, { opacity: 1, transform: 'none' }], { duration: 280, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' });
+      }
+      $$('.cc-min', cc).forEach(b => b.classList.toggle('on', +b.dataset.min === st.timer));
+      for (const r of $$('input[type=range]', cc)) { r.value = st[r.dataset.s]; r.style.setProperty('--v', st[r.dataset.s] * 100 + '%'); }
+      // 亮度真的作用在画面上（不压暗控制中心自己）；默认 0.8 = 原样，往下变暗、往上略亮
+      const lv = st.bright >= 0.8 ? 1 + (st.bright - 0.8) * 0.4 : 0.4 + 0.6 * st.bright / 0.8;
+      $$('.frame', stage).forEach(f => { f.style.filter = Math.abs(lv - 1) < 0.005 ? '' : `brightness(${lv.toFixed(3)})`; });
+    }
+
+    for (const b of $$('[data-k]', cc)) b.addEventListener('click', () => {
+      const k = b.dataset.k;
+      if (k === 'wake') { if (st.mic) st.wake = !st.wake; }
+      else if (k === 'screenOff') { close(); setTimeout(() => { black.hidden = false; black.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 400, easing: 'ease-out' }); }, 220); return; }
+      else if (k === 'restart') { close(); black.hidden = false; black.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 420, easing: 'ease-in', fill: 'forwards' }).onfinish = () => location.reload(); return; }
+      else st[k] = !st[k];
+      paint();
+    });
+    black.addEventListener('click', () => { black.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300 }).onfinish = () => { black.hidden = true; }; });
+    for (const r of $$('input[type=range]', cc)) r.addEventListener('input', () => { st[r.dataset.s] = +r.value; paint(); });
+
+    // 计时器：点 5/10/15 开始倒计时，再点同一个取消
+    let tick = 0;
+    const fmt = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+    function timerText() {
+      $('[data-timer-t]', cc).textContent = st.timer ? fmt(st.left) : 'Timer';
+      $('[data-timer-s]', cc).textContent = st.timer ? `${st.timer} min timer running` : 'Start a timer';
+    }
+    for (const b of $$('.cc-min', cc)) b.addEventListener('click', () => {
+      clearInterval(tick);
+      const m = +b.dataset.min;
+      st.timer = st.timer === m ? 0 : m;
+      st.left = st.timer * 60;
+      if (st.timer) tick = setInterval(() => { st.left = Math.max(0, st.left - 1); if (!st.left) { clearInterval(tick); st.timer = 0; paint(); } timerText(); }, 1000);
+      timerText(); paint();
+    });
+
+    // 小贴士轮播：点一下下一条，打开时每 5 秒自动换
+    let tipTimer = 0;
+    const nextTip = () => { st.tip = (st.tip + 1) % TIPS.length; paint(); };
+    $('.cc-tips', cc).addEventListener('click', () => { nextTip(); clearInterval(tipTimer); tipTimer = setInterval(nextTip, 5000); });
+
+    // 拖拽：从顶边往下拉打开，在面板上往上推收起
+    const H = () => panel.offsetHeight + 24;
+    let open = false, drag = null;
+    const place = (y, animate) => {
+      const p = Math.max(0, Math.min(1, y / H()));
+      panel.style.transition = scrim.style.transition = animate ? '' : 'none';
+      panel.style.transform = `translateY(${(p - 1) * H()}px)`;
+      scrim.style.opacity = p;
+      cc.classList.toggle('is-live', p > 0);
+    };
+    function show(on) {
+      open = on;
+      place(on ? H() : 0, true);
+      cc.classList.toggle('is-open', on);
+      clearInterval(tipTimer);
+      if (on) { paint(); tipTimer = setInterval(nextTip, 5000); }
+    }
+    function close() { show(false); }
+    const k = () => window.__stageScale || 1;
+    const startDrag = (e, from) => { drag = { y0: e.clientY, from, t0: performance.now(), moved: false }; };
+    stage.addEventListener('pointerdown', e => {
+      if (open) { if (e.target.closest('.cc-panel') && !e.target.closest('input, button, .cc-tips')) startDrag(e, H()); return; }
+      const r = stage.getBoundingClientRect();
+      if ((e.clientY - r.top) / k() < 26) startDrag(e, 0);
+    });
+    addEventListener('pointermove', e => {
+      if (!drag) return;
+      const dy = (e.clientY - drag.y0) / k();
+      if (Math.abs(dy) > 4) drag.moved = true;
+      if (drag.moved) place(drag.from + dy, false);
+    });
+    addEventListener('pointerup', e => {
+      if (!drag) return;
+      const dy = (e.clientY - drag.y0) / k(), v = dy / Math.max(1, performance.now() - drag.t0);
+      const wasMoved = drag.moved, from = drag.from;
+      drag = null;
+      if (!wasMoved) { if (!from) show(true); return; }
+      show(v > 0.4 || (v > -0.4 && from + dy > H() * 0.45));
+    });
+    scrim.addEventListener('click', close);
+    // 鼠标/手指点横条已经由上面的顶边手势处理，这里只接键盘（Enter/空格）触发的点击
+    $('.cc-grab', cc).addEventListener('click', e => { if (e.detail === 0) show(!open); });
+    addEventListener('keydown', e => { if (e.key === 'Escape' && open) close(); });
+    paint();
+    place(0, false);
+  })();
+
+  paintIdentity(document);
   window.__proto = { state, renderBalance, rwPage, voices, calPage, tkPage, show, $, $$ };
-  show(['#s2', '#s3', '#s4', '#s5', '#s6', '#s7'].includes(location.hash) ? location.hash.slice(1) : 's1');
+  show(['#s2', '#s3', '#s4', '#s5', '#s6', '#s7', '#s8'].includes(location.hash) ? location.hash.slice(1) : 's1');
 })();

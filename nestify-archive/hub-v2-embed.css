@@ -31,7 +31,13 @@ html[data-hub-tab="lists"][data-hub-phase="fly"] #s4 [data-fly] { visibility: hi
 /* Nestie 对话时 proto 会把整屏虚化压暗（components.css 那条 [data-voice] 规则）。在 pad 上
    这是对的——人在跟小鸟说话；放在网站第 0 拍 "Everything that matters today." 下面，被虚化的
    恰恰是这一拍要展示的那一屏。嵌入时只留光环和气泡。 */
-.is-embed .stage[data-voice] .frame > *,
-.is-embed .stage[data-receipt] .frame > * { filter: none; }
-.is-embed .stage[data-voice] .frame::after,
-.is-embed .stage[data-receipt] .frame::after { opacity: 0; }
+/* 只对 Archive 那块屏生效：nestify.html 的 hero 也嵌这一页，那里要保留原样的虚化压暗
+   （它在 iframe 的 <html> 上加 .keep-voice-dim）。 */
+.is-embed:not(.keep-voice-dim) .stage[data-voice] .frame > *,
+.is-embed:not(.keep-voice-dim) .stage[data-receipt] .frame > * { filter: none; }
+.is-embed:not(.keep-voice-dim) .stage[data-voice] .frame::after,
+.is-embed:not(.keep-voice-dim) .stage[data-receipt] .frame::after { opacity: 0; }
+
+/* 屏幕和机身白边分得开：proto 的页面底 #f2f2ef 和 3D 机身的白色面板几乎同色，放进设备里
+   看不出屏幕在哪结束（像画面直接贴在外框上）。嵌入时把页面底压深一档，卡片仍是纯白。 */
+html.is-embed { --md-bg: #e7e7e2; }

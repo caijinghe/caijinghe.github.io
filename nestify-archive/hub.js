@@ -362,6 +362,7 @@
   /* 第二拍（"See what's changing in your family."）落在新屏的 **Tasks** 页：新版没有
      独立的 Lists 页了。四条新任务各落进一个人的那一列；`sec` 是那一列里的分节，
      `col` 只决定它停在 pad 左边还是右边那一摞。 */
+  const LIST_PARK_W = 185;   /* 停放时的任务卡 = 185×48 画布 px 的一行等比放大（新任务行真实是 255×48，太细） */
   const listCards = [
     { m: 'emma', name: 'Feed Biscuit', icon: '1f436', coins: 3, sec: 'Evening', col: 0 },
     { m: 'sam', name: 'Piano practice', icon: '1f3b9', coins: 5, sec: 'Afternoon', col: 0 },
@@ -700,15 +701,11 @@
      淡化，只是长进去——和旧 lists 卡同一个思路。尺寸全在 hub.css 的 .is-task 里。 */
   function makeListEl(card) {
     const el = document.createElement('div');
-    el.className = 'hub__fly-card is-task';
-    el.innerHTML = '<span class="ck"></span><img class="emo" alt=""><span class="nm"></span>' +
-      (card.coins ? '<span class="cn"><img alt=""><b></b></span>' : '');
-    el.querySelector('.emo').src = V2 + 'assets/emoji/' + card.icon + '.svg';
+    el.className = 'hub__fly-card is-task m-' + card.m;   /* m-*：成员色，见 hub.css */
+    el.innerHTML = '<span class="ck"></span><span class="nm"></span>' +
+      (card.coins ? '<span class="cn"></span>' : '');
     el.querySelector('.nm').textContent = card.name;
-    if (card.coins) {
-      el.querySelector('.cn img').src = V2 + 'assets/2714f.svg';
-      el.querySelector('.cn b').textContent = card.coins;
-    }
+    if (card.coins) el.querySelector('.cn').textContent = '+' + card.coins;
     return el;
   }
   function makeMealEl(card) {
@@ -1292,8 +1289,9 @@
          一个常数写在相邻两行、一行缩放一行不缩放，就是这么来的。 */
       let h = card.source === 'sticky' ? Math.max(rawH, Math.round(158 * flyK)) : rawH;
       /* 新屏的任务行是整张等比缩放的（--tk，见下面），所以停放时的高度就是落点的宽高比 */
-      if (kind === 'lists' && !dest.pending) h = Math.round(w * dest.h / dest.w);
-      /* 日历 chip 的底色照抄落点那一块（渐变 + 颗粒），量到才写、变了才写 */
+      /* 停放时按 185 宽的行放大（比真实的 255 宽紧凑：更厚、字更大），飞行中再过渡到落点的真实比例 */
+      if (kind === 'lists') h = Math.round(w * 48 / LIST_PARK_W);
+      /* 日历 chip 的底色照抄落点那一块（成员实色 + 角落光晕），量到才写、变了才写 */
       if (kind === 'calendar' && dest.bg) {
         const ev = el.querySelector('.ev');
         if (ev && ev.dataset.bg !== dest.bg) { ev.dataset.bg = dest.bg; ev.style.background = dest.bg; }
@@ -1370,11 +1368,10 @@
       el.style.minHeight = '0px';
       /* 任务行：内部所有尺寸都是新屏画布 px × --tk。--tk = 当前宽 / 落点那一行在画布上的宽，
          所以宽度从停放走到落点的同时，里面的一切按同一个比例跟着走，落地那一帧正好 1:1。 */
-      if (kind === 'lists' && !dest.pending) {
-        const curW = w + (dest.w - w) * m;
-        el.style.setProperty('--tk', (curW / (dest.w / (scale * 1.5))).toFixed(4));
-      } else if (kind === 'lists') {
-        el.style.setProperty('--tk', (w / 283).toFixed(4));   /* .tk-row 在画布上约 283 宽 */
+      if (kind === 'lists') {
+        /* --tk：停放时 = w / LIST_PARK_W（放大的紧凑行），落地时 = 落点那一行的真实缩放（scale × 1.5），中间线性过渡 */
+        const tkPark = w / LIST_PARK_W, tkLand = dest.pending ? tkPark : scale * 1.5;
+        el.style.setProperty('--tk', (tkPark + (tkLand - tkPark) * m).toFixed(4));
       }
       el.style.width = (w + (dest.w - w) * m) + 'px';
       el.style.height = (item.h + (dest.h - item.h) * m) + 'px';

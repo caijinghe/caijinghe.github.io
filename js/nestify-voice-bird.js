@@ -3,9 +3,9 @@
  const canvas=document.querySelector('.nestify-voice-bird canvas');
  if(!canvas||!window.rive)return;
  const speakCanvas=document.createElement('canvas');speakCanvas.className='nestie-speaking';speakCanvas.setAttribute('aria-hidden','true');canvas.parentElement.append(speakCanvas);
- const bubble=document.createElement('div');bubble.className='nestie-reply';bubble.innerHTML='<span>Added soccer practice for Leo</span><span>every Wednesday at 5:30 PM.</span>';canvas.parentElement.append(bubble);
+ const bubble=document.createElement('div');bubble.className='nestie-reply';bubble.innerHTML='<span>Added soccer practice for Sam</span><span>every Wednesday at 5:30 PM.</span>';canvas.parentElement.append(bubble);
  let speakReady=false;
- const speak=new rive.Rive({src:'media/nestify/hero/bird-speak.riv',canvas:speakCanvas,autoplay:true,layout:new rive.Layout({fit:rive.Fit.Contain,alignment:rive.Alignment.Center}),onLoad(){speakReady=true;speak.resizeDrawingSurfaceToCanvas();sync();}});
+ const speak=new rive.Rive({src:'media/nestify/hero/bird-speak.riv',canvas:speakCanvas,autoplay:true,layout:new rive.Layout({fit:rive.Fit.Contain,alignment:rive.Alignment.Center}),onLoad(){speakReady=true;fitAll();sync();}});
  const reduced=matchMedia('(prefers-reduced-motion: reduce)');
  const host=canvas.parentElement, device=host.closest('.nestify-cover__device');
  // Use unzoomed layout width: the preview already applies its own outer zoom.
@@ -23,16 +23,16 @@
  const loaderObserver=new MutationObserver(enter);loaderObserver.observe(document.body,{childList:true});
  const bird=new rive.Rive({src:'media/nestify/hero/bird-blink.riv',canvas,autoplay:true,
   layout:new rive.Layout({fit:rive.Fit.Contain,alignment:rive.Alignment.Center}),
-  onLoad(){ready=true;bird.resizeDrawingSurfaceToCanvas();sync();}
+  onLoad(){ready=true;fitAll();sync();}
  });
  function sync(){if(!ready)return;enter();
  const active=visible&&!document.hidden&&!reduced.matches, talking=device.dataset.voiceState==='speaking';
- host.classList.toggle('is-speaking',talking&&speakReady);
+ host.classList.toggle('is-speaking',talking&&speakReady);if(talking)fitAll();
  if(active&&!talking)bird.play();else bird.pause();
  if(speakReady){if(active&&talking)speak.play();else speak.pause();}
  }
  const layer=document.createElement('div');layer.className='nestie-delivery';layer.setAttribute('aria-hidden','true');
- const card=document.createElement('div');card.className='nestie-delivery-card';card.innerHTML='<strong>Soccer Practice</strong><span>5:30 PM · Leo</span>';
+ const card=document.createElement('div');card.className='nestie-delivery-card';card.innerHTML='<strong>Soccer Practice</strong><span>5:30 PM · Sam</span>';
  layer.append(card);device.append(layer);
  let delivery=[];
  device.addEventListener('nestie-state',event=>{
@@ -49,7 +49,17 @@
    {offset:1,opacity:0,transform:'translate(0,0) scale(1)',boxShadow:'0 0 0 0 transparent'}];
   delivery.push(card.animate(frames,{duration:1700,easing:'ease-in-out',fill:'both'}));
  });
- new ResizeObserver(()=>{if(ready)bird.resizeDrawingSurfaceToCanvas();if(speakReady)speak.resizeDrawingSurfaceToCanvas();}).observe(canvas);
+ // Rive sizes from getBoundingClientRect, which includes the pop-in scale(.35) transform and never
+ // tracks DPR changes. Size from layout width instead (times outer zoom), with headroom for upscaling.
+ function fit(r,c){
+  const zoom=host.getBoundingClientRect().width/(host.offsetWidth||1)||1;
+  const px=Math.round(c.offsetWidth*zoom*Math.max(devicePixelRatio||1,2)*1.5);
+  if(!px||(c.width===px&&c.height===px))return;
+  c.width=c.height=px;r.resizeToCanvas();r.drawFrame?.();
+ }
+ function fitAll(){if(ready)fit(bird,canvas);if(speakReady)fit(speak,speakCanvas);}
+ new ResizeObserver(fitAll).observe(canvas);
+ (function watchDpr(){matchMedia(`(resolution: ${devicePixelRatio}dppx)`).addEventListener('change',()=>{fitAll();watchDpr();},{once:true});})();
  new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;sync();}).observe(canvas);
  document.addEventListener('visibilitychange',sync);reduced.addEventListener('change',()=>{if(reduced.matches&&started)finish();sync();});
  window.addEventListener('pagehide',()=>{replySizeObserver.disconnect();bird.cleanup();speak.cleanup();},{once:true});

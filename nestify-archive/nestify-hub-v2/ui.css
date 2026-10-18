@@ -1,0 +1,99 @@
+/* =====================================================================
+   Nestify Display · UI components（shadcn/ui 的思路：一套组件，到处复用）
+   [INPUT]  tokens.css —— 只用 token，不写裸色值 / 裸尺寸
+   [OUTPUT] Button · IconButton · Segmented · Badge · FilterChip · SectionLabel · CardHeader · PageHeader · Avatar
+   [POS]    在 tokens.css 之后、所有屏的样式之后加载；屏的 CSS 只管布局（位置、尺寸、间距），外观一律来自这里
+   展示页：导航栏切到 “System”（#s8）；规范：DESIGN_SYSTEM.md
+   ===================================================================== */
+
+/* ---------- Button ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex-shrink: 0;
+  height: 36px; padding: 0 16px; border-radius: var(--r-pill);
+  font-size: var(--fs-label); font-weight: 600; line-height: 1; white-space: nowrap;
+  background: var(--ink-a1); color: var(--ink); box-shadow: none;
+  transition: transform var(--dur-fast) var(--ease-out), background-color var(--dur-base) ease, color var(--dur-base) ease, opacity var(--dur-base) ease;
+}
+.btn:active { transform: scale(0.96); }
+.btn:disabled { background: var(--ink-a1); color: var(--ink-a5); box-shadow: none; cursor: default; }
+.btn:disabled:active { transform: none; }
+.btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.btn img { width: 16px; height: 16px; }
+.btn--primary { background: var(--btn-bg, var(--accent)); color: #fff; }
+.btn--tonal { background: var(--accent-soft); color: var(--accent-strong); }
+.btn--neutral { background: var(--md-surface-lowest); color: var(--ink); box-shadow: var(--elev-1); }
+.btn--ghost { background: var(--ink-a1); color: var(--ink); }
+.btn--sm { height: 28px; padding: 0 12px; font-size: var(--fs-small); }
+.btn--lg { height: 44px; padding: 0 20px; font-size: var(--fs-caption); }
+.btn--block { width: 100%; }
+
+/* ---------- IconButton ---------- */
+.icon-btn {
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+  width: 44px; height: 44px; border-radius: var(--r-pill); padding: 0;
+  background: var(--md-surface-lowest); color: var(--ink);
+  transition: transform var(--dur-fast) var(--ease-out), background-color var(--dur-base) ease;
+}
+.icon-btn:active { transform: scale(0.92); }
+.icon-btn img, .icon-btn svg { width: 20px; height: 20px; }
+.icon-btn svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.icon-btn--primary, .icon-btn.cur { background: var(--accent); color: #fff; }   /* .cur = 当前页（导航） */
+.icon-btn--ghost { background: var(--ink-a1); }
+.icon-btn--bare { background: transparent; }
+.icon-btn--sm { width: 32px; height: 32px; }
+.icon-btn--sm img, .icon-btn--sm svg { width: 16px; height: 16px; }
+
+/* ---------- Segmented ---------- */
+.seg { display: inline-flex; padding: 4px; gap: 2px; border-radius: var(--r-pill); background: var(--ink-a1); }
+.seg > button {
+  height: 30px; padding: 0 16px; border-radius: var(--r-pill); background: transparent; box-shadow: none;
+  font-size: var(--fs-label); font-weight: 500; color: var(--muted);
+  transition: background-color var(--dur-base) ease, color var(--dur-base) ease;
+}
+.seg > button[aria-pressed="true"] { background: var(--md-surface-lowest); color: var(--ink); box-shadow: var(--elev-1); }
+
+/* ---------- Badge（不可点的小标签） ---------- */
+.badge {
+  display: inline-flex; align-items: center; justify-content: center; gap: 4px; flex-shrink: 0;
+  height: 24px; min-width: 0; padding: 0 10px; border-radius: var(--r-pill);
+  font-size: var(--fs-small); font-weight: 600; line-height: 1; white-space: nowrap;
+  background: var(--ink-a1); color: var(--ink); box-shadow: none;
+}
+.badge b, .badge p, .badge span { font: inherit; translate: none; }
+.badge img.coin { width: 11px; height: 10px; }
+.badge svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.badge--coin { background: var(--accent-soft); color: var(--accent-strong); }
+.badge--success { background: rgba(31, 122, 66, 0.12); color: var(--success); }
+.badge--surface { background: var(--md-surface-lowest); color: var(--ink); }
+.badge--glass { background: rgba(255, 255, 255, 0.72); color: var(--ink); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+.badge--lg { height: 28px; padding: 0 12px; font-size: var(--fs-label); }
+
+/* ---------- FilterChip（可切换的筛选胶囊；选中 = 主色浅底 + 主色描边，全站一致） ---------- */
+.filter-chip {
+  display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0;
+  height: 32px; padding: 0 12px; border-radius: var(--r-pill);
+  font-size: var(--fs-label); font-weight: 500; color: var(--ink); white-space: nowrap;
+  background: var(--md-surface-lowest); box-shadow: inset 0 0 0 1px var(--md-outline);
+  transition: background-color var(--dur-base) ease, box-shadow var(--dur-base) ease, opacity var(--dur-base) ease, transform var(--dur-fast) var(--ease-out);
+}
+.filter-chip:active { transform: scale(0.96); }
+.filter-chip svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.filter-chip .av { width: 24px; height: 24px; border-radius: var(--r-pill); margin-left: -6px; }
+.filter-chip[aria-pressed="true"], .filter-chip.on, .filter-chip.sel {
+  background: var(--accent-soft); color: var(--accent-strong); box-shadow: inset 0 0 0 1.5px var(--accent); font-weight: 600;
+}
+
+/* ---------- SectionLabel ---------- */
+.section-label { font-size: var(--fs-micro); font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; color: var(--muted); line-height: 1.3; translate: none; }
+
+/* ---------- CardHeader / PageHeader ---------- */
+.card-title { font-size: var(--fs-heading); font-weight: 700; line-height: 1.3; white-space: nowrap; color: var(--ink); }
+.card-sub { font-size: var(--fs-caption); font-weight: 400; color: var(--muted); white-space: nowrap; }
+.page-title { font-size: var(--fs-title); font-weight: 700; line-height: 1.2; white-space: nowrap; color: var(--ink); }
+
+/* ---------- Avatar ---------- */
+.avatar { position: relative; flex-shrink: 0; border-radius: var(--r-pill); overflow: hidden; background: var(--md-surface-lowest); box-shadow: 0 0 0 1.5px var(--md-surface-lowest); }
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+.avatar--24 { width: 24px; height: 24px; }
+.avatar--30 { width: 30px; height: 30px; }
+.avatar--36 { width: 36px; height: 36px; }
