@@ -519,7 +519,7 @@ img.coin { width: 14px; height: 12.5px; transform: rotate(41.92deg); flex-shrink
 .celebrate.out .cele-card { animation: cele-out 280ms var(--ease-out) both; }
 @keyframes cele-in { from { opacity: 0; transform: translateY(14px) scale(0.86); } }
 @keyframes cele-out { to { opacity: 0; transform: scale(0.94); } }
-.cele-badge { position: relative; width: 96px; height: 96px; margin: 0 auto 16px; border-radius: 50%;
+.cele-badge { position: relative; width: 96px; height: 96px; margin: 0 auto 24px; border-radius: 50%;
   background: var(--gold-soft);
   box-shadow: inset 0 0 0 3px var(--glass-4), 0 8px 24px rgba(240, 178, 60, 0.35);
   display: flex; align-items: center; justify-content: center;
@@ -529,15 +529,11 @@ img.coin { width: 14px; height: 12.5px; transform: rotate(41.92deg); flex-shrink
 .cele-badge img { width: 62px; height: 62px; object-fit: contain; filter: drop-shadow(0 3px 4px rgba(120, 80, 0, 0.18)); }
 @keyframes badge-pop { from { transform: scale(0.3) rotate(-18deg); opacity: 0; } }
 @keyframes halo { from { transform: scale(0.9); opacity: 1; } to { transform: scale(1.35); opacity: 0; } }
-.cele-title { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: var(--fs-title); font-weight: 700; line-height: 1.2; color: var(--ink); translate: none; }
-.cele-title svg { width: 18px; height: 18px; fill: var(--gold); }
-.cele-sub { margin-top: 4px; font-size: var(--fs-caption); color: var(--muted); translate: none; }
-.cele-item {
-  --sc: var(--glass-5); margin-top: 18px; display: flex; align-items: center; gap: 10px;
-  height: 52px; padding: 0 12px; border-radius: var(--r-lg); background: var(--glass-2); text-align: left;
-}
-.cele-item > img { width: 32px; height: 32px; object-fit: contain; }
-.cele-item p { flex: 1; font-size: var(--fs-body-sm); font-weight: 600; translate: none; }
+/* 礼物名 → You got it! → 花了多少币：从上到下读一遍就是一句话 */
+.cele-name { font-size: var(--fs-title); font-weight: 700; line-height: 1.2; color: var(--ink); translate: none; }
+.cele-title { margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: var(--fs-body); font-weight: 500; line-height: 1.3; color: var(--muted); translate: none; }
+.cele-title svg { width: 16px; height: 16px; fill: var(--gold); }
+.cele-cost { margin-top: 16px; }
 
 @media (prefers-reduced-motion: reduce) {
   .cele-card, .cele-badge, .cele-badge i { animation: none; }

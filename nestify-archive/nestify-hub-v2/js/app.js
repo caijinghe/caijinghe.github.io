@@ -759,7 +759,7 @@
 
   // ---------- 金币 / 任务 / 奖励 ----------
   const state = {
-    balance: 22,
+    balance: 90,
     tasks: [
       { name: 'Wake up on time', icon: 'assets/emoji/23f0.svg', coins: 3, done: true, when: 'Morning' },
       { name: 'Morning reading', icon: 'assets/emoji/1f4d6.svg', coins: 10, done: false, when: 'Morning' },
@@ -847,13 +847,13 @@
     sortRewards();
   }
 
-  // 按"快完成"排：攒够的最前，其余按进度（已攒 / 目标）从高到低，兑换过的沉底；顺序变了就让条目滑到新位置
+  // 按"快完成"排：目标（Switch）钉在最前，其余攒够的在前，其余按进度（已攒 / 目标）从高到低，兑换过的沉底；顺序变了就让条目滑到新位置
   function sortRewards() {
     const list = $('.reward-list', s2);
     if (!list) return;
     const items = $$('.reward', list);
-    const key = li => { const r = rewardById(li.dataset.id); return [r.done ? 1 : 0, -Math.min(1, state.balance / r.cost), r.cost]; };
-    const cmp = (a, b) => { const x = key(a), y = key(b); return x[0] - y[0] || x[1] - y[1] || x[2] - y[2]; };
+    const key = li => { const r = rewardById(li.dataset.id); return [r.done ? 1 : 0, r.id === 'switch' ? 0 : 1, -Math.min(1, state.balance / r.cost), r.cost]; };
+    const cmp = (a, b) => { const x = key(a), y = key(b); return x[0] - y[0] || x[1] - y[1] || x[2] - y[2] || x[3] - y[3]; };
     const next = [...items].sort(cmp);
     if (next.every((li, i) => li === items[i])) return;
     const before = new Map(items.map(li => [li, li.getBoundingClientRect().top]));
@@ -1196,9 +1196,9 @@
     root.innerHTML = `<canvas class="confetti"></canvas>
       <div class="cele-card" role="dialog" aria-label="Reward redeemed">
         <div class="cele-badge"><i></i><img src="${art}" alt=""></div>
+        <p class="cele-name">${name}</p>
         <p class="cele-title"><svg viewBox="0 0 24 24"><path d="M12 2.5l2.7 6.2 6.8.6-5.2 4.5 1.6 6.6L12 16.9l-5.9 3.5 1.6-6.6-5.2-4.5 6.8-.6z"/></svg>You got it!<svg viewBox="0 0 24 24"><path d="M12 2.5l2.7 6.2 6.8.6-5.2 4.5 1.6 6.6L12 16.9l-5.9 3.5 1.6-6.6-5.2-4.5 6.8-.6z"/></svg></p>
-        <p class="cele-sub">Emma redeemed</p>
-        <div class="cele-item st"><img src="${art}" alt=""><p>${name}</p><span class="chip badge badge--coin"><img class="coin" src="assets/2714f.svg" alt=""><b>−${cost}</b></span></div>
+        <div class="cele-cost"><span class="chip badge badge--coin badge--lg"><img class="coin" src="assets/2714f.svg" alt=""><b>−${cost}</b></span></div>
       </div>`;
     $('.frame.on').append(root);
     const close = () => {

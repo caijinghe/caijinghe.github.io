@@ -817,7 +817,7 @@
      rewards-play 这一张 2026-08-30 就从静态图换成了播一次的动图。没有这个
      查询串，已经缓存过旧图的读者永远看不到新的，而且完全无声无息。
      改图就改这个数。 */
-  const STILL_V = '?v=20261018d';
+  const STILL_V = '?v=20261019a';
   const stillSrc = tok => 'assets/hub/still-' + tok.replace('|', '-') + '.webp' + STILL_V;
   const warmed = new Set();
   let stillTok = '';

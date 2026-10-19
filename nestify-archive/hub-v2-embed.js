@@ -85,12 +85,11 @@
   }
   new MutationObserver(() => { injectTasks(); layoutChanged(); }).observe(tkCols, { childList: true });
 
-  /* ---------- Rewards：idle 永远是「Stay up 30 min later 刚好攒够、还没兑」 ----------
-     新版孩子页 My goal 里只有 Switch / Stay up / Milkshake / Road trip 四个（state 里的
-     Ice Cream 已经没有卡片了），而起始 22 币一个都换不了——所以这一拍先把余额补到
-     刚好够 Stay up（25），Redeem 亮起来；play 真的点它（扣币、彩纸、庆祝卡都是 app.js
+  /* ---------- Rewards：idle 永远是「Nintendo Switch 刚好攒够、还没兑」 ----------
+     兑的是 My goal 里钉在最前的大目标 Switch（100）。起始 90 币还差一点，所以这一拍先把
+     余额补到刚好够（100），Redeem 亮起来；play 真的点它（扣币、彩纸、庆祝卡都是 app.js
      自己的）。读者往回滚再进来时还原成「刚好够」，离开这一拍还原成起始余额。 */
-  const PICK = state.rewards.find(r => r.id === 'stay-up');
+  const PICK = state.rewards.find(r => r.id === 'switch');
   const BAL0 = state.balance;
   function resetRewards(bal) {
     $$('.celebrate').forEach(el => el.remove());
@@ -102,7 +101,7 @@
     P.rwPage.renderHistory();
   }
   function playRewards() {
-    $('#s2 .reward[data-id="stay-up"] .btn')?.click();
+    $('#s2 .reward[data-id="switch"] .btn')?.click();
   }
 
   /* ---------- Meals：两道菜被收藏，飞进右边 My collection 的顶上 ----------
