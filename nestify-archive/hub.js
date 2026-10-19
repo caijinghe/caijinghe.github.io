@@ -367,7 +367,7 @@
     { m: 'emma', name: 'Feed Biscuit', icon: '1f436', coins: 3, sec: 'Evening', col: 0 },
     { m: 'sam', name: 'Piano practice', icon: '1f3b9', coins: 5, sec: 'Afternoon', col: 0 },
     { m: 'mom', name: 'Water the plants', icon: '1fab4', sec: 'Chores', col: 1 },
-    { m: 'dad', name: 'Sweep the porch', icon: '1f9f9', sec: 'Chores', col: 1 },
+    { m: 'mom', name: 'Sweep the porch', icon: '1f9f9', sec: 'Chores', col: 1 },   // 新版 Tasks 页一屏只放得下 Emma / Sam / Mom 三列，Dad 那列在屏外，落不进可见处
   ];
   const mealCards = [
     { title: 'Banana pancakes', img: 'hub-fly/meal-05.jpg', from: 'left', day: 0, row: 0 },
@@ -817,7 +817,7 @@
      rewards-play 这一张 2026-08-30 就从静态图换成了播一次的动图。没有这个
      查询串，已经缓存过旧图的读者永远看不到新的，而且完全无声无息。
      改图就改这个数。 */
-  const STILL_V = '?v=20261018c';
+  const STILL_V = '?v=20261018d';
   const stillSrc = tok => 'assets/hub/still-' + tok.replace('|', '-') + '.webp' + STILL_V;
   const warmed = new Set();
   let stillTok = '';
@@ -2133,6 +2133,14 @@
         cal: calCards.map(c => ({ title: c.title, day: c.day, start: c.start, dur: c.dur, allDay: !!c.allDay, who: c.who })),
         tasks: listCards.map(c => ({ m: c.m, name: c.name, icon: c.icon, coins: c.coins, sec: c.sec })),
       });
+    } catch (err) {}
+    /* 成员色从 proto 自己的 tokens.css 读（飞行任务卡用，见 hub.css 的 .is-task.m-*） */
+    try {
+      const cs = getComputedStyle(iframe.contentDocument.documentElement);
+      ['emma', 'sam', 'mom', 'dad'].forEach(m => ['soft', 'fill'].forEach(k => {
+        const v = cs.getPropertyValue('--id-' + m + '-' + k).trim();
+        if (v) document.documentElement.style.setProperty('--id-' + m + '-' + k, v);
+      }));
     } catch (err) {}
     lastTold = '';
     tellToken(currentStateToken());

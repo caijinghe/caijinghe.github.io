@@ -108,5 +108,9 @@
 .wall-note { position: absolute; z-index: 2; right: var(--card-pad); bottom: var(--card-pad); width: 196px; padding: var(--sp-4) var(--sp-4) var(--sp-3); border-radius: var(--r-md); background: var(--id-mom-soft); box-shadow: var(--elev-2); display: flex; flex-direction: column; }
 /* 便签顶上一颗图钉：Mom 的颜色、扁平圆头 + 一点落影，像钉在墙上 */
 .wall-note::before { content: ''; position: absolute; top: -6px; left: 50%; width: 14px; height: 14px; margin-left: -7px; border-radius: var(--r-pill); background: var(--id-mom-vivid); box-shadow: 0 2px 3px var(--ink-a3), inset 0 -2px 0 color-mix(in srgb, var(--ink) 18%, transparent); }
+/* 小鸟趴在便签上时，便签以顶边正中（小鸟抓着的地方）为轴微微左右摆 */
+.stage:not(.nestie-away):has(.nestie.is-home.is-shown:not(.is-leaving)) #s1 .wall-note { transform-origin: 50% 0; animation: note-sway 4.8s ease-in-out infinite; }
+@keyframes note-sway { 0%, 100% { rotate: -1.4deg; } 50% { rotate: 1.4deg; } }
+@media (prefers-reduced-motion: reduce) { #s1 .wall-note { animation: none !important; } }
 .wall-note p { font-family: "Caveat", cursive; font-size: 22px; font-weight: 600; line-height: 1.25; color: var(--ink); font-variation-settings: normal; }
 .wall-note span { align-self: flex-end; margin-top: var(--sp-2); font-size: var(--fs-small); font-weight: 600; color: var(--muted); }

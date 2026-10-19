@@ -575,6 +575,50 @@
   </section>
 
   <!-- ===================== Design System 展示页（#s8）：所有 token 和组件都在这里，用真实 class 渲染 ===================== -->
+  <!-- ===================== Morning Brief（s11）：早上第一眼，像报纸送到门口——送报动画放完，天亮、太阳升起，一张报纸滑进来；翻页角 = 开始今天（回首页） ===================== -->
+  <section class="frame brief" id="s11" aria-label="Morning brief">
+    <img class="mb-sun" src="assets/brief/sun.png" alt="">
+    <img class="mb-cloud mb-cloud--back" src="assets/brief/cloud2.png" alt="">
+    <img class="mb-cloud mb-cloud--front" src="assets/brief/cloud1.png" alt="">
+    <header class="mb-top">
+      <p class="mb-date">Tuesday, October 29<i></i><img src="assets/sun-filled.svg" alt="">72° Sunny</p>
+      <h1 class="mb-hello">Good morning,<br>family!</h1>
+    </header>
+    <img class="mb-bird" data-mb-bird src="assets/brief/nestie-news.webp" alt="">
+    <p class="mb-bubble">Busy afternoon: three pickups before the BBQ</p>
+    <article class="mb-paper">
+      <button class="mb-curl" type="button" aria-label="Start the day"><img src="assets/brief/curl.svg" alt=""></button>
+      <div class="mb-mast">
+        <p class="section-label">The Morning Nest · Tuesday edition</p>
+        <div class="mb-stats"><p><b>16</b>events</p><p><b>8</b>to-dos</p><p><b>1</b>needs a ride</p></div>
+      </div>
+      <div class="mb-cols">
+        <section class="mb-col mb-lead">
+          <p class="section-label">Today’s headline</p>
+          <h2 class="mb-headline">Emma’s 5:00 piano still needs a ride</h2>
+          <p class="mb-body">Mom is at the check-up until 5:30 and Dad leaves with Sam at 5:15. Sort it out this morning and the BBQ at 6:30 stays easy.</p>
+          <button class="btn btn--primary" type="button" data-mb-plan>Plan the ride</button>
+          <div class="mb-peak">
+            <p class="section-label">Peak hours</p>
+            <div class="mb-bars" data-mb-bars></div>
+            <p class="mb-note">Busiest stretch 3–7 PM: pickups, check-up, piano and soccer back to back.</p>
+          </div>
+        </section>
+        <section class="mb-col mb-overlap">
+          <p class="section-label">Overlap</p>
+          <div class="mb-rail" data-mb-rail></div>
+        </section>
+        <section class="mb-col mb-side">
+          <p class="section-label">Need to buy</p>
+          <ul class="mb-buy"><li><img src="assets/emoji/1f9c0.svg" alt=""><p>Cheese</p></li><li><img src="assets/emoji/1f951.svg" alt=""><p>Avocados</p></li><li><img src="assets/emoji/1f34e.svg" alt=""><p>Apples</p></li><li><img src="assets/emoji/1f35e.svg" alt=""><p>Bread</p></li><li><img src="assets/emoji/1f95b.svg" alt=""><p>Milk</p></li><li><img src="assets/emoji/1f95a.svg" alt=""><p>Eggs</p></li></ul>
+          <p class="section-label mb-soon-label">Coming up</p>
+          <ul class="mb-soon"><li><img src="assets/emoji/1f382.svg" alt=""><b>Wed</b><div><p>Mom’s birthday</p><span>Card is hidden in the piano bench</span></div></li><li><img src="assets/emoji/1f383.svg" alt=""><b>Thu</b><div><p>Halloween</p><span>Costumes by 5 PM</span></div></li><li><img src="assets/emoji/1f3eb.svg" alt=""><b>Fri</b><div><p>No school</p><span>Who’s home with the kids?</span></div></li></ul>
+        </section>
+      </div>
+    </article>
+    <video class="mb-intro" src="assets/brief/delivery.mp4" muted playsinline preload="auto"></video>
+  </section>
+
   <section class="frame" id="s8">
     <div class="dspage">
       <header class="ds-head"><p class="page-title">Nestify Design System</p><p class="card-sub">tokens.css · ui.css · 规范见 DESIGN_SYSTEM.md</p></header>
@@ -686,6 +730,7 @@
   <button data-to="s3" aria-pressed="false">Calendar</button>
   <button data-to="s4" aria-pressed="false">Tasks</button>
   <button data-to="s7" aria-pressed="false">Meals</button>
+  <button data-to="s11" aria-pressed="false">Brief</button>
   <button data-to="s10" aria-pressed="false">Lists</button>
   <button data-to="s6" aria-pressed="false">Screen saver</button>
   <button data-to="s8" aria-pressed="false">System</button>

@@ -40,3 +40,5 @@ html.is-embed { --md-bg: #e7e7e2; }
    讲的是那一页本身，常驻的小鸟会抢眼。2026-10-18 用户定。 */
 html.is-embed:not([data-hub-phase="think"]) .nestie,
 html.is-embed:not([data-hub-phase="think"]) .nestie-hands { visibility: hidden; }
+/* 便签只在小鸟趴着时摆；Archive 里小鸟不在场的拍子便签也不摆 */
+html.is-embed:not([data-hub-phase="think"]) #s1 .wall-note { animation: none; }

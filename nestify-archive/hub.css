@@ -4013,10 +4013,12 @@
    2026-10-18 新版：每人一整列浅色底，行本身透明、没有图标；所以飞行卡用那一列的浅色作底，
    落地时（--m → 1）内边距、圆角、投影收掉，正好和列上的那一行重合。
    成员色照抄 nestify-proto/tokens.css 的 --id-*-soft / --id-*-fill。 */
-.hub__fly-card.is-task.m-emma { --fly-bg: #fdfbe6; --fly-acc: #ebe37f; }
-.hub__fly-card.is-task.m-sam { --fly-bg: #e2f0fd; --fly-acc: #74b8e3; }
-.hub__fly-card.is-task.m-mom { --fly-bg: #ffdfdf; --fly-acc: #f1aaaa; }
-.hub__fly-card.is-task.m-dad { --fly-bg: #ebebfd; --fly-acc: #b2b2f7; }
+/* 颜色不再手抄：hub.js 在 iframe 载入后把 proto tokens.css 的 --id-*-soft / -fill 写到本页根上，
+   proto 换色板也自动跟上。后面的值只是兜底（手机上不载 iframe），2026-10-18 的色板。 */
+.hub__fly-card.is-task.m-emma { --fly-bg: var(--id-emma-soft, #effae1); --fly-acc: var(--id-emma-fill, #d3ecaf); }
+.hub__fly-card.is-task.m-sam { --fly-bg: var(--id-sam-soft, #ffebf3); --fly-acc: var(--id-sam-fill, #f7c3da); }
+.hub__fly-card.is-task.m-mom { --fly-bg: var(--id-mom-soft, #ffeee1); --fly-acc: var(--id-mom-fill, #f8cead); }
+.hub__fly-card.is-task.m-dad { --fly-bg: var(--id-dad-soft, #efeeff); --fly-acc: var(--id-dad-fill, #cecbf7); }
 .hub__fly-card.is-task {
   flex-direction: row;
   align-items: center;

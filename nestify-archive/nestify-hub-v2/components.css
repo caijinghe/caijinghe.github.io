@@ -275,8 +275,9 @@ img.coin { width: 14px; height: 12.5px; transform: rotate(41.92deg); flex-shrink
 .nestie.is-shown { transition: opacity 240ms ease, transform 280ms var(--ease-out), translate 700ms var(--ease-out), scale 700ms var(--ease-out); transform-origin: center; }
 .nestie.is-talking { scale: 1.15; }
 /* 常驻位：趴在页头正中、主内容的上边沿——只有一个脑袋，从卡片后面探出来，下巴以下藏在卡片顶边后面（像从墙头探出头） */
-.nestie.is-home { translate: 0 -186px; scale: 0.9; clip-path: inset(0 0 46px 0); }   /* 46px = 卡片顶边以下的部分（本地坐标，缩放前） */
-.nestie-hands { position: absolute; pointer-events: none; translate: 0 -186px; scale: 0.9; opacity: 0; }   /* 小鸟一离开原位，手立刻消失（不淡出） */
+.nestie.is-home { translate: var(--nest-tx, 0) var(--nest-ty, -186px); scale: var(--nest-k, 0.9); clip-path: inset(0 0 46px 0); }   /* 常驻位由 app.js placeNestieHome 量出：首页 = Mom 便签顶边；46px = 便签顶边以下藏住的下巴（本地坐标，缩放前） */
+.nestie-hands { position: absolute; pointer-events: none; translate: var(--nest-tx, 0) var(--nest-ty, -186px); scale: var(--nest-k, 0.9); opacity: 0; }   /* 小鸟一离开原位，手立刻消失（不淡出） */
+.stage.nestie-away :is(.nestie.is-home, .nestie-hands) { visibility: hidden; }   /* 首页以外不常驻：藏在上沿外，唤醒时从上面掉下来 */
 .nestie.is-home.is-shown:not(.is-leaving):not(.is-ducking) ~ .nestie-hands { opacity: 1; transition: opacity var(--dur-base) ease; }   /* 回到原位时淡入 */
 .nestie-hand { position: absolute; top: 64px; width: 30px; height: 19px; left: 6px; rotate: -8deg; }   /* 手背在卡片顶边上方，手指垂过边沿 */
 .nestie-hand.is-r { left: auto; right: 6px; rotate: 8deg; }
@@ -1456,4 +1457,85 @@ button.cc-tile:active { transform: scale(0.97); }
 .pd-grid .cp-ev.needs { box-shadow: inset 0 0 0 2px var(--accent); }   /* 日历里那块没人开车的事：同一种描边，和 Heads-up 对得上 */
 .pd-grid .cp-ev.short { justify-content: center; padding-block: 0; }   /* 半小时的块：只放标题，竖向居中 */
 .ds-popover { width: 248px; animation: none; }   /* 展示用：静态放在页面里 */
-.pd-grid .pd-wide { left: calc(54px + 3px); right: 3px; z-index: 2; }   /* 横跨所有人的列：从时间轴右边起，到最后一列 */
+
+/* ===================== Morning Brief（s11）=====================
+   早上第一眼：送报动画 → 天亮（太阳升、云飘进）→ 一张报纸滑上来 → 小鸟站在报纸上边沿看报 → 说一句今天的重点。
+   报纸里是三栏（像报纸的栏，用细竖线分栏，不再套卡片）：头条 + 高峰时段 / 时间冲突 / 要买的 + 接下来几天 */
+.brief { padding: 0; background: var(--sky); }
+.mb-intro { position: absolute; inset: 0; z-index: 10; width: 100%; height: 100%; object-fit: cover; background: var(--sky); pointer-events: none; transition: opacity 700ms ease; }
+.brief.is-awake .mb-intro { opacity: 0; }
+.mb-sun { position: absolute; left: -46px; top: -70px; width: 330px; }
+.mb-cloud { position: absolute; left: -40px; top: -18px; width: 640px; pointer-events: none; }
+.mb-top { position: absolute; left: 48px; top: 64px; z-index: 2; }
+.mb-date { display: flex; align-items: center; gap: var(--sp-2); font-size: var(--fs-body); font-weight: 600; color: var(--accent-strong); }
+.mb-date i { width: 1.5px; height: 16px; margin: 0 var(--sp-1); background: currentColor; opacity: 0.35; }
+.mb-date img { width: 22px; height: 22px; }
+.mb-hello { margin-top: var(--sp-2); font-size: var(--fs-hero); font-weight: 700; line-height: 1.08; letter-spacing: -0.5px; color: var(--ink); }
+.mb-bird { position: absolute; left: 452px; top: 30px; z-index: 3; width: 420px; height: 236px; pointer-events: none; }   /* 小鸟脚踩在报纸上边沿 */
+.mb-bubble { position: absolute; left: 790px; top: 92px; z-index: 3; white-space: nowrap; padding: 14px 20px; border-radius: var(--r-xl); background: var(--md-surface-lowest); box-shadow: var(--elev-2); font-size: var(--fs-body); font-weight: 600; line-height: 1.35; color: var(--ink); }
+.mb-bubble::before { content: ""; position: absolute; left: -9px; top: 22px; width: 18px; height: 18px; border-radius: 3px; background: inherit; rotate: 45deg; }   /* 小尖角朝向小鸟 */
+.mb-paper { position: absolute; left: 32px; right: 32px; top: 254px; bottom: 32px; z-index: 2; display: flex; flex-direction: column; gap: var(--sp-5); padding: 28px 32px 32px; border-radius: var(--r-2xl); background: var(--md-surface-lowest); box-shadow: var(--elev-2); overflow: hidden; }
+.mb-curl { position: absolute; right: 0; top: 0; z-index: 2; width: 132px; padding: 0; background: none; transform-origin: top right; transition: transform var(--dur-fast) var(--ease-out); }
+.mb-curl img { display: block; width: 100%; }
+.mb-curl:active { transform: scale(1.08); }   /* 按下：像把角再掀起来一点 */
+.mb-mast { display: flex; align-items: baseline; gap: var(--sp-6); padding-right: 120px; padding-bottom: var(--sp-4); border-bottom: 1px solid var(--hairline); }
+.mb-stats { margin-left: auto; display: flex; gap: var(--sp-6); }
+.mb-stats p { display: flex; align-items: baseline; gap: 6px; font-size: var(--fs-caption); color: var(--muted); }
+.mb-stats b { font-size: var(--fs-heading); font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+.mb-cols { flex: 1 1 0; min-height: 0; display: grid; grid-template-columns: 1.15fr 1.15fr 1fr; }
+.mb-col { min-width: 0; display: flex; flex-direction: column; gap: var(--sp-3); padding: 0 var(--sp-6); }
+.mb-col:first-child { padding-left: 0; }
+.mb-col:last-child { padding-right: 0; }
+.mb-col + .mb-col { border-left: 1px solid var(--hairline); }   /* 报纸的分栏线 */
+.mb-headline { font-size: var(--fs-title); font-weight: 700; line-height: 1.2; color: var(--ink); text-wrap: balance; }
+.mb-body { font-size: var(--fs-caption); line-height: 1.5; color: var(--muted); }
+.mb-lead .btn { align-self: flex-start; }
+.mb-peak { margin-top: auto; display: flex; flex-direction: column; gap: var(--sp-2); }
+.mb-bars { display: flex; align-items: flex-end; justify-content: space-between; height: 48px; }
+.mb-bars i { width: 10px; height: calc(var(--n) * 28% + 12%); border-radius: var(--r-pill); background: var(--ink-a1); transform-origin: bottom; }
+.mb-bars i.is-peak { background: var(--accent); }
+.mb-bars-axis { display: flex; justify-content: space-between; font-size: var(--fs-micro); color: var(--muted); }
+.mb-note { font-size: var(--fs-small); line-height: 1.45; color: var(--muted); }
+.mb-rail { position: relative; flex: 1 1 0; min-height: 0; }
+.mb-rail .mb-h { position: absolute; left: 0; right: 0; height: 1px; background: var(--hairline); }
+.mb-rail .mb-h span { position: absolute; left: 0; top: -7px; font-size: var(--fs-micro); color: var(--muted); }
+.mb-rail .cp-ev { border-radius: var(--r-md); padding: 6px 10px; }
+.mb-rail .cp-ev.needs { box-shadow: inset 0 0 0 2px var(--accent); }   /* 和父母页 Heads-up 同一种提醒 */
+.mb-buy { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-2); }
+.mb-buy li { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 4px 8px; border-radius: var(--r-md); background: var(--md-surface); }
+.mb-buy img { width: 28px; height: 28px; }
+.mb-buy p { font-size: var(--fs-small); font-weight: 600; color: var(--ink); }
+.mb-soon-label { margin-top: var(--sp-3); }
+.mb-soon { list-style: none; display: flex; flex-direction: column; gap: var(--sp-3); }
+.mb-soon li { display: flex; align-items: center; gap: var(--sp-3); }
+.mb-soon img { width: 26px; height: 26px; flex-shrink: 0; }
+.mb-soon b { width: 30px; flex-shrink: 0; font-size: var(--fs-small); font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
+.mb-soon div { min-width: 0; }
+.mb-soon p { font-size: var(--fs-caption); font-weight: 600; color: var(--ink); }
+.mb-soon span { font-size: var(--fs-small); color: var(--muted); }
+.stage:has(#s11.on) :is(.nestie, .nestie-hands) { opacity: 0 !important; visibility: hidden; pointer-events: none; }   /* 这一屏有自己的小鸟 */
+
+/* 天亮的顺序：视频淡出 → 太阳升起、云飘进 → 问候 → 报纸滑上来（带一点歪，像被放下）→ 三栏依次出现 → 小鸟 → 气泡 → 翻页角掀起 */
+.brief:not(.is-awake) :is(.mb-sun, .mb-cloud, .mb-top, .mb-paper, .mb-bird, .mb-bubble) { opacity: 0; }
+.brief.is-awake .mb-sun { animation: mb-rise 1600ms var(--ease-out) both; }
+.brief.is-awake .mb-cloud--back { animation: mb-drift 1400ms var(--ease-out) 100ms both; }
+.brief.is-awake .mb-cloud--front { animation: mb-drift 1400ms var(--ease-out) 200ms both; }
+.brief.is-awake .mb-top { animation: mb-up 600ms var(--ease-out) 300ms both; }
+.brief.is-awake .mb-paper { animation: mb-paper 700ms var(--ease-out) 500ms both; }
+.brief.is-awake .mb-col, .brief.is-awake .mb-mast { animation: mb-up 500ms var(--ease-out) both; animation-delay: calc(900ms + var(--k, 0) * 70ms); }
+.brief.is-awake .mb-bird { animation: mb-up 500ms var(--ease-out) 1200ms both; }
+.brief.is-awake .mb-bubble { animation: mb-pop 380ms var(--ease-out) 1800ms both; transform-origin: left center; }
+.brief.is-awake .mb-curl { animation: mb-curl 600ms var(--ease-out) 2100ms both; }
+.brief.is-awake .mb-bars i { animation: mb-bar 500ms var(--ease-out) both; animation-delay: calc(1100ms + var(--k, 0) * 30ms); }
+@keyframes mb-rise { from { opacity: 0; transform: translateY(120px) scale(0.9); } }
+@keyframes mb-drift { from { opacity: 0; transform: translateX(-48px); } }
+@keyframes mb-up { from { opacity: 0; transform: translateY(12px); } }
+@keyframes mb-paper { from { opacity: 0; transform: translateY(64px) rotate(1.2deg); } }
+@keyframes mb-pop { from { opacity: 0; transform: scale(0.94); } }
+@keyframes mb-curl { from { transform: scale(0.4); } }
+@keyframes mb-bar { from { transform: scaleY(0.2); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .mb-intro { display: none; }
+  .brief.is-awake * { animation-duration: 1ms !important; animation-delay: 0ms !important; }
+}
+.mb-rail .cp-ev .t, .mb-rail .cp-ev .s { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

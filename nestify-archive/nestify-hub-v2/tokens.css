@@ -24,6 +24,7 @@
   --accent: #14a4fd;         /* 主操作、今天、选中 */
   --accent-strong: #0f7fc6;  /* 浅蓝底上的蓝字、按压 */
   --accent-soft: #dcedfa;    /* 浅蓝底：金币胶囊等 */
+  --sky: #dfeefd;            /* Morning Brief 的天空：和送报动画的底色一样，视频结束时无缝接上 */
   --gold: #f0b23c;           /* 金币、进度、星星 */
   --gold-soft: #f7d78f;
   --gold-strong: #e8901c;
@@ -84,6 +85,7 @@
   --fs-heading: 20px;  /* Figma heading：所有卡片标题 */
   --fs-title: 24px;    /* 页面 / 浮层标题 */
   --fs-display: 40px;  /* 页头时间 */
+  --fs-hero: 52px;     /* Morning Brief 问候：一天只出现一次的大字 */
   /* 孩子页贴纸：每枚一种字体，跟主题走（只用在贴纸上） */
   --font-sticker-streak: "Lilita One", system-ui, sans-serif;   /* 连胜：粗壮、运动感 */
   --font-sticker-book: "Fraunces", Georgia, serif;              /* 书虫：故事书衬线，软圆歪 */

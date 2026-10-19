@@ -92,7 +92,7 @@
   <link rel="stylesheet" href="intro.css?v=702" />
   <link rel="stylesheet" href="hero.css?v=723" />
   <link rel="stylesheet" href="meet.css?v=677" />
-  <link rel="stylesheet" href="hub.css?v=785" />
+  <link rel="stylesheet" href="hub.css?v=786" />
   <link rel="preload" as="image" href="assets/device/device1.webp?v=20261018b" />
   <link rel="stylesheet" href="snap.css?v=452" />
   <link rel="stylesheet" href="privacy.css?v=638" />
@@ -399,7 +399,7 @@
                    competes with the intro film for bandwidth and main thread and
                    the film stutters. hub.js injects the real src when the hub
                    section approaches the viewport (bootHubLazily). -->
-              <iframe id="hub-app" data-src="nestify-hub-v2/index.html?v=6" title="Nestify Family Hub"></iframe>
+              <iframe id="hub-app" data-src="nestify-hub-v2/index.html?v=7" title="Nestify Family Hub"></iframe>
             </div>
             <!-- 🔴 手机上这块屏不跑 Flutter，放静态图。理由是内存：实测 iPhone 12
                  mini（4GB）上整页会被 iOS Safari 杀掉重载——读者滑到一半页面自己
@@ -463,7 +463,7 @@
                    元素截图，天然是 954×537 的精确 16:9，缩到 640×360 即可。 -->
               <li>
                 <img class="v" src="assets/hub/still-lists-fly.webp?v=20261018b" alt="" decoding="async" loading="lazy" />
-                <img class="v v--swap" src="assets/hub/still-lists-done.webp?v=20261018b" alt="" decoding="async" loading="lazy" />
+                <img class="v v--swap" src="assets/hub/still-lists-done.webp?v=20261018c" alt="" decoding="async" loading="lazy" />
               </li>
               <!-- 🔴 play 是只循环一次的 28 帧动画 WebP。不能直接把 src 写在 DOM 上：
                    它会在第四屏出现前先播完。idle 常驻作底，play 由 deckTrack 在每次
@@ -1008,7 +1008,7 @@
   <script src="hero.js?v=674"></script>
   <script src="vendor/rive.js"></script>
   <script src="meet.js?v=20261012-mobile-assets"></script>
-  <script src="hub.js?v=741"></script>
+  <script src="hub.js?v=744"></script>
   <!-- 🔴 THE 3D PAD RIDES ON TOP OF THE BRANCH'S HUB. hub3d.js is
        self-driving: it watches .hub for `class` and `data-room` and
        lights its own canvas once .is-docked lands, hiding .hub__screen

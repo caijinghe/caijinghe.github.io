@@ -117,10 +117,12 @@
     whoMenu(false);
     Object.values(voices).forEach(v => v.syncRive());
     enter($('#' + id));
+    window.__placeNestieHome?.();   // 换页：首页趴在便签上，其他页藏到上沿外
     if (id === 's2') { growProgress(); growRewards(); renderNow(); }
     if (id === 's3') calPage.restore();
     if (id === 's5') rwPage.restore();
     screensaver(id === 's6');
+    brief(id === 's11');
     if (id === 's4') tkPage.setDay(0);
     else tkPage.close();
   }
@@ -131,7 +133,7 @@
     if (frame.id === 's2') return [...$$('.board > .tile', frame)];
     if (frame.id === 's3') return [$('.calpage', frame)];
     if (frame.id === 's5') return [$('.rwpage', frame)];
-    if (frame.id === 's6') return [];
+    if (frame.id === 's6' || frame.id === 's11') return [];   // 屏保、Morning Brief 有自己的入场
     if (frame.id === 's4') return [$('.tkpage', frame)];
     if (frame.id === 's7') return [...$$('.mlpage > .card', frame)];
     const widgets = $$('.memories, .card', frame).filter(el => !el.closest('.cal') || el.classList.contains('cal'));
@@ -679,7 +681,7 @@
     function render() {
       const evs = eventsOf(day);
       const cols = COLS.map(p => {
-        const blocks = evs.filter(e => e.who[0] !== 'all' && peopleOf(e.who).includes(p)).map(e => {
+        const blocks = evs.filter(e => peopleOf(e.who).includes(p)).map(e => {
           const ps = peopleOf(e.who), who = [p, ...ps.filter(x => x !== p)];   // 这一列的人放第一个 = 底色是他的，其余的人是圆弧
           const top = (e.s - H0 * 60) / 60 * PX, h = Math.max(22, e.d / 60 * PX - 3);
           const time = `${fmtTime(e.s)} – ${fmtTime(e.s + e.d)}`;
@@ -688,15 +690,9 @@
         }).join('');
         return `<div class="cp-col" style="height:${(H1 - H0) * PX}px">${blocks}</div>`;
       }).join('');
-      // 全家都在的事：一块横跨四列，不在每列各放一份（四块一模一样的 BBQ 看起来像假数据）
-      const wide = evs.filter(e => e.who[0] === 'all').map(e => {
-        const top = (e.s - H0 * 60) / 60 * PX, h = Math.max(22, e.d / 60 * PX - 3);
-        return `<div class="cp-ev pd-wide" data-who="${COLS}" style="top:${top + 1}px;height:${h}px">
-          <p class="t">${e.t}</p><p class="s">Everyone · ${fmtTime(e.s)} – ${fmtTime(e.s + e.d)}</p><div class="avs">${COLS.map(avHTML).join('')}</div></div>`;
-      }).join('');
       // 现在：一条线横穿所有人的列，只在开头一个点；只在今天出现
       const nowLine = day === 0 && nowMin > H0 * 60 && nowMin < H1 * 60 ? `<div class="cp-now" style="top:${(nowMin - H0 * 60) / 60 * PX}px"></div>` : '';
-      inner.innerHTML = `${lines}<div class="cp-hours">${hours}</div>${cols}${wide}${nowLine}`;
+      inner.innerHTML = `${lines}<div class="cp-hours">${hours}</div>${cols}${nowLine}`;
       const date = new Date(2024, 9, 29 + day);
       title.textContent = date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
       title.classList.toggle('off', day !== 0);        // 看的不是今天：标题变灰，Today 可按
@@ -1633,7 +1629,7 @@
     const onHome = () => !$('#s2').classList.contains('on') && !$('#s5').classList.contains('on');
     voices.nestie = new Nestie(stage, {
       center: [640, 270],
-      // 常驻底边正中：这块屏是用来看和说话的，小鸟就是语音 CTA；对话时升到中间，结束后回到底边
+      // 常驻：首页趴在 Mom 的便签上（见 placeNestieHome），其他页藏在上沿外；对话时到中间，结束后回到常驻位
       resident: true,
       // heard = 演示用的识别结果；status = 工具状态（进行中 / ✓ 完成）；say = 小鸟一句一句说
       reply: () => {
@@ -1680,6 +1676,29 @@
     $('[data-ask]', s1).addEventListener('click', () => { voices.nestie.mode = 'query'; voices.nestie.start(); });
 
     $('[data-wake]')?.addEventListener('click', () => voices.nestie.start());   // 原型用：模拟说出唤醒词
+
+    // ---- 小鸟的常驻位：Family 首页趴在 Mom 的便签顶边上（下巴藏在便签后，两只小手搭边）；
+    //      其他页不常驻——藏在屏幕上沿外，唤醒时从上面掉下来。位置用 offset 量（不受便签摆动 / 入场位移影响）
+    const NEST_K = 0.7, NEST_CHIN = 46;   // 趴着时缩放；46 = 小鸟本地坐标里下巴被藏住的高度（.nestie.is-home 的 clip-path）
+    const offsetIn = (el, root) => { let x = 0, y = 0; for (let e = el; e && e !== root; e = e.offsetParent) { x += e.offsetLeft; y += e.offsetTop; } return [x, y]; };
+    function placeNestieHome() {
+      const n = voices.nestie, [cx, cy] = n.o.center, sz = n.o.size;
+      const note = s1.classList.contains('on') && $('.wall-note', s1);
+      let tx = 0, ty = -(cy + sz / 2 + 40);   // 不在首页：整只藏到屏幕上沿外
+      if (note) {
+        const [x, y] = offsetIn(note, s1);
+        tx = x + note.offsetWidth / 2 - cx;
+        ty = y - cy - (sz / 2 - NEST_CHIN) * NEST_K;   // 下巴藏住的那条线 = 便签顶边
+      }
+      stage.style.setProperty('--nest-tx', tx + 'px');
+      stage.style.setProperty('--nest-ty', ty + 'px');
+      stage.style.setProperty('--nest-k', note ? NEST_K : 1);
+      stage.classList.toggle('nestie-away', !note);
+    }
+    placeNestieHome();
+    window.__placeNestieHome = placeNestieHome;
+    // 便签贴着照片底边，字体载入后变高、顶边会上移——尺寸一变就重量
+    new ResizeObserver(placeNestieHome).observe($('.wall-note', s1));
 
     // ---- 语音回执：完成后先亮回执卡，再飞进它在界面上的位置 ----
     const ICON = {
@@ -1870,6 +1889,48 @@
     ],
     onSave: (name, who, when) => tkPage.add(name, who, when),
   }));
+
+  // ---------- Morning Brief（s11）：送报动画 → 天亮 → 报纸滑上来；点一下可跳过动画，翻页角 = 开始今天（回首页） ----------
+  const mbEl = $('#s11');
+  const mbVideo = $('.mb-intro', mbEl), mbBird = $('[data-mb-bird]', mbEl), mbBirdSrc = mbBird.getAttribute('src');
+  // 高峰时段：7 AM–9 PM 每小时有几件事（和父母页的全家日历对得上），最忙的一段用强调色
+  const MB_HOURS = [1, 0, 3, 2, 0, 2, 1, 0, 3, 3, 3, 2, 1, 1, 2];
+  $('[data-mb-bars]', mbEl).innerHTML = MB_HOURS.map((n, i) => `<i class="${i >= 8 && i <= 11 ? 'is-peak' : ''}" style="--n:${n};--k:${i}"></i>`).join('');
+  $('[data-mb-bars]', mbEl).insertAdjacentHTML('afterend', '<div class="mb-bars-axis"><span>7 AM</span><span>2 PM</span><span>9 PM</span></div>');
+  // 冲突：4–7 PM 一人一条道，撞在一起的那块和父母页一样加强调色描边
+  (() => {
+    const rail = $('[data-mb-rail]', mbEl), H0 = 16, H1 = 19, LANES = 3;
+    const evs = [
+      { t: 'Check-up', who: 'mom', s: 990, d: 60, lane: 0 },
+      { t: 'Piano', who: 'emma', s: 1020, d: 60, lane: 1, needs: true },
+      { t: 'Soccer', who: 'sam,dad', s: 1050, d: 60, lane: 2 },
+    ];
+    const y = m => `${(m / 60 - H0) / (H1 - H0) * 100}%`;
+    rail.innerHTML = Array.from({ length: H1 - H0 + 1 }, (_, i) => `<div class="mb-h" style="top:${y((H0 + i) * 60)}"><span>${fmtTime((H0 + i) * 60).replace(':00', '')}</span></div>`).join('')
+      + evs.map(e => `<div class="cp-ev${e.needs ? ' needs' : ''}" data-who="${e.who}" style="top:calc(${y(e.s)} + 2px);height:calc(${e.d / 60 / (H1 - H0) * 100}% - 4px);left:calc(40px + (100% - 40px) * ${e.lane / LANES} + 2px);width:calc((100% - 40px) / ${LANES} - 4px)">
+          <p class="t">${e.t}</p><p class="s">${e.needs ? 'No ride yet' : `${fmtTime(e.s).replace(' PM', '')}–${fmtTime(e.s + e.d).replace(' PM', '')}`}</p><div class="avs">${e.who.split(',').map(p => `<div class="av st">${PEOPLE[p].av}</div>`).join('')}</div></div>`).join('');
+  })();
+  $$('.mb-mast, .mb-col', mbEl).forEach((el, k) => el.style.setProperty('--k', k));
+  let mbTimer = 0;
+  function mbWake() {
+    if (mbEl.classList.contains('is-awake')) return;
+    clearTimeout(mbTimer);
+    mbBird.src = `${mbBirdSrc}?t=${Date.now()}`;   // 小鸟的 APNG 从头播
+    mbEl.classList.add('is-awake');
+  }
+  function brief(on) {
+    clearTimeout(mbTimer);
+    if (!on) { mbVideo.pause(); return; }
+    mbEl.classList.remove('is-awake');
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { mbWake(); return; }
+    mbVideo.currentTime = 0;
+    mbVideo.play().catch(mbWake);
+    mbTimer = setTimeout(mbWake, 6000);   // 视频出问题时也会天亮
+  }
+  mbVideo.addEventListener('timeupdate', () => { if (mbVideo.duration && mbVideo.currentTime > mbVideo.duration - 0.7) mbWake(); });   // 最后 0.7s 和天亮叠在一起
+  mbEl.addEventListener('click', () => mbWake());   // 点一下跳过送报动画
+  $('.mb-curl', mbEl).addEventListener('click', e => { e.stopPropagation(); show('s1'); });
+  $('[data-mb-plan]', mbEl).addEventListener('click', e => { e.stopPropagation(); show('s9'); });
 
   // ---------- 屏保（s6）：三张小鸟油画每 5s 交叉淡入（pad slideshowInterval），字一律白色；点一下回到之前的页面 ----------
   const ssEl = $('#s6'), ssImgs = $$('.ss-slides img', ssEl);
@@ -2103,5 +2164,5 @@
 
   paintIdentity(document);
   window.__proto = { state, renderBalance, rwPage, voices, calPage, tkPage, show, $, $$ };
-  show(['#s2', '#s3', '#s4', '#s5', '#s6', '#s7', '#s8', '#s9', '#s10'].includes(location.hash) ? location.hash.slice(1) : 's1');
+  show(['#s2', '#s3', '#s4', '#s5', '#s6', '#s7', '#s8', '#s9', '#s10', '#s11'].includes(location.hash) ? location.hash.slice(1) : 's1');
 })();
