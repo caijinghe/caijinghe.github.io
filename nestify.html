@@ -22,7 +22,10 @@
     <link rel="stylesheet" href="css/scroll-indicator.css?v=20261001-7" />
     <style>
         * { box-sizing: border-box; }
-        html, body { margin: 0; width: 100%; background: #25201c; color: #fff; }
+        html, body { margin: 0; width: 100%; background: #fff; color: #fff; }
+        /* the page under the sections is white like the sections themselves: scaled down in the Projects preview, the
+           blocks land on fractional pixels and a dark page showed through the seams as grey lines */
+        main.case-page { background: #fff; }
         body { overflow-x: hidden; overflow-y: auto; }
         .nestify-cover .case-cover__title { top: 12%; }
         .project-overview.nestify-overview { padding-bottom: 80px; }

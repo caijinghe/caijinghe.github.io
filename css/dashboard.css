@@ -87,7 +87,10 @@ a { color: inherit; text-decoration: none; }
 .id-stamp img { display: block; height: 2rem; width: auto; }
 .id-issuer { display: flex; align-items: center; gap: var(--sp-3); min-width: 0; }
 .id-panel { flex: 1 0 auto; min-height: 0; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: var(--sp-1); padding: 0 var(--sp-4); border-radius: 4px;
-  background: var(--surface); }   /* a plain gray panel, the switch track's gray (no hatching) */
+  --tile: 12px;   /* a field of small gray squares cut apart by thin white lines */
+  background: linear-gradient(90deg, #fff 1.5px, transparent 1.5px) center / var(--tile) var(--tile),
+              linear-gradient(#fff 1.5px, transparent 1.5px) center / var(--tile) var(--tile),
+              var(--surface); }
 .id-foot { display: flex; justify-content: space-between; align-items: baseline; gap: var(--sp-3); }
 .id-no { flex: none; display: flex; align-items: center; gap: 4px; font: var(--type-meta); color: var(--subtle); font-feature-settings: "tnum"; }   /* © 2026 and the card's two black dots */
 .id-no i { width: 7px; height: 7px; border-radius: 50%; background: var(--ink); }
