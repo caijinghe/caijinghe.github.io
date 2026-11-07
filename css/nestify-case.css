@@ -411,6 +411,7 @@ video.nestify-display {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 12px;   /* the same corner as the other photos and video frames on the page */
 }
 
 .nestify-mosaic .is-tall {
