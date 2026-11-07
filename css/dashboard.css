@@ -127,7 +127,7 @@ a { color: inherit; text-decoration: none; }
 .dash.is-path-joined :is(.t-exp, .t-edu) { background: none; box-shadow: none; }
 .contact-head { display: flex; justify-content: space-between; align-items: flex-start; }
 .contact { margin-top: var(--sp-4); }
-.contact-art { position: relative; flex: 1; min-height: 0; margin: var(--sp-2) calc(-1 * var(--sp-4)) 0 0; }   /* ground line starts with the text; the cup side reaches a little into the padding */
+.contact-art { position: relative; flex: 1; min-height: 0; margin: var(--sp-2) 0 0; }   /* inside the card's padding on both sides: the drawing scales down with the card (svg meet) and never reaches its edge */
 .contact-art svg { position: absolute; inset: 0; width: 100%; height: 100%; }   /* viewBox cropped to the drawing, standing on the bottom */
 /* the drawing's own ground line is the divider above "Other", so that row has none of its own */
 .contact-foot { margin-top: 0; }

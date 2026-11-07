@@ -153,15 +153,16 @@ body.project-design-system .nestify-case .case-section__label {
 .nestify-for { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin: 32px 0 0; }
 .nestify-for dt { color: var(--case-muted); margin-bottom: 6px; }
 .nestify-for dd { margin: 0; }
-/* small windows and the Projects preview: one row each, the label beside its line ("For parents   Less planning…") */
+/* small windows and the Projects preview: one row each, the label beside its line ("For parents  Less planning…"),
+   both at body size, the labels' column only as wide as the longest label */
 @media (max-width: 900px) {
-  .nestify-for { grid-template-columns: minmax(0, 1fr); gap: 0; }   /* plain line spacing, rows like lines of text */
-  .nestify-for > div { display: grid; grid-template-columns: 7.5em minmax(0, 1fr); column-gap: 16px; align-items: baseline; }
-  .nestify-for dt { margin-bottom: 0; }
+  .nestify-for { grid-template-columns: max-content minmax(0, 1fr); gap: 0 0.75em; }
+  .nestify-for > div { display: contents; }
+  body.project-design-system .nestify-for dt { margin-bottom: 0; font-size: var(--case-body-size); font-weight: 300; line-height: 1.45; }
 }
-:is(html, body).is-preview .nestify-for { grid-template-columns: minmax(0, 1fr); gap: 0; }
-:is(html, body).is-preview .nestify-for > div { display: grid; grid-template-columns: 7.5em minmax(0, 1fr); column-gap: 16px; align-items: baseline; }
-:is(html, body).is-preview .nestify-for dt { margin-bottom: 0; }
+:is(html, body).is-preview .nestify-for { grid-template-columns: max-content minmax(0, 1fr); gap: 0 0.75em; }
+:is(html, body).is-preview .nestify-for > div { display: contents; }
+body.project-design-system.is-preview .nestify-for dt { margin-bottom: 0; font-size: var(--case-body-size); font-weight: 300; line-height: 1.45; }
 
 /* a phrase picked out in the body copy, in Nestify's blue ("design AI with human verbs") */
 .nestify-hl {
