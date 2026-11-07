@@ -1,6 +1,6 @@
 /**
  * Home dashboard — the small live pieces:
- * typing "I am a …", copy-email, and the bookshelf (from the Info page).
+ * the intro panel's hover label, copy-email, and the bookshelf (from the Info page).
  */
 (() => {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -41,20 +41,23 @@
     followTip(idPanel, tip, null);
   }
 
-  // ---- The intro's line types and deletes through its sentences, one after another (a short design creed) ----
+  // ---- The intro types one sentence at a time: types it, holds, deletes it, then the next ----
   const typed = document.querySelector('.typed');
   if (typed && !reduce) {
-    const words = typed.dataset.words.split('|'), HOLD = words.some(x => x.length > 20) ? 3200 : 2200;   // whole sentences stay long enough to read
-    let w = 0, i = words[0].length, del = true;
+    const lines = typed.dataset.lines.split('|');
+    const TYPE = 75, HOLD = 3200, DEL = 35, REST = 500;   // ms: per letter, sentence up, per deleted letter, empty
+    let n = 0, i = 0, del = false;
     const step = () => {
-      if (del) {
-        i--;
-        if (i === 0) { del = false; w = (w + 1) % words.length; }
-      } else if (++i === words[w].length) { del = true; typed.textContent = words[w]; return setTimeout(step, HOLD); }
-      typed.textContent = words[w].slice(0, i);
-      setTimeout(step, del ? 45 : 85);
+      const line = lines[n];
+      typed.textContent = line.slice(0, i);
+      if (!del) {
+        if (i === line.length) { del = true; return setTimeout(step, HOLD); }
+        i++; return setTimeout(step, TYPE);
+      }
+      if (i === 0) { del = false; n = (n + 1) % lines.length; return setTimeout(step, REST); }
+      i--; setTimeout(step, DEL);
     };
-    setTimeout(step, HOLD);
+    typed.textContent = ''; setTimeout(step, 400);
   }
 
   // ---- Clock: the melting clock from Figma (CAI'S WEBSITE › new homepage › "helo2", double rim), US Eastern time ----
@@ -263,20 +266,24 @@
   // On / Off are SVG text, which scales with the switch: convert the tile labels' on-screen size into the SVG's
   // units so the words stay exactly label-sized whatever size the switch is drawn at.
   document.querySelectorAll('.sw').forEach(sw => {
-    const lbl = sw.querySelector('.sw-label'), fit = () => {
+    // The groove's diagonal lines get the same treatment: the pattern is scaled so they sit 5 screen px apart, 1px wide,
+    // like the intro panel's.
+    const lbl = sw.querySelector('.sw-label'), hatch = sw.querySelector('pattern'), fit = () => {
       const w = sw.getBoundingClientRect().width;
-      if (w) sw.style.setProperty('--sw-label', parseFloat(getComputedStyle(document.querySelector('.tile-label') || lbl).fontSize) * 200 / w + 'px');
+      if (!w) return;
+      sw.style.setProperty('--sw-label', parseFloat(getComputedStyle(document.querySelector('.tile-label') || lbl).fontSize) * 200 / w + 'px');
+      hatch?.setAttribute('patternTransform', `scale(${200 / w})`);
     };
     new ResizeObserver(fit).observe(sw); fit();
   });
-  // ---- Toggle switch = a song: On plays it, Off pauses (next On picks up where it stopped), the end flips it back
-  // to Off. No file / blocked playback → it stays Off. ----
+  // ---- Toggle switch = a song: On plays it on loop, Off pauses (next On picks up where it stopped).
+  // No file / blocked playback → it stays Off. ----
   document.querySelectorAll('.sw').forEach(sw => {
     const set = on => sw.setAttribute('aria-checked', on ? 'true' : 'false');
     let song = null;
     sw.addEventListener('click', () => {
       if (sw.getAttribute('aria-checked') === 'true') { set(false); song?.pause(); return; }
-      if (!song && sw.dataset.song) { song = new Audio(sw.dataset.song); song.addEventListener('ended', () => { set(false); song.currentTime = 0; }); }
+      if (!song && sw.dataset.song) { song = new Audio(sw.dataset.song); song.loop = true; }   // keeps playing until the switch is turned off
       set(true);
       song?.play().catch(() => set(false));
     });

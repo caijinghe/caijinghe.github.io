@@ -87,15 +87,18 @@ a { color: inherit; text-decoration: none; }
 .id-stamp img { display: block; height: 2rem; width: auto; }
 .id-issuer { display: flex; align-items: center; gap: var(--sp-3); min-width: 0; }
 .id-panel { flex: 1 0 auto; min-height: 0; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: var(--sp-1); padding: 0 var(--sp-4); border-radius: 4px;
-  background: repeating-linear-gradient(-45deg, #e2e2e2 0 1px, transparent 1px 6px) var(--surface); }   /* the hatched panel: fine diagonal lines on the light gray */
+  /* light-gray panel behind the typed sentence, fine dense white diagonal lines so it isn't blank. A 5px SVG tile, not a
+     repeating gradient: a gradient stripe at 45° lands on the pixel grid differently each repeat (1px, then 2px), which
+     made the earlier lines look uneven and heavy; a whole-pixel tile draws every line the same. */
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='5' height='5'%3E%3Cpath d='M-1 1 1-1M0 5 5 0M4 6 6 4' stroke='%23fff' stroke-width='1'/%3E%3C/svg%3E") 0 0 / 5px 5px var(--surface); }   /* the On/Off track's light gray */
 .id-foot { display: flex; justify-content: space-between; align-items: baseline; gap: var(--sp-3); }
 .id-no { flex: none; display: flex; align-items: center; gap: 4px; font: var(--type-meta); color: var(--subtle); font-feature-settings: "tnum"; }   /* © 2026 and the card's two black dots */
-.id-no i { width: 7px; height: 7px; border-radius: 50%; background: var(--ink); }
+.id-no i { width: 7px; height: 7px; border-radius: 50%; background: var(--ink); translate: 0 -.085em; }   /* flex centring uses the line box, which sits ~1px below the digits' visual middle; lift to match it */
 .id-no i:first-of-type { margin-left: var(--sp-2); }
 .who { text-align: right; }   /* top right of the card, across from the stamp */
 .who b { display: block; font: 500 0.75rem/1.3 var(--font-ui); letter-spacing: 0.01em; }   /* the name, quiet: it's already in the title, the calendar, the showreel */
 .who span { font: var(--type-meta); color: var(--subtle); }
-.iam { font: 400 clamp(1.05rem, 1.5vw, 1.4rem)/1.3 var(--font-ui); letter-spacing: -0.01em; }   /* the one sentence, typed on the hatched panel; kept short enough to sit on one line at this size */
+.iam { min-height: 1.3em; font: 400 clamp(1.05rem, 1.5vw, 1.4rem)/1.3 var(--font-ui); letter-spacing: -0.01em; }   /* the design creed, typed one sentence at a time; each kept short enough for one line */
 .iam .caret { display: inline-block; width: 1px; height: 1.05em; margin-left: 1px; vertical-align: -0.12em; background: var(--ink); animation: caret 1s steps(1) infinite; }
 @keyframes caret { 50% { opacity: 0; } }
 .bio { min-width: 0; font: var(--type-meta); color: var(--muted); }
@@ -170,6 +173,9 @@ a { color: inherit; text-decoration: none; }
 /* Off (default): ball on the right, the cards' gray. On: ball rolls left, the track goes black */
 .sw-track { fill: var(--surface); transition: fill var(--dur) ease; }
 .sw[aria-checked="true"] .sw-track { fill: var(--ink); }
+#sw-hatch path { stroke: #fff; stroke-width: 1; }   /* same lines as the intro panel; dashboard.js keeps them 5px apart on screen */
+.sw-hatch { pointer-events: none; transition: opacity var(--dur) ease; }
+.sw[aria-checked="true"] .sw-hatch { opacity: 0; }   /* On: plain black groove (lines on black shimmered) */
 /* On / Off engraved at the two ends; the one the ball is at reads, the other stays faint */
 .sw-label { font: var(--type-label); font-size: var(--sw-label, 12px); letter-spacing: 0.03em; text-anchor: middle;   /* = the tiles' labels (Chapters, Contact) on screen; dashboard.js sets --sw-label in the SVG's units */
   dominant-baseline: central; fill: var(--subtle); opacity: 0.6; transition: fill var(--dur) ease, opacity var(--dur) ease; }
@@ -183,7 +189,7 @@ a { color: inherit; text-decoration: none; }
 .sw-knob { transition: transform var(--dur-slow) var(--ease-spring); }
 .sw[aria-checked="true"] .sw-knob { transform: translateX(-38px); }   /* 119 → 81 in the 200×76 drawing, clear of the labels */
 .sw:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
-@media (prefers-reduced-motion: reduce) { .sw-knob, .sw-track, .sw-label, .sw-shadow { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .sw-knob, .sw-track, .sw-hatch, .sw-label, .sw-shadow { transition: none; } }
 
 /* ---------- Research (links to research.html) ---------- */
 /* Research slot: just the hanging flip calendar (black line drawing), standing on the page; it hangs still. Grab a page to

@@ -40,12 +40,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Sora:wght@100;200;300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/tokens.css?v=20261106-6" />
     <link rel="stylesheet" href="css/index.css?v=20260924-1" />   <!-- showreel player styles -->
-    <link rel="stylesheet" href="css/dashboard.css?v=20261106-153" />
+    <link rel="stylesheet" href="css/dashboard.css?v=20261106-172" />
     <link rel="stylesheet" href="css/site-dock.css?v=20261106-8" />
     <link rel="expect" href="#dock-drawn" blocking="render" />
     <script src="js/mushroom-run-data.js?v=20261105-5" defer></script>
     <script src="js/mushroom-run.js?v=20261106-2" defer></script>
-    <script src="js/dashboard.js?v=20261106-116" defer></script>
+    <script src="js/dashboard.js?v=20261106-128" defer></script>
 </head>
 
 <body>
@@ -66,7 +66,7 @@
                 </div>
             </div>
             <div class="id-panel" role="group" aria-label="Design philosophy">   <!-- the label shows on hover (dashboard.js) -->
-                <p class="iam"><span class="typed" data-words="Every product tells a story.|Every screen is a frame.">Every product tells a story.</span><span class="caret" aria-hidden="true"></span></p>
+                <p class="iam" aria-label="Every product tells a story. Every screen is a frame."><span class="typed" aria-hidden="true" data-lines="Every product tells a story.|Every screen is a frame.">Every product tells a story.</span><span class="caret" aria-hidden="true"></span></p>
             </div>
             <div class="id-foot">
                 <p class="bio id-status">Open to product design roles</p>
@@ -110,7 +110,9 @@
             <button class="sw" type="button" role="switch" aria-checked="false" aria-label="Play a song" data-song="media/cowboy-bebop.mp3">
                 <svg viewBox="0 0 200 76" aria-hidden="true">
                     <rect class="sw-rim" x="0.5" y="0.5" width="199" height="75" rx="37.5"/>
+                    <defs><pattern id="sw-hatch" patternUnits="userSpaceOnUse" width="5" height="5"><path d="M-1 1 1-1M0 5 5 0M4 6 6 4"/></pattern></defs>
                     <rect class="sw-track" x="5.5" y="5.5" width="189" height="65" rx="32.5"/>
+                    <rect class="sw-hatch" x="5.5" y="5.5" width="189" height="65" rx="32.5" fill="url(#sw-hatch)"/>   <!-- the intro panel's white diagonal lines, on the Off groove -->
                     <text class="sw-label sw-label-on" x="34" y="38">On</text>
                     <text class="sw-label sw-label-off" x="166" y="38">Off</text>
                     <g class="sw-knob">
