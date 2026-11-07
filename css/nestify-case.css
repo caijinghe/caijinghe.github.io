@@ -153,7 +153,15 @@ body.project-design-system .nestify-case .case-section__label {
 .nestify-for { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin: 32px 0 0; }
 .nestify-for dt { color: var(--case-muted); margin-bottom: 6px; }
 .nestify-for dd { margin: 0; }
-@media (max-width: 600px) { .nestify-for { grid-template-columns: minmax(0, 1fr); gap: 16px; } }
+/* small windows and the Projects preview: one row each, the label beside its line ("For parents   Less planning…") */
+@media (max-width: 900px) {
+  .nestify-for { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .nestify-for > div { display: grid; grid-template-columns: 7.5em minmax(0, 1fr); column-gap: 16px; align-items: baseline; }
+  .nestify-for dt { margin-bottom: 0; }
+}
+:is(html, body).is-preview .nestify-for { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+:is(html, body).is-preview .nestify-for > div { display: grid; grid-template-columns: 7.5em minmax(0, 1fr); column-gap: 16px; align-items: baseline; }
+:is(html, body).is-preview .nestify-for dt { margin-bottom: 0; }
 
 /* a phrase picked out in the body copy, in Nestify's blue ("design AI with human verbs") */
 .nestify-hl {
