@@ -329,8 +329,23 @@ video.nestify-display {
   color: var(--case-muted);
 }
 
+/* the card's title ("AI adoption · App"): body size, black, medium weight; the grey description under the number
+   at the body copy's size too */
+body.project-design-system .nestify-stat [data-case-type="label"] {
+  font-size: var(--case-body-size);
+  font-weight: 500;
+  line-height: 1.4;
+  color: #000;
+}
+
+body.project-design-system .nestify-stat [data-case-type="caption"] {
+  font-size: var(--case-body-size);
+  font-weight: 300;
+  line-height: 1.45;
+}
+
 .nestify-stat__value {
-  margin: 28px 0 8px !important;
+  margin: 36px 0 14px !important;   /* air above and below the number */
   font-size: clamp(34px, 3.2vw, 48px);
   font-weight: 400;
   line-height: 1.05;
