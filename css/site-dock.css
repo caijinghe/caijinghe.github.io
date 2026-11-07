@@ -1,0 +1,153 @@
+/* =========================================
+   Site dock — bottom navigation (needs tokens.css)
+   Text tabs for the two bodies of work, icon buttons for utilities.
+   Two surfaces: solid gray over a plain page; frosted glass once it sits over imagery
+   (js/site-dock.js toggles .is-over by checking what is underneath).
+   ========================================= */
+.site-dock,
+.dock-ink {   /* .dock-ink = the twin text layer (site-dock.js), same box, laid right on top */
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--sp-4) + env(safe-area-inset-bottom, 0px));
+  z-index: 10050;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  translate: -50% 0;
+  font-family: var(--font-ui);
+}
+
+.dock-seg {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: var(--sp-1);
+  border-radius: var(--r-pill);
+  background: var(--chip);
+  box-shadow: inset 0 0 0 1px transparent;
+  transition: background-color var(--dur) ease, box-shadow var(--dur) ease,
+              backdrop-filter var(--dur) ease, -webkit-backdrop-filter var(--dur) ease;
+}
+
+/* Over imagery: the page shows through, frosted. Only a faint white tint (not --glass): the words invert against
+   what's under them (see Ink below), and a strong gray tint would turn any dark photo mid-gray, where an inverted
+   word vanishes into its own background. */
+.site-dock.is-over .dock-seg {
+  background: rgba(255, 255, 255, 0.12);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35), var(--shadow-float);
+}
+
+.dock-tab {
+  display: grid;
+  place-items: center;
+  height: 36px;
+  min-width: 96px;
+  padding: 0 var(--sp-4);
+  border-radius: var(--r-pill);
+  font: var(--type-nav);
+  color: var(--muted);
+  white-space: nowrap;
+  transition: background-color var(--dur-fast) ease, color var(--dur-fast) ease, scale var(--dur-fast) ease;
+}
+
+.dock-tab:hover { color: var(--ink); }
+.dock-seg { position: relative; }
+.dock-tab { position: relative; z-index: 1; }   /* above the pill */
+/* the active tab's black pill: its own element, placed under the tab by site-dock.js, so it can glide between tabs */
+.dock-pill { position: absolute; border-radius: var(--r-pill); background: var(--ink); pointer-events: none; }
+
+.dock-icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-pill);
+  color: var(--ink);
+  transition: background-color var(--dur-fast) ease, scale var(--dur-fast) ease;
+}
+
+.dock-icon svg { width: 18px; height: 18px; fill: currentColor; }
+.dock-icon:hover { background: rgba(255, 255, 255, 0.7); }
+.dock-icon.is-active { background: var(--ink); color: var(--paper); }
+
+.dock-tab:active,
+.dock-icon:active { scale: 0.96; }
+
+/* ---- Ink: inverted words and icons (like the old header) ----
+   The real dock keeps pills, clicks and focus but draws its words and icons transparent; the twin on top draws them
+   white with difference, so each pixel is the inverse of what's behind: dark on the gray pill or a light page,
+   light on a dark photo, white on the black active pill. Inactive tabs are the same white at partial strength,
+   which comes out at the old --muted gray on a plain page and stays legible on imagery. */
+.site-dock .dock-tab,
+.site-dock .dock-icon { color: transparent; }
+.dock-ink {
+  z-index: 10051; pointer-events: none; user-select: none;
+  mix-blend-mode: difference;
+}
+::view-transition-group(site-dock-ink) { mix-blend-mode: difference; }   /* keeps inverting during the page slide */
+/* During the Dashboard ↔ Projects slide the dock holds still, the pill glides to the new tab, and the words cross-fade —
+   all on the page's own timing, so the whole move reads as one motion. */
+::view-transition-group(dock-pill),
+::view-transition-group(site-dock), ::view-transition-group(site-dock-ink),
+::view-transition-old(site-dock), ::view-transition-new(site-dock),
+::view-transition-old(site-dock-ink), ::view-transition-new(site-dock-ink) {
+  animation-duration: 520ms; animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+}
+::view-transition-old(dock-pill), ::view-transition-new(dock-pill) { animation: none; }   /* one pill moving, not two fading */
+::view-transition-old(dock-pill) { display: none; }
+.dock-ink .dock-seg { background: none; box-shadow: none; }
+.dock-ink .dock-tab,
+.dock-ink .dock-icon { color: #fff; background: none; }
+.dock-ink .dock-tab { opacity: 0.65; transition: opacity var(--dur-fast) ease, scale var(--dur-fast) ease; }
+.dock-ink .dock-tab.is-active,
+.dock-ink .dock-tab.is-hover { opacity: 1; }
+.dock-ink .is-press { scale: 0.96; }
+.dock-ink .dock-icon::after { content: none; }
+
+.dock-tab:focus-visible,
+.dock-icon:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+/* Icon label: icons get their word on hover/focus */
+.dock-icon::after {
+  content: attr(data-label);
+  position: absolute;
+  bottom: calc(100% + 14px);
+  left: 50%;
+  padding: 6px 10px;
+  border-radius: var(--r-tag);
+  background: var(--ink);
+  color: var(--paper);
+  font: 400 12px/1 var(--font-ui);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  translate: -50% 4px;
+  transition: opacity var(--dur-fast) ease, translate var(--dur) var(--ease-out);
+}
+
+.dock-icon:hover::after,
+.dock-icon:focus-visible::after { opacity: 1; translate: -50% 0; }
+
+/* Info already opens its own popover — no label needed */
+.dock-icon[data-popover]::after { content: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .dock-tab, .dock-icon, .dock-icon::after { transition: none; }
+}
+
+/* Page end clears the dock so the footer never sits under it */
+body:has(.site-dock) .site-footer { padding-bottom: calc(44px + 2 * var(--sp-4)); }
+
+/* Info popover opened from the dock: rises above it instead of dropping from the top-right */
+.info-hover-popover.from-dock { transform: translateY(12px); transform-origin: bottom center; }
+.info-hover-popover.from-dock.is-open { transform: none; }
+.info-hover-popover.from-dock::before { top: auto; bottom: -16px; }
+
+/* Phone: tabs tighten so the whole dock fits a 360px screen */
+@media (max-width: 600px) {
+  .site-dock { gap: 6px; }
+  .dock-tab { min-width: 80px; padding: 0 14px; }
+}

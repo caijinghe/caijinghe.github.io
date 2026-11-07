@@ -1,0 +1,138 @@
+/* Nestify hero：真机外壳（nestify-archive 那台 3D 机身，浅蓝边）+ 屏幕里实时运行的新版 pad UI。
+   取代原来「机身照片 + 一张静态截图 + 叠加光环」的平面版（旧标记注释保留在 nestify.html）。
+
+   🔴 几何全部来自 nestify-archive/nestie-unit.js 的 DIMS：机身 1.792 × 1.192（16:10 屏幕
+   1.6 × 1.0，四周各 0.096 的白面 + 蓝边），容器再外扩一点留给透视下边框的厚度。屏幕开口的
+   百分比由 JS 写进 --scr-*，这里不写死，改机身比例时两边不会对不上。 */
+.nestify-live {
+    position: relative;
+    width: min(800px, 76%);
+    aspect-ratio: var(--body-ar, 1.5034);
+    margin: clamp(48px, 5vw, 88px) auto 0;
+    perspective: 1800px;
+}
+.nestify-live__body {
+    position: absolute;
+    inset: 0;
+    transform-origin: 50% 85%;
+    transform: rotateX(16deg) translateY(36px) scale(.955);
+    opacity: 0;
+    transition:
+        transform 1.25s cubic-bezier(.16, 1, .3, 1),
+        opacity .7s ease;
+}
+.nestify-live.is-in .nestify-live__body {
+    transform: none;
+    opacity: 1;
+}
+/* 入场之后整台机器轻轻晃：画布和屏幕是同一个元素里的两层，一起转，屏幕永远贴着开口。
+   角度很小（≤ 2.4°），只是让它像个立在那儿的实物，不抢屏幕里的演示。 */
+.nestify-live__sway {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+}
+.nestify-live.is-in .nestify-live__sway {
+    animation: nestify-live-sway 11s ease-in-out 1.3s infinite;
+}
+@keyframes nestify-live-sway {
+    0%, 100% { transform: rotateX(0deg) rotateY(0deg) translateY(0); }
+    25%      { transform: rotateX(1.6deg) rotateY(-2.4deg) translateY(-4px); }
+    50%      { transform: rotateX(-0.8deg) rotateY(0.6deg) translateY(-7px); }
+    75%      { transform: rotateX(1.2deg) rotateY(2.2deg) translateY(-3px); }
+}
+/* 落在桌面 / 墙面上的一点影子，和旧版 ::after 同一个意思 */
+.nestify-live::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    left: 8%; right: 8%;
+    top: 97%;
+    height: 3%;
+    border-radius: 50%;
+    background: rgba(25, 35, 40, .32);
+    filter: blur(14px);
+    opacity: 0;
+    transition: opacity 1s ease .35s;
+    pointer-events: none;
+}
+.nestify-live.is-in::after { opacity: 1; }
+
+.nestify-live__gl {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+.nestify-live__screen {
+    position: absolute;
+    left: var(--scr-l, 5.357%);
+    top: var(--scr-t, 8.054%);
+    width: var(--scr-w, 89.286%);
+    height: var(--scr-h, 83.893%);
+    overflow: hidden;
+    border-radius: var(--scr-r, 10px);
+    background: #f4f3ed;
+    /* iframe 在 Safari 里不跟圆角裁切，强制合成层才会裁 */
+    transform: translateZ(0);
+}
+.nestify-live__poster,
+.nestify-live__app {
+    position: absolute;
+    left: 0; top: 0;
+    border: 0;
+    display: block;
+}
+.nestify-live__poster { width: 100%; height: 100%; object-fit: cover; }
+/* 新版 UI 的画布是 1280×800，嵌入层把它放大成 1920×1200（hub-v2-embed.css）；这里再按
+   屏幕实际宽度缩回来——--app-k 由 JS 写 */
+.nestify-live__app {
+    width: 1920px;
+    height: 1200px;
+    transform-origin: 0 0;
+    transform: scale(var(--app-k, .5));
+    opacity: 0;
+    /* 只看不点：屏幕里是自动演示，访客的点击不进去，也就不会把演示打断 */
+    pointer-events: none;
+    transition: opacity .6s ease;
+}
+.nestify-live.is-live .nestify-live__app { opacity: 1; }
+
+/* 自动演示的手指：iframe 坐标 × --app-k，由 JS 写 transform */
+.nestify-live__finger {
+    position: absolute;
+    left: 0; top: 0;
+    width: 0; height: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .2s ease;
+    z-index: 2;
+}
+.nestify-live__finger.is-on { opacity: 1; }
+.nestify-live__finger i,
+.nestify-live__finger::after {
+    content: '';
+    position: absolute;
+    left: -15px; top: -15px;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+}
+.nestify-live__finger i {
+    background: rgba(255, 255, 255, .6);
+    box-shadow: 0 0 0 1.5px rgba(40, 60, 90, .18), 0 4px 12px rgba(40, 60, 90, .2);
+}
+.nestify-live__finger::after { border: 2px solid rgba(255, 255, 255, .9); opacity: 0; }
+.nestify-live__finger.is-tap i { animation: nestify-live-tap .42s ease-out; }
+.nestify-live__finger.is-tap::after { animation: nestify-live-ring .55s ease-out; }
+@keyframes nestify-live-tap { 40% { transform: scale(.78); } }
+@keyframes nestify-live-ring { from { opacity: .9; transform: scale(.6); } to { opacity: 0; transform: scale(2.1); } }
+
+@media (max-width: 768px) {
+    .nestify-live { width: 92%; }
+    .nestify-live__finger i, .nestify-live__finger::after { left: -10px; top: -10px; width: 20px; height: 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .nestify-live__body { transform: none; transition: opacity .3s ease; }
+    .nestify-live.is-in .nestify-live__sway { animation: none; }
+}

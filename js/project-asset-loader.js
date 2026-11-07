@@ -48,8 +48,10 @@
 
     function collectAssets() {
         const overlay = document.querySelector(overlaySelector);
-        const images = [...document.images].filter(image => !overlay?.contains(image));
-        const videos = [...document.querySelectorAll("video")].filter(video => !overlay?.contains(video));
+        // Below-the-fold case content opts out with [data-defer-assets] and loads lazily.
+        const counted = element => !overlay?.contains(element) && !element.closest("[data-defer-assets]");
+        const images = [...document.images].filter(counted);
+        const videos = [...document.querySelectorAll("video")].filter(counted);
         return [...images.map(waitForImage), ...videos.map(waitForVideo)];
     }
 

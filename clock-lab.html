@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clock lab · Jinghe Cai</title>
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="media/logo.svg" type="image/svg+xml" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/tokens.css?v=20261105-2" />
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-ui); color: var(--ink); background: var(--paper); padding: 40px; }
+        h1 { font-size: 20px; font-weight: 500; }
+        .lede { margin-top: 8px; font-size: 14px; color: var(--muted); max-width: 640px; line-height: 1.6; }
+        .controls { display: flex; flex-wrap: wrap; gap: 28px; margin: 28px 0 32px; font-size: 13px; color: var(--muted); }
+        .controls label { display: flex; align-items: center; gap: 10px; }
+        .controls output { min-width: 34px; color: var(--ink); font-feature-settings: "tnum"; }
+        .grid { display: flex; flex-wrap: wrap; gap: 32px; }
+        figure { display: grid; gap: 10px; }
+        figcaption { font-size: 13px; }
+        figcaption span { display: block; font-size: 12px; color: var(--subtle); margin-top: 2px; }
+        .tile { width: var(--size, 231px); aspect-ratio: 1; border-radius: var(--r-panel); box-shadow: inset 0 0 0 1px var(--line); overflow: hidden; }   /* homepage tile size; the swell gets clipped */
+        .tile.big { --size: 460px; }
+        .lens-clock { display: block; width: 100%; height: 100%; }
+        .lc-num { font-family: var(--font-ui); font-weight: 800; font-style: italic; fill: #b3b3b3; stroke: var(--ink); stroke-width: 2; vector-effect: non-scaling-stroke; paint-order: stroke;   /* fill covers the inner half: outline only on the outside, no overlap lines */ letter-spacing: -0.02em; }
+        .lc-hand { stroke: var(--ink); stroke-linecap: round; }
+        .lc-h { stroke-width: 4; }
+        .lc-m { stroke-width: 2.6; }
+        .lc-s { stroke-width: 1; }
+        .lc-pin { fill: #e23b2a; }
+        h2 { font-size: 14px; font-weight: 500; margin: 48px 0 16px; }
+    </style>
+</head>
+<body>
+    <h1>Spiral clock — test page</h1>
+    <p class="lede">Distortions measured from the reference: the numeral the hand points at is huge and sheared; going clockwise each numeral takes the next shape (tall-thin, flat-wide, edge-on…), smallest just before the big one. The first clock is held at 1 o’clock to compare with the reference. Intensity 1 = as measured.</p>
+
+    <div class="controls">
+        <label>Intensity <input type="range" id="intensity" min="0" max="1.5" step="0.05" value="1" /><output>1</output></label>
+    </div>
+
+    <div class="grid">
+        <figure><div class="tile" data-drive="fixed"></div><figcaption>Reference pose<span>Held at 1 — compare with the photo</span></figcaption></figure>
+        <figure><div class="tile" data-drive="hour"></div><figcaption>Hour hand<span>Moves one numeral an hour — nearly still on a visit</span></figcaption></figure>
+        <figure><div class="tile" data-drive="minute"></div><figcaption>Minute hand<span>Visible drift over a few minutes</span></figcaption></figure>
+        <figure><div class="tile" data-drive="second"></div><figcaption>Second hand<span>The swell sweeps the dial once a minute</span></figcaption></figure>
+        <figure><div class="tile" data-drive="pointer"></div><figcaption>Pointer (recommended)<span>Minute hand at rest; follows your cursor on hover</span></figcaption></figure>
+    </div>
+
+    <h2>Large preview — pointer version</h2>
+    <figure><div class="tile big" data-drive="pointer"></div></figure>
+
+    <script src="js/lens-clock.js?v=20261105-9"></script>
+    <script>
+        const clocks = [...document.querySelectorAll('.tile')].map(t => LensClock(t, { drive: t.dataset.drive }));
+        document.querySelectorAll('.controls input').forEach(input => input.addEventListener('input', () => {
+            input.nextElementSibling.textContent = input.value;
+            clocks.forEach(c => c.set({ [input.id]: +input.value }));
+        }));
+    </script>
+</body>
+</html>

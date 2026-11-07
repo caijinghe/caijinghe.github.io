@@ -166,7 +166,7 @@ function initShowreelOverlay() {
     overlay.inert = true;
     mainVideo.pause();
     loadingVideo.pause();
-    sessionStorage.setItem('showreelShown', 'true');
+    sessionStorage.setItem('showreelSeen', 'true');
     previouslyFocused?.focus?.({ preventScroll: true });
   }
 
@@ -214,7 +214,7 @@ function initShowreelOverlay() {
     if (!opened || activeVideo !== loadingVideo) return;
     const muted = loadingVideo.muted;
     start(mainVideo, muted);
-    sessionStorage.setItem('showreelShown', 'true');
+    sessionStorage.setItem('showreelSeen', 'true');
   });
 
   loadingVideo.addEventListener('error', () => { if (opened && activeVideo === loadingVideo) start(mainVideo, loadingVideo.muted); });
@@ -222,9 +222,9 @@ function initShowreelOverlay() {
 
   open?.addEventListener('click', (event) => {
     event.preventDefault();
-    const firstVisit = sessionStorage.getItem('showreelShown') !== 'true';
+    const firstVisit = sessionStorage.getItem('showreelSeen') !== 'true';
     show(firstVisit ? loadingVideo : mainVideo, firstVisit);
-    sessionStorage.setItem('showreelShown', 'true');
+    sessionStorage.setItem('showreelSeen', 'true');
   });
 
   overlay.classList.remove('preload');
@@ -233,8 +233,10 @@ function initShowreelOverlay() {
   loadingVideo.pause();
   sync();
 
+  // the first visit plays the showreel by itself — on Projects only; a page can opt out (the Dashboard sets
+  // window.autoShowreel = false: there the mushroom tile opens it on a click)
   const triggerAutoShowreel = () => {
-    if (!window.siteLocked && sessionStorage.getItem('showreelShown') !== 'true') {
+    if (window.autoShowreel !== false && !window.siteLocked && sessionStorage.getItem('showreelSeen') !== 'true') {
       show(loadingVideo, true);
     }
   };

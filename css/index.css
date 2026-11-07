@@ -80,7 +80,7 @@ a {
    3. 真·瀑布流布局 (CSS Columns)
    ========================================= */
 .works-section {
-    padding: 48px 0 40px; 
+    padding: 48px 0 120px;   /* the page ends a little below the last row, clear of the fixed dock (no footer any more) */
     width: 100%;
 }
 

@@ -40,7 +40,7 @@
     margin: 0 0 32px;
 }
 
-.nestify-cover__logo { display: block; width: clamp(95px, 8vw, 105px); height: auto; margin: -7px 0; }
+.nestify-cover__logo { display: block; width: clamp(84px, 6.7vw, 96px); height: auto; }   /* the wordmark alone, about Samsung's wordmark width */
 
 html .nestify-cover .case-cover__title {
     position: relative;
@@ -160,7 +160,7 @@ html .nestify-cover .case-cover__title {
         padding: 82px 16px 52px;
     }
     .nestify-cover__brand { margin-bottom: 36px; }
-    .nestify-cover__logo { width: 95px; }
+    .nestify-cover__logo { width: 84px; }
     html .nestify-cover .case-cover__title {
         top: 20px;
         width: min(1050px, calc(100% - 24px));

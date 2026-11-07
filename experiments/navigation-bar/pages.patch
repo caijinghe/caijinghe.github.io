@@ -1,0 +1,251 @@
+diff --git a/about.html b/about.html
+index 97a4be8..ab93d3d 100644
+--- a/about.html
++++ b/about.html
+@@ -10,8 +10,11 @@
+         href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Sora:wght@100;200;300;400;600;700&display=swap"
+         rel="stylesheet">
+     <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.35/bundled/lenis.min.js"></script>
+-    <link rel="stylesheet" href="css/index.css?v=20260924-1" />
+-    <link rel="stylesheet" href="css/about.css?v=20261012-mobile-type" />
++    <link rel="stylesheet" href="css/tokens.css?v=20261104-2" />
++    <link rel="stylesheet" href="css/index.css?v=20261104-1" />
++    <link rel="stylesheet" href="css/about.css?v=20261104-1" />
++    <link rel="stylesheet" href="css/site-dock.css?v=20261104-3" />
++    <script src="js/site-dock.js?v=20261104-2" defer></script>
+     <style>
+         @media (min-width: 601px) {
+             .scroll-right {
+@@ -48,22 +51,7 @@
+ <body>
+     <div class="layout" id="mainLayout">
+         <div class="page-wrapper">
+-            <header class="site-header">
+-                <div class="header-col-1">
+-                    <a href="index.html" class="logo">Jinghe Cai</a>
+-                </div>
+-
+-                <nav class="header-col-2">
+-                    <a href="index.html#work">Work</a>
+-                    <a href="https://scholar.google.com/citations?user=USR_nP8AAAAJ&hl=en" target="_blank">Research</a>
+-                </nav>
+-
+-                <nav class="header-col-3">
+-                    <a href="about.html">Info</a>
+-                    <a href="https://drive.google.com/file/d/1IsOUI2ZcsX_7XXkCw_bYc1aIiybE1FQT/view?usp=sharing"
+-                        target="_blank">Résumé</a>
+-                </nav>
+-            </header>
++            <nav class="site-dock" data-active="info"></nav>
+             <main class="about">
+                 <section class="shelf-section" id="section3">
+                     <div class="shelf-viewport">
+diff --git a/css/index.css b/css/index.css
+index 5ac7fe4..f20ab7c 100644
+--- a/css/index.css
++++ b/css/index.css
+@@ -80,7 +80,7 @@ a {
+    3. 真·瀑布流布局 (CSS Columns)
+    ========================================= */
+ .works-section {
+-    padding: 48px 0 40px; 
++    padding: var(--page-gutter) 0 40px;   /* 顶部 header 已移到底部 dock，网格贴顶只留页边 */
+     width: 100%;
+ }
+ 
+diff --git a/index.html b/index.html
+index 664a80e..809315d 100644
+--- a/index.html
++++ b/index.html
+@@ -75,7 +75,9 @@
+ 
+     <link rel="preload" as="image" href="media/index/logo.webp" type="image/webp" />
+     <link rel="stylesheet" href="css/preloader.css?v=20260924-7" />
+-    <link rel="stylesheet" href="css/index.css?v=20260924-1" />
++    <link rel="stylesheet" href="css/tokens.css?v=20261104-2" />
++    <link rel="stylesheet" href="css/index.css?v=20261104-6" />
++    <link rel="stylesheet" href="css/site-dock.css?v=20261104-3" />
+     <!-- 开站密码开关：当前已停用。之后如需重新启用告诉我“打开开站密码”即可 -->
+     <script>window.siteLocked = false;</script>
+ 
+@@ -84,7 +86,8 @@
+     <script src="js/concept-gallery.js?v=20260922-23" defer></script>
+     <script src="js/project-analytics.js?v=20261013-1" defer></script>
+     <script src="js/project-preview.js?v=20261004-nestify-light-1" defer></script>
+-    <script src="js/info-popover.js?v=20260923-10" defer></script>
++    <script src="js/site-dock.js?v=20261104-4" defer></script>
++    <script src="js/info-popover.js?v=20261104-1" defer></script>
+ </head>
+ 
+ <body>
+@@ -120,22 +123,7 @@
+ 
+     <div class="layout">
+ 
+-        <header class="site-header">
+-            <div class="header-col-1">
+-                <a href="index.html" class="my-name">Jinghe Cai</a>
+-            </div>
+-
+-            <nav class="header-col-2">
+-                <a href="#work">Work</a>
+-                <a href="https://scholar.google.com/citations?user=USR_nP8AAAAJ&hl=en" target="_blank">Research</a>
+-            </nav>
+-
+-            <nav class="header-col-3">
+-                <a href="about.html">Info</a>
+-                <a href="https://drive.google.com/file/d/1IsOUI2ZcsX_7XXkCw_bYc1aIiybE1FQT/view?usp=sharing"
+-                    target="_blank">Résumé</a>
+-            </nav>
+-        </header>
++        <nav class="site-dock" data-active="design"></nav>
+ 
+         <main>
+             <section class="works-section" id="work">
+@@ -143,7 +131,7 @@
+ 
+                     <a href="#" id="open-showreel" class="work-item video-item">
+                         <div class="work-image-wrapper">
+-                            <video src="media/index/logo.mp4" autoplay muted loop playsinline></video>
++                            <video src="media/index/logo.mp4" width="1080" height="1080" autoplay muted loop playsinline></video>
+                         </div>
+                         <div class="work-tags-container">
+                             <span class="tag-business">Showreel<span class="tag-year">2020-2025</span></span>
+@@ -152,7 +140,7 @@
+ 
+                     <a href="samsung.html" id="open-samsung" class="work-item" aria-haspopup="dialog">
+                         <div class="work-image-wrapper">
+-                            <img src="media/index/samsung.png" alt="Samsung" loading="lazy" decoding="async" />
++                            <img src="media/index/samsung.png" width="1532" height="862" alt="Samsung" loading="lazy" decoding="async" />
+                         </div>
+                         <div class="work-tags-container">
+                             <span class="tag-name">Samsung<span class="tag-year">2025</span></span>
+@@ -162,7 +150,7 @@
+ 
+                     <div class="work-item no-click">
+                         <div class="work-image-wrapper">
+-                            <img src="media/index/linko.png" alt="Linko — Indigo Design Award" loading="lazy" decoding="async" />
++                            <img src="media/index/linko.png" width="2312" height="2312" alt="Linko — Indigo Design Award" loading="lazy" decoding="async" />
+                         </div>
+                         <div class="work-tags-container">
+                             <span class="tag-business">Learning Community, Design System</span>
+@@ -183,7 +171,7 @@
+ 
+                     <a href="lepal.html?v=20260920-3" id="open-lepal" class="work-item" aria-haspopup="dialog">
+                         <div class="work-image-wrapper">
+-                            <img src="media/index/lepal.png" alt="LePal" loading="lazy" decoding="async" />
++                            <img src="media/index/lepal.png" width="2312" height="2312" alt="LePal" loading="lazy" decoding="async" />
+                         </div>
+                         <div class="work-tags-container">
+                             <span class="tag-name">Lepal.ai<span class="tag-year">2024</span></span>
+@@ -193,7 +181,7 @@
+ 
+                     <a href="bibf.html" id="open-bibf" class="work-item" aria-haspopup="dialog">
+                         <div class="work-image-wrapper">
+-                            <img src="media/index/BIBF.png" alt="BIBF" loading="lazy" decoding="async" />
++                            <img src="media/index/BIBF.png" width="3076" height="2298" alt="BIBF" loading="lazy" decoding="async" />
+                         </div>
+                         <div class="work-tags-container">
+                             <span class="tag-name">BIBF<span class="tag-year">2020</span></span>
+@@ -203,7 +191,7 @@
+ 
+                     <a href="naivevil.html?v=20260920-8" id="open-naivevil" class="work-item" aria-haspopup="dialog">
+                         <div class="work-image-wrapper">
+-                            <img src="media/index/naive.png" alt="Naivevil" loading="lazy" decoding="async" />
++                            <img src="media/index/naive.png" width="3074" height="2036" alt="Naivevil" loading="lazy" decoding="async" />
+                         </div>
+                         <div class="work-tags-container">
+                             <span class="tag-name">Naivevil<span class="tag-year">2019</span></span>
+@@ -213,7 +201,7 @@
+ 
+                     <a href="redwing.html" id="open-concept-gallery" class="work-item" aria-haspopup="dialog">
+                         <div class="work-image-wrapper">
+-                            <video src="media/index/redwing.mp4" autoplay muted loop playsinline></video>
++                            <video src="media/index/redwing.mp4" width="1440" height="1080" autoplay muted loop playsinline></video>
+                         </div>
+                         <div class="work-tags-container">
+                             <span class="tag-business">Concept Art<span class="tag-year">2020</span></span>
+@@ -222,8 +210,8 @@
+ 
+                     <a href="microsoft.html" id="open-microsoft" class="work-item" aria-haspopup="dialog">
+                         <div class="work-image-wrapper">
+-                            <img src="media/index/mfst.png" alt="Microsoft" loading="lazy" decoding="async" />
+-                            <video class="hover-video" src="media/index/mfst2.mp4" muted loop playsinline preload="none"></video>
++                            <img src="media/index/mfst.png" width="1532" height="862" alt="Microsoft" loading="lazy" decoding="async" />
++                            <video class="hover-video" src="media/index/mfst2.mp4" width="1920" height="1080" muted loop playsinline preload="none"></video>
+                         </div>
+                         <div class="work-tags-container">
+                             <span class="tag-name">Microsoft<span class="tag-year">2025</span></span>
+@@ -233,7 +221,7 @@
+ 
+                     <a href="thermopal.html" id="open-thermopal" class="work-item thermopal-card" aria-label="ThermoPal — Design System" aria-haspopup="dialog">
+                         <div class="work-image-wrapper">
+-                            <img src="media/index/thermopal.png?v=20260921-6" alt="ThermoPal" loading="lazy" decoding="async" />
++                            <img src="media/index/thermopal.png?v=20260921-6" width="2002" height="1754" alt="ThermoPal" loading="lazy" decoding="async" />
+                         </div>
+                         <div class="work-tags-container">
+                             <span class="tag-name">ThermoPal<span class="tag-year">2025</span></span>
+@@ -243,7 +231,7 @@
+ 
+                     <div class="work-item no-click">
+                         <div class="work-image-wrapper">
+-                            <img src="media/index/pink.svg" alt="Pink Panthers — Menstrual Health, Service Design" loading="lazy" decoding="async" />
++                            <img src="media/index/pink.svg" width="833" height="552" alt="Pink Panthers — Menstrual Health, Service Design" loading="lazy" decoding="async" />
+                         </div>
+                         <div class="work-tags-container">
+                             <span class="tag-business">Menstrual Health, Service Design</span>
+@@ -253,7 +241,7 @@
+                     <!-- Wander temporarily hidden from the homepage.
+                     <a href="wander.html" class="work-item">
+                         <div class="work-image-wrapper">
+-                            <img src="media/index/wander.png" alt="Wander" />
++                            <img src="media/index/wander.png" width="2312" height="2312" alt="Wander" />
+                         </div>
+                         <div class="work-tags-container">
+                             <span class="tag-business">Gamified Sleep Experience, Published Reserch</span>
+@@ -274,6 +262,7 @@
+             </div>
+         </footer>
+ 
++
+     </div>
+ 
+     <div id="showreelOverlay" class="preload hidden">
+@@ -461,7 +450,7 @@
+     <script src="vendor/gsap/gsap.min.js"></script>
+     <script src="https://unpkg.com/lenis@1.0.45/dist/lenis.min.js"></script>
+     <script src="https://unpkg.com/@rive-app/canvas@2.31.6"></script>
+-    <script src="js/index.js?v=20260922-3"></script>
++    <script src="js/index.js?v=20261104-2"></script>
+     <script src="js/nestify-bird-data.js?v=20260924-1"></script>
+     <script>
+         (() => {
+diff --git a/js/info-popover.js b/js/info-popover.js
+index a6a687b..33094c4 100644
+--- a/js/info-popover.js
++++ b/js/info-popover.js
+@@ -79,12 +79,23 @@
+     if (!popover) return;
+ 
+     // Find Info links in headers
+-    const infoLinks = document.querySelectorAll('header a[href*="about.html"], .site-header a[href*="about.html"]');
++    const infoLinks = document.querySelectorAll('header a[href*="about.html"], .site-header a[href*="about.html"], .site-dock a[href*="about.html"]');
+     if (!infoLinks.length) return;
+ 
+     let closeTimer = null;
+ 
+     function positionPopover(link) {
++      const dock = link.closest('.site-dock');
++      popover.classList.toggle('from-dock', !!dock);
++      if (dock) {   // 底部 dock：浮在 dock 正上方，和 dock 居中对齐
++        const r = dock.getBoundingClientRect();
++        popover.style.top = 'auto';
++        popover.style.bottom = `${window.innerHeight - r.top + 12}px`;
++        popover.style.right = 'auto';
++        popover.style.left = `${Math.max(8, Math.min(window.innerWidth - popover.offsetWidth - 8, r.left + r.width / 2 - popover.offsetWidth / 2))}px`;
++        return;
++      }
++      popover.style.bottom = 'auto';
+       popover.style.top = '48px';
+       popover.style.left = 'auto';
+       popover.style.right = 'var(--page-gutter, 8px)';

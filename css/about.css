@@ -154,17 +154,13 @@ body {
 }
 
 .about-panel h1 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  line-height: 1.4;
+  font: var(--type-title);
   margin-bottom: 20px;
 }
 
 .about-panel h2 {
-  font-size: 1.2rem;
-  line-height: 1.5;
+  font: var(--type-lead);
   margin-bottom: 20px;
-  font-weight: 200;
 }
 
 .scholar-pill {
@@ -235,15 +231,13 @@ body {
 
 .exp-group-label {
   margin-bottom: 8px;
-  color: #949494;
-  font-family: 'Inter', sans-serif;
-  font-size: 0.8rem;
-  font-weight: 400;
+  color: var(--subtle);
+  font: var(--type-label);
   letter-spacing: 0.03em;
 }
 
 .exp-list {
-  border-top: 1px solid #ebebeb;
+  border-top: 1px solid var(--line);
 }
 
 .exp-row {
@@ -253,10 +247,9 @@ body {
   justify-content: space-between;
   gap: 16px;
   padding: 8.5px 0;
-  border-bottom: 1px solid #ebebeb;
+  border-bottom: 1px solid var(--line);
   box-sizing: border-box;
-  font-size: 0.98rem;
-  line-height: 1.45;
+  font: var(--type-row);
 }
 
 .exp-title {
@@ -269,13 +262,13 @@ body {
 }
 
 .exp-org {
-  color: #111;
+  color: var(--ink);
   font-weight: 300;
   white-space: nowrap;
 }
 
 .exp-role {
-  color: #767676;
+  color: var(--muted);
   font-weight: 200;
   white-space: normal;
 }
@@ -283,10 +276,8 @@ body {
 .exp-year {
   flex-shrink: 0;
   color: #888;
-  font-family: 'Sora', sans-serif;
-  font-size: 0.95rem;
+  font: var(--type-year);
   font-feature-settings: "tnum";
-  font-weight: 200;
   text-align: right;
   white-space: nowrap;
 }
@@ -1025,9 +1016,7 @@ Timeline Ruler
   }
 
   .about-panel h1 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  line-height: 1.4;
+  font: var(--type-title);
   margin-bottom: 20px;
 }
 

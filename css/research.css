@@ -1,0 +1,57 @@
+/* =========================================
+   Research page — built on about.css + tokens.css.
+   Same panel type as Info; only the paper rows are new.
+   ========================================= */
+.research {
+  width: 100%;
+  max-width: 630px;
+  margin: 0 auto;
+  padding: 28vh clamp(20px, 5vw, 28px) 200px;
+}
+
+.research .about-panel { min-height: 0; }
+
+.pub-list { border-top: 1px solid var(--line); }
+
+.pub-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--sp-4);
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+  color: inherit;
+  text-decoration: none;
+}
+
+.pub-title {
+  font: var(--type-row);
+  color: var(--ink);
+  text-wrap: pretty;
+  transition: color var(--dur-fast) ease;
+}
+
+.pub-row:hover .pub-title { color: var(--ink-2); }
+
+.pub-row .pub-meta {   /* beats `.about-panel p` (line-height 1, margin 20px) */
+  margin: var(--sp-1) 0 0;
+  font: 200 0.88rem/1.45 var(--font-ui);
+  color: var(--muted);
+}
+
+.pub-meta b { font-weight: 300; color: var(--ink); }
+
+.pub-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: var(--sp-2); }
+
+.pub-tag {
+  padding: 3px 8px;
+  border-radius: 5px;
+  background: var(--chip);
+  color: var(--muted);
+  font: 400 0.75rem/1.1 var(--font-ui);
+  text-decoration: none;
+  transition: background-color var(--dur-fast) ease, color var(--dur-fast) ease;
+}
+
+a.pub-tag:hover { background: var(--ink); color: var(--paper); }
+
+.pub-row .exp-year { padding-top: 1px; }

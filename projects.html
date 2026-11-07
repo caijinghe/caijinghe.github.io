@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Projects · Jinghe Cai</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q1VYN4W02W"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-Q1VYN4W02W');
+    </script>
+    <script src="js/site-tracking.js?v=20261030-1" defer></script>
+
+    <!-- Arrived by scrolling past the bottom of the dashboard → sideways, like the dock: Dashboard (left tab) moves
+         off to the left and this page (right tab) comes in from the right. Any other arrival (dock tab, back button,
+         a link) stays an instant cut. -->
+    <style>
+        @view-transition { navigation: auto; }
+        ::view-transition-old(root) { animation: 520ms cubic-bezier(0.32, 0.72, 0, 1) both vt-side-out; }
+        ::view-transition-new(root) { animation: 520ms cubic-bezier(0.32, 0.72, 0, 1) both vt-side-in; }
+        @keyframes vt-side-out { to { transform: translateX(-100%); } }
+        @keyframes vt-side-in { from { transform: translateX(100%); } }
+    </style>
+    <script>
+        addEventListener('pagereveal', e => {
+            let fromDash = false;
+            try { fromDash = sessionStorage.getItem('vt-from-dash') === '1'; sessionStorage.removeItem('vt-from-dash'); } catch (_) {}
+            if (e.viewTransition && (!fromDash || matchMedia('(prefers-reduced-motion: reduce)').matches)) e.viewTransition.skipTransition();
+        });
+    </script>
+    <link rel="icon" href="media/logo.svg" type="image/svg+xml" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+
+    <script>
+        try {
+            if (sessionStorage.getItem('site-preloader-seen') === '1') {
+                document.documentElement.classList.add('preloader-skipped');
+            }
+        } catch (_) {}
+    </script>
+
+    <style>
+        /* 关键内联样式：确保首帧即约束尺寸，防止任何 FOUC 巨大视频跳动或白屏闪烁 */
+        html.preloader-skipped #site-preloader {
+            display: none !important;
+        }
+        #site-preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999999;
+        }
+        .preloader-box {
+            transform: translateY(-24px);
+        }
+        .preloader-box .preloader-logo-pic,
+        .preloader-box .preloader-logo {
+            display: block;
+            width: 88px;
+            height: 92px;
+            object-fit: contain;
+            margin: 0 auto;
+            background: transparent;
+        }
+        .preloader-progress {
+            margin-top: 14px;
+        }
+        /* 简单的淡入预设 */
+        .work-item {
+            opacity: 0;
+            transition: opacity 0.8s ease,
+                        transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .work-item.visible {
+            opacity: 1;
+        }
+    </style>
+
+    <link rel="preload" as="image" href="media/index/logo.webp" type="image/webp" />
+    <link rel="stylesheet" href="css/preloader.css?v=20260924-7" />
+    <link rel="stylesheet" href="css/tokens.css?v=20261106-6" />
+    <link rel="stylesheet" href="css/index.css?v=20261106-1" />
+    <link rel="stylesheet" href="css/site-dock.css?v=20261106-8" />
+    <link rel="expect" href="#dock-drawn" blocking="render" />
+    <style>.works-section { padding-top: var(--page-gutter); }   /* 没有顶部 header 了 */</style>
+    <!-- 开站密码开关：当前已停用。之后如需重新启用告诉我“打开开站密码”即可 -->
+    <script>window.siteLocked = false;</script>
+
+    <link rel="stylesheet" href="css/concept-gallery.css?v=20261004-nestify-light-1" />
+    <link rel="stylesheet" href="css/project-loader.css?v=20260928-3" />
+    <script src="js/concept-gallery.js?v=20260922-23" defer></script>
+    <script src="js/project-analytics.js?v=20261013-1" defer></script>
+    <script src="js/project-preview.js?v=20261004-nestify-light-1" defer></script>
+</head>
+
+<body>
+
+    <!-- 开屏加载动画（蘑菇奔跑 + 0%~100% 计数器） -->
+    <div id="site-preloader" aria-label="Loading site">
+        <div class="preloader-box">
+            <picture class="preloader-logo-pic">
+                <source srcset="media/index/logo.webp" type="image/webp" />
+                <img class="preloader-logo" src="media/index/logo.gif" alt="Jinghe Cai" width="88" height="92" decoding="async" />
+            </picture>
+            <div class="preloader-progress">
+                <span id="preloader-percent">0%</span>
+            </div>
+        </div>
+    </div>
+    <script src="js/preloader.js?v=20260924-1"></script>
+
+    <!-- 开站密码遮罩（已注释停用）：
+    <div id="password-overlay" role="dialog" aria-label="Enter password">
+        <div class="password-box">
+            <video class="logo" autoplay muted loop playsinline aria-label="Loading logo">
+                <source src="media/index/logo.mp4" type="video/mp4" />
+            </video>
+            <div class="input-container">
+                <input id="password-input" type="password" placeholder="•••" autocomplete="off" aria-label="Password" />
+                <button id="password-submit" type="button" aria-label="Submit password"><img src="media/go.svg" alt="" /></button>
+            </div>
+            <p id="password-error" class="error-message">Incorrect password. Please try again.</p>
+        </div>
+    </div>
+    -->
+
+    <div class="layout">
+
+        <nav class="site-dock" data-active="projects"></nav>
+        <!-- Drawn right here (not deferred) so the first frame already has the dock: when arriving from the
+             dashboard by scrolling, the dock is held in place across the slide (link rel=expect in <head>). -->
+        <script src="js/site-dock.js?v=20261106-6"></script>
+        <script src="js/projects-back.js?v=20261106-1" defer></script>   <!-- scroll up past the top → Dashboard -->
+        <i id="dock-drawn" hidden></i>
+
+        <main>
+            <section class="works-section" id="work">
+                <div class="grid-container">
+
+                    <a href="#" id="open-showreel" class="work-item video-item">
+                        <div class="work-image-wrapper">
+                            <video src="media/index/logo.mp4" autoplay muted loop playsinline></video>
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-business">Showreel<span class="tag-year">2020-2025</span></span>
+                        </div>
+                    </a>
+
+                    <a href="samsung.html" id="open-samsung" class="work-item" aria-haspopup="dialog">
+                        <div class="work-image-wrapper">
+                            <img src="media/index/samsung.png" alt="Samsung" loading="lazy" decoding="async" />
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-name">Samsung<span class="tag-year">2025</span></span>
+                            <span class="tag-business">Branding Strategy</span>
+                        </div>
+                    </a>
+
+                    <div class="work-item no-click">
+                        <div class="work-image-wrapper">
+                            <img src="media/index/linko.png" alt="Linko — Indigo Design Award" loading="lazy" decoding="async" />
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-business">Learning Community, Design System</span>
+                        </div>
+                    </div>
+
+                    <a href="nestify.html" id="open-nestify" class="work-item" aria-label="Nestify — Voice-first Family AI Copilot">
+                        <div class="work-image-wrapper">
+                            <div class="nestify-card-stage">
+                                <canvas id="nestify-card-bird" width="800" height="600" aria-label="Animated Nestify bird" role="img"></canvas>
+                            </div>
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-name">Nestify<span class="tag-year">2026</span></span>
+                            <span class="tag-business">Voice-first Family AI Copilot</span>
+                        </div>
+                    </a>
+
+                    <a href="lepal.html?v=20260920-3" id="open-lepal" class="work-item" aria-haspopup="dialog">
+                        <div class="work-image-wrapper">
+                            <img src="media/index/lepal.png" alt="LePal" loading="lazy" decoding="async" />
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-name">Lepal.ai<span class="tag-year">2024</span></span>
+                            <span class="tag-business">AI Companion for Gen Z</span>
+                        </div>
+                    </a>
+
+                    <a href="bibf.html" id="open-bibf" class="work-item" aria-haspopup="dialog">
+                        <div class="work-image-wrapper">
+                            <img src="media/index/BIBF.png" alt="BIBF" loading="lazy" decoding="async" />
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-name">BIBF<span class="tag-year">2020</span></span>
+                            <span class="tag-business">Global Reading Fest VI Design</span>
+                        </div>
+                    </a>
+
+                    <a href="naivevil.html?v=20260920-8" id="open-naivevil" class="work-item" aria-haspopup="dialog">
+                        <div class="work-image-wrapper">
+                            <img src="media/index/naive.png" alt="Naivevil" loading="lazy" decoding="async" />
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-name">Naivevil<span class="tag-year">2019</span></span>
+                            <span class="tag-business">Chinese Ink Painting</span>
+                        </div>
+                    </a>
+
+                    <a href="redwing.html" id="open-concept-gallery" class="work-item" aria-haspopup="dialog">
+                        <div class="work-image-wrapper">
+                            <video src="media/index/redwing.mp4" autoplay muted loop playsinline></video>
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-business">Concept Art<span class="tag-year">2020</span></span>
+                        </div>
+                    </a>
+
+                    <a href="microsoft.html" id="open-microsoft" class="work-item" aria-haspopup="dialog">
+                        <div class="work-image-wrapper">
+                            <img src="media/index/mfst.png" alt="Microsoft" loading="lazy" decoding="async" />
+                            <video class="hover-video" src="media/index/mfst2.mp4" muted loop playsinline preload="none"></video>
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-name">Microsoft<span class="tag-year">2025</span></span>
+                            <span class="tag-business">Internal AI Design Toolkit</span>
+                        </div>
+                    </a>
+
+                    <a href="thermopal.html" id="open-thermopal" class="work-item thermopal-card" aria-label="ThermoPal — Design System" aria-haspopup="dialog">
+                        <div class="work-image-wrapper">
+                            <img src="media/index/thermopal.png?v=20260921-6" alt="ThermoPal" loading="lazy" decoding="async" />
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-name">ThermoPal<span class="tag-year">2025</span></span>
+                            <span class="tag-business">Design System</span>
+                        </div>
+                    </a>
+
+                    <div class="work-item no-click">
+                        <div class="work-image-wrapper">
+                            <img src="media/index/pink.svg" alt="Pink Panthers — Menstrual Health, Service Design" loading="lazy" decoding="async" />
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-business">Menstrual Health, Service Design</span>
+                        </div>
+                    </div>
+
+                    <!-- Wander temporarily hidden from the homepage.
+                    <a href="wander.html" class="work-item">
+                        <div class="work-image-wrapper">
+                            <img src="media/index/wander.png" alt="Wander" />
+                        </div>
+                        <div class="work-tags-container">
+                            <span class="tag-business">Gamified Sleep Experience, Published Reserch</span>
+                        </div>
+                    </a>
+                    -->
+
+                </div>
+            </section>
+        </main>
+
+    </div>
+
+    <div id="showreelOverlay" class="preload hidden">
+        <div class="showreel-frame" tabindex="0" aria-label="Showreel video player">
+            <div class="showreel-header">
+                <div class="header-center" title="Jinghe Cai · Showreel 2020-2025">Jinghe Cai · Showreel 2020-2025</div>
+            </div>
+            <div class="showreel-card">
+                <div class="video-container">
+                    <video id="loadingVideo" muted playsinline preload="none" class="loading-video">
+                        <source src="media/loading.mp4" type="video/mp4" />
+                    </video>
+                    <video id="showreelVideo" playsinline muted preload="none" class="main-video">
+                        <source src="media/showreel.mp4" type="video/mp4" />
+                    </video>
+                    <div class="video-controls">
+                        <div class="playback-button-group">
+                            <button id="playPauseBtn" class="player-control" type="button" aria-label="Play"><span><img src="media/player-play.svg?v=filled-1" alt="" /></span></button>
+                            <button id="soundToggleBtn" class="player-control" type="button" aria-label="Unmute"><span><img src="media/player-muted.svg?v=filled-1" alt="" /></span></button>
+                        </div>
+                        <span id="showreelElapsed" class="player-time">0:00</span>
+                        <input id="showreelProgress" class="player-progress" type="range" min="0" max="100" step="0.1" value="0" aria-label="Video progress" disabled />
+                        <span id="showreelDuration" class="player-time">0:00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <dialog id="concept-gallery" class="concept-gallery" aria-label="Red Wing — Concept Art" data-lenis-prevent>
+        <header class="concept-gallery__header">
+            <button class="concept-gallery__expand" type="button" aria-label="Expand gallery" aria-pressed="false"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="gallery-expand-icon" d="M9 4H4v5M15 20h5v-5M4 4l5.5 5.5M20 20l-5.5-5.5"/><path class="gallery-restore-icon" d="M4 10h6V4M20 14h-6v6M10 10L4.5 4.5M14 14l5.5 5.5"/></svg><img class="concept-gallery__brand concept-gallery__brand--solid" src="media/logo.svg" alt="Jinghe Cai logo" width="32" height="32" /><img class="concept-gallery__brand concept-gallery__brand--hover" src="media/logo_light.svg?v=20260920-1" alt="" width="32" height="32" aria-hidden="true" /></button>
+            <nav class="concept-gallery__breadcrumbs" aria-label="Project breadcrumb" inert>
+                <button type="button" class="concept-gallery__back">Work</button>
+                <span aria-hidden="true">›</span>
+                <span aria-current="page">Red Wing</span>
+            </nav>
+        </header>
+        <div class="concept-gallery__stage" tabindex="0" role="region" aria-label="Concept Art gallery. Scroll or use arrow keys to browse.">
+                <section class="concept-gallery__slide concept-gallery__info-slide" data-aspect="1" aria-label="Project information">
+                    <div class="concept-gallery__info">
+                        <h2>Red Wing</h2>
+                        <p class="concept-gallery__description">Concept Art</p>
+                        <p class="concept-gallery__details">Mar 2020, Individual Work</p>
+                        <img class="concept-gallery__info-award" src="media/redwing/aniwow.svg" alt="ANIWOW 2020 China — Finalist" />
+                    </div>
+                </section>
+                <figure class="concept-gallery__slide" data-aspect="1.41091658"><img width="1370" height="971" src="media/redwing/redwing1.png" alt="Red Wing — illustration 1 of 9" loading="lazy" decoding="async" draggable="false" /></figure>
+                <figure class="concept-gallery__slide" data-aspect="1.00000000"><img width="587" height="587" src="media/redwing/redwing2.png" alt="Red Wing — illustration 2 of 9" loading="lazy" decoding="async" draggable="false" /></figure>
+                <figure class="concept-gallery__slide" data-aspect="1.23679727"><img width="726" height="587" src="media/redwing/redwing3.png" alt="Red Wing — illustration 3 of 9" loading="lazy" decoding="async" draggable="false" /></figure>
+                <figure class="concept-gallery__slide" data-aspect="1.41443299"><img width="1372" height="970" src="media/redwing/redwing4.png" alt="Red Wing — illustration 4 of 9" loading="lazy" decoding="async" draggable="false" /></figure>
+                <figure class="concept-gallery__slide" data-aspect="0.70654297"><img width="2894" height="4096" src="media/redwing/redwing5.png" alt="Red Wing — illustration 5 of 9" loading="lazy" decoding="async" draggable="false" /></figure>
+                <figure class="concept-gallery__slide" data-aspect="0.70695553"><img width="2480" height="3508" src="media/redwing/redwing6.png" alt="Red Wing — illustration 6 of 9" loading="lazy" decoding="async" draggable="false" /></figure>
+                <figure class="concept-gallery__slide" data-aspect="0.70654297"><img width="2894" height="4096" src="media/redwing/redwing7.png" alt="Red Wing — illustration 7 of 9" loading="lazy" decoding="async" draggable="false" /></figure>
+                <figure class="concept-gallery__slide" data-aspect="0.70654297"><img width="2894" height="4096" src="media/redwing/redwing8.png" alt="Red Wing — illustration 8 of 9" loading="lazy" decoding="async" draggable="false" /></figure>
+                <figure class="concept-gallery__slide" data-aspect="0.70703125"><img width="2896" height="4096" src="media/redwing/redwing9.png" alt="Red Wing — illustration 9 of 9" loading="lazy" decoding="async" draggable="false" /></figure>
+                <section class="concept-gallery__slide concept-gallery__info-slide" data-aspect="1" aria-label="Project information">
+                    <div class="concept-gallery__info">
+                        <h2>Red Wing</h2>
+                        <p class="concept-gallery__description">Concept Art</p>
+                        <p class="concept-gallery__details">Mar 2020, Individual Work</p>
+                        <img class="concept-gallery__info-award" src="media/redwing/aniwow.svg" alt="ANIWOW 2020 China — Finalist" />
+                    </div>
+                </section>
+        </div>
+<footer class="concept-gallery__footer">
+            <div class="concept-gallery__navigation">
+            <div class="concept-gallery__steps" aria-label="Choose gallery page">
+                    <button class="concept-gallery__step" type="button" aria-label="View project introduction" aria-current="true"></button>
+                    <button class="concept-gallery__step" type="button" aria-label="View illustration 1" aria-current="false"></button>
+                    <button class="concept-gallery__step" type="button" aria-label="View illustration 2" aria-current="false"></button>
+                    <button class="concept-gallery__step" type="button" aria-label="View illustration 3" aria-current="false"></button>
+                    <button class="concept-gallery__step" type="button" aria-label="View illustration 4" aria-current="false"></button>
+                    <button class="concept-gallery__step" type="button" aria-label="View illustration 5" aria-current="false"></button>
+                    <button class="concept-gallery__step" type="button" aria-label="View illustration 6" aria-current="false"></button>
+                    <button class="concept-gallery__step" type="button" aria-label="View illustration 7" aria-current="false"></button>
+                    <button class="concept-gallery__step" type="button" aria-label="View illustration 8" aria-current="false"></button>
+                    <button class="concept-gallery__step" type="button" aria-label="View illustration 9" aria-current="false"></button>
+                    <button class="concept-gallery__step" type="button" aria-label="View project information" aria-current="false"></button>
+            </div>
+            </div>
+        </footer>
+    </dialog>
+
+
+    <dialog id="bibf-dialog" class="concept-gallery" aria-label="BIBF — Global Reading Fest VI Design" data-lenis-prevent>
+        <header class="concept-gallery__header">
+            <button class="concept-gallery__expand" type="button" aria-label="Expand project" aria-pressed="false"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="gallery-expand-icon" d="M9 4H4v5M15 20h5v-5M4 4l5.5 5.5M20 20l-5.5-5.5"/><path class="gallery-restore-icon" d="M4 10h6V4M20 14h-6v6M10 10L4.5 4.5M14 14l5.5 5.5"/></svg><img class="concept-gallery__brand concept-gallery__brand--solid" src="media/logo.svg" alt="Jinghe Cai logo" width="32" height="32"><img class="concept-gallery__brand concept-gallery__brand--hover" src="media/logo-line.svg?v=20260921-3" alt="" width="32" height="32" aria-hidden="true"></button>
+            <nav class="concept-gallery__breadcrumbs" aria-label="Project breadcrumb" inert>
+                <button type="button" class="concept-gallery__back">Work</button>
+                <span aria-hidden="true">›</span>
+                <span aria-current="page">BIBF</span>
+            </nav>
+        </header>
+        <div class="concept-gallery__stage" tabindex="0" role="region" aria-label="BIBF gallery">
+            <section class="concept-gallery__slide concept-gallery__info-slide" data-aspect="1"><div class="concept-gallery__info"><p class="bibf-title">Beijing International Book Fair</p><img class="bibf-gallery-logo" src="media/bibf/bibf.png" alt="BIBF logo"><p class="bibf-subtitle">Global Reading Festival VI</p><p class="concept-gallery__details">Jun 2020, Individual Work</p></div></section>
+            <figure class="concept-gallery__slide" data-aspect="0.707"><img src="media/bibf/bibf1.jpg" alt="BIBF image 1" loading="lazy"></figure>
+            <figure class="concept-gallery__slide" data-aspect="0.707"><img src="media/bibf/bibf2.jpg" alt="BIBF image 2" loading="lazy"></figure>
+            <figure class="concept-gallery__slide" data-aspect="0.707"><img src="media/bibf/bibf3.jpg" alt="BIBF image 3" loading="lazy"></figure>
+            <figure class="concept-gallery__slide" data-aspect="0.707"><img src="media/bibf/bibf4.jpg" alt="BIBF image 4" loading="lazy"></figure>
+            <figure class="concept-gallery__slide" data-aspect="0.707"><img src="media/bibf/bibf5.jpg" alt="BIBF image 5" loading="lazy"></figure>
+            <figure class="concept-gallery__slide" data-aspect="0.707"><img src="media/bibf/bibf6.jpg" alt="BIBF image 6" loading="lazy"></figure>
+            <figure class="concept-gallery__slide" data-aspect="0.707"><img src="media/bibf/bibf7.jpg" alt="BIBF image 7" loading="lazy"></figure>
+            <figure class="concept-gallery__slide" data-aspect="0.707"><img src="media/bibf/bibf8.jpg" alt="BIBF image 8" loading="lazy"></figure>
+            <section class="concept-gallery__slide concept-gallery__info-slide" data-aspect="1"><div class="concept-gallery__info"><p class="bibf-title">Beijing International Book Fair</p><img class="bibf-gallery-logo" src="media/bibf/bibf.png" alt="BIBF logo"><p class="bibf-subtitle">Global Reading Festival VI</p><p class="concept-gallery__details">Jun 2020, Individual Work</p></div></section>
+        </div>
+        <footer class="concept-gallery__footer"><div class="concept-gallery__steps" aria-label="Choose gallery page"><button class="concept-gallery__step" type="button" aria-label="View project introduction" aria-current="true"></button><button class="concept-gallery__step" type="button" aria-label="View image 1"></button><button class="concept-gallery__step" type="button" aria-label="View image 2"></button><button class="concept-gallery__step" type="button" aria-label="View image 3"></button><button class="concept-gallery__step" type="button" aria-label="View image 4"></button><button class="concept-gallery__step" type="button" aria-label="View image 5"></button><button class="concept-gallery__step" type="button" aria-label="View image 6"></button><button class="concept-gallery__step" type="button" aria-label="View image 7"></button><button class="concept-gallery__step" type="button" aria-label="View image 8"></button><button class="concept-gallery__step" type="button" aria-label="View project closing page"></button></div></footer>
+    </dialog>
+
+    <dialog id="naivevil-dialog" class="concept-gallery project-preview" aria-label="Naivevil — Chinese Ink Painting" data-lenis-prevent>
+        <header class="concept-gallery__header">
+            <button class="concept-gallery__expand" type="button" aria-label="Expand gallery" aria-pressed="false"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="gallery-expand-icon" d="M9 4H4v5M15 20h5v-5M4 4l5.5 5.5M20 20l-5.5-5.5"/><path class="gallery-restore-icon" d="M4 10h6V4M20 14h-6v6M10 10L4.5 4.5M14 14l5.5 5.5"/></svg><img class="concept-gallery__brand concept-gallery__brand--solid" src="media/logo.svg" alt="Jinghe Cai logo" width="32" height="32" /><img class="concept-gallery__brand concept-gallery__brand--hover" src="media/logo_light.svg?v=20260920-1" alt="" width="32" height="32" aria-hidden="true" /></button>
+            <nav class="concept-gallery__breadcrumbs" aria-label="Project breadcrumb" inert>
+                <button type="button" class="concept-gallery__back">Work</button>
+                <span aria-hidden="true">›</span>
+                <span aria-current="page">Naivevil</span>
+            </nav>
+        </header>
+        <iframe class="project-preview__frame" title="Naivevil project" data-src="naivevil.html?v=20261013-analytics-time&amp;preview=1"></iframe>
+    </dialog>
+
+    <dialog id="lepal-dialog" class="concept-gallery project-preview project-preview--dark" aria-label="Lepal.ai — AI Companion for Gen Z" data-lenis-prevent>
+        <header class="concept-gallery__header">
+            <button class="concept-gallery__expand" type="button" aria-label="Expand gallery" aria-pressed="false"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="gallery-expand-icon" d="M9 4H4v5M15 20h5v-5M4 4l5.5 5.5M20 20l-5.5-5.5"/><path class="gallery-restore-icon" d="M4 10h6V4M20 14h-6v6M10 10L4.5 4.5M14 14l5.5 5.5"/></svg><img class="concept-gallery__brand concept-gallery__brand--solid" src="media/logo_withe.svg" alt="Jinghe Cai logo" width="32" height="32" /><img class="concept-gallery__brand concept-gallery__brand--hover" src="media/logo_light.svg?v=20260920-1" alt="" width="32" height="32" aria-hidden="true" /></button>
+            <nav class="concept-gallery__breadcrumbs" aria-label="Project breadcrumb" inert>
+                <button type="button" class="concept-gallery__back">Work</button>
+                <span aria-hidden="true">›</span>
+                <span aria-current="page">Lepal.ai</span>
+            </nav>
+        </header>
+        <iframe class="project-preview__frame" title="Lepal.ai project" data-src="lepal.html?v=20261001-type-6&amp;preview=1"></iframe>
+    </dialog>
+
+    <dialog id="samsung-dialog" class="concept-gallery project-preview project-preview--dark" aria-label="Samsung — Branding Strategy" data-lenis-prevent>
+        <header class="concept-gallery__header">
+            <button class="concept-gallery__expand" type="button" aria-label="Expand gallery" aria-pressed="false"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="gallery-expand-icon" d="M9 4H4v5M15 20h5v-5M4 4l5.5 5.5M20 20l-5.5-5.5"/><path class="gallery-restore-icon" d="M4 10h6V4M20 14h-6v6M10 10L4.5 4.5M14 14l5.5 5.5"/></svg><img class="concept-gallery__brand concept-gallery__brand--solid" src="media/logo_withe.svg" alt="Jinghe Cai logo" width="32" height="32" /><img class="concept-gallery__brand concept-gallery__brand--hover" src="media/logo_light.svg?v=20260920-1" alt="" width="32" height="32" aria-hidden="true" /></button>
+            <nav class="concept-gallery__breadcrumbs" aria-label="Project breadcrumb" inert>
+                <button type="button" class="concept-gallery__back">Work</button>
+                <span aria-hidden="true">›</span>
+                <span aria-current="page">Samsung</span>
+            </nav>
+        </header>
+        <iframe class="project-preview__frame" title="Samsung project" data-src="samsung.html?v=20261012-responsive-2&amp;preview=1"></iframe>
+    </dialog>
+
+    <dialog id="microsoft-dialog" class="concept-gallery project-preview" aria-label="Microsoft — Internal AI Design Toolkit" data-lenis-prevent>
+        <header class="concept-gallery__header">
+            <button class="concept-gallery__expand" type="button" aria-label="Expand gallery" aria-pressed="false"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="gallery-expand-icon" d="M9 4H4v5M15 20h5v-5M4 4l5.5 5.5M20 20l-5.5-5.5"/><path class="gallery-restore-icon" d="M4 10h6V4M20 14h-6v6M10 10L4.5 4.5M14 14l5.5 5.5"/></svg><img class="concept-gallery__brand concept-gallery__brand--solid" src="media/logo.svg" alt="Jinghe Cai logo" width="32" height="32" /><img class="concept-gallery__brand concept-gallery__brand--hover" src="media/logo_light.svg?v=20260920-1" alt="" width="32" height="32" aria-hidden="true" /></button>
+            <nav class="concept-gallery__breadcrumbs" aria-label="Project breadcrumb" inert>
+                <button type="button" class="concept-gallery__back">Work</button>
+                <span aria-hidden="true">›</span>
+                <span aria-current="page">Microsoft</span>
+            </nav>
+        </header>
+        <iframe class="project-preview__frame" title="Microsoft project" data-src="microsoft.html?v=20261012-responsive-2&amp;preview=1"></iframe>
+    </dialog>
+
+    <dialog id="nestify-dialog" class="concept-gallery project-preview" aria-label="Nestify — Voice-first Family AI Copilot" data-lenis-prevent>
+        <header class="concept-gallery__header">
+            <button class="concept-gallery__expand" type="button" aria-label="Expand gallery" aria-pressed="false"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="gallery-expand-icon" d="M9 4H4v5M15 20h5v-5M4 4l5.5 5.5M20 20l-5.5-5.5"/><path class="gallery-restore-icon" d="M4 10h6V4M20 14h-6v6M10 10L4.5 4.5M14 14l5.5 5.5"/></svg><img class="concept-gallery__brand concept-gallery__brand--solid" src="media/logo.svg" alt="Jinghe Cai logo" width="32" height="32" /><img class="concept-gallery__brand concept-gallery__brand--hover" src="media/logo_light.svg?v=20260920-1" alt="" width="32" height="32" aria-hidden="true" /></button>
+            <nav class="concept-gallery__breadcrumbs" aria-label="Project breadcrumb" inert>
+                <button type="button" class="concept-gallery__back">Work</button>
+                <span aria-hidden="true">›</span>
+                <span aria-current="page">Nestify</span>
+            </nav>
+        </header>
+        <iframe class="project-preview__frame" title="Nestify project" data-src="nestify.html?v=20261107-28&amp;preview=1"></iframe>
+    </dialog>
+
+        <dialog id="thermopal-dialog" class="concept-gallery project-preview" aria-label="ThermoPal — Design System" data-lenis-prevent>
+        <header class="concept-gallery__header">
+            <button class="concept-gallery__expand" type="button" aria-label="Expand gallery" aria-pressed="false"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="gallery-expand-icon" d="M9 4H4v5M15 20h5v-5M4 4l5.5 5.5M20 20l-5.5-5.5"/><path class="gallery-restore-icon" d="M4 10h6V4M20 14h-6v6M10 10L4.5 4.5M14 14l5.5 5.5"/></svg><img class="concept-gallery__brand concept-gallery__brand--solid" src="media/logo.svg" alt="Jinghe Cai logo" width="32" height="32" /><img class="concept-gallery__brand concept-gallery__brand--hover" src="media/logo_light.svg?v=20260920-1" alt="" width="32" height="32" aria-hidden="true" /></button>
+            <nav class="concept-gallery__breadcrumbs" aria-label="Project breadcrumb" inert>
+                <button type="button" class="concept-gallery__back">Work</button>
+                <span aria-hidden="true">›</span>
+                <span aria-current="page">ThermoPal</span>
+            </nav>
+        </header>
+        <iframe class="project-preview__frame" title="ThermoPal project" data-src="thermopal.html?v=20261013-analytics-time&amp;preview=1"></iframe>
+    </dialog>
+
+    <div id="custom-cursor"></div>
+    <!-- <div id="customCursorText" class="cursor-hidden">MORE</div> -->
+
+    <script src="vendor/gsap/gsap.min.js"></script>
+    <script src="https://unpkg.com/lenis@1.0.45/dist/lenis.min.js"></script>
+    <script src="https://unpkg.com/@rive-app/canvas@2.31.6"></script>
+    <script src="js/index.js?v=20261106-2"></script>
+    <script src="js/nestify-bird-data.js?v=20260924-1"></script>
+    <script>
+        (() => {
+            const encodedBird = window.NESTIFY_BIRD_RIVE_BASE64;
+            const birdCanvas = document.getElementById('nestify-card-bird');
+            if (!encodedBird || !birdCanvas || !window.rive) return;
+
+            const birdBytes = Uint8Array.from(atob(encodedBird), character => character.charCodeAt(0));
+            new rive.Rive({
+                buffer: birdBytes.buffer,
+                canvas: birdCanvas,
+                autoplay: true,
+                fit: rive.Fit.Contain,
+                alignment: rive.Alignment.Center
+            });
+        })();
+    </script>
+    <!-- 开站密码验证逻辑（已注释停用。之后如需重新启用告诉我“打开开站密码”即可）：
+    <script>
+        (() => {
+            const overlay = document.getElementById('password-overlay');
+            if (!overlay) return;
+            const input = document.getElementById('password-input');
+            const submit = document.getElementById('password-submit');
+            const error = document.getElementById('password-error');
+            const inputContainer = overlay.querySelector('.input-container');
+            const key = 'site-unlocked';
+            const unlock = () => {
+                overlay.classList.add('hidden');
+                document.body.classList.remove('site-locked');
+                window.siteLocked = false;
+                sessionStorage.setItem(key, '1');
+                if (sessionStorage.getItem('showreelSeen') !== 'true') {
+                    document.getElementById('open-showreel')?.click();
+                }
+            };
+            const check = () => {
+                if (input.value === '321') unlock();
+                else {
+                    error.style.visibility = 'hidden';
+                    input.value = '';
+                    inputContainer.classList.remove('shake-animation');
+                    void inputContainer.offsetWidth;
+                    inputContainer.classList.add('shake-animation');
+                    inputContainer.addEventListener('animationend', () => inputContainer.classList.remove('shake-animation'), { once: true });
+                    input.focus();
+                }
+            };
+            if (sessionStorage.getItem(key) === '1') unlock();
+            else { document.body.classList.add('site-locked'); input.focus(); }
+            submit.addEventListener('click', check);
+            input.addEventListener('keydown', (event) => { if (event.key === 'Enter') check(); });
+        })();
+    </script>
+    -->
+
+</body>
+
+</html>

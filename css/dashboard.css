@@ -1,0 +1,330 @@
+/* =========================================
+   Home dashboard — one screen of tiles that introduces Jinghe.
+   Built only from tokens.css; the dock (site-dock.css) sits under the grid.
+   Grays only (tokens): tiles on --surface. Colour comes from the work and photos.
+   Desktop: 6 columns × 10 rows filling the viewport, laid out after the Yi Xiang dashboard; empty slots are fine.
+   Narrow screens: tiles stack.
+   ========================================= */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--paper); }
+body { font-family: var(--font-ui); color: var(--ink); -webkit-font-smoothing: antialiased; }
+a { color: inherit; text-decoration: none; }
+
+.dash {
+  --gap: var(--page-gutter, 8px);
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-rows: repeat(10, minmax(0, 1fr));
+  gap: var(--gap);
+  height: 100vh;
+  height: 100dvh;
+  padding: var(--gap) var(--gap) calc(44px + 2 * var(--sp-4));   /* bottom clears the dock */
+}
+
+.tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: var(--sp-4) var(--sp-5);
+  border-radius: var(--r-panel);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.tile-label { font: var(--type-label); letter-spacing: 0.03em; color: var(--subtle); }
+
+/* ---------- Grid placement (column widths: A+B | C | D | E | F) ---------- */
+.t-intro    { grid-column: 1 / 3; grid-row: 1 / 4; }
+.t-logo     { grid-column: 3 / 4; grid-row: 1 / 4; }    /* running mushroom → opens the showreel */
+.t-shelf    { grid-column: 1 / 4; grid-row: 4 / 11; }
+.t-contact  { grid-column: 4 / 5; grid-row: 1 / 7; }
+.t-clock    { grid-column: 4 / 5; grid-row: 7 / 11; }
+/* Desktop: the clock is as wide as its column and exactly as tall as it needs, standing on the grid's bottom edge; the
+   contact card takes the rest of the column, one gap above it. So the clock's top and bottom sit on the same lines as
+   the cards around it, never floating in a padded box. (Both span the whole column; the card's bottom margin is the
+   clock's height — a % margin is a share of the column's width.) */
+@media (min-width: 1024px) {
+  .t-contact { grid-row: 1 / 11; margin-bottom: calc(100% * 424 / 396 + var(--gap)); }
+  .t-clock   { grid-row: 1 / 11; align-self: end; aspect-ratio: 396 / 424; }
+}
+.t-exp      { grid-column: 5 / 6; grid-row: 1 / 6; }    /* experience; education is its own card below it */
+.t-edu      { grid-column: 5 / 6; grid-row: 6 / 8; }    /* ends where the calendar / switch split on the right does */
+/* desktop: the two cards share rows 1–8 and split what's left after their fixed parts in proportion to their
+   entries (5 and 2), so a row is the same height in both. --f-exp / --f-edu = what a card has besides its rows
+   (padding top + bottom, the label and its gap); short screens trim Education's (see below) */
+@media (min-width: 1024px) {
+  .t-exp, .t-edu { --f-exp: calc(2 * var(--sp-4) + 1.12rem + 4px); --f-edu: var(--f-exp); --rows: calc(100% - var(--gap) - var(--f-exp) - var(--f-edu)); grid-row: 1 / 8; }
+  .t-exp { align-self: start; height: calc(var(--f-exp) + var(--rows) * 5 / 7); }
+  .t-edu { align-self: end;   height: calc(var(--f-edu) + var(--rows) * 2 / 7); }
+}
+@media (min-width: 1024px) and (max-height: 820px) { .t-exp, .t-edu { --f-edu: calc(2 * var(--sp-3) + 1.12rem); } }
+.t-research { grid-column: 6 / 7; grid-row: 1 / 6; }
+.t-switch   { grid-column: 6 / 7; grid-row: 6 / 8; }    /* the toggle switch */
+/* Desktop: same split as contact / clock. The switch stands on the line the Education card ends on; the calendar takes
+   the rest of the column, one gap above it, and dashboard.js lengthens its pages to fill that (rings stay put). */
+@media (min-width: 1024px) {
+  .t-research { grid-row: 1 / 8; margin-bottom: calc(100% * 76 / 200 + var(--gap)); }
+  .t-switch   { grid-row: 1 / 8; align-self: end; }
+}
+.t-stats    { grid-column: 5 / 7; grid-row: 8 / 11; }   /* wide: the four numbers in a row */
+
+/* ---------- Logo: the running mushroom; click = showreel ---------- */
+.t-logo { padding: 0; align-items: center; justify-content: center; cursor: pointer; background: none; box-shadow: inset 0 0 0 1px var(--edge); transition: box-shadow var(--dur) ease; }   /* outline only; the page shows through */
+.t-logo .mr-slot { display: block; height: 56%; aspect-ratio: 1; translate: 0 10%; transition: scale var(--dur-slow) var(--ease-spring); }   /* a little below centre: the heavy cap (and the bounce, which lifts it) reads high */
+.t-logo .mushroom-run { display: block; width: 100%; height: 100%; }
+.t-logo:hover { box-shadow: inset 0 0 0 1px var(--edge-hover); }
+.t-logo:hover .mr-slot { scale: 1.06; }
+.t-logo:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+/* ---------- Intro ---------- */
+/* laid out like an ID card: white, outlined, a small square notch in the right edge (a white square with the edge
+   drawn round its three inner sides, over the card's own outline); stamp + issuer on top, a hatched panel, a footer */
+.t-intro { --notch-w: 9px; --notch-h: 20px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--edge); gap: var(--sp-3); }
+.t-intro::after { content: ""; position: absolute; right: 0; top: 40%; width: var(--notch-w); height: var(--notch-h); box-sizing: border-box; background: var(--paper); border: 1px solid var(--edge); border-right: 0; }
+.id-top { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--sp-3); }
+.id-stamp { flex: none; display: block; }   /* just the outline mushroom, on the card's left edge (no ring) */
+.id-stamp img { display: block; height: 2rem; width: auto; }
+.id-issuer { display: flex; align-items: center; gap: var(--sp-3); min-width: 0; }
+.id-panel { flex: 1 0 auto; min-height: 0; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: var(--sp-1); padding: 0 var(--sp-4); border-radius: 4px;
+  background: var(--surface); }   /* a plain gray panel, the switch track's gray (no hatching) */
+.id-foot { display: flex; justify-content: space-between; align-items: baseline; gap: var(--sp-3); }
+.id-no { flex: none; display: flex; align-items: center; gap: 4px; font: var(--type-meta); color: var(--subtle); font-feature-settings: "tnum"; }   /* © 2026 and the card's two black dots */
+.id-no i { width: 7px; height: 7px; border-radius: 50%; background: var(--ink); }
+.id-no i:first-of-type { margin-left: var(--sp-2); }
+.who { text-align: right; }   /* top right of the card, across from the stamp */
+.who b { display: block; font: 500 0.75rem/1.3 var(--font-ui); letter-spacing: 0.01em; }   /* the name, quiet: it's already in the title, the calendar, the showreel */
+.who span { font: var(--type-meta); color: var(--subtle); }
+.iam { font: 400 clamp(1.05rem, 1.5vw, 1.4rem)/1.3 var(--font-ui); letter-spacing: -0.01em; }   /* the one sentence, typed on the hatched panel; kept short enough to sit on one line at this size */
+.iam .caret { display: inline-block; width: 1px; height: 1.05em; margin-left: 1px; vertical-align: -0.12em; background: var(--ink); animation: caret 1s steps(1) infinite; }
+@keyframes caret { 50% { opacity: 0; } }
+.bio { min-width: 0; font: var(--type-meta); color: var(--muted); }
+/* the card's status line: the one thing a visitor should act on, so it reads as an entry (ink, item size) */
+.id-status { display: flex; align-items: center; gap: var(--sp-2); font: var(--type-item); color: var(--ink); }   /* same weight as the other entries (Say hi, Google Scholar) */
+@media (min-width: 1024px) and (max-height: 820px) { .t-intro { gap: var(--sp-2); } .id-stamp img { height: 1.6rem; } }   /* short windows: a smaller mushroom */
+
+/* ---------- Numbers: a column of rows ---------- */
+/* the four sit on one line drawn across the whole tile; each column is as wide as its own number / words and the
+   spaces between them are equal, so a wide "130" and a narrow "5" look evenly spread (first flush left, last flush right) */
+.stats { flex: 1; display: grid; grid-template-columns: repeat(4, auto); justify-content: space-between; align-content: end; column-gap: var(--sp-2); margin-top: var(--sp-2); min-height: 0; }
+.stats::before { content: ""; grid-column: 1 / -1; border-top: 1px solid var(--line); }
+.stat { display: flex; flex-direction: column; gap: var(--sp-3); padding-top: var(--sp-3); }   /* room between the number and its words; nothing below, so the words end one tile-padding from the bottom, as "In numbers" starts one from the top */
+.stat b { font: 600 clamp(1.8rem, 3vw, 2.6rem)/1 var(--font-display); font-feature-settings: "tnum"; letter-spacing: -0.02em; }
+.stat span { font: var(--type-meta); line-height: 1.3; color: var(--subtle); white-space: nowrap; }   /* always its own two lines, close together */
+@media (min-width: 1024px) and (max-width: 1179px) { .stats { column-gap: 6px; } .stat span { font-size: 0.62rem; } }   /* narrowest desktop: the four captions still fit side by side */
+
+/* ---------- Contact: one of the Info page's drawings; hover swaps to the other ---------- */
+.t-contact, .t-stats, .t-exp { background: var(--paper); box-shadow: inset 0 0 0 1px var(--edge); }   /* white, outlined */
+/* desktop: Experience and Education drawn as one shape, pinched where they meet (dashboard.js draws it behind them) */
+.dash { position: relative; }
+.path-join { position: absolute; display: none; pointer-events: none; overflow: visible; }
+.path-join path { fill: var(--paper); stroke: var(--edge); stroke-width: 1px; }
+.path-join .path-perf { fill: none; stroke: var(--edge-inner); stroke-width: 4px; stroke-linecap: round; }   /* dots, a lighter gray than the card's outline */
+.dash.is-path-joined .path-join { display: block; }
+.dash.is-path-joined :is(.t-exp, .t-edu) { background: none; box-shadow: none; }
+.contact-head { display: flex; justify-content: space-between; align-items: flex-start; }
+.contact { margin-top: var(--sp-4); }
+.contact-art { position: relative; flex: 1; min-height: 0; margin: var(--sp-2) calc(-1 * var(--sp-4)) 0 0; }   /* ground line starts with the text; the cup side reaches a little into the padding */
+.contact-art svg { position: absolute; inset: 0; width: 100%; height: 100%; }   /* viewBox cropped to the drawing, standing on the bottom */
+/* the drawing's own ground line is the divider above "Other", so that row has none of its own */
+.contact-foot { margin-top: 0; }
+.contact-foot .contact-row { border-top: 0; }
+/* the steam over the cup (drawn in dashboard.js: the rising plume and the puffs it lets go of): a lighter line than
+   the drawing, its grey slowly fading lighter and back together — --subtle is the darkest it gets */
+.steam { color: var(--subtle); animation: steam-tone 7s ease-in-out infinite; }
+.steam-wave, .steam-puff { stroke: currentColor; }
+@keyframes steam-tone { 50% { color: #d2d2d2; } }
+@media (prefers-reduced-motion: reduce) { .steam { animation: none; } }
+.contact-row { display: flex; justify-content: space-between; align-items: baseline; gap: var(--sp-2); padding: 9px 0; border-top: 1px solid var(--line); font: var(--type-item); }
+.contact-row span { font: var(--type-meta); color: var(--subtle); }   /* field name: meta */
+.contact-row { flex-wrap: wrap; }   /* a link never splits: short of room it moves whole to the next line, still on the right */
+.contact-row a, .contact-row button { margin-left: auto; white-space: nowrap; font: inherit; color: var(--ink);   /* the link: an item, same as Nestify / SCAD */ background: none; border: 0; cursor: pointer; transition: color var(--dur-fast) ease; }
+.contact-row a:hover, .contact-row button:hover, .contact-row button.is-done { color: var(--muted); }
+
+/* ---------- Clock: the melting clock from Figma (new homepage › helo); dashboard.js draws the hands and their
+   reflection in the water. Stands on the page, no tile. ---------- */
+.t-clock { position: relative; display: grid; place-items: center; min-height: 0; container-type: size; }
+/* hover the clock: a small label like the dock's icon labels, naming the zone (no city). It trails the pointer, below
+   and to the right like a cursor's tag; dashboard.js moves it every frame (eased, a slight lean with fast moves).
+   It grows in from its corner by the pointer as it appears. */
+.mc-tip { position: absolute; left: 0; top: 0; z-index: 4; padding: 6px 10px; border-radius: var(--r-tag);
+  background: var(--ink); color: var(--paper); font: 400 12px/1.35 var(--font-ui); white-space: nowrap; pointer-events: none;
+  transform-origin: 0 0; will-change: transform; opacity: 0; scale: 0.9;
+  transition: opacity 0.15s ease-out, scale 0.22s var(--ease-out); }
+.mc-tip.is-on { opacity: 1; scale: 1; }
+.hover-tip { position: fixed; z-index: 50; }   /* the intro panel's label: same tag, on the body (fixed, so no card clips it) */
+.mc-tip-sub { display: block; font-size: 10px; color: rgb(255 255 255 / 0.55); }   /* "Local time": the small, faint line; the zone is what matters */
+.mc { height: min(100cqh, 100cqw * 424 / 396); aspect-ratio: 396 / 424; }
+.mc svg { display: block; width: 100%; height: 100%; }
+
+/* ---------- Toggle switch: line drawing like the calendar and the clock, double rim. On: orange track, white knob;
+   off: the panels' grey track, black knob. Full column width, sitting at the foot of its slot. Click (or Space / Enter)
+   flips it; the knob springs across. ---------- */
+.t-switch { display: grid; align-items: end; justify-items: stretch; min-height: 0; }
+.sw { display: block; width: 100%; aspect-ratio: 200 / 76; padding: 0; border: 0; background: none; cursor: pointer; border-radius: 999px; -webkit-tap-highlight-color: transparent; }   /* as wide as the tiles, flat */
+.sw svg { display: block; width: 100%; height: 100%; overflow: visible; }
+/* 1px at any size: the outer rim is the tiles' edge gray (--edge); the track inside has its own lighter gray (--edge-inner) */
+.sw-rim, .sw-track { stroke: var(--edge); stroke-width: 1px; vector-effect: non-scaling-stroke; }
+.sw-track { stroke: var(--edge-inner); }
+.sw-rim { fill: #fff; }
+/* Off (default): ball on the right, the cards' gray. On: ball rolls left, the track goes black */
+.sw-track { fill: var(--surface); transition: fill var(--dur) ease; }
+.sw[aria-checked="true"] .sw-track { fill: var(--ink); }
+/* On / Off engraved at the two ends; the one the ball is at reads, the other stays faint */
+.sw-label { font: var(--type-label); font-size: var(--sw-label, 12px); letter-spacing: 0.03em; text-anchor: middle;   /* = the tiles' labels (Chapters, Contact) on screen; dashboard.js sets --sw-label in the SVG's units */
+  dominant-baseline: central; fill: var(--subtle); opacity: 0.6; transition: fill var(--dur) ease, opacity var(--dur) ease; }
+.sw[aria-checked="false"] .sw-label-off { fill: var(--ink); opacity: 1; }
+.sw[aria-checked="true"] .sw-label { fill: #fff; opacity: 0.35; }
+.sw[aria-checked="true"] .sw-label-on { opacity: 1; }
+/* the ball (flat white), and its flat shadow lying on the track (down-right, no blur) */
+.sw-ball { fill: #fff; stroke: var(--edge-inner); stroke-width: 1px; vector-effect: non-scaling-stroke; }   /* a hairline so the white ball holds its edge on the gray */
+.sw-shadow { fill: #000; opacity: 0.07; transition: opacity var(--dur) ease; }
+.sw[aria-checked="true"] .sw-shadow { opacity: 0; }   /* nothing to see on black */
+.sw-knob { transition: transform var(--dur-slow) var(--ease-spring); }
+.sw[aria-checked="true"] .sw-knob { transform: translateX(-38px); }   /* 119 → 81 in the 200×76 drawing, clear of the labels */
+.sw:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+@media (prefers-reduced-motion: reduce) { .sw-knob, .sw-track, .sw-label, .sw-shadow { transition: none; } }
+
+/* ---------- Research (links to research.html) ---------- */
+/* Research slot: just the hanging flip calendar (black line drawing), standing on the page; it hangs still. Grab a page to
+   tear it off (dashboard.js). Sits above its neighbours so a torn page falls over them. */
+.t-research { position: relative; z-index: 3; display: grid; place-items: start center; min-height: 0; container-type: size; }
+.t-research .cal-slot { display: contents; }
+.t-research .hang-cal { display: block; height: min(100cqh, 100cqw * var(--cal-h, 622) / 392); width: auto; aspect-ratio: 392 / var(--cal-h, 622); overflow: visible;   /* --cal-h: the drawing's height once lengthened (dashboard.js) */
+  touch-action: none; user-select: none; }
+.t-research svg.hang-cal { cursor: grab; }
+/* hairlines: page edges are a fixed 0.5px on screen (one device pixel on Retina), whatever the drawing's size or
+   lengthening — a stretched page would otherwise thicken its horizontal edges. Rings and the outlined lettering thinner too. */
+.t-research svg [stroke-width="1"] { vector-effect: non-scaling-stroke; stroke-width: 0.5px; }
+.t-research svg [stroke-width="2.6"] { stroke-width: 1.7; }
+.t-research svg [stroke-width="0.92"] { stroke-width: 1.2; }   /* the outlined PRODUCT DESIGNER: a touch heavier than its 0.92 so the letters read */
+.t-research .is-pulling .hang-cal { cursor: grabbing; }
+
+/* ---------- Bookshelf: a long strip (one picture, like the Info page) ----------
+   At rest it's the whole shelf. Hover a book (tap on touch): the others fade, that year's photos and words appear.
+   Book offsets are the Info page's px values (drawn at 380px tall) as fractions of the book height. */
+.t-shelf { container-type: size; padding: 0; background: none; }   /* no fill — just a thin frame around the shelf */
+/* the frame: 1px, the tiles' edge gray (drawn as a masked ring so it sits above the books) */
+.t-shelf::after { content: ""; position: absolute; inset: 0; z-index: 2; border-radius: inherit; padding: 1px; pointer-events: none;
+  background: var(--edge);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
+/* the card's label, where every other card has its own (same padding as a tile) */
+.shelf-label, .logo-label { position: absolute; left: var(--sp-5); top: var(--sp-4); z-index: 1; pointer-events: none; }
+.shelf-name {   /* the big name across the top of the frame, under the label */
+  position: absolute; left: 4cqw; top: calc(var(--sp-4) + 1.12rem + var(--sp-3));   /* label's top + its line (0.8rem × 1.4) + a gap */
+  font: 700 12cqw/0.9 var(--font-display); letter-spacing: -0.06em;
+  color: var(--ink); white-space: nowrap; pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.t-shelf.is-open .shelf-name { opacity: 0; }
+.shelf {
+  --book-h: min(35cqw, 54cqh);   /* centred; the row spans ~94% of the frame, even margins both sides */
+  position: absolute; left: 50%; bottom: 0; translate: -50% 0;   /* the books stand right on the frame's bottom edge (no shelf line) */
+  display: flex; align-items: flex-end;
+}
+.book { position: relative; z-index: 1; height: var(--book-h); padding: 0; border: 0; background: none; cursor: pointer; transition: opacity 0.5s ease, filter 0.5s ease; }
+.book img { display: block; height: 100%; width: auto; pointer-events: none; }
+.shelf.is-open .book:not(.is-on) { opacity: 0.35; filter: blur(3px); transition-duration: 0.3s; }   /* the other years go out of focus behind the open one, still there and still hoverable */
+.book:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; border-radius: 4px; }
+.book[data-y="2019"] { margin-left: calc(var(--book-h) * -0.0395); margin-right: calc(var(--book-h) * 0.1316); }
+.book[data-y="2020"] { margin-left: calc(var(--book-h) * -0.1316); margin-right: calc(var(--book-h) * -0.0316); }
+.book[data-y="2021"] { margin-left: calc(var(--book-h) * 0.0211); }
+.book[data-y="2022"] { margin-left: calc(var(--book-h) * -0.0132); }
+.book[data-y="2024"] { margin-left: calc(var(--book-h) * -0.0921); }
+.book[data-y="2025"] { margin-left: calc(var(--book-h) * 0.0132); margin-right: calc(var(--book-h) * -0.0921); }
+
+.year-card {   /* in the name's place while a year is open: same top as the name, left edge on the "Chapters" label */
+  position: absolute; left: var(--sp-5); right: var(--sp-5); top: calc(var(--sp-4) + 1.12rem + var(--sp-3));
+  display: flex; gap: var(--sp-6); align-items: flex-start;   /* two halves side by side */
+  opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+}
+.t-shelf.is-open .year-card { opacity: 1; }
+.t-shelf { --photo-h: clamp(48px, 20cqh, 110px); }   /* fallback; dashboard.js sets the shared height on open */
+.year-side { display: flex; flex-direction: column; gap: var(--sp-3); min-width: 0; }
+.year-photos { display: flex; gap: var(--sp-2); }   /* one row; dashboard.js picks a --photo-h every year fits in */
+.year-photos img { flex: none; height: var(--photo-h); width: auto; border-radius: 10px; opacity: 0; transform: translateY(18px) scale(0.96); transition: opacity 0.6s var(--ease-out), transform 0.7s var(--ease-out); }
+.t-shelf.is-open .year-photos img { opacity: 1; transform: none; }
+.year-photos img:nth-child(2) { transition-delay: 0.08s; }
+.year-photos img:nth-child(3) { transition-delay: 0.16s; }
+.year-photos img:nth-child(4) { transition-delay: 0.24s; }
+.year-text { max-width: 38em; font-size: clamp(0.64rem, 2cqw, 0.8rem); line-height: 1.5; color: var(--ink); white-space: pre-line; opacity: 0; transform: translateY(12px); transition: opacity 0.5s var(--ease-out) 0.14s, transform 0.6s var(--ease-out) 0.14s; }
+.t-shelf.is-open .year-text { opacity: 1; transform: none; }
+.year-text.is-flow { white-space: normal; text-wrap: pretty; }   /* the Info page breaks don't fit here: flow, no lone last word */
+
+/* ---------- Path: Experience and Education, one card each; org on top, role + year below ---------- */
+/* the rows share the card's height: spare room goes between them (each row's text stays centred between its rules),
+   not into a gap at the bottom. */
+.path { flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }   /* no extra top margin: "Experience" lines up with the other tiles' first line */
+.path .tile-label { flex: none; display: block; margin-bottom: 4px; }   /* the same label as every other tile (Contact, In numbers) */
+.path-row { flex: 1 1 auto; display: grid; grid-template-columns: 1fr auto; align-items: baseline; align-content: center; column-gap: var(--sp-3); padding: 6px 0; border-bottom: 1px solid var(--line); font: var(--type-item); }
+/* the place on its own line; underneath, the role / the major with the year at the right */
+.path-row:last-child { border-bottom: 0; }   /* no rule under the last row of a group */
+.path-row span { grid-column: 1 / -1; min-width: 0; }
+.path-row i { min-width: 0; font: var(--type-meta); font-style: normal; color: var(--subtle); }
+.path-row em { font: var(--type-meta); font-style: normal; color: var(--subtle); font-feature-settings: "tnum"; text-align: right; }   /* role and year: one meta line */
+
+/* Short desktop windows: tighter type */
+@media (min-width: 1024px) and (max-height: 820px) { .path-row { padding: 3px 0; } }
+/* short screens: the groups sit a little closer (everything still shows) */
+/* very short screens: the two lines of each row sit tighter, so all of it still fits */
+/* short screens: Education is only two grid rows tall, so it trims its own padding to keep both rows in */
+@media (min-width: 1024px) and (max-height: 820px) { .t-edu { padding-block: var(--sp-3); } .t-edu .tile-label { margin-bottom: 0; } }
+@media (min-width: 1024px) and (max-height: 720px) { .path-row { line-height: 1.2; padding: 2px 0; } }
+
+/* Mid-size desktop, up to 1400 wide (the grid is narrow but still one screen): tiles tighten their padding so rows keep one line */
+@media (min-width: 1024px) and (max-width: 1399px) {
+  .tile { padding: var(--sp-3) var(--sp-4); }
+  /* the column is too narrow for "M.S. Computer Science" + year on one line: the year moves up beside the name */
+  .path-row span { grid-column: 1; grid-row: 1; }
+  .path-row em { grid-column: 2; grid-row: 1; }
+  .path-row i { grid-column: 1 / -1; grid-row: 2; }
+}
+
+/* ---------- Narrow screens: stack, in a set reading order (not source order) ----------
+   Tablet: three columns — who I am beside the mushroom, the shelf across, then each card beside the picture that goes
+   with it (experience · calendar, education · switch), the numbers across, contact beside the clock. Phone: two
+   columns, same order. Rows are as tall as their content; drawings keep their own proportions. */
+@media (max-width: 1023px) {
+  .dash { height: auto; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: none;
+    grid-template-areas: "intro intro logo" "shelf shelf shelf" "exp exp cal" "edu edu switch" "stats stats stats" "contact contact clock"; }
+  .tile, .t-research, .t-switch, .t-clock { grid-column: auto; grid-row: auto; margin: 0; }
+  .t-intro { grid-area: intro; min-height: 220px; }
+  .t-logo { grid-area: logo; min-height: 0; }   /* as tall as the intro beside it (the row sets the height) */
+  .t-shelf { grid-area: shelf; height: auto; aspect-ratio: 16 / 9; }   /* a wide strip across, like the desktop shelf */
+  .t-exp { grid-area: exp; }
+  .t-edu { grid-area: edu; min-height: 0; }
+  .t-research { grid-area: cal; container-type: inline-size; }
+  .t-research .hang-cal { width: 100%; height: auto; }
+  .t-switch { grid-area: switch; align-self: end; }
+  .t-stats { grid-area: stats; min-height: 200px; }
+  .t-contact { grid-area: contact; min-height: 280px; }
+  .t-clock { grid-area: clock; align-self: center; aspect-ratio: 396 / 424; height: auto; }
+}
+@media (max-width: 600px) {
+  .dash { grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas: "intro intro" "logo cal" "shelf shelf" "exp exp" "edu edu" "stats stats" "contact contact" "clock switch"; }
+  .t-shelf { aspect-ratio: 5 / 4; }   /* a phone is narrow: the shelf needs more height for its books and a year's photos */
+  .t-switch { align-self: center; }
+  .stats { grid-template-columns: repeat(2, auto); row-gap: var(--sp-2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iam .caret { animation: none; }
+  .book, .year-card, .year-photos img, .year-text { transition: none; }
+}
+
+/* ---------- Dark mode (a first try; parked: nothing sets html.is-dark for now, see dashboard.js) ----------
+   The whole page flips: the line drawings, outlines and type are black on white, so inverted they're white on black.
+   Not pure black / pure white (that glares): contrast(.86) after the flip lands the page on ≈ #121212 with text
+   ≈ #EDEDED (Material's dark surface), and the gray cards a step lighter than the page, like raised surfaces.
+   Photos, video and the coloured mushroom flip back, so they keep their real colours (a touch softer, which suits dark). */
+html { transition: filter 0.5s ease; }
+html.is-dark { filter: invert(1) hue-rotate(180deg) contrast(0.86); }
+html.is-dark :is(img[src*=".png"], img[src*=".jpg"], img[src*=".jpeg"], img[src*=".webp"], video, .mushroom-run) { filter: invert(1) hue-rotate(180deg); }
+@media (prefers-reduced-motion: reduce) { html { transition: none; } }
+/* the switch in dark mode: no slab of light track — drawn like the cards, a dark track with a thin gray outline
+   (values are pre-flip: paper → the dark page, --edge → the cards' outline gray), the ball a lined disc a step lighter */
+html.is-dark .sw[aria-checked="true"] .sw-track { fill: var(--paper); stroke: var(--edge); }
+html.is-dark .sw[aria-checked="true"] .sw-label { fill: var(--ink); }
+html.is-dark .sw[aria-checked="true"] .sw-ball { fill: var(--surface); stroke: var(--edge); }

@@ -1,0 +1,14 @@
+<svg width="486" height="647" viewBox="0 0 486 647" fill="none" xmlns="http://www.w3.org/2000/svg">
+<!-- day: the standing person's reflection (Figma "day") and the mushroom's -->
+<g transform="translate(54.5 187.5)">
+<path id="Vector 771" d="M86.5176 256.5C82.869 257.968 83.2635 261.5 86 262.5C89.4955 263.777 91.0772 263.266 92.9017 264C94.359 264.586 96 267.402 92.9017 268.648C90.6457 269.556 88.4163 270.921 89.2533 273.052C91 277.5 99.8087 273.412 98.8305 278.924C97.9187 284.062 81.1427 281.768 83.7812 289.201C85.6051 294.339 97.0063 294.339 95.182 298.009C92.5554 303.293 87.4291 299.477 87.4291 304.615C87.4291 309.753 94.6022 311.076 98.8305 310.487C103.059 309.897 110.688 306.817 105.215 298.009C101.927 292.716 109.32 287.733 115.705 286.999C118.877 286.634 119.809 284.796 117.761 281.86C115.976 279.302 117.948 276.788 123.914 275.988C134.846 274.522 137.595 269.495 134.403 267.914C128.474 264.978 127.562 261.308 131.667 260.574C138.466 259.358 141.244 253.234 135.771 252.5" stroke="url(#day-refl)" stroke-linecap="round"/>
+</g>
+<path d="M333 460.2C336.5 459.4 341 460.1 345 460.9C349 461.6 353.5 461.2 357 460.2" stroke="url(#leaf-refl)" stroke-linecap="round"/>
+<defs>
+<linearGradient id="day-refl" x1="111.086" y1="252.5" x2="111.086" y2="310.617" gradientUnits="userSpaceOnUse">
+<stop stop-color="#8A8165"/>
+<stop offset="0.966346" stop-color="#CCC9BD"/>
+</linearGradient>
+<linearGradient id="leaf-refl" x1="333" y1="460" x2="357" y2="461" gradientUnits="userSpaceOnUse"><stop stop-color="#8A8165"/><stop offset="1" stop-color="#CCC9BD"/></linearGradient>
+</defs>
+</svg>

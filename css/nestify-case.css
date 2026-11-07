@@ -1,0 +1,545 @@
+/*
+ * NESTIFY CASE STUDY — body below the overview.
+ * Structure, type and rhythm come from case-study-system.css (the LePal system).
+ * This file only sets the light theme and Nestify-specific media.
+ */
+
+.nestify-case {
+  --case-page-bg: #fff;
+  --case-text: #000;
+  --case-muted: #777;
+  --case-divider: #e5e5e5;
+  --case-accent: #289bfa;
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  background: var(--case-page-bg);
+  color: var(--case-text);
+  font-family: var(--case-font);
+}
+
+.nestify-case figure {
+  margin: 0;
+}
+
+.nestify-case figcaption {
+  margin-top: 16px;
+  color: var(--case-muted);
+  text-align: center;
+}
+
+.nestify-case .case-pill {   /* black, not the blue accent (same size as LePal's pills) */
+  background: #111;
+  color: #fff;
+}
+
+/* the section title first, its label ("Strategy 02") under it */
+.nestify-case .case-section__header > div:first-child {
+  display: flex;
+  flex-direction: column;
+}
+
+.nestify-case .case-section__label {
+  order: 1;
+  margin-top: 10px;
+}
+
+/* the blue label under each strategy title ("Challenge #1 · Share information"): body size and weight, like the
+   copy beside it — only the blue sets it apart */
+body.project-design-system .nestify-case .case-section__label {
+  font-size: var(--case-body-size);
+  font-weight: 300;
+}
+
+.nestify-case__question {
+  margin: 0 0 24px;
+}
+
+.nestify-case__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 56px;
+}
+
+.nestify-case__image--inset {
+  width: min(100%, 1040px);
+  margin-inline: auto;
+}
+
+.nestify-case__note {
+  margin: 16px 0 0;
+  color: var(--case-muted);
+}
+
+/* The first section follows the white overview directly. */
+.nestify-background {
+  padding-top: 0;
+}
+
+/* Family photo with the things parents keep track of. Sizes scale with the photo, as on the slide. */
+.nestify-scene {
+  position: relative;
+  margin-top: 56px !important;
+  container-type: inline-size;
+}
+
+.nestify-scene img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.nestify-scene__tags {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nestify-scene__tags li {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  padding: 0.88cqw 1.24cqw;
+  border-radius: 1.03cqw;
+  background: rgba(255, 255, 255, 0.82);
+  color: #000;
+  font-size: max(1.66cqw, 10px);
+  font-weight: 500;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+/* ---------- Design principles framework ---------- */
+
+.nestify-principles {
+  padding-top: 48px;
+}
+
+.nestify-framework {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--case-column-gap);
+  margin: 56px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nestify-framework li {
+  display: flex;
+  flex-direction: column;
+  padding: 22px 24px;
+  border-radius: 16px;
+  background: #f5f6f8;
+}
+
+/* the principle first, its label ("01 · Share") close under it, grey; cards only as tall as the longest principle */
+.nestify-framework span {
+  display: block;
+  order: 1;
+  margin-top: auto;
+  padding-top: 20px;
+  color: var(--case-accent);   /* Nestify's blue */
+}
+
+/* Challenge: the three questions, each its own block, a little air between them */
+.case-section__copy .nestify-q { margin: 0; }
+.case-section__copy .nestify-q + .nestify-q { margin-top: 0; }   /* the three read as lines of one paragraph: body spacing, nothing added */
+.case-section__copy .nestify-case__question + .nestify-q { margin-top: 24px; }   /* a breath after the big question */   /* the three questions under the big one, at body size */
+.nestify-q { display: flex; gap: 0.6em; }
+.nestify-qn { flex: none; color: var(--case-muted); font-feature-settings: "tnum"; }   /* the number, grey; the blue is kept for the key words */
+
+/* Showcase opener: who the product is for, three short rows under the intro */
+.nestify-for { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin: 32px 0 0; }
+.nestify-for dt { color: var(--case-muted); margin-bottom: 6px; }
+.nestify-for dd { margin: 0; }
+@media (max-width: 600px) { .nestify-for { grid-template-columns: minmax(0, 1fr); gap: 16px; } }
+
+/* a phrase picked out in the body copy, in Nestify's blue ("design AI with human verbs") */
+.nestify-hl {
+  color: var(--case-accent);
+}
+
+/* the cards' small labels ("01 · Share") a step heavier than the light body copy, so they don't read thin;
+   blue words in the body copy and the strategy labels keep the body's own weight — only their colour changes */
+body.project-design-system .nestify-case .nestify-framework span {
+  font-weight: 400;
+}
+
+body.project-design-system .nestify-framework strong {   /* a step below the section titles ("Design principles.") */
+  display: block;
+  font-size: calc(var(--case-section-title-size) * 0.8);
+  font-weight: 400;
+}
+
+/* ---------- Strategy headers sit tight on their media ---------- */
+
+.nestify-strategy {
+  padding-bottom: 0;
+}
+
+.nestify-strategy:first-of-type .case-section__header {
+  padding-top: 0;
+}
+
+.nestify-compare .case-media-group__grid {
+  gap: clamp(24px, 4vw, 64px);
+}
+
+.nestify-compare .case-media-group__item {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.nestify-tag {
+  margin-bottom: 20px;
+  padding: 6px 16px 5px;
+  border: 1px solid #000;
+  border-radius: 999px;
+}
+
+.nestify-tag--after {   /* black, like the section pills */
+  border-color: #111;
+  background: #111;
+  color: #fff;
+}
+
+/* Before and After drawn as the same screen: one size, the screen's own cream behind, the same corners and hairline.
+   (The Before screenshot is wider: it sits centred with a little cream above and below.) */
+.nestify-display {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  object-fit: contain;
+  border-radius: 10px;
+  background: #f5f3ee;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+
+video.nestify-display {
+  object-fit: cover;
+}
+
+/* Phone recordings already include the device frame. */
+.nestify-phone {
+  display: block;
+  width: min(20vw, 260px);
+  height: auto;
+  aspect-ratio: 1476 / 2874;
+  object-fit: contain;
+}
+
+/* A media group ends as a section does: the next divider sits one section-padding below its captions, the same
+   distance as below a paragraph (the shared default leaves 150px, so every image row stood further from its line). */
+.nestify-case .case-media-group {
+  padding-bottom: var(--case-section-padding-y);
+}
+
+/* Phone rows: a grid that shares the container's width — each phone a column, so the row never runs past its
+   container (as a flex row of fixed-width phones did), the gaps even, the phones as big as the room allows. */
+.nestify-phones {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  justify-items: center;
+  gap: clamp(16px, 3vw, 48px);
+}
+
+.nestify-phones--four {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(12px, 2vw, 32px);
+}
+
+.nestify-phones .case-media-group__item {
+  width: 100%;
+  min-width: 0;
+}
+
+.nestify-phones .nestify-phone {
+  width: 100%;
+  max-width: 260px;
+}
+
+.nestify-phones--four .nestify-phone {
+  max-width: 220px;
+}
+
+.nestify-tools .case-media-group__item {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.nestify-square {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 12px;
+  background: #eceae4;
+  object-fit: cover;
+}
+
+/* the two AI tool videos: filling a thin light-gray frame edge to edge (no white mat) */
+.nestify-tools .nestify-square {
+  box-sizing: border-box;
+  border: 1px solid #111;   /* a thin black frame */
+}
+
+.nestify-tools + .nestify-case__image {
+  margin-top: 120px;
+}
+
+/* ---------- Impact ---------- */
+
+.nestify-impact {   /* the Impact pill sits as far above its cards as Showcase does above its first section */
+  padding-top: var(--case-section-padding-y);
+}
+
+.nestify-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--case-column-gap);
+}
+
+.nestify-stat {
+  display: flex;
+  flex-direction: column;
+  padding: 24px 24px 20px;
+  border-radius: 16px;
+  background: #f5f6f8;
+}
+
+.nestify-stat p {
+  margin: 0;
+}
+
+.nestify-stat [data-case-type="label"] {
+  color: var(--case-muted);
+}
+
+.nestify-stat [data-case-type="caption"] {
+  color: var(--case-muted);
+}
+
+.nestify-stat__value {
+  margin: 28px 0 8px !important;
+  font-size: clamp(34px, 3.2vw, 48px);
+  font-weight: 400;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+}
+
+.nestify-stat__value span {
+  color: var(--case-accent);
+}
+
+/* the arrow and the "+" drawn thin, so the numbers carry the weight */
+.nestify-stat__value .nf-thin {
+  font-style: normal;
+  font-weight: 200;
+  color: var(--case-accent);
+}
+
+.nestify-stat__value .nf-arrow {   /* Material Symbols' arrow_forward, drawn as a thin rounded line (the → character isn't in Google Sans Flex) */
+  display: inline-block;
+  width: 0.7em;
+  margin: 0 -0.02em;   /* the spaces either side are gap enough */
+  vertical-align: -0.04em;
+  color: inherit;
+}
+
+.nestify-stat__value .nf-arrow svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.nestify-stat__chart {
+  width: 100%;
+  height: auto;
+  margin-top: auto;   /* every chart sits on its card's foot, so the three line up whatever the text above */
+  padding-top: 28px;
+  box-sizing: content-box;
+  overflow: visible;
+}
+
+/* the charts, redrawn from the Figma impact cards: a line from the start value (hollow dot) to now (filled dot with a
+   soft halo), labelled at both ends, May → Aug; the line runs light grey into Nestify blue */
+.nestify-stat__chart .nf-line {
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.nestify-stat__chart text {
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 300;
+  fill: var(--case-muted);
+}
+
+.nestify-stat__chart .nf-val--now,
+.nestify-stat__chart .nf-axis--now {
+  fill: var(--case-accent);
+}
+
+.nestify-mosaic {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: clamp(120px, 12vw, 200px);
+  gap: 8px;
+  margin-top: var(--case-column-gap);
+}
+
+.nestify-mosaic img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.nestify-mosaic .is-tall {
+  grid-row: span 2;
+}
+
+.nestify-takeaway {
+  padding-bottom: 0;
+}
+
+/* ---------- Motion: a short fade-up as content scrolls in, once ---------- */
+
+.nf-js [data-nf-reveal] {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 600ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(var(--nf-i, 0) * 70ms);
+}
+
+.nf-js [data-nf-reveal].is-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Tags pop in one at a time after the photo settles. */
+.nf-js .nestify-scene__tags li {
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 200ms ease-out,
+    transform 450ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition-delay: calc(400ms + var(--nf-t, 0) * 220ms);
+}
+
+.nf-js .nestify-scene.is-in .nestify-scene__tags li {
+  opacity: 1;
+  transform: none;
+}
+
+.nf-js .nestify-stat__chart path {
+  stroke-dasharray: var(--nf-len, 400);
+  stroke-dashoffset: var(--nf-len, 400);
+  transition: stroke-dashoffset 1400ms cubic-bezier(0.22, 1, 0.36, 1) 250ms;
+}
+
+.nf-js .is-in .nestify-stat__chart path {
+  stroke-dashoffset: 0;
+}
+
+/* the end dot, the area and the labels arrive once the line has drawn */
+.nf-js .nestify-stat__chart :is(.nf-end, .nf-area, text) {
+  opacity: 0;
+  transition: opacity 500ms ease-out 1300ms;
+}
+
+.nf-js .is-in .nestify-stat__chart :is(.nf-end, .nf-area, text) {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nf-js [data-nf-reveal] {
+    transform: none;
+    transition: opacity 300ms ease-out;
+    transition-delay: 0ms;
+  }
+
+  .nf-js .nestify-stat__chart path {
+    stroke-dashoffset: 0;
+    transition: none;
+  }
+
+  .nf-js .nestify-stat__chart :is(.nf-end, .nf-area, text) {
+    opacity: 1;
+    transition: none;
+  }
+
+  .nf-js .nestify-scene__tags li {
+    transform: none;
+    transition: opacity 300ms ease-out;
+    transition-delay: 0ms;
+  }
+}
+
+@media (max-width: 600px) {
+  .nestify-phones:not(.nestify-phones--four) {   /* three would be too small side by side: one per row */
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+  }
+
+  .nestify-phones:not(.nestify-phones--four) .nestify-phone {
+    max-width: 240px;
+  }
+}
+
+@media (max-width: 768px) {
+  .nestify-framework,
+  .nestify-stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .nestify-framework li {
+    min-height: 0;
+  }
+
+  .nestify-framework span {
+    margin-bottom: 16px;
+  }
+
+  .nestify-compare .case-media-group__grid,
+  .nestify-tools {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .nestify-phones--four {   /* two by two, close together */
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 32px 16px;
+  }
+
+  .nestify-mosaic {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Too small to read on the photo; the tags line up underneath instead. */
+  .nestify-scene__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .nestify-scene__tags li {
+    position: static;
+    padding: 6px 12px;
+    border-radius: 10px;
+    background: #f5f6f8;
+    font-size: 14px;
+  }
+}

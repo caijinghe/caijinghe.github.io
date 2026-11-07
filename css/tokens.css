@@ -1,0 +1,71 @@
+/* =========================================
+   Design tokens — single source of truth.
+   Documented on design-system.html; change a value here, not in page CSS.
+   ========================================= */
+:root {
+  /* Color · neutrals (the site is grayscale; color comes from the work) */
+  --ink: #111111;          /* body text, icons, active nav */
+  --ink-2: #555555;        /* hover text on light surfaces */
+  --muted: #767676;        /* secondary text, inactive nav */
+  --subtle: #949494;       /* captions, metadata */
+  --line: #ebebeb;         /* hairlines, dividers */
+  --edge: #c6c6c6;         /* outer edge of outlined tiles / the switch (darker than --line) */
+  --edge-hover: #adadad;   /* that edge under the pointer */
+  --edge-inner: #d4d4d4;   /* hairlines inside the switch (track, ball): lighter than the outer edge, set on their own */
+  --chip: #ededed;         /* dock, pills, small chips */
+  --chip-press: #e2e2e2;   /* chip hover / pressed */
+  --surface: #f6f6f6;      /* card placeholder behind media */
+  --paper: #ffffff;        /* page, active tab, popovers */
+  --case-dark: #000000;    /* case-study page background */
+  --case-accent: #ff6dd8;  /* case-study highlight (one-off) */
+
+  /* Type */
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Sora', sans-serif;
+  --font-case: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, sans-serif;
+  --fs-tag: 13px;
+  --fs-ui: 14px;
+  --fs-nav: 15px;
+  --fs-body: 16px;
+  --fw-ui: 400;
+
+  /* Text styles — use as `font: var(--type-…)`; the Info & Research pages are built from these */
+  --type-title: 600 1.5rem/1.4 var(--font-display);   /* page / panel title */
+  --type-lead: 200 1.2rem/1.5 var(--font-ui);         /* intro statement */
+  --type-row: 300 0.98rem/1.45 var(--font-ui);        /* list row primary (role / detail uses weight 200) */
+  --type-label: 400 0.8rem/1.4 var(--font-ui);        /* group label, color --subtle, tracking 0.03em */
+  --type-year: 200 0.95rem/1.45 var(--font-display);  /* years, tabular numbers */
+  --type-nav: 400 13px/1 var(--font-ui);              /* dock tabs */
+  /* Dashboard tiles — three levels only: --type-label (tile title) > --type-item (the thing) > --type-meta (about it) */
+  --type-item: 300 0.85rem/1.4 var(--font-ui);        /* an entry: Nestify, SCAD, Say hi, Google Scholar; --ink */
+  --type-meta: 300 0.7rem/1.4 var(--font-ui);         /* about an entry: Email, UX Design, 2025, stat captions; --subtle, tnum */
+
+  /* Space (4px base) */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --sp-7: 48px;
+
+  /* Radius */
+  --r-tag: 6px;
+  --r-card: 12px;
+  --r-panel: 16px;
+  --r-pill: 999px;
+
+  /* Glass — the dock's surface over imagery (the only translucent surface) */
+  --glass: rgba(236, 236, 236, 0.5);
+  --glass-blur: blur(18px) saturate(1.6);
+
+  /* Elevation — only for things that float over imagery */
+  --shadow-float: 0 1px 2px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.08);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 150ms;
+  --dur: 240ms;
+  --dur-slow: 400ms;
+}

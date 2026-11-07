@@ -1,0 +1,116 @@
+/* =========================================
+   Site dock — bottom navigation (needs tokens.css)
+   Text tabs for the two bodies of work, icon buttons for utilities.
+   Two surfaces: solid gray over a plain page; frosted glass once it sits over imagery
+   (js/site-dock.js toggles .is-over by checking what is underneath).
+   ========================================= */
+.site-dock {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--sp-4) + env(safe-area-inset-bottom, 0px));
+  z-index: 10050;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  translate: -50% 0;
+  font-family: var(--font-ui);
+}
+
+.dock-seg {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: var(--sp-1);
+  border-radius: var(--r-pill);
+  background: var(--chip);
+  box-shadow: inset 0 0 0 1px transparent;
+  transition: background-color var(--dur) ease, box-shadow var(--dur) ease,
+              backdrop-filter var(--dur) ease, -webkit-backdrop-filter var(--dur) ease;
+}
+
+/* Over imagery: the page shows through, frosted */
+.site-dock.is-over .dock-seg {
+  background: var(--glass);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35), var(--shadow-float);
+}
+
+.dock-tab {
+  display: grid;
+  place-items: center;
+  height: 36px;
+  min-width: 96px;
+  padding: 0 var(--sp-4);
+  border-radius: var(--r-pill);
+  font: var(--type-nav);
+  color: var(--muted);
+  white-space: nowrap;
+  transition: background-color var(--dur-fast) ease, color var(--dur-fast) ease, scale var(--dur-fast) ease;
+}
+
+.dock-tab:hover { color: var(--ink); }
+.dock-tab.is-active { background: var(--ink); color: var(--paper); }
+
+.dock-icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-pill);
+  color: var(--ink);
+  transition: background-color var(--dur-fast) ease, scale var(--dur-fast) ease;
+}
+
+.dock-icon svg { width: 18px; height: 18px; fill: currentColor; }
+.dock-icon:hover { background: rgba(255, 255, 255, 0.7); }
+.dock-icon.is-active { background: var(--ink); color: var(--paper); }
+
+.dock-tab:active,
+.dock-icon:active { scale: 0.96; }
+
+.dock-tab:focus-visible,
+.dock-icon:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+/* Icon label: icons get their word on hover/focus */
+.dock-icon::after {
+  content: attr(data-label);
+  position: absolute;
+  bottom: calc(100% + 14px);
+  left: 50%;
+  padding: 6px 10px;
+  border-radius: var(--r-tag);
+  background: var(--ink);
+  color: var(--paper);
+  font: 400 12px/1 var(--font-ui);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  translate: -50% 4px;
+  transition: opacity var(--dur-fast) ease, translate var(--dur) var(--ease-out);
+}
+
+.dock-icon:hover::after,
+.dock-icon:focus-visible::after { opacity: 1; translate: -50% 0; }
+
+/* Info already opens its own popover — no label needed */
+.dock-icon[data-popover]::after { content: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .dock-tab, .dock-icon, .dock-icon::after { transition: none; }
+}
+
+/* Page end clears the dock so the footer never sits under it */
+body:has(.site-dock) .site-footer { padding-bottom: calc(44px + 2 * var(--sp-4)); }
+
+/* Info popover opened from the dock: rises above it instead of dropping from the top-right */
+.info-hover-popover.from-dock { transform: translateY(12px); transform-origin: bottom center; }
+.info-hover-popover.from-dock.is-open { transform: none; }
+.info-hover-popover.from-dock::before { top: auto; bottom: -16px; }
+
+/* Phone: tabs tighten so the whole dock fits a 360px screen */
+@media (max-width: 600px) {
+  .site-dock { gap: 6px; }
+  .dock-tab { min-width: 80px; padding: 0 14px; }
+}
