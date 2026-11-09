@@ -131,7 +131,13 @@ function initShowreelOverlay() {
     video.currentTime = 0;
     video.muted = muted;
     sync();
-    video.play().catch(sync);
+    // Sound on unless the browser won't allow it (no click on the site yet): then it plays muted, and a tap on the
+    // video turns the sound on.
+    video.play().catch(() => {
+      if (video.muted || activeVideo !== video) return sync();
+      video.muted = true; sync();
+      video.play().catch(sync);
+    });
   }
 
   function show(video, muted) {
@@ -223,7 +229,7 @@ function initShowreelOverlay() {
   open?.addEventListener('click', (event) => {
     event.preventDefault();
     const firstVisit = sessionStorage.getItem('showreelSeen') !== 'true';
-    show(firstVisit ? loadingVideo : mainVideo, firstVisit);
+    show(firstVisit ? loadingVideo : mainVideo, false);   // opened by a click: that's a yes to sound
     sessionStorage.setItem('showreelSeen', 'true');
   });
 
@@ -237,7 +243,7 @@ function initShowreelOverlay() {
   // window.autoShowreel = false: there the mushroom tile opens it on a click)
   const triggerAutoShowreel = () => {
     if (window.autoShowreel !== false && !window.siteLocked && sessionStorage.getItem('showreelSeen') !== 'true') {
-      show(loadingVideo, true);
+      show(loadingVideo, false);   // tries sound; start() falls back to muted where the browser blocks it
     }
   };
 

@@ -38,6 +38,19 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Sora:wght@100;200;300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Loader (same as Projects): the running mushroom + 0–100% counter, on the first page of a tab only; later visits skip it -->
+    <script>
+        try { if (sessionStorage.getItem('site-preloader-seen') === '1') document.documentElement.classList.add('preloader-skipped'); } catch (_) {}
+    </script>
+    <style>
+        html.preloader-skipped #site-preloader { display: none !important; }
+        #site-preloader { position: fixed; inset: 0; background: #fff; display: flex; justify-content: center; align-items: center; z-index: 999999; }
+        .preloader-box { transform: translateY(-24px); }
+        .preloader-box .preloader-logo-pic, .preloader-box .preloader-logo { display: block; width: 88px; height: 92px; object-fit: contain; margin: 0 auto; background: transparent; }
+        .preloader-progress { margin-top: 14px; }
+    </style>
+    <link rel="preload" as="image" href="media/index/logo.webp" type="image/webp" />
+    <link rel="stylesheet" href="css/preloader.css?v=20260924-7" />
     <link rel="stylesheet" href="css/tokens.css?v=20261106-6" />
     <link rel="stylesheet" href="css/index.css?v=20260924-1" />   <!-- showreel player styles -->
     <link rel="stylesheet" href="css/dashboard.css?v=20261106-172" />
@@ -45,10 +58,23 @@
     <link rel="expect" href="#dock-drawn" blocking="render" />
     <script src="js/mushroom-run-data.js?v=20261105-5" defer></script>
     <script src="js/mushroom-run.js?v=20261106-2" defer></script>
-    <script src="js/dashboard.js?v=20261106-128" defer></script>
+    <script src="js/dashboard.js?v=20261109-5" defer></script>
 </head>
 
 <body>
+    <!-- 开屏加载动画（蘑菇奔跑 + 0%~100% 计数器），和 Projects 同一套 -->
+    <div id="site-preloader" aria-label="Loading site">
+        <div class="preloader-box">
+            <picture class="preloader-logo-pic">
+                <source srcset="media/index/logo.webp" type="image/webp" />
+                <img class="preloader-logo" src="media/index/logo.gif" alt="Jinghe Cai" width="88" height="92" decoding="async" />
+            </picture>
+            <div class="preloader-progress">
+                <span id="preloader-percent">0%</span>
+            </div>
+        </div>
+    </div>
+    <script src="js/preloader.js?v=20260924-1"></script>
     <main class="dash">
 
         <a href="#" id="open-showreel" class="tile t-logo" aria-label="Play showreel 2020–2025">
@@ -105,9 +131,9 @@
             </div>
         </section>
 
-        <!-- 拨动开关＝放一首歌（media/cowboy-bebop.mp3；黑暗模式先注释掉了，见 dashboard.js）：凹槽里一颗纯白平涂的球（带一块平的投影），两头刻 On / Off。外圈是各板块外框那种 1px 灰（--edge），槽边和球边是单独的更浅一档的灰（--edge-inner），宽度和下面的板块一样、扁。默认 Off：球在右、卡片灰底槽；拨到 On：球滚到左、底槽变黑（dashboard.js 只切 aria-checked） -->
+        <!-- 拨动开关＝放一首歌（media/cowboy-bebop.m4a；黑暗模式先注释掉了，见 dashboard.js）：凹槽里一颗纯白平涂的球（带一块平的投影），两头刻 On / Off。外圈是各板块外框那种 1px 灰（--edge），槽边和球边是单独的更浅一档的灰（--edge-inner），宽度和下面的板块一样、扁。默认 Off：球在右、卡片灰底槽；拨到 On：球滚到左、底槽变黑（dashboard.js 只切 aria-checked） -->
         <div class="t-switch">
-            <button class="sw" type="button" role="switch" aria-checked="false" aria-label="Play a song" data-song="media/cowboy-bebop.mp3">
+            <button class="sw" type="button" role="switch" aria-checked="false" aria-label="Play a song" data-song="media/cowboy-bebop.m4a">
                 <svg viewBox="0 0 200 76" aria-hidden="true">
                     <rect class="sw-rim" x="0.5" y="0.5" width="199" height="75" rx="37.5"/>
                     <defs><pattern id="sw-hatch" patternUnits="userSpaceOnUse" width="5" height="5"><path d="M-1 1 1-1M0 5 5 0M4 6 6 4"/></pattern></defs>
@@ -226,7 +252,7 @@
     <script>window.siteLocked = false; window.autoShowreel = false;</script>   <!-- no showreel by itself here: it plays on the first visit to Projects; the mushroom tile opens it -->
     <script src="vendor/gsap/gsap.min.js"></script>
     <script src="https://unpkg.com/lenis@1.0.45/dist/lenis.min.js"></script>
-    <script src="js/index.js?v=20261106-2"></script>
+    <script src="js/index.js?v=20261109-1"></script>
 
 </body>
 

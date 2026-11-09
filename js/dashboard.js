@@ -280,13 +280,30 @@
   // No file / blocked playback → it stays Off. ----
   document.querySelectorAll('.sw').forEach(sw => {
     const set = on => sw.setAttribute('aria-checked', on ? 'true' : 'false');
+    // The file starts loading as soon as the pointer comes near (hover / touch / focus), so the click doesn't wait on
+    // the download. (The track's near-silent first 2.6s are trimmed out of the file itself.)
     let song = null;
+    const load = () => {
+      if (song || !sw.dataset.song) return;
+      song = new Audio(sw.dataset.song); song.preload = 'auto'; song.loop = true;   // keeps playing until the switch is turned off
+    };
+    sw.addEventListener('pointerenter', load);
+    sw.addEventListener('pointerdown', load);
+    sw.addEventListener('focus', load);
     sw.addEventListener('click', () => {
       if (sw.getAttribute('aria-checked') === 'true') { set(false); song?.pause(); return; }
-      if (!song && sw.dataset.song) { song = new Audio(sw.dataset.song); song.loop = true; }   // keeps playing until the switch is turned off
+      load();
       set(true);
       song?.play().catch(() => set(false));
     });
+    // The showreel comes first: as soon as it plays (muted or not, the reel is what you came to watch), the song
+    // stops and the switch goes back to Off. 'play' doesn't bubble, so listen in the capture phase on the overlay.
+    const reel = document.getElementById('showreelOverlay');
+    const yield_ = e => {
+      if (e.target.tagName !== 'VIDEO' || !song || song.paused) return;
+      song.pause(); set(false);
+    };
+    ['play', 'playing'].forEach(k => reel?.addEventListener(k, yield_, true));
   });
   // Dark mode (a first try, parked until the other pages have a dark version too): the switch's On swapped the
   // page's black and white. To bring it back, toggle html.is-dark here (the styles are kept in dashboard.css).
