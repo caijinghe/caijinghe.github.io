@@ -2,7 +2,7 @@
 //   - 打开网站：问一次访客接口（Vercel 上的 jinghe-site-tracker）这个 IP 属于哪家公司，公司名记进 GA（用户属性 visitor_org）。这一步不推送
 //   - 每页：实际阅读时长（只算页面在前台的时间）、最大滚动深度、看到了哪几节（h1/h2）、点了什么（简历 / 邮箱 / Scholar / 外链）、视频播放
 //     → GA 事件照常发；同时累计进这位访客这次浏览的记录（localStorage，多个标签页共用一份）
-//   - 关掉网站的最后一个页面时（站内点链接跳页不算），把整次浏览的报告一次发出 → 作者手机只收到一条
+//   - 关掉网站的最后一个页面时（站内点链接跳页不算），把整次浏览的报告一次发出 → 作者手机只收到一条（同一台设备一天最多一条）
 //   - 手机直接划掉浏览器来不及发的：下次再打开网站时先补发上一次的
 // 作者自己：网址带一次 ?me 之后，这台设备永远不发（GA 照常记）。本地打开（localhost / file）也不发。
 (() => {
@@ -28,11 +28,22 @@
   const pv = Math.random().toString(36).slice(2, 10); // 这一次打开这个页面
   const now = Date.now();
 
+  // —— 报告：同一台设备一天最多推一次（常来的人不刷屏；之后的浏览照样记进 GA）
+  const today = new Date().toDateString();
+  const report = (session, beacon, late) => {
+    try { if (localStorage.getItem('jh:pushed') === today) return; localStorage.setItem('jh:pushed', today); } catch (_) {}
+    send({ type: 'summary', session, late }, beacon);
+  };
+
   // —— 这一次浏览的记录：上一次没发出去、又过了 30 分钟的，先补发
   let s = read(SESS, null);
-  if (s && !s.sent && now - s.last > IDLE && Object.keys(s.visits || {}).length) send({ type: 'summary', session: s, late: true });
+  if (s && !s.sent && now - s.last > IDLE && Object.keys(s.visits || {}).length) report(s, false, true);
   const fresh = !s || now - s.last > IDLE;
-  if (fresh) s = { start: now, last: now, ref: document.referrer, utm: q.get('utm_source') || '', landing: page, visits: {}, sent: false };
+  if (fresh) {
+    const n = (Number(read('jh:n', 0)) || 0) + 1; // 这台设备第几次来
+    write('jh:n', n);
+    s = { start: now, last: now, n, ref: document.referrer, utm: q.get('utm_source') || '', landing: page, visits: {}, sent: false };
+  }
   else if (s.sent) { s.sent = false; s.resumed = true; } // 发过报告后又回来接着看：之后再发一份「续」
   s.visits[pv] = { page, title, at: now, secs: 0, scroll: 0, sections: [], clicks: [], videos: 0 };
   s.last = now;
@@ -149,7 +160,7 @@
     if (Date.now() - internalNavAt < 4000 || othersOpen()) return;
     cur.sent = true;
     write(SESS, cur);
-    send({ type: 'summary', session: cur }, true);
+    report(cur, true);
   });
   // 从「返回」缓存里恢复的页面：重新报到，接着记
   addEventListener('pageshow', (e) => {
