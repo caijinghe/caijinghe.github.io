@@ -544,14 +544,6 @@
     requestAnimationFrame(frame);
   }
 
-  // ---- Copy email ----
-  document.querySelectorAll('.copy-mail').forEach(btn => btn.addEventListener('click', async () => {
-    try { await navigator.clipboard.writeText(btn.dataset.mail); } catch { location.href = 'mailto:' + btn.dataset.mail; return; }
-    const was = btn.textContent;
-    btn.textContent = 'Copied'; btn.classList.add('is-done');
-    setTimeout(() => { btn.textContent = was; btn.classList.remove('is-done'); }, 1600);
-  }));
-
   // ---- Scroll on past the bottom → Projects ----
   // Desktop: the dashboard is one screen, so any deliberate downward scroll continues to Projects.
   // Narrow screens scroll the stacked tiles first; only a NEW gesture made once you're already at the bottom

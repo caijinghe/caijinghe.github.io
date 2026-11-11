@@ -141,8 +141,8 @@ a { color: inherit; text-decoration: none; }
 .contact-row { display: flex; justify-content: space-between; align-items: baseline; gap: var(--sp-2); padding: 9px 0; border-top: 1px solid var(--line); font: var(--type-item); }
 .contact-row span { font: var(--type-meta); color: var(--subtle); }   /* field name: meta */
 .contact-row { flex-wrap: wrap; }   /* a link never splits: short of room it moves whole to the next line, still on the right */
-.contact-row a, .contact-row button { margin-left: auto; white-space: nowrap; font: inherit; color: var(--ink);   /* the link: an item, same as Nestify / SCAD */ background: none; border: 0; cursor: pointer; transition: color var(--dur-fast) ease; }
-.contact-row a:hover, .contact-row button:hover, .contact-row button.is-done { color: var(--muted); }
+.contact-row a { margin-left: auto; white-space: nowrap; font: inherit; color: var(--ink);   /* the link: an item, same as Nestify / SCAD */ background: none; border: 0; cursor: pointer; transition: color var(--dur-fast) ease; }
+.contact-row a:hover { color: var(--muted); }
 
 /* ---------- Clock: the melting clock from Figma (new homepage › helo); dashboard.js draws the hands and their
    reflection in the water. Stands on the page, no tile. ---------- */
