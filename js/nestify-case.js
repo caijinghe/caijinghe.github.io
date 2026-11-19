@@ -144,6 +144,7 @@
   const setTip = (tip, open) => {
     if (tip.classList.contains('is-open') === open) return;
     clearTimeout(tip._nfClose);
+    if (open) fitTip(tip);   // measured as it opens, with the real font in place
     tip.classList.toggle('is-open', open);
     tip.querySelector('.nestify-tip__mark').setAttribute('aria-expanded', String(open));
     tip.classList.toggle('is-closing', !open);
@@ -169,8 +170,42 @@
     band._nfTip = tip;
     tipObserver.observe(band);
   });
+  // shrink each card to its longest line once the words have wrapped, so it is exactly as big as what it says
+  // size each card to its words: first its natural lines (the set breaks, no wrapping); if that is wider than its
+  // column allows, let it wrap at the limit and then shrink to the longest wrapped line
+  const widestLine = pop => {
+    let widest = 0;
+    pop.querySelectorAll('.nestify-grad, .nestify-tip__label').forEach(el => {
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      [...range.getClientRects()].forEach(r => { widest = Math.max(widest, r.width); });
+    });
+    return widest;
+  };
+  const fitTip = tip => {
+    const pop = tip.querySelector('.nestify-tip__pop');
+    const cs = getComputedStyle(pop);
+    const pad = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + 4;
+    const limit = parseFloat(cs.maxWidth) || Infinity;
+    pop.style.transition = 'none';
+    pop.style.transform = 'none';   // measure at full size, not mid-grow
+    pop.style.width = 'max-content';
+    pop.style.maxWidth = 'none';
+    pop.style.whiteSpace = 'nowrap';
+    let width = widestLine(pop) + pad;
+    pop.style.whiteSpace = '';
+    pop.style.maxWidth = '';
+    if (width > limit) { pop.style.width = limit + 'px'; width = widestLine(pop) + pad; }
+    pop.style.width = Math.ceil(width) + 'px';
+    pop.style.transform = '';
+    pop.offsetWidth;   // settle before the transition comes back
+    pop.style.transition = '';
+  };
+  const fitTips = () => tips.forEach(fitTip);
   placeTips();
-  window.addEventListener('resize', placeTips);
+  fitTips();
+  window.addEventListener('resize', () => { placeTips(); fitTips(); });
+  document.fonts?.ready.then(fitTips);
 
   const revealObserver = new IntersectionObserver(entries => {
     entries.forEach(entry => {

@@ -1326,3 +1326,7 @@ body.project-design-system.is-preview .nestify-case .nestify-origin dt { margin-
 /* the card is as wide as its words need, up to the end of its column (set by the script), and can be tapped away */
 .case-section__label .nestify-tip__pop { width: max-content; max-width: min(400px, var(--tip-max, 320px)); white-space: normal; cursor: pointer; }
 .case-section__label .nestify-tip.is-open .nestify-tip__pop { pointer-events: auto; }
+
+/* the principle breaks where it reads (a set break), so the card hugs its two lines; if the column is too narrow
+   for those lines, it balances the wrap instead of leaving one word alone */
+.case-section__label .nestify-tip__pop .nestify-grad { text-wrap-style: pretty; }   /* not balance: that splits the long line to match the short one */
