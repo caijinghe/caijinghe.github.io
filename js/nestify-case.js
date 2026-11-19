@@ -134,7 +134,12 @@
   const tips = [...root.querySelectorAll('.nestify-tip')];
   const placeTips = () => tips.forEach(tip => {
     const label = tip.closest('.case-section__label');
-    if (label) tip.style.setProperty('--tip-x', (tip.getBoundingClientRect().left - label.getBoundingClientRect().left) + 'px');
+    if (!label) return;
+    const x = tip.getBoundingClientRect().left - label.getBoundingClientRect().left;
+    tip.style.setProperty('--tip-x', x + 'px');
+    // the card may grow only as far as its own column, so it never covers the copy beside it
+    const column = label.parentElement.getBoundingClientRect();
+    tip.style.setProperty('--tip-max', Math.max(200, column.right - tip.getBoundingClientRect().left - 8) + 'px');
   });
   const setTip = (tip, open) => {
     if (tip.classList.contains('is-open') === open) return;
@@ -149,14 +154,16 @@
     entries.forEach(entry => {
       const tip = entry.target._nfTip;
       clearTimeout(tip._nfTimer);
-      if (entry.isIntersecting) tip._nfTimer = setTimeout(() => setTip(tip, true), 400);
-      else setTip(tip, false);
+      if (entry.isIntersecting) { if (!tip._nfDismissed) tip._nfTimer = setTimeout(() => setTip(tip, true), 400); }
+      else { tip._nfDismissed = false; setTip(tip, false); }   // leaving the band resets a dismissal
     });
   }, { rootMargin: '-25% 0px -25% 0px' });
   tips.forEach(tip => {
     const mark = tip.querySelector('.nestify-tip__mark');
-    mark.addEventListener('click', () => setTip(tip, !tip.classList.contains('is-open')));
-    tip.addEventListener('mouseenter', () => setTip(tip, true));
+    mark.addEventListener('click', e => { e.stopPropagation(); tip._nfDismissed = false; setTip(tip, !tip.classList.contains('is-open')); });
+    // a tap on the open card, or anywhere else, closes it, and it stays closed until you scroll away and back
+    tip.querySelector('.nestify-tip__pop').addEventListener('click', e => { e.stopPropagation(); tip._nfDismissed = true; setTip(tip, false); });
+    document.addEventListener('click', e => { if (tip.classList.contains('is-open') && !tip.contains(e.target)) { tip._nfDismissed = true; setTip(tip, false); } });
     mark.addEventListener('focus', () => setTip(tip, true));
     const band = tip.closest('.nestify-band') || tip;
     band._nfTip = tip;

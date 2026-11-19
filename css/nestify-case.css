@@ -1322,3 +1322,7 @@ body.project-design-system.is-preview .nestify-case .nestify-origin dt { margin-
 @media (prefers-reduced-motion: reduce) { .nestify-toc__rail-mark, .nestify-toc .nestify-toc__item { transition: none; } .nestify-toc__item--l2.is-open { animation: none; } }
 .nestify-toc__group + .nestify-toc__group { margin-top: 2px; }
 .nestify-toc__group.is-open + .nestify-toc__group { margin-top: 8px; }
+
+/* the card is as wide as its words need, up to the end of its column (set by the script), and can be tapped away */
+.case-section__label .nestify-tip__pop { width: max-content; max-width: min(400px, var(--tip-max, 320px)); white-space: normal; cursor: pointer; }
+.case-section__label .nestify-tip.is-open .nestify-tip__pop { pointer-events: auto; }
