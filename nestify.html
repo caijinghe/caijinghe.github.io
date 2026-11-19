@@ -178,12 +178,12 @@
     <link rel="stylesheet" href="css/confidential-lock.css?v=20261012-responsive-2" />
     <link rel="stylesheet" href="css/project-loader.css?v=20261001-1" />
     <link rel="stylesheet" href="css/nestify-hero.css?v=20261107-wordmark" />
-    <link rel="stylesheet" href="css/nestify-case.css?v=20261111-1" />
+    <link rel="stylesheet" href="css/nestify-case.css?v=20261118-83" />
     <script src="js/project-asset-loader.js?v=20261103-1" defer></script>
     <script src="js/case-preview-scale.js?v=20261001-1" defer></script>
     <script src="js/scroll-indicator.js?v=20260926-2" defer></script>
     <script src="js/nestify-building.js?v=20261007-scroll-dizzy-1" defer></script>
-    <script src="js/nestify-case.js?v=20261103-2" defer></script>
+    <script src="js/nestify-case.js?v=20261118-19" defer></script>
 </head>
 <body class="project-design-system">
     <div id="loading-overlay">
@@ -227,15 +227,15 @@
         </section>
         -->
         <section class="project-overview project-overview--light nestify-overview" aria-labelledby="nestify-overview-title">
-            <h1 id="nestify-overview-title" data-case-type="overview">Family Copilot.<br />Proactive Intelligence.</h1>
+            <h1 id="nestify-overview-title" data-case-type="overview">Proactive family AI.<br />One display, one app.</h1>
             <div class="project-overview__content">
                 <div class="project-overview__meta" data-case-type="label">
-                    <span>Product Design, 2026</span>
-                    <span>6+ Months</span>
+                    <span>Founding Designer, 2026</span>
+                    <span>7+ Months</span>
                     <span>End-to-End</span>
                 </div>
-                <p data-case-type="body">Nestify is an intelligent layer for family life. Families hand off whatever is on their plate, and Nestify turns it into plans, reminders and follow-ups that keep everyone in sync. I designed its smart display and mobile app from 0 to 1, shaping how families capture information, manage daily life, and live alongside AI.</p>
-                <p data-case-type="body">I defined cross-device voice interactions, dynamic feedback states, and multimodal AI onboarding. The biggest shift was AI adoption: families went from handing off 2 tasks a week to 9.5. Onboarding completion reached 83%, Nestify secured 1,000+ pre-orders, and the work supported the company’s seed round.</p>
+                <p data-case-type="body">Nestify is a voice-first, multimodal AI copilot for families with multiple children: one smart display for the whole family, and one app for parents. Families simply speak, snap a photo or forward an email, and Nestify takes care of the rest, from start to finish. I joined in March 2026 as the founding designer, owning the AI agent and multimodal experiences along with visual design, and helped the team build AI design tools.</p>
+                <p data-case-type="body">The biggest shift was AI adoption: tasks added by AI went from 50% to 85%, and families went from handing off 2 tasks a week to 9.5. Nestify secured 1,000+ pre-orders, and the work supported the company’s seed round.</p>
                 <p class="project-overview__label" data-case-type="label">My deliverables</p>
                 <ol>
                     <li data-case-type="body">Created the AI’s character, from its personality and look to a reusable library of expressions and animations.</li>
@@ -243,16 +243,17 @@
                     <li data-case-type="body">Designed the cross-device onboarding and pairing experience.</li>
                     <li data-case-type="body">Built and maintained a code-based design system with 40+ Flutter components.</li>
                     <li data-case-type="body">Designed the company website and fundraising materials.</li>
-                    <li data-case-type="body">Built an AI-native design environment by developing a real-time UI inspector and an internal Slack-to-prototype assistant.</li>
+                    <li data-case-type="body">Built an AI-native design workflow: a Slack-to-prototype agent, a real-time UI inspector, and a code review skill.</li>
                 </ol>
                 <p class="project-overview__label" data-case-type="label">Collaborators</p>
                 <div class="project-overview__collaborators">
-                    <p data-case-type="body">3-person Product Design team<br />Engineering &amp; Hardware teams<br />Founding team</p>
+                    <p data-case-type="body">2 Product Designers, 1 UX Researcher<br />PM, Engineering &amp; Hardware teams</p>
                 </div>
                 <p class="nestify-live-link" data-case-type="body"><a href="nestify-archive/index.html" target="_blank" rel="noopener noreferrer">Website Archive</a></p>
             </div>
         </section>
-        <!-- Case study body. Follows LePal's structure: Background → Challenge → Design principles → Showcase → Impact → Takeaway. -->
+        <!-- Case study body. Follows LePal's structure: Background → Challenge → Design principles → Showcase → Impact → Takeaway.
+             The showcase follows the deck: Meet Nestie → Hand off to AI → Every family member → Designing with AI. -->
         <div class="nestify-case" data-defer-assets>
 
             <section class="case-section nestify-background" aria-labelledby="nestify-background-title">
@@ -260,7 +261,7 @@
                 <div class="case-section__header">
                     <h2 class="case-section__title" id="nestify-background-title" data-case-type="section">Background.</h2>
                     <div class="case-section__copy">
-                        <p data-case-type="body">Multi-child families run on their parents. With two or more school-age kids who can’t yet manage their schedules independently, parents carry the logistics and mental load for everyone, well beyond their personal calendars.</p>
+                        <p data-case-type="body">In the U.S., 32.9 million families are raising children under 18. When two or more of them are school age, every day is a puzzle: school, activities, chores, pickups and meals, for several kids at once. The kids can’t yet manage their own schedules, so parents carry it all, a lot of logistical and mental load on top of their own lives.</p>
                     </div>
                 </div>
                 <!-- Tag positions come from slide 9 of the deck, as a share of the photo. -->
@@ -276,31 +277,38 @@
                 </figure>
             </section>
 
+            <!-- Competitive analysis: where today's home devices stop -->
+            <section class="case-section" aria-labelledby="nestify-market-title">
+                <div class="case-section__divider" aria-hidden="true"></div>
+                <div class="case-section__header">
+                    <h2 class="case-section__title" id="nestify-market-title" data-case-type="section">Opportunity.</h2>
+                    <div class="case-section__copy">
+                        <p data-case-type="body">AI is becoming part of the home. Some products focus on running the smart home, others help families coordinate. But in all of them, AI stays passive: it waits to be asked. That is the gap Nestify set out to bridge, an AI that is proactive and built for the family.</p>
+                    </div>
+                </div>
+                <img class="nestify-case__image" src="media/nestify/case/competitive-map.png" width="3168" height="1520" loading="lazy" decoding="async" alt="A map of AI proactivity against family fit. Google Home, Echo Show and Apple HomeView are built for the home and passive; Cozyla, Skylight, Hearth and Nori are built for the family but passive. Nestify sits alone in the proactive family AI corner." data-nf-reveal />
+            </section>
+
             <section class="case-section" aria-labelledby="nestify-challenge-title">
                 <div class="case-section__divider" aria-hidden="true"></div>
                 <div class="case-section__header">
                     <h2 class="case-section__title" id="nestify-challenge-title" data-case-type="section">Challenge.</h2>
                     <div class="case-section__copy">
-                        <p class="nestify-case__question" data-case-type="question">How might a family hand off daily life to AI, from start to finish?</p>
-                        <p class="nestify-q" data-case-type="body"><span class="nestify-qn">#1</span><span>How do we keep the whole family <span class="nestify-hl">in sync</span>?</span></p>
-                        <p class="nestify-q" data-case-type="body"><span class="nestify-qn">#2</span><span>How do families learn to <span class="nestify-hl">hand things off to AI</span>?</span></p>
-                        <p class="nestify-q" data-case-type="body"><span class="nestify-qn">#3</span><span>How does AI <span class="nestify-hl">get things done</span>?</span></p>
+                        <p class="nestify-case__question" data-case-type="question">How might AI become part of the family, not just part of the home?</p>
+                        <p class="nestify-q" data-case-type="body"><span class="nestify-qn">#1 · Feel</span><span>Giving the AI a face</span></p>
+                        <p class="nestify-q" data-case-type="body"><span class="nestify-qn">#2 · Use</span><span>Driving AI adoption</span></p>
+                        <p class="nestify-q" data-case-type="body"><span class="nestify-qn">#3 · Use</span><span>Keeping every family member in sync</span></p>
                     </div>
                 </div>
             </section>
 
             <section class="case-section nestify-principles" aria-labelledby="nestify-principles-title">
                 <div class="case-section__header">
-                    <h2 class="case-section__title" id="nestify-principles-title" data-case-type="section">Design principles.</h2>
+                    <h2 class="case-section__title" id="nestify-principles-title" data-case-type="section">Design principle.</h2>
                     <div class="case-section__copy">
-                        <p data-case-type="body">My principles come from my years in HCI research: <span class="nestify-hl">design AI with human verbs</span>. In a family home, that came down to one question: <span class="nestify-hl">what would a good butler do?</span></p>
+                        <p data-case-type="body">My AI design principle is to design AI with human verbs: describe what it does the way a person would do it. For Nestify, that became one simple question: <span class="nestify-butler">what would a good butler do?</span> Each challenge below comes back to it.</p>
                     </div>
                 </div>
-                <ol class="nestify-framework" data-nf-stagger>
-                    <li><span data-case-type="label">01 · Share</span><strong data-case-type="section">A good butler knows what matters to each person.</strong></li>
-                    <li><span data-case-type="label">02 · Hand off</span><strong data-case-type="section">A good butler earns trust by proving value.</strong></li>
-                    <li><span data-case-type="label">03 · Get it done</span><strong data-case-type="section">A good butler knows when to step in, and when to stay quiet.</strong></li>
-                </ol>
             </section>
 
             <div class="case-showcase-divider" aria-hidden="true"></div>
@@ -313,7 +321,7 @@
                         <h2 class="case-section__title" id="nestify-product-title" data-case-type="section">Smart display and mobile app.</h2>
                     </div>
                     <div class="case-section__copy">
-                        <p data-case-type="body">It lives in two places: a shared smart display for the home, and a mobile app for parents. Say it out loud, snap a photo, or forward an email, and both stay up to date.</p>
+                        <p data-case-type="body">Nestify lives in two places: a shared smart display for the home, and a mobile app for parents. Say it out loud, snap a photo, or forward an email, and both stay up to date.</p>
                         <dl class="nestify-for">
                             <div><dt data-case-type="label">For parents</dt><dd data-case-type="body">Less planning, less mental load</dd></div>
                             <div><dt data-case-type="label">For family</dt><dd data-case-type="body">One shared view of family life</dd></div>
@@ -322,76 +330,356 @@
                     </div>
                 </div>
             </section>
-            <section class="case-media-group" aria-label="The Nestify mobile app: splash screen, voice interaction and chat with AI">
-                <div class="case-media-group__grid case-media-group__grid--spread nestify-phones" data-nf-stagger>
-                    <figure class="case-media-group__item"><video class="nestify-phone" data-nf-video muted loop playsinline preload="none" poster="media/nestify/case/phone-app-splash.jpg" src="media/nestify/case/phone-app-splash.mp4" aria-label="The app’s splash screen"></video><figcaption data-case-type="caption">Splash screen</figcaption></figure>
-                    <figure class="case-media-group__item"><video class="nestify-phone" data-nf-video muted loop playsinline preload="none" poster="media/nestify/case/phone-app-voice.jpg" src="media/nestify/case/phone-app-voice.mp4" aria-label="Adding Sam’s dentist to the calendar by voice"></video><figcaption data-case-type="caption">Voice interaction</figcaption></figure>
-                    <figure class="case-media-group__item"><video class="nestify-phone" data-nf-video muted loop playsinline preload="none" poster="media/nestify/case/phone-app-chat.jpg" src="media/nestify/case/phone-app-chat.mp4" aria-label="Chatting with the AI to plan the week"></video><figcaption data-case-type="caption">Chat with AI</figcaption></figure>
+            <!-- One display for the family, one app for parents (slide 7), side by side at the same height, captions on top. The phone plays
+                 the splash screen, voice and chat recordings back to back. -->
+            <section class="case-media-group" aria-label="The Nestify app for parents and the smart display for the family">
+                <div class="nestify-duo" data-nf-stagger>
+                    <figure class="case-media-group__item"><figcaption data-case-type="caption">One display for the family</figcaption><video class="nestify-device" data-nf-video muted loop playsinline preload="none" poster="media/nestify/case/display-device-walkthrough.jpg" src="media/nestify/case/display-device-walkthrough.mp4" aria-label="The smart display turning to show the family page, the calendar, tasks and a kid’s page"></video></figure>
+                    <figure class="case-media-group__item"><figcaption data-case-type="caption">One app for parents</figcaption><video class="nestify-phone" data-nf-video muted loop playsinline preload="none" poster="media/nestify/case/phone-app-calendar.jpg" src="media/nestify/case/phone-app-calendar.mp4" aria-label="The app’s calendar: adding an event by hand, then Nestie offering to do it next time"></video></figure>
                 </div>
             </section>
 
-            <!-- Strategy 01 -->
+            <!-- Each challenge reads as the deck does: the problem, what was tried, what was learned, then the design
+                 decision as the big title, and the result. -->
+            <!-- Challenge #1 · Feel (slides 15–18) -->
             <section class="case-section nestify-strategy" aria-labelledby="nestify-strategy-1">
+                <div class="case-section__divider" aria-hidden="true"></div>
                 <div class="case-section__header">
                     <div>
-                        <p class="case-section__label" data-case-type="label">Challenge #1 · Share information</p>
-                        <h2 class="case-section__title" id="nestify-strategy-1" data-case-type="section">Organize by people, not features.</h2>
+                        <p class="case-section__label" data-case-type="label">Challenge #1 · Feel</p>
+                        <h2 class="case-section__title" id="nestify-strategy-1" data-case-type="section">Giving the AI a face.</h2>
                     </div>
                     <div class="case-section__copy">
-                        <p data-case-type="body">Most family displays are organized like a fridge door: a calendar tab, a chores tab, a meals tab. Shared by everyone, owned by no one.</p>
-                        <p data-case-type="body">Talking in depth with multi-child families, I saw the opportunity to flip that. The display opens to <span class="nestify-hl">a person, not a feature</span>. Each family member has their own view with their day, their tasks and their rewards, and can customize it to make it their own. The AI recognizes who is speaking and switches to their page.</p>
-                        <p data-case-type="body">Organizing around people also laid the foundation for a <span class="nestify-hl">family OS</span>: every new capability lands in each person’s view, instead of becoming one more tab.</p>
+                        <p data-case-type="body">Nestie is the face of Nestify’s AI: a blue jay, a bird that builds nests and looks after its family. Starting from the founder’s first sketch, I redesigned it into a hardworking, knowledgeable little bird with glasses, but also a little imperfect and humorous, just like a member of the family.</p>
+                        <dl class="nestify-for nestify-origin">
+<div><dt data-case-type="label">Inspired by</dt><dd data-case-type="body"><span class="nestify-origin__faces"><img src="media/nestify/case/nestie-origin-bluejay.png" width="150" height="147" alt="" /></span>A blue jay</dd></div>
+<div><dt data-case-type="label">Evolved from</dt><dd data-case-type="body"><span class="nestify-origin__faces"><img src="media/nestify/case/nestie-origin-v1-nest.png" width="153" height="141" alt="" /><img src="media/nestify/case/nestie-origin-v1-face.png" width="141" height="141" alt="" /></span>The founder’s v1</dd></div>
+</dl>
                     </div>
                 </div>
             </section>
-            <section class="case-media-group nestify-compare" aria-label="Shared board before, personal views after">
-                <div class="case-media-group__grid">
-                    <figure class="case-media-group__item" data-nf-reveal>
-                        <span class="nestify-tag" data-case-type="ui">Before</span>
-                        <img class="nestify-display" src="media/nestify/case/screen-shared-flat.png?v=2" width="1004" height="628" loading="lazy" decoding="async" alt="One shared board for the whole family" />
-                        <figcaption data-case-type="caption">Everything, for everyone</figcaption>
-                    </figure>
-                    <figure class="case-media-group__item" data-nf-reveal>
-                        <span class="nestify-tag nestify-tag--after" data-case-type="ui">After</span>
-                        <video class="nestify-display" data-nf-video muted loop playsinline preload="none" poster="media/nestify/case/display-parent-view.jpg" src="media/nestify/case/display-parent-view.mp4" aria-label="The display switching from a parent’s view to a kid’s view"></video>
-                        <figcaption data-case-type="caption">A view for each person</figcaption>
-                    </figure>
+            <!-- Nestie's animations in the product: talking (rebuilt in Rive), the typing loader, and the app's splash screen -->
+            <section class="case-media-group" aria-label="Nestie’s animations: talking, the typing loader, and the splash screen">
+                <div class="nestify-tiles" data-nf-stagger>
+                    <figure class="case-media-group__item"><div class="nestify-tile"><video data-nf-video muted loop playsinline preload="none" poster="media/nestify/case/nestie-anim-talk.jpg" src="media/nestify/case/nestie-anim-talk.mp4" aria-label="Nestie blinks, then talks"></video></div><figcaption data-case-type="caption">Talking</figcaption></figure>
+                    <figure class="case-media-group__item"><div class="nestify-tile"><video data-nf-video muted loop playsinline preload="none" poster="media/nestify/case/nestie-anim-loading.jpg" src="media/nestify/case/nestie-anim-loading.mp4" aria-label="Nestie typing at a laptop while small birds land around it"></video></div><figcaption data-case-type="caption">Loading</figcaption></figure>
+                    <figure class="case-media-group__item"><div class="nestify-tile"><video data-nf-video muted loop playsinline preload="none" poster="media/nestify/case/nestie-anim-splash.jpg" src="media/nestify/case/nestie-anim-splash.mp4" aria-label="Nestie dusting with a feather duster, then turning round with a smile"></video></div><figcaption data-case-type="caption">Splash screen</figcaption></figure>
                 </div>
             </section>
 
-            <!-- Strategy 02 -->
+            <section class="case-section nestify-strategy nestify-cont nestify-step">
+                <div class="case-section__header">
+                    <div></div>
+                    <div class="case-section__copy">
+                        <p class="nestify-step__label" data-case-type="label">Character design</p>
+                        <h3 class="nestify-step__title" data-case-type="question">Keep Nestie consistent.</h3>
+                        <p data-case-type="body">I started with hand-drawn sketches, then used AI to polish them and explore variations until the character was set. Along the way I defined its visual principles, palette, proportions and style, and turned them into a reusable AI workflow, so anyone on the team can generate Nestie and keep it on model. For motion, I generate start and end frames with AI, turn them into video, test them in the prototype, then rebuild the ones that work in Rive as editable animations.</p>
+                    </div>
+                </div>
+            </section>
+            <section class="case-media-group" aria-label="Character sketches, the AI character library, and animations rebuilt in Rive">
+                <div class="nestify-tiles" data-nf-stagger>
+                    <figure class="case-media-group__item"><img class="nestify-shot" src="media/nestify/case/nestie-sketches.png" width="1354" height="1138" loading="lazy" decoding="async" alt="Hand sketches of Nestie’s expressions: default, listening, thinking, done and alert" /><figcaption data-case-type="caption">Step 1 · Sketch the character</figcaption></figure>
+                    <figure class="case-media-group__item"><img class="nestify-shot" src="media/nestify/case/nestie-library.png" width="1240" height="1138" loading="lazy" decoding="async" alt="The character library: a style-rule prompt, a 13-colour palette and a grid of 40+ poses" /><figcaption data-case-type="caption">Step 2 · Turn it into a reusable AI library</figcaption></figure>
+                    <figure class="case-media-group__item"><img class="nestify-shot" src="media/nestify/case/nestie-rive.png" width="1270" height="1138" loading="lazy" decoding="async" alt="Keyframes from AI video, rebuilt as a blink animation in Rive" /><figcaption data-case-type="caption">Step 3 · Rebuild AI motion in Rive</figcaption></figure>
+                </div>
+            </section>
+
+            <!-- Challenge #2 · Use: AI adoption (slides 20–27) -->
             <section class="case-section nestify-strategy" aria-labelledby="nestify-strategy-2">
                 <div class="case-section__divider" aria-hidden="true"></div>
                 <div class="case-section__header">
                     <div>
-                        <p class="case-section__label" data-case-type="label">Challenge #2 · Hand off to AI</p>
-                        <h2 class="case-section__title" id="nestify-strategy-2" data-case-type="section">Don’t force AI. Make it the easier choice.</h2>
+                        <p class="case-section__label" data-case-type="label">Challenge #2 · Use</p>
+                        <h2 class="case-section__title" id="nestify-strategy-2" data-case-type="section">Driving AI adoption.</h2>
                     </div>
                     <div class="case-section__copy">
-                        <p data-case-type="body">Some families are already at home with AI. Others still keep track the traditional way, typing each event in by hand. The goal: get as many families as possible handing things off to AI, without forcing anyone to give up how they already work.</p>
-                        <p data-case-type="body">For families already at home with AI, it is the entry closest to their thumb: always <span class="nestify-hl">one tap away</span> at the bottom of the screen. Onboarding has them sync their calendar and answer one question about what matters at home. From those two, AI gives them <span class="nestify-hl">personalized voice guidance</span> for their first try.</p>
-                        <p data-case-type="body">For families used to the traditional way, AI shows up inside that habit. Every form for adding things by hand opens with an AI shortcut at the top, and when someone finishes by hand, AI follows with a contextual tip: <span class="nestify-hl">next time, just tell me. It’s faster.</span></p>
+                        <p data-case-type="body">With a face in place, the harder part is use. Some parents already use AI at work; most still run family life on conversations, notebooks and memory. How might both turn to AI?</p>
                     </div>
                 </div>
             </section>
-            <section class="case-media-group" aria-label="AI as the main entry, personalized onboarding, and AI as the easier choice">
-                <div class="case-media-group__grid case-media-group__grid--spread nestify-phones" data-nf-stagger>
-                    <figure class="case-media-group__item"><img class="nestify-phone" src="media/nestify/case/phone-home.png" width="720" height="1402" loading="lazy" decoding="async" alt="Home with AI at the bottom as the main entry" /><figcaption data-case-type="caption">AI as the main entry</figcaption></figure>
-                    <figure class="case-media-group__item"><video class="nestify-phone" data-nf-video muted loop playsinline preload="none" poster="media/nestify/case/phone-onboarding.jpg" src="media/nestify/case/phone-onboarding.mp4" aria-label="Personalized onboarding: a first task added by voice"></video><figcaption data-case-type="caption">Personalized onboarding</figcaption></figure>
-                    <figure class="case-media-group__item"><video class="nestify-phone" data-nf-video muted loop playsinline preload="none" poster="media/nestify/case/phone-calendar-tip.jpg" src="media/nestify/case/phone-calendar-tip.mp4" aria-label="Adding an event by hand, then the AI’s tip: next time, just hold and say it"></video><figcaption data-case-type="caption">AI as the easier choice</figcaption></figure>
+            <section class="case-section nestify-strategy nestify-cont nestify-step nestify-step--first">
+                <div class="case-section__header">
+                    <div></div>
+                    <div class="case-section__copy">
+                        <p class="nestify-step__label" data-case-type="label">Assumption</p>
+                        <p data-case-type="body">My initial assumption was bold: what if we removed the traditional nav bar and made AI the primary way to use the product? Would families turn to AI more often? To explore it, I designed two ways to present AI: an AI bubble with contextual suggestions, and a chat bar for direct input.</p>
+                    </div>
+                </div>
+            </section>
+            <section class="case-media-group" aria-label="The first assumption: no nav bar, only an AI bubble or an AI chat bar">
+                <div class="nestify-pair" data-nf-stagger>
+                    <figure class="case-media-group__item"><video class="nestify-phone-alt" data-nf-video muted loop playsinline preload="none" poster="media/nestify/case/phone-assume-bubble.jpg" src="media/nestify/case/phone-assume-bubble.mp4" aria-label="Home with no nav bar, scrolled to the bottom, with an AI bubble in the corner"></video><figcaption data-case-type="caption">No nav · AI bubble</figcaption></figure>
+                    <figure class="case-media-group__item"><video class="nestify-phone-alt" data-nf-video muted loop playsinline preload="none" poster="media/nestify/case/phone-assume-chatbar.jpg" src="media/nestify/case/phone-assume-chatbar.mp4" aria-label="Home with no nav bar, scrolled to the bottom, with an AI chat bar along the bottom"></video><figcaption data-case-type="caption">No nav · AI chat bar</figcaption></figure>
                 </div>
             </section>
 
-            <!-- Strategy 03 -->
+            <section class="case-section nestify-strategy nestify-cont nestify-step">
+                <div class="case-section__header">
+                    <div></div>
+                    <div class="case-section__copy">
+                        <p class="nestify-step__label" data-case-type="label">What I learned from user testing</p>
+                        <p data-case-type="body">In testing, parents immediately asked, “Where can I find the calendar and the to-do lists?”, even though both were one tap away on the home page. Two things became clear. Familiar navigation patterns are part of parents’ mental model of an app. And AI is great for taking action, but families still need visual interfaces to see and understand their information; not everything fits inside a chat window, and a calendar can’t live in one. AI is for doing; screens are for seeing.</p>
+                        <p data-case-type="body">Testing also showed something encouraging: even hesitant parents warmed to AI once they experienced its value. One mom carried a handwritten notebook everywhere. I asked her to take a photo, and Nestify turned her notes into calendar events in seconds; that was her aha moment. Our backend data backed it up: families who tried AI once tended to stay.</p>
+                    </div>
+                </div>
+            </section>
+            <!-- Slide 23: try AI once, and they stay. The photo-to-list recording beside the 81% -->
+            <section class="case-media-group" aria-label="Turning a photo of a handwritten list into a shared list; 81% of users who tried voice or photo in onboarding were still active on day 7">
+                <figure class="nestify-insight" data-nf-reveal>
+                    <video class="nestify-phone-alt" data-nf-video muted loop playsinline preload="none" poster="media/nestify/case/phone-photo-to-list.jpg?v=2" src="media/nestify/case/phone-photo-to-list.mp4?v=2" aria-label="Snapping a photo of a handwritten shopping list; Nestie reads nine items and turns them into a shared list"></video>
+                    <div class="nestify-insight__text">
+                        <p class="nestify-insight__value"><span data-nf-count="81" data-nf-suffix="%">81%</span></p>
+                        <p data-case-type="body">of users who tried voice or photo during onboarding were still active on day 7.</p>
+                    </div>
+                </figure>
+            </section>
+            <!-- Design decision: on a full-width band of the hero blue, so the decision stands out -->
+            <div class="nestify-band">
+            <section class="case-section nestify-strategy nestify-cont nestify-step">
+                <div class="case-section__header">
+                    <div>
+                        <p class="case-section__label" data-case-type="label">Design decision<span class="nestify-tip"><button type="button" class="nestify-tip__mark" aria-expanded="false" aria-describedby="nf-tip-1" aria-label="Design principle"></button><span class="nestify-tip__pop" id="nf-tip-1" role="tooltip" data-case-type="body"><span class="nestify-tip__label">Design principle</span><span class="nestify-grad">A good butler earns trust by showing value, not forcing help.</span></span></span></p>
+                        <h3 class="case-section__title" data-case-type="section">Don’t force AI. Make it the easier choice.</h3>
+                    </div>
+                    <div class="case-section__copy">
+                        <p data-case-type="body">Instead of forcing families toward AI, I made it the easier choice and let them move at their own pace, with three changes:</p>
+                        <p class="nestify-step__label nestify-principle__label" data-case-type="label">#1 · AI on every page</p>
+                        <p data-case-type="body">The nav bar came back, so families find their way around as they expect, and the AI bubble stays on every page, with suggestions that change as they move around.</p>
+                        <p class="nestify-step__label nestify-principle__label" data-case-type="label">#2 · A first try in onboarding</p>
+                        <p data-case-type="body">Parents connect one calendar and answer one question about what matters most to their family; onboarding then walks them through a personalized voice request, so they feel the value of AI right away.</p>
+                        <p class="nestify-step__label nestify-principle__label" data-case-type="label">#3 · A tip after adding by hand</p>
+                        <p data-case-type="body">Even the manual form has an AI shortcut at the top, and when someone finishes adding by hand, Nestie gently suggests, “Next time, just tell me. It’s faster.”</p>
+                    </div>
+                </div>
+            </section>
+            <section class="case-media-group" aria-label="AI on every page, a first try in onboarding, and a tip after adding by hand">
+                <div class="case-media-group__grid case-media-group__grid--spread nestify-phones" data-nf-stagger>
+                    <figure class="case-media-group__item"><video class="nestify-phone-alt" data-nf-video muted loop playsinline preload="none" poster="media/nestify/case/phone-nav-shortcut.jpg" src="media/nestify/case/phone-nav-shortcut.mp4" aria-label="Switching tabs: the AI bubble stays and changes its suggestion for each page"></video><figcaption data-case-type="caption">#1 · AI on every page</figcaption></figure>
+                    <figure class="case-media-group__item"><video class="nestify-phone-alt" data-nf-video muted loop playsinline preload="none" poster="media/nestify/case/phone-nav-onboarding.jpg" src="media/nestify/case/phone-nav-onboarding.mp4" aria-label="Personalized onboarding: picking kids in school, then a first request by voice"></video><figcaption data-case-type="caption">#2 · A first try in onboarding</figcaption></figure>
+                    <figure class="case-media-group__item"><video class="nestify-phone-alt" data-nf-video muted loop playsinline preload="none" poster="media/nestify/case/phone-nav-calendar-tip.jpg" src="media/nestify/case/phone-nav-calendar-tip.mp4" aria-label="Adding an event by hand, then Nestie’s tip: next time, just tell me"></video><figcaption data-case-type="caption">#3 · A tip after adding by hand</figcaption></figure>
+                </div>
+            </section>
+            </div>
+
+            <section class="case-section nestify-strategy nestify-cont nestify-step">
+                <div class="case-section__header">
+                    <div>
+                        <p class="case-section__label" data-case-type="label">Result</p>
+                        <h3 class="case-section__title" data-case-type="section">AI became the default choice.</h3>
+                    </div>
+                    <div class="case-section__copy">
+                        <p data-case-type="body">Overall, AI adoption grew: tasks added by voice, photo or chat went from 50% to 85%, and each family went from handing off 2 tasks a week to 9.5.</p>
+                        <p data-case-type="body">One finding stood out. With both options on the Tasks page, the [+ Add] button at the top and Nestie’s bubble at the bottom, 91% of new items came in through the bubble. AI had changed how families behave, so the [+ Add] button was removed.</p>
+                    </div>
+                </div>
+            </section>
+            <section class="case-section nestify-strategy nestify-result" aria-label="Overall AI adoption, May to August, beside the Tasks page: 91% of new items came through Nestie’s bubble, and the top + Add button was removed">
+                <div class="nestify-result-row">
+                    <div class="nestify-stats nestify-stats--stack" data-nf-stagger>
+                        <article class="nestify-stat">
+                            <p class="nestify-stat__label" data-case-type="caption">AI adoption · App</p>
+                            <p class="nestify-stat__value"><span data-nf-count="85" data-nf-from="50" data-nf-suffix="%">85%</span></p>
+                            <p data-case-type="body">of tasks added by voice, photo or chat</p>
+                            <p class="nestify-stat__from" data-case-type="caption">Up from 50%</p>
+                        </article>
+                        <article class="nestify-stat">
+                            <p class="nestify-stat__label" data-case-type="caption">AI hand-offs · App</p>
+                            <p class="nestify-stat__value"><span data-nf-count="9.5" data-nf-from="2">9.5</span></p>
+                            <p data-case-type="body">tasks handed off to AI per family, every week</p>
+                            <p class="nestify-stat__from" data-case-type="caption">Up from 2</p>
+                        </article>
+                    </div>
+                    <figure class="nestify-handoff" data-nf-reveal>
+                        <div class="nestify-handoff__stage">
+                            <img class="nestify-phone-alt" src="media/nestify/case/phone-tasks.png?v=2" width="720" height="1520" loading="lazy" decoding="async" alt="The Tasks page with Nestie’s Add a Task bubble at the bottom" />
+                            <span class="nestify-handoff__add" aria-hidden="true">+ Add</span>
+                            <p class="nestify-handoff__callout nestify-handoff__callout--add" style="--y: 11.4%; --from: 91" data-case-type="body"><i aria-hidden="true"></i><span>Manual input</span></p>
+                            <p class="nestify-handoff__callout nestify-handoff__callout--ai" style="--y: 83.4%; --from: 97" data-case-type="body"><i aria-hidden="true"></i><span><b data-nf-count="91" data-nf-suffix="%" data-nf-delay="800">91%</b> of new items added through AI</span></p>
+                        </div>
+                    </figure>
+                </div>
+            </section>
+
+            <!-- Challenge #3 · Use: every family member (slides 28–37) -->
             <section class="case-section nestify-strategy" aria-labelledby="nestify-strategy-3">
                 <div class="case-section__divider" aria-hidden="true"></div>
                 <div class="case-section__header">
                     <div>
-                        <p class="case-section__label" data-case-type="label">Challenge #3 · Get things done</p>
-                        <h2 class="case-section__title" id="nestify-strategy-3" data-case-type="section">Complex logic, simple experience.</h2>
+                        <p class="case-section__label" data-case-type="label">Challenge #3 · Use</p>
+                        <h2 class="case-section__title" id="nestify-strategy-3" data-case-type="section">Keeping every family member in sync.</h2>
                     </div>
                     <div class="case-section__copy">
-                        <p data-case-type="body">To make reminders and follow-ups simple, the system sorts 16 event types into just two levels: <span class="nestify-hl">Needs Your Attention</span> for things that require action, and <span class="nestify-hl">Family Updates</span> for things you just need to know. Updates stay quietly in the notification center, where family members can react with an emoji to <span class="nestify-hl">appreciate each other’s contributions</span>, and Nestify reaches out only at the right moment. You can also set how strong a reminder is: a <span class="nestify-hl">gentle notification</span>, or a <span class="nestify-hl">strong reminder</span> like a voice call with Call me.</p>
+                        <p data-case-type="body">As more gets handed to Nestie, each update has to reach the right person, kids included. This was also where I started designing the smart display from zero to one, for two reasons: younger kids don’t have their own phones, so they need a shared place to stay in sync; and hardware gave the business a clear path to revenue.</p>
+                    </div>
+                </div>
+            </section>
+            <section class="case-section nestify-strategy nestify-cont nestify-step nestify-step--first">
+                <div class="case-section__header">
+                    <div></div>
+                    <div class="case-section__copy">
+                        <p class="nestify-step__label" data-case-type="label">Assumption</p>
+                        <p data-case-type="body">We started with the proven pattern from successful competitors: everything for everyone, on one shared screen. Then V2 upgraded the design system, brighter for the screen, playful for kids and warm for the home.</p>
+                    </div>
+                </div>
+            </section>
+            <section class="case-media-group" aria-label="The shared display, V1 and V2: home, tasks and calendar">
+                <figure class="nestify-v1v2" data-nf-reveal>
+                    <div class="nestify-v1v2__row">
+                        <div class="nestify-v1v2__item"><div class="nestify-v1v2__frame"><img src="media/nestify/case/display-v1-home.jpg?v=2" width="1280" height="800" loading="lazy" decoding="async" alt="V1 home: the family’s week, tasks due today and lists" /><img class="is-v2" src="media/nestify/case/display-v2-home.jpg" width="1280" height="800" loading="lazy" decoding="async" alt="V2 home: today, the family photo, weather, dinner, shopping list and tasks" /></div><p data-case-type="caption">Home</p></div>
+                        <div class="nestify-v1v2__item"><div class="nestify-v1v2__frame"><img src="media/nestify/case/display-v1-tasks.jpg?v=2" width="1280" height="800" loading="lazy" decoding="async" alt="V1 tasks: a column of to-dos for each person" /><img class="is-v2" src="media/nestify/case/display-v2-tasks.jpg" width="1280" height="800" loading="lazy" decoding="async" alt="V2 tasks: up for grabs, then a colored column for each person" /></div><p data-case-type="caption">Tasks</p></div>
+                        <div class="nestify-v1v2__item"><div class="nestify-v1v2__frame"><img src="media/nestify/case/display-v1-calendar.jpg?v=2" width="1280" height="800" loading="lazy" decoding="async" alt="V1 calendar: a week view color-coded by person" /><img class="is-v2" src="media/nestify/case/display-v2-calendar.jpg" width="1280" height="800" loading="lazy" decoding="async" alt="V2 calendar: a brighter week view with each person’s color" /></div><p data-case-type="caption">Calendar</p></div>
+                    </div>
+                    <figcaption data-case-type="caption"><button type="button" class="nestify-v1v2__tag" data-v="v1" aria-pressed="false">V1</button> Followed the popular pattern <span aria-hidden="true">→</span> <button type="button" class="nestify-v1v2__tag nestify-v1v2__tag--v2" data-v="v2" aria-pressed="false">V2</button> Upgraded the design system</figcaption>
+                </figure>
+            </section>
+
+            <section class="case-section nestify-strategy nestify-cont nestify-step">
+                <div class="case-section__header">
+                    <div></div>
+                    <div class="case-section__copy">
+                        <p class="nestify-step__label" data-case-type="label">What I learned from user testing</p>
+                        <p data-case-type="body">Families said it felt familiar. But interviews and backend data from 20 pilot families told another story: parents mostly used the display to check what’s happening, since they create things on their phones; kids focused on completing their own tasks, while keeping an eye on their siblings.</p>
+                        <div class="nestify-roles" role="img" aria-label="On the shared display, 20 pilot families: parents spent 63% of their time checking information and 37% completing tasks; kids 9% checking information and 91% completing tasks">
+                            <div class="nestify-role">
+                                <p data-case-type="body">Parents run the whole family.</p>
+                                <div class="nestify-role__bar"><span class="is-check" style="--w: 63%">Check information <b>63%</b></span><span style="--w: 37%"><b>37%</b></span></div>
+                            </div>
+                            <div class="nestify-role">
+                                <p data-case-type="body">Kids care about themselves and their siblings.</p>
+                                <div class="nestify-role__bar"><span class="is-check" style="--w: 9%"><b>9%</b></span><span style="--w: 91%">Complete tasks <b>91%</b></span></div>
+                            </div>
+                        <p class="nestify-source" data-case-type="caption">What the backend data showed · 20 pilot families</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- Design decision: on a full-width band of the hero blue, so the decision stands out -->
+            <div class="nestify-band">
+            <section class="case-section nestify-strategy nestify-cont nestify-step">
+                <div class="case-section__header">
+                    <div>
+                        <p class="case-section__label" data-case-type="label">Design decision<span class="nestify-tip"><button type="button" class="nestify-tip__mark" aria-expanded="false" aria-describedby="nf-tip-2" aria-label="Design principle"></button><span class="nestify-tip__pop" id="nf-tip-2" role="tooltip" data-case-type="body"><span class="nestify-tip__label">Design principle</span><span class="nestify-grad">A good butler knows what matters most to each person.</span></span></span></p>
+                        <h3 class="case-section__title" data-case-type="section">Organize by people, not features.</h3>
+                    </div>
+                    <div class="case-section__copy">
+                        <p data-case-type="body">Kids see what’s coming up, their tasks and rewards; parents see what everyone is doing today.</p>
+                    </div>
+                </div>
+            </section>
+            <section class="case-media-group nestify-compare" aria-label="Kid view and parent view on the display">
+                <div class="case-media-group__grid" data-nf-stagger>
+                    <figure class="case-media-group__item"><video class="nestify-display" data-nf-video muted loop playsinline preload="none" poster="media/nestify/case/display-kid-view.jpg?v=2" src="media/nestify/case/display-kid-view.mp4?v=2" aria-label="From the family home to a kid’s page: next up, tasks done with a sibling leaderboard, badges and rewards"></video><figcaption data-case-type="caption">Kid view</figcaption></figure>
+                    <figure class="case-media-group__item"><video class="nestify-display" data-nf-video muted loop playsinline preload="none" poster="media/nestify/case/display-parent-view.jpg?v=2" src="media/nestify/case/display-parent-view.mp4?v=2" aria-label="From the family home to a parent’s page: next up, tasks, and what everyone is doing today"></video><figcaption data-case-type="caption">Parent view</figcaption></figure>
+                </div>
+            </section>
+
+            <!-- Slides 34–35: design and validate with limited time and limited data -->
+            <section class="case-section nestify-strategy nestify-cont nestify-step">
+                <div class="case-section__header">
+                    <div></div>
+                    <div class="case-section__copy">
+                        <p class="nestify-step__label" data-case-type="label">Design and validate with limited time</p>
+                        <p data-case-type="body">I proposed the smallest testable change: one new entry in the nav bar, and nothing else changed. The full vision is a customizable page for everyone, but that takes much longer to build, so I proposed starting with one default personal page.</p>
+                    </div>
+                </div>
+            </section>
+            <section class="case-media-group" aria-label="The smallest testable change: one new entry in the nav bar, and a default page for each person">
+                <div class="nestify-limited nestify-limited--two" data-nf-reveal>
+                    <figure class="nestify-shot-card">
+                        <figcaption><span class="nestify-qn" data-case-type="body">#1</span><span data-case-type="body">One new entry in the nav bar</span><span class="nestify-shot-card__sub" data-case-type="caption">Everything else stays the same.</span></figcaption>
+                        <div class="nestify-whose" role="img" aria-label="Tapping a new people icon at the end of the display’s nav bar: the screen dims and Whose view? opens, with Emma, Sam, Mom and Dad">
+                            <img class="nestify-whose__base" src="media/nestify/case/display-whose-base.jpg?v=3" width="1088" height="706" loading="lazy" decoding="async" alt="" />
+                            <span class="nestify-whose__veil" aria-hidden="true"></span>
+                            <img class="nestify-whose__icon" src="media/nestify/case/display-whose-icon.png" width="167" height="167" loading="lazy" decoding="async" alt="" />
+                            <img class="nestify-whose__pop" src="media/nestify/case/display-whose-pop.png" width="870" height="382" loading="lazy" decoding="async" alt="" />
+                        </div>
+                    </figure>
+                    <figure class="nestify-shot-card">
+                        <figcaption><span class="nestify-qn" data-case-type="body">#2</span><span data-case-type="body">Start with a default page</span><span class="nestify-shot-card__sub" data-case-type="caption">A quick test of whether personal pages work, before building the fully customizable version.</span></figcaption>
+                        <div class="nestify-defaults">
+                            <img src="media/nestify/case/display-default-kid.png" width="800" height="520" loading="lazy" decoding="async" alt="Wireframe of the default kid view on the display’s grid" />
+                            <img src="media/nestify/case/display-default-parent.png" width="800" height="520" loading="lazy" decoding="async" alt="Wireframe of the default parent view on the display’s grid" />
+                        </div>
+                    </figure>
+                </div>
+            </section>
+            <section class="case-section nestify-strategy nestify-cont nestify-step">
+                <div class="case-section__header">
+                    <div></div>
+                    <div class="case-section__copy">
+                        <p class="nestify-step__label" data-case-type="label">Design and validate with limited data</p>
+                        <p data-case-type="body">With just 12 pilot families, I combined usage data with interviews. Usage data showed what’s used most, which decided what goes on each page. Interviews showed the order people look, which decided where things go: Next up first. And to keep it readable from across the room, I set a 9 × 5 grid on the 15.6″ display, with a minimum readable size, larger touch targets and more icons for kids.</p>
+                    </div>
+                </div>
+            </section>
+            </div>
+
+            <section class="case-section nestify-strategy nestify-cont nestify-step">
+                <div class="case-section__header">
+                    <div>
+                        <p class="case-section__label" data-case-type="label">Result</p>
+                        <h3 class="case-section__title" data-case-type="section">Relevance beats completeness.</h3>
+                    </div>
+                    <div class="case-section__copy">
+                        <p data-case-type="body">Families acted far more on their own pages than on the shared board, and asked to make them even more their own.</p>
+                    </div>
+                </div>
+            </section>
+            <!-- What the 7-day test showed: plain findings under a hairline, not the grey Impact cards, so a test reads as a test -->
+            <section class="case-section nestify-strategy nestify-result" aria-label="What the 7-day test showed">
+                <p class="nestify-test__label" data-case-type="caption">7-day test · 12 pilot families</p>
+                <div class="nestify-test" data-nf-stagger>
+                    <div class="nestify-test__item"><p class="nestify-test__value">5× more actions on personal pages</p><p data-case-type="caption">than on the shared board, per family</p></div>
+                    <figure class="nestify-test__item"><blockquote class="nestify-test__value">“Nestie knows it’s me.”</blockquote><figcaption data-case-type="caption">Kids</figcaption></figure>
+                    <figure class="nestify-test__item"><blockquote class="nestify-test__value">“I wish I could customize my page a bit more.”</blockquote><figcaption data-case-type="caption">Parents</figcaption></figure>
+                </div>
+            </section>
+
+            <section class="case-section nestify-strategy nestify-cont nestify-step">
+                <div class="case-section__header">
+                    <div></div>
+                    <div class="case-section__copy">
+                        <p class="nestify-step__label" data-case-type="label">Next step</p>
+                        <h3 class="nestify-step__title" data-case-type="question">Co-designing widgets with families.</h3>
+                        <p data-case-type="body">Families asked to make their pages their own, so we’re now co-creating the widget system with them. With our user researcher, I built a set of simple widgets and gave parents and kids a blank canvas to arrange their own page. They can drag widgets around, and if one doesn’t exist yet, they ask AI to make it. In a way, families are vibe coding their own page, and what they build tells us what to build next.</p>
+                        <video class="nestify-display nestify-next__video" data-nf-video muted loop playsinline preload="none" poster="media/nestify/case/display-widgets-poster.jpg" src="media/nestify/case/display-widgets.mp4" aria-label="A family arranging widgets on a blank canvas, and asking AI for one that doesn’t exist yet"></video>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Designing with AI: one paragraph; each tool's stage sits in its caption -->
+            <section class="case-section nestify-strategy" aria-labelledby="nestify-tools">
+                <div class="case-section__divider" aria-hidden="true"></div>
+                <div class="case-section__header">
+                    <div>
+                        <p class="case-section__label" data-case-type="label">Beyond the product</p>
+                        <h2 class="case-section__title" id="nestify-tools" data-case-type="section">Building an AI-native workflow.</h2>
+                    </div>
+                    <div class="case-section__copy">
+                        <p data-case-type="body">I built AI tools that help our team move from idea to production code, across three stages of the design process: ideate, iterate and adapt.</p>
+                        <p data-case-type="body">They have been live for four months, and every designer on the team uses them daily, iterating faster and contributing code more safely.</p>
+                    </div>
+                </div>
+            </section>
+            <section class="case-media-group" aria-label="Slack design agent, Flutter design inspector and code review">
+                <div class="nestify-tiles nestify-tools" data-nf-stagger>
+                    <figure class="case-media-group__item"><video class="nestify-square" data-nf-video muted loop playsinline preload="none" poster="media/nestify/case/slack-agent.jpg" src="media/nestify/case/slack-agent.mp4" aria-label="The Slack design agent turning a team thread into prototypes"></video><figcaption class="nestify-tool"><span class="nestify-tool__stage" data-case-type="label">01 · Ideate</span><span class="nestify-tool__name" data-case-type="body">Slack Design Agent</span><span class="nestify-tool__desc" data-case-type="caption">Turns team talk into working prototypes, so every discussion gets visual and concrete.</span></figcaption></figure>
+                    <figure class="case-media-group__item"><video class="nestify-square" data-nf-video muted loop playsinline preload="none" poster="media/nestify/case/design-inspector.jpg" src="media/nestify/case/design-inspector.mp4" aria-label="Adjusting spacing and type with the Flutter design inspector"></video><figcaption class="nestify-tool"><span class="nestify-tool__stage" data-case-type="label">02 · Iterate</span><span class="nestify-tool__name" data-case-type="body">Flutter Design Inspector</span><span class="nestify-tool__desc" data-case-type="caption">Polish UI right in the simulator, with every change checked against our tokens.</span></figcaption></figure>
+                    <figure class="case-media-group__item"><img class="nestify-square nestify-square--code" src="media/nestify/case/code.png" width="1748" height="1842" loading="lazy" decoding="async" alt="The code review skill: intent, impact analysis, project rules, how to confirm a finding, and what to exclude" /><figcaption class="nestify-tool"><span class="nestify-tool__stage" data-case-type="label">03 · Adapt</span><span class="nestify-tool__name" data-case-type="body">Code Review</span><span class="nestify-tool__desc" data-case-type="caption">Safe UI changes ship fast; logic and backend changes go to engineering.</span></figcaption></figure>
+                </div>
+            </section>
+
+            <!-- Saved for later reuse: "Get things done" (16 event types → two levels, Call me). Not in the current story.
+            <section class="case-section nestify-strategy" aria-labelledby="nestify-strategy-x">
+                <div class="case-section__divider" aria-hidden="true"></div>
+                <div class="case-section__header">
+                    <div>
+                        <p class="case-section__label" data-case-type="label">Get things done</p>
+                        <h2 class="case-section__title" id="nestify-strategy-x" data-case-type="section">Complex logic, simple experience.</h2>
+                    </div>
+                    <div class="case-section__copy">
+                        <p data-case-type="body">To make reminders and follow-ups simple, the system sorts 16 event types into just two levels: Needs Your Attention for things that require action, and Family Updates for things you just need to know. Updates stay quietly in the notification center, where family members can react with an emoji to appreciate each other’s contributions, and Nestify reaches out only at the right moment. You can also set how strong a reminder is: a gentle notification, or a strong reminder like a voice call with Call me.</p>
                     </div>
                 </div>
                 <img class="nestify-case__image" src="media/nestify/case/decision-logic-tight.png" width="3168" height="1354" loading="lazy" decoding="async" alt="16 event types flow into the AI’s decision logic of actionability, urgency and relevance, and come out as two UI levels: needs your attention, and family updates." data-nf-reveal />
@@ -404,48 +692,18 @@
                     <figure class="case-media-group__item"><video class="nestify-phone" data-nf-video muted loop playsinline preload="none" poster="media/nestify/case/phone-nestie-calls.jpg" src="media/nestify/case/phone-nestie-calls.mp4" aria-label="The AI calling with a reminder"></video><figcaption data-case-type="caption">AI calls you</figcaption></figure>
                 </div>
             </section>
-
-            <!-- Designing with AI -->
-            <section class="case-section nestify-strategy" aria-labelledby="nestify-tools">
-                <div class="case-section__divider" aria-hidden="true"></div>
-                <div class="case-section__header">
-                    <div>
-                        <p class="case-section__label" data-case-type="label">Beyond the product</p>
-                        <h2 class="case-section__title" id="nestify-tools" data-case-type="section">Designing with AI.</h2>
-                    </div>
-                    <div class="case-section__copy">
-                        <p data-case-type="body">I built AI tools that take the team from ideation to production code: a <span class="nestify-hl">Slack design agent</span> that turns team discussion into working prototypes, and a <span class="nestify-hl">Flutter design inspector</span> that lets me fine-tune UI right in the simulator and flags any element that isn’t using a design token.</p>
-                        <p data-case-type="body">These tools have been in use for four months, and every designer on the team uses them daily. Designers move faster, take more ownership of what ships, and contribute code more safely.</p>
-                    </div>
-                </div>
-            </section>
-            <section class="case-media-group" aria-label="Slack design agent and Flutter design inspector">
-                <div class="case-media-group__grid nestify-tools" data-nf-stagger>
-                    <figure class="case-media-group__item"><video class="nestify-square" data-nf-video muted loop playsinline preload="none" poster="media/nestify/case/slack-agent.jpg" src="media/nestify/case/slack-agent.mp4" aria-label="The Slack design agent turning a team thread into prototypes"></video><figcaption data-case-type="caption">Slack Design Agent</figcaption></figure>
-                    <figure class="case-media-group__item"><video class="nestify-square" data-nf-video muted loop playsinline preload="none" poster="media/nestify/case/design-inspector.jpg" src="media/nestify/case/design-inspector.mp4" aria-label="Adjusting spacing and type with the Flutter design inspector"></video><figcaption data-case-type="caption">Flutter Design Inspector</figcaption></figure>
-                </div>
-            </section>
+            -->
 
             <p class="case-pill case-pill--impact" data-case-type="badge">Impact</p>
             <section class="case-section nestify-impact" aria-label="Nestify impact">
-                <div class="nestify-stats" data-nf-stagger>
-                    <article class="nestify-stat">
-                        <div class="nestify-stat__head"><p data-case-type="label">AI Adoption</p><span class="nestify-stat__tag">APP</span></div>
-                        <p data-case-type="caption">Tasks added by AI</p>
-                        <p class="nestify-stat__value">50 <i class="nf-arrow" role="img" aria-label="to"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15.5M13 5.5l6.5 6.5-6.5 6.5"/></svg></i> <span data-nf-count="85" data-nf-from="50" data-nf-suffix="%">85%</span></p>
-                        <svg class="nestify-stat__chart" viewBox="0 0 260 132" aria-hidden="true"><defs><linearGradient id="nf-line-1" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#cfd8e3"/><stop offset="0.45" stop-color="#a9c6ea"/><stop offset="1" stop-color="#289bfa"/></linearGradient></defs><path class="nf-line" stroke="url(#nf-line-1)" d="M7 98 L95 35 L246 35"/><circle class="nf-start" cx="7" cy="98" r="3.5" fill="#fff" stroke="#b9c2cc" stroke-width="1.2"/><g class="nf-end"><circle cx="246" cy="35" r="9" fill="#289bfa" fill-opacity="0.16"/><circle cx="246" cy="35" r="4.5" fill="#289bfa"/></g><text class="nf-val" x="20" y="102">50%</text><text class="nf-val nf-val--now" x="252" y="18" text-anchor="end">85%</text><text class="nf-axis" x="6" y="128">May</text><text class="nf-axis nf-axis--now" x="252" y="128" text-anchor="end">Aug</text></svg>
-                    </article>
-                    <article class="nestify-stat">
-                        <div class="nestify-stat__head"><p data-case-type="label">AI hand-offs</p><span class="nestify-stat__tag">APP</span></div>
-                        <p data-case-type="caption">Tasks handed off to AI weekly</p>
-                        <p class="nestify-stat__value">2 <i class="nf-arrow" role="img" aria-label="to"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15.5M13 5.5l6.5 6.5-6.5 6.5"/></svg></i> <span data-nf-count="9.5" data-nf-from="2">9.5</span></p>
-                        <svg class="nestify-stat__chart" viewBox="0 0 260 132" aria-hidden="true"><defs><linearGradient id="nf-line-2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#cfd8e3"/><stop offset="0.45" stop-color="#a9c6ea"/><stop offset="1" stop-color="#289bfa"/></linearGradient></defs><path class="nf-line" stroke="url(#nf-line-2)" d="M7 100 C18 90 25 82 34 84 S62 116 81 114 S102 40 115 42 S141 92 153 91 S183 54 196 56 S212 79 221 77 S240 40 246 25"/><circle class="nf-start" cx="7" cy="100" r="3.5" fill="#fff" stroke="#b9c2cc" stroke-width="1.2"/><g class="nf-end"><circle cx="246" cy="25" r="9" fill="#289bfa" fill-opacity="0.16"/><circle cx="246" cy="25" r="4.5" fill="#289bfa"/></g><text class="nf-val" x="2" y="78">2</text><text class="nf-val nf-val--now" x="234" y="29" text-anchor="end">9.5</text><text class="nf-axis" x="6" y="128">May</text><text class="nf-axis nf-axis--now" x="252" y="128" text-anchor="end">Aug</text></svg>
-                    </article>
-                    <article class="nestify-stat">
-                        <div class="nestify-stat__head"><p data-case-type="label">Demand</p><span class="nestify-stat__tag">Hardware</span></div>
-                        <p data-case-type="caption">Families pre-ordered</p>
-                        <p class="nestify-stat__value"><span data-nf-count="1000">1000</span><i class="nf-thin">+</i></p>
-                        <svg class="nestify-stat__chart" viewBox="0 0 260 132" aria-hidden="true"><defs><linearGradient id="nf-line-3" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#cfd8e3"/><stop offset="0.45" stop-color="#a9c6ea"/><stop offset="1" stop-color="#289bfa"/></linearGradient></defs><defs><linearGradient id="nf-area-3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#289bfa" stop-opacity="0.14"/><stop offset="1" stop-color="#289bfa" stop-opacity="0"/></linearGradient></defs><path class="nf-area" fill="url(#nf-area-3)" d="M7 118 C120 112 190 82 246 25 L246 120 L7 120 Z"/><path class="nf-line" stroke="url(#nf-line-3)" d="M7 118 C120 112 190 82 246 25"/><g class="nf-end"><circle cx="246" cy="25" r="9" fill="#289bfa" fill-opacity="0.16"/><circle cx="246" cy="25" r="4.5" fill="#289bfa"/></g><text class="nf-axis" x="252" y="128" text-anchor="end">Seed round closed</text></svg>
+                <div class="nestify-stats nestify-stats--single" data-nf-stagger>
+                    <article class="nestify-stat nestify-stat--wide">
+                        <p class="nestify-stat__value"><span data-nf-count="1000">1000</span><i>+</i></p>
+                        <div>
+                            <p class="nestify-stat__label" data-case-type="caption">Demand · Display</p>
+                            <p data-case-type="body">families pre-ordered the display</p>
+                            <p class="nestify-stat__from" data-case-type="caption">Helped close the seed round</p>
+                        </div>
                     </article>
                 </div>
                 <div class="nestify-mosaic" data-nf-stagger>

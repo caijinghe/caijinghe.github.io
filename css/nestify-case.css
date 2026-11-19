@@ -147,12 +147,16 @@ body.project-design-system .nestify-case .case-section__label {
 .case-section__copy .nestify-q + .nestify-q { margin-top: 0; }   /* the three read as lines of one paragraph: body spacing, nothing added */
 .case-section__copy .nestify-case__question + .nestify-q { margin-top: 24px; }   /* a breath after the big question */   /* the three questions under the big one, at body size */
 .nestify-q { display: flex; gap: 0.6em; }
-.nestify-qn { flex: none; color: var(--case-muted); font-feature-settings: "tnum"; }   /* the number, grey; the blue is kept for the key words */
+.nestify-qn { flex: none; min-width: 4.9em; color: var(--case-muted); font-feature-settings: "tnum"; }   /* one width for all three, so the names line up */   /* the number, grey; the blue is kept for the key words */
 
 /* Showcase opener: who the product is for, three short rows under the intro */
 .nestify-for { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin: 32px 0 0; }
 .nestify-for dt { color: var(--case-muted); margin-bottom: 6px; }
 .nestify-for dd { margin: 0; }
+/* the showcase's three "For …" lines read across, one row each: grey label, then its line, labels in one column */
+.nestify-for:not(.nestify-origin) { grid-template-columns: max-content minmax(0, 1fr); gap: 0 1.25em; }   /* plain line spacing, like a paragraph */
+.nestify-for:not(.nestify-origin) > div { display: contents; }
+body.project-design-system .nestify-for:not(.nestify-origin) dt { margin-bottom: 0; font-size: var(--case-body-size); font-weight: 300; line-height: 1.45; }
 /* small windows and the Projects preview: one row each, the label beside its line ("For parents  Less planning…"),
    both at body size, the labels' column only as wide as the longest label */
 @media (max-width: 900px) {
@@ -164,13 +168,9 @@ body.project-design-system .nestify-case .case-section__label {
 :is(html, body).is-preview .nestify-for > div { display: contents; }
 body.project-design-system.is-preview .nestify-for dt { margin-bottom: 0; font-size: var(--case-body-size); font-weight: 300; line-height: 1.45; }
 
-/* a phrase picked out in the body copy, in Nestify's blue ("design AI with human verbs") */
-.nestify-hl {
-  color: var(--case-accent);
-}
+/* Body copy carries no colour emphasis (as on LePal): the section titles and labels do the pointing. */
 
-/* the cards' small labels ("01 · Share") a step heavier than the light body copy, so they don't read thin;
-   blue words in the body copy and the strategy labels keep the body's own weight — only their colour changes */
+/* the cards' small labels ("01 · Meet Nestie") a step heavier than the light body copy, so they don't read thin */
 body.project-design-system .nestify-case .nestify-framework span {
   font-weight: 400;
 }
@@ -182,6 +182,13 @@ body.project-design-system .nestify-framework strong {   /* a step below the sec
 }
 
 /* ---------- Strategy headers sit tight on their media ---------- */
+
+/* the story continues under one takeaway title: a paragraph in the copy column, no title of its own, as close to the
+   media above it as a section is to its divider */
+.nestify-cont { padding-top: 0; }
+.nestify-cont .case-section__header { padding-top: 0; }
+.nestify-strategy:not(.nestify-result) + .nestify-cont { padding-top: var(--case-paragraph-gap); }   /* two blocks of copy in a row read as paragraphs */
+
 
 .nestify-strategy {
   padding-bottom: 0;
@@ -273,9 +280,353 @@ video.nestify-display {
   max-width: 220px;
 }
 
+/* ---------- Meet Nestie ---------- */
+
+/* where Nestie came from: two rows under the copy, each with a small round picture before its line */
+.nestify-origin { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.nestify-origin dd { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+.nestify-origin__faces { display: inline-flex; flex: none; }
+.nestify-origin__faces img {
+  display: block;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #f5f6f8;
+}
+.nestify-origin__faces img + img { margin-left: -6px; box-shadow: 0 0 0 2px #fff; }
+/* small windows and the Projects preview: one row each, label beside its line, as the "For parents" rows */
+@media (max-width: 900px) {
+  .nestify-origin { grid-template-columns: max-content minmax(0, 1fr); row-gap: 10px; }
+  .nestify-origin dt { align-self: center; }
+}
+:is(html, body).is-preview .nestify-origin { grid-template-columns: max-content minmax(0, 1fr); row-gap: 10px; }
+
+/* three pictures in a row. The character art comes on white, so its frames are white with a hairline, not the grey card */
+.nestify-tiles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--case-column-gap);
+}
+
+.nestify-tiles .case-media-group__item { min-width: 0; }
+
+.nestify-tile {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  aspect-ratio: 1 / 1;
+  border: 1px solid var(--case-divider);
+  border-radius: 16px;
+  background: #fff;
+}
+
+.nestify-tile :is(img, video) {
+  position: absolute;
+  inset: 12%;
+  width: 76%;
+  height: 76%;
+  object-fit: contain;
+}
+
+/* process pictures (sketches, library, Rive): shown whole, the same corner as the other media */
+.nestify-shot {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1190 / 1138;
+  object-fit: contain;
+  border-radius: 16px;
+  background: #f5f6f8;
+}
+
+/* two phones side by side, centred, each as wide as the phones in the three-up rows */
+.nestify-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 240px));
+  justify-content: center;
+  gap: clamp(32px, 8vw, 120px);
+}
+
+.nestify-pair .case-media-group__item { min-width: 0; }
+
+.nestify-phone-alt {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* results sit tight under what they measure, and end as a section does */
+.nestify-result { padding-top: 0; padding-bottom: var(--case-section-padding-y); }
+.nestify-strategy:not(.nestify-result) + .nestify-result { padding-top: 56px; }
+
+/* what a test showed: three findings in grey frames, no fill and no accent,
+   so they read as notes from a test, not as the Impact results */
+.nestify-test__label { margin: 0 0 12px !important; color: var(--case-muted); text-align: left !important; }
+
+.nestify-test {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--case-column-gap);
+}
+
+.nestify-test__item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 20px 24px 22px;
+  border: 1px solid #d9d9d9;   /* a grey frame, no fill: a test, not the grey Impact cards */
+  border-radius: 20px;
+}
+
+.nestify-test__item p,
+.nestify-test__item blockquote { margin: 0; }
+
+.nestify-case .nestify-test__item figcaption { margin: 0; text-align: left; }
+
+.nestify-test__item [data-case-type="caption"] { color: var(--case-muted); }
+
+.nestify-test__value {
+  font-size: calc(var(--case-section-title-size) * 0.8);
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+/* the newer phone recordings and the variant screens (taller frame than the older recordings) in the three-up rows */
+.nestify-phones .nestify-phone-alt { width: 100%; max-width: 240px; }
+
+/* the display itself, turning: full width, its white ground is the page's */
+.nestify-device { display: block; width: 100%; height: auto; aspect-ratio: 1280 / 934; }
+
+/* the display and the app side by side at one height: each column as wide as its video is at that height
+   (display 1280 × 934, phone 720 × 1402); captions sit above, so the display's shadow fades out undisturbed */
+.nestify-duo {
+  display: grid;
+  /* 1280/934 × 1.25 and 720/1518: the display's video is 1.25× the phone's height, because the device fills only
+     the top ~77% of it (the rest is shadow), so the device itself ends up about as tall as the phone */
+  grid-template-columns: minmax(0, 1.713fr) minmax(0, 0.4743fr);
+  gap: clamp(24px, 3vw, 48px);
+  align-items: start;
+}
+
+.nestify-duo .case-media-group__item { min-width: 0; }
+.nestify-case .nestify-duo figcaption { margin: 0 0 16px; }
+.nestify-duo .nestify-phone { width: 100%; max-width: none; }
+/* the device sits from 3.8% to 81% of its video's height; at 1.25× the phone, lift it 2.5% to centre it on the phone */
+@media (min-width: 601px) {
+  .nestify-duo .nestify-device { transform: translateY(-2.5%); }
+}
+
+@media (max-width: 600px) {
+  .nestify-duo { grid-template-columns: minmax(0, 1fr); gap: 40px; }
+  .nestify-duo .nestify-phone { width: min(100%, 240px); margin-inline: auto; }
+}
+
+.nestify-case__note--center { text-align: center; }
+
+/* ---------- V1 → V2 (slide 28): three screens, each V1 fading into V2 and back, the caption's tags in step ---------- */
+
+.nestify-v1v2 { margin: 0; }
+
+.nestify-v1v2__row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--case-column-gap);
+}
+
+.nestify-v1v2__frame {   /* the same screen treatment as the Kid / Parent views */
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #f5f3ee;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+
+.nestify-v1v2__frame img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.nestify-v1v2__item p {
+  margin: 12px 0 0;
+  color: var(--case-muted);
+  text-align: center;
+}
+
+.nestify-case .nestify-v1v2 > figcaption {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 28px;
+}
+
+.nestify-v1v2__tag {
+  padding: 2px 10px;
+  border: 1px solid #111;
+  border-radius: 999px;
+  color: #111;
+}
+
+.nf-js .nestify-v1v2 .is-v2 { opacity: 0; }
+.nf-js .nestify-v1v2.is-in .is-v2 { animation: nf-v2-in 7s ease-in-out 1s infinite; }
+.nf-js .nestify-v1v2.is-in .nestify-v1v2__tag:not(.nestify-v1v2__tag--v2) { animation: nf-tag-v1 7s ease-in-out 1s infinite; }
+.nf-js .nestify-v1v2.is-in .nestify-v1v2__tag--v2 { animation: nf-tag-v2 7s ease-in-out 1s infinite; }
+.nf-js .nestify-v1v2 .nestify-v1v2__tag:not(.nestify-v1v2__tag--v2) { background: #111; color: #fff; }
+
+@keyframes nf-v2-in { 0%, 8% { opacity: 0; } 16%, 58% { opacity: 1; } 66%, 100% { opacity: 0; } }
+@keyframes nf-tag-v1 { 0%, 8% { background: #111; color: #fff; } 16%, 58% { background: transparent; color: #111; } 66%, 100% { background: #111; color: #fff; } }
+@keyframes nf-tag-v2 { 0%, 8% { background: transparent; color: #111; } 16%, 58% { background: #111; color: #fff; } 66%, 100% { background: transparent; color: #111; } }
+
+@media (prefers-reduced-motion: reduce) {   /* no cross-fading: the finished V2 */
+  .nf-js .nestify-v1v2 .is-v2 { opacity: 1; animation: none !important; }
+  .nf-js .nestify-v1v2 .nestify-v1v2__tag { animation: none !important; }
+  .nf-js .nestify-v1v2 .nestify-v1v2__tag:not(.nestify-v1v2__tag--v2) { background: transparent; color: #111; }
+  .nf-js .nestify-v1v2 .nestify-v1v2__tag--v2 { background: #111; color: #fff; }
+}
+
+@media (max-width: 600px) {
+  .nestify-v1v2__row { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+}
+
+/* ---------- Result, animated (slide 27): the bubble gets the 91% first, then the "+ Add" is marked removed ---------- */
+
+.nestify-handoff {
+  display: flex;
+  justify-content: center;
+  margin: 0;
+  padding-right: clamp(150px, 22vw, 300px);   /* room for the callouts to the phone's right */
+}
+
+.nestify-handoff__stage {
+  position: relative;
+  width: min(240px, 100%);   /* as wide as every other phone recording on the page */
+  container-type: inline-size;
+}
+
+.nestify-handoff__stage > img { display: block; }
+
+/* the button that used to sit beside the "Tasks" title, as on slide 27: solid blue (64 × 25 on a 350 phone), then,
+   once removed, a dashed outline with blue text, so you can still see where it was */
+.nestify-handoff__add {
+  position: absolute;
+  top: 11.4%;
+  left: 73.7%;
+  display: grid;
+  place-items: center;
+  width: 18.3cqw;
+  height: 7.1cqw;
+  transform: translateY(-50%);
+  border-radius: 2.3cqw;
+  background: #2497f0;
+  color: #fff;
+  font-size: 3.7cqw;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.nestify-handoff__add::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px dashed #0c8ce9;
+  border-radius: inherit;
+  opacity: 0;
+}
+
+html:not(.nf-js) .nestify-handoff__add,
+.nf-js .nestify-handoff.is-in .nestify-handoff__add { background-color: transparent; color: #0c8ce9; }
+html:not(.nf-js) .nestify-handoff__add::after,
+.nf-js .nestify-handoff.is-in .nestify-handoff__add::after { opacity: 1; }
+
+/* a hairline from the thing on screen to its label, past the phone's edge */
+.nestify-handoff__callout {
+  position: absolute;
+  top: var(--y);
+  left: calc(100% + 10px);   /* the leader starts just outside the phone's frame, not on the screen */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  transform: translateY(-50%);
+  white-space: nowrap;
+}
+
+.nestify-handoff__callout i {
+  flex: none;
+  width: 44px;
+  height: 1px;
+  background: #000;
+  transform-origin: left center;
+}
+
+.nestify-handoff__callout i::before {   /* the dot on the thing itself */
+  content: "";
+  display: block;
+  width: 5px;
+  height: 5px;
+  margin: -2px 0 0 -2px;
+  border-radius: 50%;
+  background: #000;
+}
+
+.nestify-handoff__callout b {
+  display: block;
+  font-size: clamp(32px, 3.4vw, 48px);
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.nestify-handoff__callout--ai span { white-space: nowrap; }   /* "of new items added here" on one line; it wraps only on phones */
+
+/* the sequence, once the figure scrolls in */
+.nf-js .nestify-handoff__callout i { transform: scaleX(0); transition: transform 500ms cubic-bezier(0.22, 1, 0.36, 1); }
+.nf-js .nestify-handoff__callout span { opacity: 0; transition: opacity 400ms ease-out; }
+/* the transition sits on the removed state only, so the button doesn't animate while the page's script starts */
+.nf-js .nestify-handoff.is-in .nestify-handoff__add { transition: background-color 400ms ease-out 1900ms, color 400ms ease-out 1900ms; }
+.nf-js .nestify-handoff.is-in .nestify-handoff__add::after { transition: opacity 400ms ease-out 1900ms; }
+
+.nf-js .nestify-handoff.is-in .nestify-handoff__callout--add i { transform: none; transition-delay: 1700ms; }
+.nf-js .nestify-handoff.is-in .nestify-handoff__callout--add span { opacity: 1; transition-delay: 2100ms; }
+.nf-js .nestify-handoff.is-in .nestify-handoff__callout--ai i { transform: none; transition-delay: 400ms; }
+.nf-js .nestify-handoff.is-in .nestify-handoff__callout--ai span { opacity: 1; transition-delay: 800ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .nf-js .nestify-handoff__callout i,
+  .nf-js .nestify-handoff__callout span,
+  .nf-js .nestify-handoff.is-in .nestify-handoff__add,
+  .nf-js .nestify-handoff.is-in .nestify-handoff__add::after { transition: none !important; }
+}
+
+@media (max-width: 600px) {
+  .nestify-handoff { justify-content: flex-start; padding-right: 0; }
+  .nestify-handoff__stage { width: 55%; }
+  .nestify-handoff__callout i { width: 24px; }
+  .nestify-handoff__callout--ai span { white-space: normal; width: 7em; }
+}
+
+/* ---------- Designing with AI ---------- */
+
 .nestify-tools .case-media-group__item {
   flex: 1 1 0;
   min-width: 0;
+}
+
+/* the code review skill: the top of the file, on its own dark ground */
+.nestify-square--code {
+  height: auto;
+  object-fit: cover;
+  object-position: top;
+  background: #282a36;
 }
 
 .nestify-square {
@@ -287,10 +638,10 @@ video.nestify-display {
   object-fit: cover;
 }
 
-/* the two AI tool videos: filling a thin light-gray frame edge to edge (no white mat) */
+/* the two AI tool videos: edge to edge, no black frame */
 .nestify-tools .nestify-square {
   box-sizing: border-box;
-  border: 1px solid #111;   /* a thin black frame */
+  border: 1px solid #e5e5e5;   /* a light hairline, only so the white Slack screen keeps an edge */
 }
 
 .nestify-tools + .nestify-case__image {
@@ -309,122 +660,39 @@ video.nestify-display {
   gap: var(--case-column-gap);
 }
 
+/* just the numbers: what it is, the number, what it counts, where it started. No charts, no accent;
+   the number carries the card */
 .nestify-stat {
   display: flex;
   flex-direction: column;
-  padding: 24px 24px 20px;
+  padding: 28px 28px 26px;
   border-radius: 16px;
   background: #f5f6f8;
 }
 
-.nestify-stat p {
-  margin: 0;
-}
+.nestify-stat p { margin: 0; }
 
-/* laid out as the Figma impact cards: title + tag on one line, then the description, the number right under it */
-.nestify-stat__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 24px;
-}
-
-.nestify-stat__tag {
-  flex: none;
-  display: grid;
-  place-items: center;
-  height: 28px;
-  padding: 0 12px;
-  border: 1px solid #000;   /* a hairline, not the accent: it labels, it isn't a button */
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 1;
-  color: #000;
-}
-
-body.project-design-system .nestify-stat [data-case-type="label"] {
-  font-size: var(--case-body-size);
-  font-weight: 600;
-  line-height: 1.4;
-  color: #000;
-}
-
-body.project-design-system .nestify-stat [data-case-type="caption"] {
-  font-size: 15px;
-  font-weight: 400;
-  line-height: 1.4;
-  color: #444;   /* a step lighter than the title, so the number leads */
-}
+body.project-design-system .nestify-stat .nestify-stat__label,
+body.project-design-system .nestify-stat .nestify-stat__from { color: var(--case-muted); text-align: left; }
 
 .nestify-stat__value {
-  margin: 10px 0 0 !important;
-  font-size: clamp(34px, 3.2vw, 48px);
-  font-weight: 400;
-  line-height: 1.1;
+  margin: 48px 0 14px !important;
+  font-size: clamp(56px, 5.6vw, 88px);
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.03em;
   font-variant-numeric: tabular-nums;
+  color: #000;
 }
 
-.nestify-stat__value span {
-  color: var(--case-accent);
-}
-
-/* the arrow and the "+" drawn thin, so the numbers carry the weight */
-.nestify-stat__value .nf-thin {
+.nestify-stat__value i {   /* the "+", lighter so the number leads */
   font-style: normal;
   font-weight: 200;
-  color: var(--case-accent);
 }
 
-.nestify-stat__value .nf-arrow {   /* Material Symbols' arrow_forward, drawn as a thin rounded line (the → character isn't in Google Sans Flex) */
-  display: inline-block;
-  width: 0.7em;
-  margin: 0 -0.02em;   /* the spaces either side are gap enough */
-  vertical-align: -0.04em;
-  color: inherit;
-}
-
-.nestify-stat__value .nf-arrow svg {
-  display: block;
-  width: 100%;
-  height: auto;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.5px;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
-}
-
-.nestify-stat__chart {
-  width: 100%;
-  height: auto;
-  margin-top: auto;   /* every chart sits on its card's foot, so the three line up whatever the text above */
+.nestify-stat__from {
+  margin-top: auto !important;   /* every card's last line sits on its foot, so the three line up */
   padding-top: 28px;
-  box-sizing: content-box;
-  overflow: visible;
-}
-
-/* the charts, redrawn from the Figma impact cards: a line from the start value (hollow dot) to now (filled dot with a
-   soft halo), labelled at both ends, May → Aug; the line runs light grey into Nestify blue */
-.nestify-stat__chart .nf-line {
-  fill: none;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.nestify-stat__chart text {
-  font-family: inherit;
-  font-size: 10px;
-  font-weight: 300;
-  fill: var(--case-muted);
-}
-
-.nestify-stat__chart .nf-val--now,
-.nestify-stat__chart .nf-axis--now {
-  fill: var(--case-accent);
 }
 
 .nestify-mosaic {
@@ -482,41 +750,11 @@ body.project-design-system .nestify-stat [data-case-type="caption"] {
   transform: none;
 }
 
-.nf-js .nestify-stat__chart path {
-  stroke-dasharray: var(--nf-len, 400);
-  stroke-dashoffset: var(--nf-len, 400);
-  transition: stroke-dashoffset 1400ms cubic-bezier(0.22, 1, 0.36, 1) 250ms;
-}
-
-.nf-js .is-in .nestify-stat__chart path {
-  stroke-dashoffset: 0;
-}
-
-/* the end dot, the area and the labels arrive once the line has drawn */
-.nf-js .nestify-stat__chart :is(.nf-end, .nf-area, text) {
-  opacity: 0;
-  transition: opacity 500ms ease-out 1300ms;
-}
-
-.nf-js .is-in .nestify-stat__chart :is(.nf-end, .nf-area, text) {
-  opacity: 1;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .nf-js [data-nf-reveal] {
     transform: none;
     transition: opacity 300ms ease-out;
     transition-delay: 0ms;
-  }
-
-  .nf-js .nestify-stat__chart path {
-    stroke-dashoffset: 0;
-    transition: none;
-  }
-
-  .nf-js .nestify-stat__chart :is(.nf-end, .nf-area, text) {
-    opacity: 1;
-    transition: none;
   }
 
   .nf-js .nestify-scene__tags li {
@@ -566,6 +804,15 @@ body.project-design-system .nestify-stat [data-case-type="caption"] {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .nestify-test,
+  .nestify-tiles:has(.nestify-shot),
+  .nestify-tools {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+
+
+
   /* Too small to read on the photo; the tags line up underneath instead. */
   .nestify-scene__tags {
     display: flex;
@@ -582,3 +829,496 @@ body.project-design-system .nestify-stat [data-case-type="caption"] {
     font-size: 14px;
   }
 }
+
+/* ---------- Steps inside a challenge: assumption → what we learned → design decision → result → next step ---------- */
+.nestify-case .nestify-step { padding-top: 72px; }
+.nestify-case .nestify-step--first { padding-top: 48px; }
+
+/* the principle a challenge comes back to, as the turn before its design decision */
+/* the butler principle, wherever it appears, in Nestify blue at body size (#1a80ea, the app's button blue: the
+   lighter brand blue is too faint for running text); in a challenge it carries a small grey "Design principle" label */
+.nestify-butler { color: #1a80ea; }
+body.project-design-system .nestify-case .case-section__copy .nestify-step__label.nestify-principle__label { margin-top: var(--case-paragraph-gap, 24px); }
+
+/* section labels ("Challenge #2 · Use", "Design decision"…) in grey, not Nestify blue */
+.nestify-case .case-section__label { color: var(--case-muted); }
+
+/* a step without a title ("Assumption", "What we learned") carries its label as a small heading over its copy */
+body.project-design-system .nestify-case .case-section__copy .nestify-step__label { margin: 0 0 8px; color: var(--case-muted); text-align: left; }
+body.project-design-system .nestify-case .case-section__copy .nestify-step__label + p { margin-top: 6px; }
+/* a step's takeaway ("Don’t force AI. Make it the easier choice.") sits under its label in the copy column, at the
+   size of the principle lines; only the challenge titles stay in the left column */
+.case-section__copy .nestify-step__title { margin: 6px 0 16px; font-weight: inherit; }
+
+.nestify-case .nestify-step h3.case-section__title { margin: 0; }   /* a design decision: titled like a challenge, in the left column */
+
+/* an insight beside its recording (slide 23): the phone, then the number and its line, centred as a pair */
+.nestify-insight {   /* the same two 240px columns and gap as the assumption pair above, so the phones line up */
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 240px));
+  justify-content: center;
+  align-items: center;
+  gap: clamp(32px, 8vw, 120px);
+  margin: 0;
+}
+
+.nestify-insight__text { width: max-content; max-width: 300px; }
+.nestify-insight__text p { margin: 0; }
+
+.nestify-insight__value {
+  margin-bottom: 12px !important;
+  font-size: clamp(56px, 5.6vw, 88px);
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 600px) {
+  .nestify-insight { grid-template-columns: minmax(0, 240px); gap: 28px; }
+}
+
+/* numbered changes inside a step's copy: the first follows its intro line at paragraph spacing, the rest as one list */
+.case-section__copy p:not(.nestify-q) + .nestify-q:not(:first-child) { margin-top: 6px; }   /* the list reads on from its intro, at plain line spacing */
+
+/* #2's result: the overall change (two app numbers, stacked) beside the finding that changed behaviour (the 91%) */
+.nestify-result-row {
+  display: grid;
+  grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+  gap: clamp(32px, 5vw, 72px);
+  align-items: center;
+}
+.nestify-stats--stack { grid-template-columns: minmax(0, 1fr); }
+.nestify-stats--stack .nestify-stat__value { margin: 24px 0 10px !important; font-size: clamp(48px, 4.4vw, 64px); }
+.nestify-stats--stack .nestify-stat__from { padding-top: 18px; }
+@media (min-width: 769px) { .nestify-result-row .nestify-handoff { padding-right: clamp(150px, 18vw, 260px); } }
+
+/* Impact keeps one number: the number on the left, its lines in the copy column */
+.nestify-stats--single { grid-template-columns: minmax(0, 1fr); }
+.nestify-stat--wide {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--case-column-gap);
+  align-items: end;
+}
+.nestify-stat--wide .nestify-stat__value { margin: 0 !important; }
+.nestify-stat--wide .nestify-stat__from { padding-top: 12px; }
+
+@media (max-width: 768px) {
+  .nestify-result-row { grid-template-columns: minmax(0, 1fr); }
+  .nestify-stat--wide { grid-template-columns: minmax(0, 1fr); row-gap: 20px; }
+}
+
+/* numbered changes in a step: just "#1", so the number column is narrow */
+.nestify-step .nestify-qn { min-width: 2.8em; }
+
+/* test findings: the grey line under each sits on the card's foot, so the three line up */
+.nestify-test__item > :last-child { margin-top: auto !important; padding-top: 10px; }
+
+/* V1 / V2 can be clicked: the loop stops and the chosen version stays */
+button.nestify-v1v2__tag { font: inherit; background: transparent; cursor: pointer; }
+.nf-js .nestify-v1v2.is-manual .is-v2 { animation: none; opacity: 0; transition: opacity 400ms ease-out; }
+.nf-js .nestify-v1v2.is-manual[data-show="v2"] .is-v2 { opacity: 1; }
+.nf-js .nestify-v1v2.is-manual .nestify-v1v2__tag { animation: none; background: transparent; color: #111; }
+.nf-js .nestify-v1v2.is-manual[data-show="v1"] .nestify-v1v2__tag:not(.nestify-v1v2__tag--v2),
+.nf-js .nestify-v1v2.is-manual[data-show="v2"] .nestify-v1v2__tag--v2 { background: #111; color: #fff; }
+
+/* the co-creation video, smaller than a full-width image */
+.nestify-case__image--small { width: min(100%, 640px); }
+
+/* AI tools: what stage, what tool, what it does, under each */
+.nestify-case figcaption.nestify-tool { display: flex; flex-direction: column; gap: 4px; margin-top: 16px; text-align: left; }
+body.project-design-system .nestify-case .nestify-tool__stage { color: var(--case-muted); }
+body.project-design-system .nestify-case .nestify-tool__name { color: #000; }
+body.project-design-system .nestify-case .nestify-tool__desc { color: #444; }   /* a step lighter than the name, darker than the stage label */
+
+/* #3: what 20 pilot families did on the shared screen (slide 30): one bar per role, checking information tinted */
+.case-section__copy .nestify-roles { margin-top: 10px; display: grid; gap: 18px; }
+.nestify-roles p { margin: 0; }
+.nestify-role { display: grid; gap: 8px; }
+.nestify-role__bar { display: flex; height: 36px; border-radius: 999px; overflow: hidden; background: #f2f2f2; font-size: 14px; line-height: 1; }
+.nestify-role__bar span { flex: 0 0 var(--w); display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 0 12px; color: #777; white-space: nowrap; box-sizing: border-box; }
+.nestify-role__bar span.is-check { background: #dbe9f3; color: #3f6687; }
+.nestify-role__bar b { font-weight: 400; }
+body.project-design-system .nestify-case .nestify-roles__note { color: var(--case-muted); text-align: left; }
+
+/* #3: designing with limited data (slide 35): the usage counts beside the layouts they led to */
+.nestify-limited {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));   /* data → principles → layout, as on slide 35 */
+  gap: var(--case-column-gap);
+  align-items: stretch;
+}
+.nestify-limited figure { margin: 0; padding: 28px; border-radius: 20px; background: #fff; }   /* white cards on the blue band; the grid image has a white ground */
+.nestify-case .nestify-limited figcaption { margin: 0 0 20px; color: var(--case-muted); text-align: left; }
+.nestify-usage__group + .nestify-usage__group { margin-top: 28px; }
+.nestify-usage__group > p { margin: 0 0 10px; }
+.nestify-usage__row { display: grid; grid-template-columns: 6em minmax(0, 1fr) 2em; align-items: center; gap: 12px; padding: 5px 0; font-size: 15px; }
+.nestify-usage__row i { height: 10px; border-radius: 999px; background: linear-gradient(90deg, #8aa3b8 calc(var(--v) * 10%), #f0f0f0 0); }
+.nestify-usage__row b { font-weight: 400; color: var(--case-muted); text-align: right; }
+.nestify-usage__row.is-off span { color: var(--case-muted); }
+.nestify-usage__row.is-off i { background: linear-gradient(90deg, #cfcfcf calc(var(--v) * 10%), #f0f0f0 0); }
+.nestify-layout img { display: block; width: min(100%, 360px); height: auto; margin: 0 auto; }
+
+@media (max-width: 768px) {
+  .nestify-limited { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Design decision: a full-width band in the hero's light blue (#e9f2f6) behind the decision and its media */
+.nestify-band { position: relative; isolation: isolate; margin: 72px 0 0; padding: 8px 0 80px; }
+.nestify-band::before { content: ""; position: absolute; inset: 0; z-index: -1; background: #e9f2f6; }   /* the band is already page-wide; no vw maths, which breaks in the zoomed preview */
+.nestify-band + .nestify-step { padding-top: 80px; }
+/* the phone recordings' white corners, clipped to the phone's own curve so they don't show on the blue */
+.nestify-band .nestify-phone-alt { border-radius: 16.5% / 7.8%; }
+
+/* the butler principle in the deck's gradient (blue → lilac → pink → peach → gold, as on "Making AI accessible") */
+.nestify-case .nestify-butler,
+.nestify-grad {
+  background-image: linear-gradient(90deg, #6f8ae6 0%, #b07fd2 30%, #df7fac 58%, #ec9b76 80%, #e2ad48 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* in a design decision, the principle behind it hides in a small gradient dot at the title's top-right corner, which
+   pulses now and then to invite a tap; hover, focus or tap it and the principle pops out above */
+.nestify-tip { position: relative; display: inline-block; width: 0; height: 0; vertical-align: top; }
+.nestify-tip__mark {
+  position: absolute;
+  left: 8px;
+  top: -2px;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6f8ae6, #b07fd2 35%, #df7fac 65%, #ec9b76 85%, #e2ad48);
+  cursor: pointer;
+}
+.nestify-tip__mark::after {   /* the pulse: a soft ring that grows and fades every few seconds */
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: inherit;
+  opacity: 0;
+  animation: nf-tip-pulse 2.8s ease-out infinite;
+}
+.nestify-tip__mark::before {   /* a bigger hit area than the dot */
+  content: "";
+  position: absolute;
+  inset: -12px;
+}
+@keyframes nf-tip-pulse { 0% { opacity: 0.55; transform: scale(1); } 60%, 100% { opacity: 0; transform: scale(2.6); } }
+.nestify-tip__pop {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 26px);
+  z-index: 5;
+  width: max-content;
+  max-width: min(340px, 78vw);
+  padding: 14px 18px 16px;
+  border-radius: 14px;
+  background-color: #fff;
+  box-shadow: 0 0 24px rgba(31, 60, 90, 0.12);
+  font-size: calc(var(--case-section-title-size) * 0.72);
+  font-weight: 400;
+  line-height: 1.3;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(6px) scale(0.92);
+  transform-origin: 16px 100%;
+  transition: opacity 160ms ease-out, transform 160ms ease-out;
+}
+.nestify-tip__label { display: block; margin-bottom: 6px; font-size: 13px; color: var(--case-muted); }
+.nestify-tip__pop .nestify-grad { display: block; }
+.nestify-tip:hover .nestify-tip__pop,
+.nestify-tip:focus-within .nestify-tip__pop,
+.nestify-tip.is-open .nestify-tip__pop {
+  opacity: 1;
+  transform: none;
+  transition: opacity 200ms ease-out, transform 420ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.nestify-tip:hover .nestify-tip__mark::after,
+.nestify-tip.is-open .nestify-tip__mark::after { animation: none; }
+@media (max-width: 600px) { .nestify-tip__pop { left: auto; right: -24px; transform-origin: calc(100% - 16px) 100%; } }
+@media (prefers-reduced-motion: reduce) { .nestify-tip__mark::after { animation: none; } }
+.nestify-band { padding-top: 8px; }
+
+.nestify-rule + .nestify-rule { margin-top: 24px; }
+.nestify-rule p { margin: 0 0 10px; }
+.nestify-rule ul { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.nestify-rule li { padding: 4px 10px; border: 1px solid #d9d9d9; border-radius: 999px; font-size: 13px; line-height: 1.3; color: #444; }
+@media (min-width: 769px) and (max-width: 1100px) { .nestify-usage__row { grid-template-columns: 5em minmax(0, 1fr) 1.6em; gap: 8px; } }
+
+/* the bar titles are labels for the data, not more body copy: grey and a step smaller */
+body.project-design-system .nestify-case .nestify-role > p { color: var(--case-muted); font-size: 15px; line-height: 1.4; }
+
+/* a line someone said in an interview: a hairline frame, like the test quotes */
+.case-section__copy .nestify-said { margin-top: 8px; padding: 14px 20px; border: 1px solid #d9d9d9; border-radius: 16px; }
+
+/* #3, limited time: the two changes as cards (slide 34), each with its number, line and picture */
+/* the two changes as one flat strip, no cards: #1's display, then the kid and parent pages side by side, all three the
+   same size (each picture is 1.54 : 1) */
+.nestify-limited--two { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); align-items: start; }
+.nestify-limited--two > figure { padding: 0; background: none; border-radius: 0; }
+.nestify-shot-card { display: flex; flex-direction: column; }
+.nestify-defaults { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--case-column-gap); }
+.nestify-defaults > img { display: block; width: 100%; height: auto; aspect-ratio: 1088 / 706; object-fit: contain; border-radius: 12px; background: #fff; }
+@media (max-width: 768px) { .nestify-limited--two { grid-template-columns: minmax(0, 1fr); row-gap: 40px; } }
+
+/* #1: the display as it was, then it dims, the new entry lights up and "Whose view?" pops open (slide 34) */
+.nestify-whose { position: relative; overflow: hidden; border-radius: 12px; }
+.nestify-whose img { display: block; }
+.nestify-whose .nestify-whose__base { width: 100%; height: auto; border-radius: 0; }
+.nestify-whose__veil { position: absolute; inset: 0; background: rgba(236, 236, 236, 0.5); -webkit-backdrop-filter: blur(5px) grayscale(0.6); backdrop-filter: blur(5px) grayscale(0.6); }
+.nestify-whose .nestify-whose__icon { position: absolute; border-radius: 0; left: 78.68%; top: 7.37%; width: 15.35%; }
+.nestify-whose .nestify-whose__pop { position: absolute; border-radius: 0; left: 17%; top: 29.04%; width: 79.96%; transform-origin: 80% 0; }
+/* plays on a 4s loop once on screen: the new entry lights up, the screen dims, "Whose view?" pops open (all within the
+   first second), it holds, resets */
+.nf-js .nestify-limited--two :is(.nestify-whose__veil, .nestify-whose__icon, .nestify-whose__pop) { opacity: 0; }
+.nf-js .nestify-limited--two.is-in .nestify-whose__icon { animation: nf-whose-icon 4s infinite; }
+.nf-js .nestify-limited--two.is-in .nestify-whose__veil { animation: nf-whose-veil 4s infinite; }
+.nf-js .nestify-limited--two.is-in .nestify-whose__pop { animation: nf-whose-pop 4s infinite; }
+@keyframes nf-whose-icon {
+  0%, 3% { opacity: 0; transform: scale(0.6); }
+  9% { opacity: 1; transform: scale(1.08); animation-timing-function: ease-out; }
+  12%, 88% { opacity: 1; transform: none; }
+  95%, 100% { opacity: 0; transform: none; }
+}
+@keyframes nf-whose-veil { 0%, 10% { opacity: 0; } 17%, 88% { opacity: 1; } 95%, 100% { opacity: 0; } }
+@keyframes nf-whose-pop {
+  0%, 14% { opacity: 0; transform: translateY(-8px) scale(0.92); }
+  21% { opacity: 1; transform: scale(1.02); animation-timing-function: ease-out; }
+  24%, 88% { opacity: 1; transform: none; }
+  95%, 100% { opacity: 0; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {   /* the opened state, still */
+  .nf-js .nestify-limited--two :is(.nestify-whose__veil, .nestify-whose__icon, .nestify-whose__pop) { animation: none !important; opacity: 1; transform: none; }
+}
+.nestify-shot-card figcaption { display: grid; grid-template-columns: 2em minmax(0, 1fr); column-gap: 4px; margin: 0 0 20px !important; color: #000 !important; }
+.nestify-shot-card figcaption .nestify-qn { min-width: 0; }
+body.project-design-system .nestify-case .nestify-shot-card__sub { grid-column: 2; color: var(--case-muted); text-align: left; }
+.nestify-shot-card img { display: block; width: 100%; height: auto; border-radius: 12px; }
+body.project-design-system .nestify-case .nestify-limited__title { margin: 0 0 16px; color: var(--case-muted); text-align: left; }
+@media (max-width: 768px) { .nestify-limited--two { grid-template-columns: minmax(0, 1fr); } }
+
+/* next step: the co-creation video in the left column, its title and copy on the right */
+.nestify-next__media { min-width: 0; }
+.nestify-next__video { display: block; width: 100%; height: auto; border-radius: 12px; }
+@media (max-width: 768px) { .nestify-next__media { order: 2; margin-top: 24px; } }
+
+/* where a quote or a chart comes from: a small grey line under it, below the bar titles in the hierarchy */
+body.project-design-system .nestify-case .case-section__copy .nestify-source { margin-top: 8px; font-size: 13px; color: var(--case-muted); text-align: left; }
+.case-section__copy .nestify-said + .nestify-source + .nestify-roles { margin-top: var(--case-paragraph-gap, 24px); }
+.case-section__copy .nestify-next__video { margin-top: 28px; }
+
+/* #2 result: the phone on the page's centre line, like the three phones above; the numbers to its left, the callouts
+   in the space to its right */
+@media (min-width: 769px) {
+  .nestify-result-row { grid-template-columns: minmax(0, 1fr) 240px minmax(0, 1fr); gap: clamp(32px, 4vw, 64px); }
+  .nestify-result-row .nestify-stats--stack { width: min(100%, 300px); }
+  .nestify-result-row .nestify-handoff { padding-right: 0; }
+}
+
+/* ---------- Table of contents in the left margin (wide screens, full page only) ---------- */
+.nestify-toc {   /* in the left margin */
+  position: fixed;
+  left: 20px;
+  top: 50%;
+  z-index: 20;
+  display: none;
+  flex-direction: column;
+  transform: translateY(-50%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 300ms ease-out;
+}
+.nestify-toc.is-on { opacity: 1; pointer-events: auto; }
+.nestify-toc__item { color: #c4c4c4;   /* three tones: other sections light, the steps of the section you're in mid grey, where you are black */ text-decoration: none; transition: color 200ms ease-out; }
+/* the four sections at plain line spacing; the one you're in grows a size */
+.nestify-toc__item--l1 { margin-top: 6px; font-size: 13px;   /* the copy's smallest grey caption size */ line-height: 1.35; transition: color 200ms ease-out, font-size 240ms ease-out; }
+.nestify-toc__item--l1.is-open { font-size: 16px; }
+.nestify-toc__item--l1:first-child { margin-top: 0; }
+/* the steps: a size smaller, indented, no line */
+.nestify-toc__item--l2 { display: none; padding: 3px 0 3px 12px; font-size: 13px;   /* the size of the smallest grey captions in the copy */ line-height: 1.3; transition: color 200ms ease-out; }
+.nestify-toc__item--l1 + .nestify-toc__item--l2.is-open { margin-top: 4px; }
+.nestify-toc__item--l2.is-open + .nestify-toc__item--l1 { margin-top: 10px; }
+.nestify-toc__item--l2.is-open { display: block; }
+.nestify-toc__item.is-open.nestify-toc__item--l1 { color: #000; }
+.nestify-toc__item--l2.is-current { color: #000; }
+.nestify-toc__item:active { color: #000; }
+.nestify-toc.is-fits { display: flex; }
+@media (prefers-reduced-motion: reduce) { .nestify-toc { transition: none; } }
+
+
+/* the two origins side by side in the Projects preview too (its canvas is 1100 wide, so there's room) */
+:is(html, body).is-preview .nestify-case .nestify-origin { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 0; }
+:is(html, body).is-preview .nestify-case .nestify-origin > div { display: block; }
+body.project-design-system.is-preview .nestify-case .nestify-origin dt { margin-bottom: 6px; font-size: 13px; }
+.nestify-grad { display: inline; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+
+/* a numbered change with its own small title, then why */
+.nestify-q__title { display: block; margin-bottom: 2px; font-weight: 500; }
+.case-section__copy .nestify-q--titled + .nestify-q--titled { margin-top: 16px; }
+.case-section__copy p:not(.nestify-q) + .nestify-q--titled { margin-top: 16px; }
+
+/* the principle dot sits right after the "Design decision" label, centred on its line */
+.case-section__label .nestify-tip { vertical-align: middle; }
+.case-section__label .nestify-tip__mark { left: 10px; top: -8px; }
+/* the card grows out of the dot like a speech bubble: a quick spring from the dot's spot, a soft glow in the dot's
+   colours, the words settling a beat later. The dot gives one ripple as it hands over, so the eye follows it. */
+.case-section__label .nestify-tip__pop {
+  left: 10px;
+  top: -8px;
+  bottom: auto;
+  width: 320px;
+  padding: 16px 20px 18px;
+  border-radius: 16px;
+  text-align: left;
+  clip-path: none;
+  box-shadow: 0 10px 30px rgba(150, 120, 210, 0.16), 0 2px 8px rgba(31, 60, 90, 0.06);
+  visibility: hidden;
+  opacity: 0;
+  transform: scale(0.12);
+  transform-origin: 8px 8px;   /* the dot's centre */
+  transition: transform 260ms cubic-bezier(0.4, 0, 1, 1), opacity 200ms ease-in 60ms, visibility 0s linear 280ms;
+}
+.case-section__label .nestify-tip__pop::before {   /* a still gradient hairline, the dot's colours */
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: linear-gradient(120deg, #6f8ae6, #b07fd2, #df7fac, #ec9b76, #e2ad48);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+.case-section__label .nestify-tip__pop::after { content: none; }
+.case-section__label .nestify-tip__pop > * { opacity: 0; transform: translateY(4px); transition: opacity 120ms ease-in, transform 120ms ease-in; }
+
+.case-section__label .nestify-tip.is-open .nestify-tip__pop {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  transition: transform 560ms cubic-bezier(0.34, 1.32, 0.64, 1), opacity 160ms ease-out, visibility 0s;
+}
+.case-section__label .nestify-tip.is-open .nestify-tip__pop > * { opacity: 1; transform: none; transition: opacity 320ms ease-out 200ms, transform 420ms cubic-bezier(0.22, 1, 0.36, 1) 200ms; }
+
+/* the hand-over: the dot swells and fades as the card leaves it, and comes back once the card has folded in */
+.case-section__label .nestify-tip__mark { transition: transform 200ms ease-out 260ms, opacity 160ms ease-out 260ms; }
+.case-section__label .nestify-tip.is-open .nestify-tip__mark { opacity: 0; transform: scale(1.8); transition: transform 240ms ease-out, opacity 200ms ease-out 60ms; }
+.case-section__label .nestify-tip.is-open .nestify-tip__mark::after { animation: none; }
+@media (max-width: 768px) { .case-section__label .nestify-tip__pop { width: min(320px, calc(100vw - var(--tip-x, 0px) - 64px)); } }
+@media (prefers-reduced-motion: reduce) {
+  .case-section__label .nestify-tip__pop, .case-section__label .nestify-tip__pop > *, .case-section__label .nestify-tip__mark { transform: none !important; transition-property: opacity, visibility !important; }
+}
+
+/* no single word left alone on a paragraph's last line */
+.nestify-case :is(p, li, blockquote, figcaption) { text-wrap-style: pretty; }   /* the style only: the shorthand would also undo nowrap on the callouts */
+
+/* the contents never spill: long names wrap inside the margin, and it never runs taller than the window */
+.nestify-toc { max-height: calc(100vh - 160px); overflow: hidden; overflow-wrap: anywhere; box-sizing: border-box; }
+
+
+/* the bars follow their paragraph at paragraph spacing */
+.case-section__copy p + .nestify-roles { margin-top: var(--case-paragraph-gap, 24px); }
+
+
+/* label tips open only through their is-open class (scroll, hover, focus and tap all go through the script) */
+.case-section__label .nestify-tip:hover:not(.is-open) .nestify-tip__pop,
+.case-section__label .nestify-tip:focus-within:not(.is-open) .nestify-tip__pop { opacity: 1; transform: none; }
+
+.nestify-toc__item--l2.is-open { color: var(--case-muted); }
+.nestify-toc__item--l2.is-open.is-current { color: #000; }
+
+/* ---------- Contents, styled like the site's bottom dock ----------
+   one frosted grey panel; the section you're in is a black pill with white words (as the dock's active tab), the
+   others dock-grey; the steps of that section sit under its pill, small, the current step in ink. */
+.nestify-toc {
+  padding: 4px;
+  border-radius: 20px;
+  background: rgba(237, 237, 237, 0.86);
+  -webkit-backdrop-filter: blur(18px) saturate(1.6);
+  backdrop-filter: blur(18px) saturate(1.6);
+  box-shadow: none;   /* flat, like the dock on a plain page */
+  width: auto !important;
+  max-width: var(--toc-room, 200px);
+}
+.nestify-toc .nestify-toc__item--l1,
+.nestify-toc .nestify-toc__item--l1:first-child,
+.nestify-toc .nestify-toc__item--l2.is-open + .nestify-toc__item--l1 {
+  margin: 0;
+  padding: 8px 14px;
+  border-radius: 16px;
+  font-size: 13px;
+  line-height: 1.3;
+  color: #b0b0b0;   /* sections you're not in: the lightest tone */
+  transition: background-color 200ms ease, color 200ms ease;
+}
+.nestify-toc .nestify-toc__item--l1.is-open { color: #111; }
+.nestify-toc .nestify-toc__item--l2 { padding: 4px 14px 4px 22px; font-size: 12px; color: #6f6f6f; }   /* steps of your section: mid grey */
+.nestify-toc .nestify-toc__item--l1 + .nestify-toc__item--l2.is-open { margin-top: 4px; }
+.nestify-toc .nestify-toc__item--l2.is-open:has(+ .nestify-toc__item--l1),
+.nestify-toc .nestify-toc__item--l2.is-open:last-child { margin-bottom: 4px; }
+.nestify-toc .nestify-toc__item--l2.is-open.is-current { color: #111; }
+.nestify-toc .nestify-toc__item--l1:not(.is-open):active { color: #111; }
+
+/* a smaller dot (10px) with a gentler pulse */
+.case-section__label .nestify-tip__mark { width: 10px; height: 10px; left: 8px; top: -5px; }
+.case-section__label .nestify-tip__mark::after { animation-name: nf-tip-pulse-small; }
+@keyframes nf-tip-pulse-small { 0% { opacity: 0.45; transform: scale(1); } 60%, 100% { opacity: 0; transform: scale(2); } }
+.case-section__label .nestify-tip__pop { left: 8px; top: -5px; transform-origin: 5px 5px; }
+.case-section__label .nestify-tip.is-open .nestify-tip__mark { transform: scale(1.4); }
+
+/* the section you're in, title and steps together, sits on one white card inside the grey panel */
+.nestify-toc__group { display: flex; flex-direction: column; border-radius: 16px; transition: background-color 200ms ease, box-shadow 200ms ease; }
+.nestify-toc__group.is-open { background: #fff; padding-bottom: 6px; }
+.nestify-toc .nestify-toc__group .nestify-toc__item--l2.is-open { margin: 0; }
+.nestify-toc__group.is-open + .nestify-toc__group { margin-top: 2px; }
+
+/* ---------- Contents: just words, no panel. Three tones: sections you're not in lightest, the steps of your section
+   mid grey, where you are black ---------- */
+.nestify-toc { padding: 0; border-radius: 0; background: none; -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: none; }
+.nestify-toc__group.is-open { background: none; padding-bottom: 0; }
+.nestify-toc__group + .nestify-toc__group { margin-top: 6px; }
+.nestify-toc .nestify-toc__item--l1,
+.nestify-toc .nestify-toc__item--l1:first-child,
+.nestify-toc .nestify-toc__item--l2.is-open + .nestify-toc__item--l1 { padding: 0; border-radius: 0; font-size: 13px; color: #d6d6d6; }
+.nestify-toc .nestify-toc__item--l1.is-open { color: #111; font-size: 15px; }
+.nestify-toc .nestify-toc__item--l2 { padding: 3px 0 3px 12px; font-size: 13px; color: #a3a3a3; }
+.nestify-toc .nestify-toc__item--l2.is-open.is-current { color: #111; }
+.nestify-toc .nestify-toc__item--l1 + .nestify-toc__item--l2.is-open { margin-top: 6px; }
+.nestify-toc__group.is-open + .nestify-toc__group { margin-top: 12px; }
+
+/* ---------- Contents, after the reference: one light rail down the left; where you are is black, a step bolder, with a
+   short black mark on the rail. Sections you're not in are lightest; the steps of your section mid grey. ---------- */
+.nestify-toc { border-left: 1px solid #e6e6e6; }
+.nestify-toc .nestify-toc__item { position: relative; }
+.nestify-toc .nestify-toc__item--l1,
+.nestify-toc .nestify-toc__item--l1:first-child,
+.nestify-toc .nestify-toc__item--l2.is-open + .nestify-toc__item--l1 { padding: 3px 0 3px 16px; }
+.nestify-toc .nestify-toc__item--l2 { padding: 3px 0 3px 28px; }
+/* tones, lightest to strongest: other sections; the steps of your section; the step you're on (dark grey, not bold);
+   your section's title (black, a size up) leads the group */
+.nestify-toc .nestify-toc__item--l1.is-open { color: #111; font-size: 15px; }
+.nestify-toc .nestify-toc__item--l2.is-open.is-current { color: #4a4a4a; font-weight: 400; }
+.nestify-toc .nestify-toc__item--l1.is-current { color: #111; font-weight: 400; }
+.nestify-toc .nestify-toc__item { transition: color 260ms ease; }
+.nestify-toc__rail-mark {
+  position: absolute;
+  left: -1px;
+  top: 0;
+  width: 2px;
+  height: 16px;
+  border-radius: 2px;
+  background: #111;
+  transition: transform 360ms cubic-bezier(0.32, 0.72, 0, 1), height 360ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+.nestify-toc__item--l2.is-open { animation: nf-toc-in 260ms ease-out both; }
+@keyframes nf-toc-in { from { opacity: 0; transform: translateY(-3px); } }
+@media (prefers-reduced-motion: reduce) { .nestify-toc__rail-mark, .nestify-toc .nestify-toc__item { transition: none; } .nestify-toc__item--l2.is-open { animation: none; } }
+.nestify-toc__group + .nestify-toc__group { margin-top: 2px; }
+.nestify-toc__group.is-open + .nestify-toc__group { margin-top: 8px; }
