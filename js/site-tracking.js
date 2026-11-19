@@ -27,12 +27,63 @@
   const title = (document.querySelector('h1')?.innerText || document.title || page).replace(/\s+/g, ' ').trim().slice(0, 60);
   const pv = Math.random().toString(36).slice(2, 10); // 这一次打开这个页面
   const now = Date.now();
+  // GA 给这个浏览器的编号（_ga cookie「GA1.1.<编号>」）：接口按它认出关注名单里的人
+  const cid = () => (document.cookie.match(/(?:^|; )_ga=GA\d\.\d\.(\d+\.\d+)/) || [])[1] || '';
+
+  // —— 指定的人要先输密码才能看：两种认法——浏览器编号在 LOCKED 里（只存哈希），或访客接口按 IP 判定（LOCK_IPS，回 lock:true）。别的访客完全不受影响
+  // 样子沿用停用的「开站密码」（projects.html / css/password.css）：logo 动画 + 圆角输入框 + 箭头，输错抖一下
+  const LOCKED = ['11a51d77ce0e31a7', '7ecc85765c89b3f8']; // sha256('jh:' + 浏览器编号) 前 16 位
+  const PASS = '2688677b07da482d'; // sha256('jh:' + 密码) 前 16 位
+  const root = new URL('..', document.currentScript?.src || location.href).href; // 网站根目录（脚本在 js/ 下）
+  const sha = async (t) => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('jh:' + t)))].map((b) => b.toString(16).padStart(2, '0')).join('').slice(0, 16);
+  const showGate = () => {
+    if (document.getElementById('jh-gate')) return;
+    const gate = document.createElement('div');
+    gate.id = 'jh-gate';
+    gate.innerHTML = `<style>
+      #jh-gate{position:fixed;inset:0;z-index:2147483647;background:#fff;display:flex;align-items:center;justify-content:center}
+      #jh-gate .box{display:flex;flex-direction:column;align-items:center;transform:translateY(-136px)}
+      #jh-gate video{width:90px;height:90px;object-fit:contain;margin:0 0 -8px;transform:scale(3.9);filter:brightness(1.18) contrast(1.08)}
+      #jh-gate .field{position:relative;display:flex;align-items:center;width:250px;height:50px;border-radius:999px;background:#F7F7F7}
+      #jh-gate input{width:100%;height:100%;padding:0 46px;border:0;background:transparent;font:1.2rem 'Inter',sans-serif;color:#333;outline:0;text-align:center;box-sizing:border-box}
+      #jh-gate input::placeholder{color:#B0A9A3}
+      #jh-gate button{position:absolute;right:3px;top:0;bottom:0;width:44px;border:0;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+      #jh-gate button img{width:24px;height:24px;opacity:.3;transition:opacity .3s}
+      #jh-gate .field:focus-within button img{opacity:1}
+      #jh-gate .shake{animation:jh-shake .4s ease-in-out}
+      @keyframes jh-shake{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+    </style><div class="box" role="dialog" aria-label="Enter password">
+      <video autoplay muted loop playsinline src="${root}media/index/logo.mp4"></video>
+      <form class="field"><input type="password" placeholder="•••" autocomplete="off" aria-label="Password"><button aria-label="Submit password"><img src="${root}media/go.svg" alt=""></button></form>
+    </div>`;
+    document.documentElement.style.overflow = 'hidden';
+    document.documentElement.appendChild(gate);
+    const form = gate.querySelector('form'), input = gate.querySelector('input');
+    input.focus();
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (await sha(input.value) !== PASS) {
+        input.value = '';
+        form.classList.remove('shake'); void form.offsetWidth; form.classList.add('shake');
+        return;
+      }
+      localStorage.setItem('jh:unlocked', PASS);
+      gate.remove();
+      document.documentElement.style.overflow = '';
+    });
+  };
+  const unlocked = () => { try { return localStorage.getItem('jh:unlocked') === PASS; } catch (_) { return false; } };
+  const lockedHere = () => { try { return localStorage.getItem('jh:locked') === '1'; } catch (_) { return false; } };
+  (async () => {
+    if (unlocked()) return;
+    if (lockedHere() || (cid() && crypto.subtle && LOCKED.includes(await sha(cid())))) showGate();
+  })().catch(() => {});
 
   // —— 报告：同一台设备一天最多推一次（常来的人不刷屏；之后的浏览照样记进 GA）
   const today = new Date().toDateString();
   const report = (session, beacon, late) => {
     try { if (localStorage.getItem('jh:pushed') === today) return; localStorage.setItem('jh:pushed', today); } catch (_) {}
-    send({ type: 'summary', session, late }, beacon);
+    send({ type: 'summary', session, late, cid: cid() }, beacon);
   };
 
   // —— 这一次浏览的记录：上一次没发出去、又过了 30 分钟的，先补发
@@ -51,8 +102,9 @@
 
   // —— 公司名：每次新的浏览问一次接口（不推送），记进 GA
   if (fresh) {
-    send({ type: 'start', page }).then((info) => {
+    send({ type: 'start', page, cid: cid() }).then((info) => {
       if (!info) return;
+      if (info.lock && !unlocked()) { try { localStorage.setItem('jh:locked', '1'); } catch (_) {} showGate(); }
       try { localStorage.setItem('jh:org', info.org || ''); } catch (_) {}
       ga('set', 'user_properties', { visitor_org: (info.org || 'unknown').slice(0, 36) });
       ga('event', 'visitor_info', { visitor_org: (info.org || 'unknown').slice(0, 100), visitor_city: info.city || '', vpn_or_hosting: info.hosting || info.proxy ? 'yes' : 'no' });
