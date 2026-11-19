@@ -405,7 +405,7 @@ video.nestify-display {
   display: grid;
   /* 1280/934 × 1.25 and 720/1518: the display's video is 1.25× the phone's height, because the device fills only
      the top ~77% of it (the rest is shadow), so the device itself ends up about as tall as the phone */
-  grid-template-columns: minmax(0, 1.713fr) minmax(0, 0.4743fr);
+  grid-template-columns: minmax(0, 1.713fr) minmax(0, 0.5136fr);   /* phone video 720 × 1402 */
   gap: clamp(24px, 3vw, 48px);
   align-items: start;
 }
