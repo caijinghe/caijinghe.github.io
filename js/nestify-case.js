@@ -150,12 +150,15 @@
     tip.classList.toggle('is-closing', !open);
     if (!open) tip._nfClose = setTimeout(() => tip.classList.remove('is-closing'), 540);
   };
-  // each tip stays open the whole time its blue design-decision band is on screen
+  // each tip stays open the whole time its blue design-decision band is on screen (wide windows only;
+  // on a narrow one the dot just waits to be tapped)
+  const tipAuto = window.matchMedia('(min-width: 769px)');
+  tipAuto.addEventListener('change', () => { if (!tipAuto.matches) tips.forEach(tip => { clearTimeout(tip._nfTimer); setTip(tip, false); }); });
   const tipObserver = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       const tip = entry.target._nfTip;
       clearTimeout(tip._nfTimer);
-      if (entry.isIntersecting) { if (!tip._nfDismissed) tip._nfTimer = setTimeout(() => setTip(tip, true), 400); }
+      if (entry.isIntersecting) { if (!tip._nfDismissed && tipAuto.matches) tip._nfTimer = setTimeout(() => setTip(tip, true), 400); }
       else { tip._nfDismissed = false; setTip(tip, false); }   // leaving the band resets a dismissal
     });
   }, { rootMargin: '-25% 0px -25% 0px' });
