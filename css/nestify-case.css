@@ -415,7 +415,8 @@ video.nestify-display {
 .nestify-duo .nestify-phone { width: 100%; max-width: none; }
 /* the device sits from 3.8% to 81% of its video's height; at 1.25× the phone, lift it 2.5% to centre it on the phone */
 @media (min-width: 601px) {
-  .nestify-duo .nestify-device { transform: translateY(-2.5%); }
+  .nestify-duo .nestify-device { transform: translate(-5%, -2.5%); }   /* and a little to the left: the turned display reads off-centre otherwise */
+  .nestify-duo .case-media-group__item:first-child figcaption { transform: translateX(-5%); }   /* its caption moves with it */
 }
 
 @media (max-width: 600px) {
