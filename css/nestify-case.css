@@ -613,6 +613,7 @@ html:not(.nf-js) .nestify-handoff__add::after,
   .nestify-handoff__stage { width: 55%; }
   .nestify-handoff__callout i { width: 24px; }
   .nestify-handoff__callout--ai span { white-space: normal; width: 7em; }
+  .nestify-handoff__callout--add span { white-space: normal; width: 6.5em; }   /* "Manual input / removed" */
 }
 
 /* ---------- Designing with AI ---------- */
