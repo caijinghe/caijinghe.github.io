@@ -245,4 +245,11 @@
     loadObserver.observe(video);
     playObserver.observe(video);
   });
+
+  // the app tour starts over on a click, or when the pointer comes onto it
+  document.querySelectorAll('video[data-nf-replay]').forEach(video => {
+    const replay = () => { video.currentTime = 0; video.play().catch(() => {}); };
+    video.addEventListener('click', replay);
+    video.addEventListener('mouseenter', e => { if (e.pointerType !== 'touch' && matchMedia('(hover: hover)').matches) replay(); });
+  });
 })();
